@@ -1,70 +1,102 @@
 # Context Pack
 
-## 目的
+Context Pack は、AI が現在タスクを進めるために必要な情報だけをまとめた一時パケットです。
 
-Context Pack は、AI が1つの作業を行うために必要な情報だけをまとめた小さな入力単位です。
+固定された巨大文書ではなく、原典から必要部分だけ再構築します。
 
-固定された巨大ファイルを維持するものではなく、タスクごとに必要な情報を選別して組み立てます。
-
-## 標準構成
-
-最小限の標準項目は次の通りです。
+## 最小構成
 
 ```text
-Context Pack
-├─ Task
-├─ Project Context
-├─ Changes / Working Set
-├─ Required Constraints
-├─ Relevant Architecture
-├─ Required References
-└─ 必要な場合のみ Source Excerpts
+Task
+Out of Scope
+Working Set
+Required Constraints
+Routed References
+Validation
+Change Summary
+Exploration Status
 ```
 
 標準テンプレートは `templates/CONTEXT_PACK.md` を参照してください。
 
-## 必須と任意を分離する
+## 最優先項目
 
-Context Pack はプロジェクトや作業内容によって必要情報が大きく変わるため、厳密な固定スキーマにはしません。
+Task では最初に次を揃えます。
 
-標準項目は共通の入口として維持し、必要に応じて `Optional Extensions` を追加します。
+- Goal
+- Required
+- Acceptance
 
-これにより、実際のプロジェクトで有効だった手法を後から共通方針へ逆輸入できます。
+さらに対象source / tests と Out of Scope が分かれば、探索停止条件として使えます。
 
-例:
+## Working Set
 
-- 性能計測情報
-- テスト対象
-- 実行環境
-- 依存関係メモ
-- Git差分要約
-- AI間の引き継ぎ情報
-- プロジェクト固有の解析結果
+可能なら changed files だけでなく changed symbols まで絞ります。
+
+読む順序は原則として次です。
+
+```text
+target source
+  -> matching tests
+  -> direct dependencies
+  -> detailed docs only if needed
+```
+
+## Validation
+
+すべての検証項目を埋める必要はありません。
+
+変更種別に応じて smallest sufficient evidence を選び、未確認領域は `Unverified areas` として明示します。
+
+`0 tests`、空走査、対象外のみの検査は成功根拠にしません。
+
+## Optional Extensions
+
+必要な場合だけ追加します。
+
+- Current State reference
+- Remote Delta
+- Policy Context / active exception
+- Relevant Architecture
+- headless / deterministic / visual validation
+- disposable workspace
+- structured runtime observation
+- artifact validation
+- performance measurement
+- Source Excerpts
+
+プロジェクト固有の項目も、Coreを壊さない範囲で追加できます。
+
+## Split Packet
+
+長くなる場合は1ファイルへ詰め込まず、再生成可能な小さい構成要素へ分離できます。
+
+```text
+task.md
+files.txt
+symbols.txt
+constraints.md
+diff.patch
+```
+
+名前や配置は標準ではありません。
 
 ## Source of Truth ではない
 
-Context Pack は作業用のスナップショットです。
+Context Pack は作業用スナップショットです。
 
-長期保存すべき設計判断・仕様・未完了作業などは、正式な設計文書、Issue、ソースコードなどへ反映します。
+長期保存する設計判断・仕様・未完了作業は、正式な docs、Issue、source、tests 等へ反映します。
 
-Context Pack 自体を何世代も継ぎ足し続ける運用は避けます。必要なら現在の原典から再構築します。
+古い Context Pack を何世代も継ぎ足したり、再要約して原典から離れたりしません。
 
-## 更新方針
+## 判断原則
 
-この標準は実運用から改善します。
+Context Pack 自体が大きくなった場合は、まず情報を追加するのではなく削れる項目を確認します。
 
-各プロジェクトで有効だった手法は、次の基準で共通仕様へ取り込みます。
+```text
+current task に必要か?
+  yes -> keep
+  no  -> omit / reference only
+```
 
-- 他プロジェクトでも再利用できるか
-- コンテキスト削減に実際に寄与するか
-- 正確性を落とさないか
-- 導入コストを増やしすぎないか
-- 特定AIや特定言語だけへの不要な依存がないか
-
-実験的・プロジェクト固有の手法は、最初から標準必須項目にはせず拡張として扱います。
-
-## 互換性
-
-将来項目を追加するときは、既存の最小構成を可能な限り維持します。
-
-標準仕様を大きく変更する必要がある場合も、古い Context Pack を読めなくするより、追加項目・任意項目として段階的に拡張することを優先します。
+正確性を保ったまま、今回の判断に必要な情報だけを入れることを優先します。
