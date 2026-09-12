@@ -47,12 +47,14 @@ AI には次のように依頼できます。
 - Remote Delta First による作業開始時の状態同期
 - Source Structure Index によるコード全体走査の削減
 - Search-first / Read-second と探索停止条件
+- Change Routing Map による source / tests / docs の直接ルーティング
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
 - Task Capsule と metadata-driven document routing
 - Acceptance-first task packet と changed-symbol routing
 - compact change summary / validation result を使った変更確認
-- 未確認領域を明示した限定的 validation
+- targeted tests と未確認領域を明示した限定的 validation
+- 再実行可能なデータ変換と dry-run
 - 各プロジェクトへの導入方法
 - 実運用からの手法の逆輸入・標準化
 - 必要に応じた補助ツールの設計・実装
@@ -64,6 +66,7 @@ AI には次のように依頼できます。
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
 - Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
 - Exploration Control / Stop Conditions: [`docs/exploration-control.md`](docs/exploration-control.md)
+- Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
@@ -86,6 +89,7 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 
 - `kadoka_code_atlas`: Source Structure Index、共通 IR、call graph、bounded traversal
 - `comfyUI_support_tools`: Search-first / Read-second、優先Issue選択、Acceptance 抽出、分割 Context Packet、bounded diff、探索停止条件
+- `kadocacio`: 変更対象 → source → targeted tests の対応表、巨大仕様書の見出し検索、重要 invariant、dry-run 付き再実行可能変換、簡潔な最終報告
 
 これらがなくても各標準は成立します。
 
