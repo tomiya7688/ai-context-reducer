@@ -56,6 +56,7 @@ AI には次のように依頼できます。
 - Validation Routing による変更種別ごとの evidence 選択
 - evidence validity check による空検査・0件検査の排除
 - source と生成成果物を分けた artifact-boundary validation
+- canonical template + variables による定型文生成と generated diff 中心の確認
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
 - Task Capsule と metadata-driven document routing
@@ -79,6 +80,7 @@ AI には次のように依頼できます。
 - Validation Routing: [`docs/validation-routing.md`](docs/validation-routing.md)
 - Responsibility Map / Policy Check: [`docs/responsibility-map.md`](docs/responsibility-map.md)
 - Policy Routing / Rule Strength: [`docs/policy-routing.md`](docs/policy-routing.md)
+- Boilerplate Generation / Canonical Templates: [`docs/boilerplate-generation.md`](docs/boilerplate-generation.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
@@ -107,8 +109,15 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 - `obake-no-sumika`: 変更種別ごとの Validation Routing、固定 seed / bounded runtime、structured evaluation log、必要な場合だけ visual confirmation
 - `upd-commander-base-design`: 説明文書と規定文書の分離、Required / Recommended の区別、確定違反と warning の分離、規約例外の reason / scope / mitigation 記録、言語別 checker adapter
 - `kadoka_tetris_ai`: 0件検査を成功扱いしない evidence validity、配布物を直接確認する artifact smoke、常時配布可能性を品質境界として扱う運用
+- `Obake_Lisense`: versioned license document と短い利用案内の分離、定型文を canonical template + variables として扱うための参考例
 
 これらがなくても各標準は成立します。
+
+## 将来の共通ツール候補
+
+文書中心の方針は維持しつつ、繰り返し処理を AI のコンテキスト外へ移せるものは `tools/<tool-name>/script/` 配下へ共通化できます。
+
+候補として、ライセンス・著作権表記・定型通知などを承認済み template から生成する `boilerplate-generator` を検討できます。生成ツールは法的条件を独自判断せず、template 選択、変数展開、dry-run、placeholder 検査、generated diff、version metadata などを担当する想定です。
 
 ## 想定用途
 
