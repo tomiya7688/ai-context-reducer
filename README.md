@@ -20,6 +20,10 @@ AI / Codex を利用した開発で、必要以上にコンテキストを消費
 
 また、要約は原典の代替ではなく **索引** として扱います。判断に必要な場合は、必ず元のコード・文書へ戻れる構造を維持します。
 
+もう一つ重要なのは、必要情報が揃った後も探索を続けないことです。
+
+> Goal / Required / Acceptance が実装可能な粒度まで揃ったら、追加探索を止める。
+
 ## 最短導入
 
 別プロジェクトへ導入する場合は、まずこのリポジトリの README と `templates/AI_CONTEXT.md` だけを入口として使います。
@@ -42,10 +46,13 @@ AI には次のように依頼できます。
 - Git 差分を中心とした作業フロー
 - Remote Delta First による作業開始時の状態同期
 - Source Structure Index によるコード全体走査の削減
+- Search-first / Read-second と探索停止条件
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
 - Task Capsule と metadata-driven document routing
+- Acceptance-first task packet と changed-symbol routing
 - compact change summary / validation result を使った変更確認
+- 未確認領域を明示した限定的 validation
 - 各プロジェクトへの導入方法
 - 実運用からの手法の逆輸入・標準化
 - 必要に応じた補助ツールの設計・実装
@@ -56,6 +63,7 @@ AI には次のように依頼できます。
 - 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
 - Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
+- Exploration Control / Stop Conditions: [`docs/exploration-control.md`](docs/exploration-control.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
@@ -74,7 +82,12 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 - 実装例として外部リポジトリを紹介・参照することは許容する
 - 外部側の変更を自動的に標準へ追従させず、必要な手法だけ改めて評価して取り込む
 
-たとえば Source Structure Index には `kadoka_code_atlas` という実装例があります。Code Atlas は共通 IR、call graph、bounded traversal など、この標準で扱う考え方を実際に実装している参考例として利用できます。ただし、Code Atlas がなくても Source Structure Index の標準自体は成立します。
+実装例:
+
+- `kadoka_code_atlas`: Source Structure Index、共通 IR、call graph、bounded traversal
+- `comfyUI_support_tools`: Search-first / Read-second、優先Issue選択、Acceptance 抽出、分割 Context Packet、bounded diff、探索停止条件
+
+これらがなくても各標準は成立します。
 
 ## 想定用途
 
