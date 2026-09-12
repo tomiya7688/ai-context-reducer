@@ -11,6 +11,15 @@
 - Priority:
 - Labels / Type:
 
+## Explicitly Deferred / Out of Scope
+今回やらないことを必要に応じて明示する。
+
+- Deferred behavior:
+- Out-of-scope modules:
+- Future work reference:
+
+非対象範囲を探索・実装の境界として扱い、現在タスクの完了に不要なら読まない・変更しない。
+
 ## Compact Summary
 Issue や依頼文をそのまま大量転載せず、今回の作業に必要な要点だけを短くまとめる。
 
@@ -62,6 +71,7 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 - Required constraints known: yes / no
 - Acceptance known: yes / no
 - Target source/tests identified: yes / no
+- Deferred scope known: yes / no
 
 すべて十分なら追加探索を止め、必要な実装・検証だけへ進む。
 
@@ -118,7 +128,8 @@ diff.patch
 
 ## Rules
 - Search first, read second。検索・索引・changed files で候補を絞ってから全文を読む。
-- Goal / Required / Acceptance が実装可能な粒度まで揃ったら探索を止める。
+- Goal / Required / Acceptance と非対象範囲が実装可能な粒度まで揃ったら探索を止める。
+- 明示的に deferred / out of scope とされた挙動や領域へ、現在タスクに必要でない限り探索・変更を広げない。
 - リポジトリ全体、全 Issue、全 docs を無条件に含めない。
 - roadmap / backlog / index など非実装タスクを現在タスク候補から除外できる場合は除外する。
 - remote 変更確認では compact delta を先に使い、必要な changed files だけ読む。
@@ -130,6 +141,7 @@ diff.patch
 - 要約だけで判断できない場合は原典を参照する。
 - 状態や前提が曖昧な場合は推測で埋めず、原典確認へ戻る。
 - unrelated refactor を混ぜない。
+- 性能最適化は、対象の正しさを検証するテストや契約がない段階では現在タスクへ混ぜない。
 - 古い Context Pack を原典として扱わない。
 - 作業終了後に長期保存すべき内容は正式な設計文書・Issue・コードへ反映する。
 - このテンプレートは拡張可能とし、標準項目を壊さない範囲でプロジェクト固有項目を追加してよい。
