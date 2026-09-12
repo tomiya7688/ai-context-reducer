@@ -77,11 +77,18 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 
 ## Validation / Completion Gates
 - Build:
-- Tests:
-- Generated docs / consistency:
+- Targeted tests:
+- Deterministic runtime / smoke:
+- Structured evaluation log:
+- Visual / interactive confirmation:
+- Generated docs / data consistency:
+- Performance measurement:
 - Other checks:
 - Unverified areas:
 
+変更の性質に合う evidence だけを選ぶ。すべてを常時実行しない。
+ランダム性や時間依存がある場合は、可能なら seed / input / timestep / frame count などを固定する。
+UI・描画・レイアウトの正しさが Acceptance に含まれる場合は、テスト成功だけで断定せず visual confirmation を使う。
 成功時は結果だけを残す。失敗時のみ必要なログ範囲を追加する。
 未確認領域は隠さず明示する。
 
@@ -142,6 +149,8 @@ diff.patch
 - 状態や前提が曖昧な場合は推測で埋めず、原典確認へ戻る。
 - unrelated refactor を混ぜない。
 - 性能最適化は、対象の正しさを検証するテストや契約がない段階では現在タスクへ混ぜない。
+- validation は変更種別に応じて smallest sufficient evidence を選び、不要な全検証・大量ログを避ける。
+- テストで確認できない UI / visual / runtime behavior を推測で補完しない。
 - 古い Context Pack を原典として扱わない。
 - 作業終了後に長期保存すべき内容は正式な設計文書・Issue・コードへ反映する。
 - このテンプレートは拡張可能とし、標準項目を壊さない範囲でプロジェクト固有項目を追加してよい。
