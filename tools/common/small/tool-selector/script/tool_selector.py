@@ -36,18 +36,22 @@ def detect_types(paths):
 
 
 def recommend(size, languages, project_types, docs, tests, has_git):
-    rec = ['common/small/repo-profile', 'common/small/tool-selector']
+    rec = ['common/small/analyze-and-recommend', 'common/small/repo-profile', 'common/small/source-of-truth-candidates']
     cond = ['common/small/doc-index'] if docs else []
     if has_git:
         rec.append('common/medium/compact-diff')
-        cond.extend(['common/medium/change-router', 'common/medium/context-pack-builder'])
+        cond.extend(['common/medium/remote-delta', 'common/medium/change-router', 'common/medium/context-pack-builder'])
     if tests:
-        cond.append('common/medium/validation-plan')
+        cond.extend(['common/medium/validation-plan', 'common/medium/compact-log'])
+    if docs:
+        cond.extend(['common/medium/acceptance-extractor', 'common/medium/exploration-stop-check'])
     if size in {'medium', 'large'}:
         rec.append('common/medium/change-router')
-        cond.append('common/large/hotspot-report')
+        cond.extend(['common/medium/responsibility-candidates', 'common/medium/doc-duplicate-hints', 'common/large/hotspot-report'])
     if size == 'large':
-        rec.extend(['common/large/context-manifest', 'common/large/target-slice'])
+        rec.extend(['common/large/context-manifest', 'common/large/target-slice', 'common/large/context-budget'])
+    if 'rule-heavy' in project_types:
+        cond.append('common/medium/policy-index')
     for lang, _ in languages[:3]:
         if lang not in {'other', 'rust', 'javascript', 'typescript', 'java'}:
             rec.append(f'{lang}/small')
@@ -61,7 +65,7 @@ def recommend(size, languages, project_types, docs, tests, has_git):
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Recommend ai-context-reducer tools for a repository.')
+    ap = argparse.ArgumentParser(description='Low-level tool selector. Prefer analyze-and-recommend for normal adoption.')
     ap.add_argument('root', nargs='?', default='.')
     ap.add_argument('--json', action='store_true')
     args = ap.parse_args()
