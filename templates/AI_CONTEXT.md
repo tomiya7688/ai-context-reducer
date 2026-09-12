@@ -78,6 +78,15 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 
 必要に応じて「対象 source -> matching tests -> 詳細 docs」のように読む順番も指定する。
 
+## Change Routing Map
+変更カテゴリから最初に読む実装・先に走らせるテスト・必要時だけ読む資料を直接引ける場合に使う。
+
+例:
+- `UI` -> `src/app/...` -> `tests/test_app_...` -> `docs/ui.md`
+- `save` -> `src/data/...` -> `tests/test_save_...` -> `docs/data.md`
+
+巨大な README / SPEC / 設計文書は、最初から全文を読まず見出し・キーワード検索で対象節を特定してから読む。
+
 ## Information Responsibilities
 同じ詳細情報を複数箇所へ重複させないため、情報源の役割を必要に応じて指定する。
 
@@ -101,8 +110,12 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 - unrelated historical files
 - unrelated issues
 - unrelated docs
+- runtime saves
+- evaluation outputs
+- backups
+- reference-only datasets
 
-生成物は、その生成物自体や生成ロジックが作業対象の場合だけ読むことを基本とする。
+生成物・実測出力・セーブ・バックアップ類は、その対象自体が作業対象の場合だけ読むことを基本とする。
 
 ## Current Work
 - Task:
@@ -112,15 +125,20 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 ## Important Constraints
 今回の判断に必要な重要制約だけを書く。詳細規約は別文書へ置く。
 
+必要に応じて、変更で破ってはいけない既知の invariant を短く列挙する。
+
 ## Validation
 作業完了前に実行すべき標準検証がある場合だけ書く。
 
+- Targeted tests:
 - Build:
-- Tests:
+- Full / standard tests:
 - Generated docs / consistency:
+- Reproducibility conditions:
 - Other checks:
 - Unverified areas:
 
+小変更では targeted tests を先に実行し、完了前に標準検証へ進む。
 成功時は結果だけを保持し、失敗時のみ必要なログを追加する。
 未確認領域が残る場合は、全体を追加走査する代わりに明示して引き継ぐ。
 
@@ -144,10 +162,12 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 - Current Task Context がある場合は最初に読む。
 - Current State は現在の能力と制約の把握に使い、詳細仕様の代替にしない。
 - タスクのメタデータから必要資料を絞れる場合は Task Routing を使う。
-- 実装タスクでは、対象 source と matching tests を先に読む方式を選べる。
+- Change Routing Map がある場合は対象 source と matching tests を先に特定する。
+- 大きな文書は全文読み込みより対象見出し検索を先に使う。
 - 変更確認では、まず changed files、diff stat、commit summary、validation result を見る。
 - full diff は実装・レビュー・問題調査に必要な場合だけ読む。
 - generated artifacts は必要な場合だけ読む。
+- 大量データ変換は再実行可能な手段と dry-run を優先する。
 - 必要な周辺情報だけ追加取得する。
 - 要約だけで判断できない場合は原典を確認する。
 - 状態や前提が曖昧な場合は推測で補完せず、追加の原典確認へ進む。
