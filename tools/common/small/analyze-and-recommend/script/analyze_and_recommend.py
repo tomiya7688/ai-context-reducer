@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import platform
 import shutil
 import subprocess
 from collections import Counter
@@ -35,6 +36,23 @@ def git(root, *args):
         return ''
 
 
+def implementation_plan(repo_root):
+    system = platform.system().lower()
+    arch = platform.machine().lower()
+    native_name = 'acr-toolbox.exe' if system == 'windows' else 'acr-toolbox'
+    candidates = [
+        repo_root / 'tools' / 'bin' / native_name,
+        Path(__file__).resolve().parents[4] / 'bin' / native_name,
+    ]
+    native = next((str(p) for p in candidates if p.exists()), None)
+    python_available = shutil.which('python3') or shutil.which('python')
+    preferred = 'native' if native else 'python' if python_available else 'prebuilt-native-required'
+    unused = []
+    if preferred == 'native': unused.append('python runtime is optional for deployed common tools')
+    if preferred == 'python': unused.append('native binary is optional but recommended for Python-free hosts')
+    return {'os': system, 'arch': arch, 'preferred': preferred, 'native_binary': native, 'python': python_available, 'unused_variants': unused}
+
+
 def main():
     ap = argparse.ArgumentParser(description='Analyze a repo and recommend ai-context-reducer techniques/tools.')
     ap.add_argument('root', nargs='?', default='.')
@@ -49,12 +67,13 @@ def main():
     docs = [p for p in paths if p.suffix.lower() in {'.md','.rst','.txt'}]
     tests = [p for p in paths if 'test' in p.name.lower() or any(x.lower() in {'test','tests'} for x in p.parts)]
     large_files = sum(1 for p in paths if p.stat().st_size >= 100_000)
-    has_git = (root / '.git').exists()
+    has_git = (root / '.git').exists() and bool(shutil.which('git'))
     dirty = bool(git(root,'status','--porcelain')) if has_git else False
     external = [x for x in EXTERNAL if shutil.which(x)]
+    runtime_plan = implementation_plan(root)
 
     techniques = ['AI_CONTEXT minimum core','Search-first / Read-second','Exploration stop condition','Source of Truth','Targeted validation']
-    tools = ['common/small/doc-index','common/small/file-role-map']
+    tools = ['common/small/doc-index','common/small/file-role-map','common/small/environment-plan']
     if has_git:
         techniques += ['Diff-first workflow','Remote Delta First']
         tools += ['common/medium/compact-diff','common/medium/remote-delta','common/medium/change-router']
@@ -72,27 +91,23 @@ def main():
     if 'rule-heavy' in types:
         techniques += ['Policy Routing','Compact checker output']
         tools.append('common/medium/policy-index')
-    if {'game','gui'} & set(types):
-        techniques.append('Headless-first + visual confirmation when required')
-    if 'simulation' in types:
-        techniques.append('Deterministic seam / structured observation')
-    if 'packaged-app' in types:
-        techniques.append('Artifact-boundary validation')
+    if {'game','gui'} & set(types): techniques.append('Headless-first + visual confirmation when required')
+    if 'simulation' in types: techniques.append('Deterministic seam / structured observation')
+    if 'packaged-app' in types: techniques.append('Artifact-boundary validation')
     for lang, _ in langs.most_common(3):
         if lang in {'python','csharp','go','c','cpp','gdscript'}:
             tools.append(f'{lang}/small')
-            if size in {'medium','large'}:
-                tools.append(f'{lang}/medium')
-            if size == 'large':
-                tools.append(f'{lang}/large')
+            if size in {'medium','large'}: tools.append(f'{lang}/medium')
+            if size == 'large': tools.append(f'{lang}/large')
 
     out = {
         'project': root.name, 'size': size, 'files': len(paths), 'docs': len(docs), 'tests': len(tests),
         'large_files_100kb_plus': large_files, 'languages': dict(langs.most_common()), 'project_types': types,
         'git': {'available': has_git, 'dirty': dirty}, 'external_tools_available': external,
+        'runtime_plan': runtime_plan,
         'recommended_techniques': list(dict.fromkeys(techniques)),
         'recommended_tools': list(dict.fromkeys(tools)),
-        'next_step': 'Create/update a minimal AI_CONTEXT.md, then run only the recommended tools needed for the current task.'
+        'next_step': 'Keep only implementations usable in this environment; create/update minimal AI_CONTEXT.md; then run only tools needed for the current task.'
     }
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
@@ -101,10 +116,14 @@ def main():
         print('languages=' + ', '.join(f'{k}:{v}' for k,v in langs.most_common()))
         print('types=' + (', '.join(types) if types else 'unknown'))
         print('external=' + (', '.join(external) if external else 'none detected'))
+        print(f"runtime={runtime_plan['os']}/{runtime_plan['arch']} preferred={runtime_plan['preferred']}")
         print('\nrecommended techniques:')
         for x in out['recommended_techniques']: print('  - ' + x)
         print('\nrecommended tools:')
         for x in out['recommended_tools']: print('  - ' + x)
+        if runtime_plan['unused_variants']:
+            print('\nimplementation notes:')
+            for x in runtime_plan['unused_variants']: print('  - ' + x)
         print('\nnext: ' + out['next_step'])
 
 if __name__ == '__main__':
