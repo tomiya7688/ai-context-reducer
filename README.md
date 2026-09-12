@@ -22,7 +22,7 @@ AI / Codex を利用した開発で、必要以上にコンテキストを消費
 
 もう一つ重要なのは、必要情報が揃った後も探索を続けないことです。
 
-> Goal / Required / Acceptance が実装可能な粒度まで揃ったら、追加探索を止める。
+> Goal / Required / Acceptance と必要な非対象範囲が実装可能な粒度まで揃ったら、追加探索を止める。
 
 ## 最短導入
 
@@ -47,6 +47,7 @@ AI には次のように依頼できます。
 - Remote Delta First による作業開始時の状態同期
 - Source Structure Index によるコード全体走査の削減
 - Search-first / Read-second と探索停止条件
+- Explicit Deferred / Out of Scope による作業境界
 - Change Routing Map による source / tests / docs の直接ルーティング
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
@@ -54,6 +55,7 @@ AI には次のように依頼できます。
 - Acceptance-first task packet と changed-symbol routing
 - compact change summary / validation result を使った変更確認
 - targeted tests と未確認領域を明示した限定的 validation
+- correctness boundary を作ってから必要な最適化へ進む運用
 - 再実行可能なデータ変換と dry-run
 - 各プロジェクトへの導入方法
 - 実運用からの手法の逆輸入・標準化
@@ -90,6 +92,7 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 - `kadoka_code_atlas`: Source Structure Index、共通 IR、call graph、bounded traversal
 - `comfyUI_support_tools`: Search-first / Read-second、優先Issue選択、Acceptance 抽出、分割 Context Packet、bounded diff、探索停止条件
 - `kadocacio`: 変更対象 → source → targeted tests の対応表、巨大仕様書の見出し検索、重要 invariant、dry-run 付き再実行可能変換、簡潔な最終報告
+- `Kadoka-shougi-ai`: narrow task、明示的 deferred behavior、対象 subsystem / acceptance tests の固定、correctness tests 前の先行最適化を避ける運用
 
 これらがなくても各標準は成立します。
 
