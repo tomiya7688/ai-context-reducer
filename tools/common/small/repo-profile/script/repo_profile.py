@@ -4,8 +4,13 @@ import json
 from collections import Counter
 from pathlib import Path
 
-IGNORE = {'.git', '.venv', 'venv', 'node_modules', 'bin', 'obj', 'build', 'dist', '__pycache__'}
-LANG = {'.py':'Python','.cs':'CSharp','.go':'Go','.rs':'Rust','.js':'JavaScript','.ts':'TypeScript','.cpp':'C++','.c':'C','.java':'Java'}
+IGNORE = {'.git', '.venv', 'venv', 'node_modules', 'bin', 'obj', 'build', 'dist', '__pycache__', 'vendor'}
+LANG = {
+    '.py':'Python', '.cs':'CSharp', '.go':'Go', '.gd':'GDScript',
+    '.cpp':'C++', '.cc':'C++', '.cxx':'C++', '.hpp':'C++', '.hh':'C++', '.hxx':'C++',
+    '.c':'C', '.h':'C/C++ Header',
+    '.rs':'Rust', '.js':'JavaScript', '.ts':'TypeScript', '.java':'Java'
+}
 
 
 def walk(root: Path):
