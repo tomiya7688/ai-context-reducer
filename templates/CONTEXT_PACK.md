@@ -99,6 +99,8 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 - Build:
 - Targeted tests:
 - Evidence coverage / count:
+- Headless validation:
+- Disposable validation workspace:
 - Deterministic runtime / smoke:
 - Structured evaluation log:
 - Generated / distribution artifact:
@@ -111,6 +113,8 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 - Unverified areas:
 
 変更の性質に合う evidence だけを選ぶ。すべてを常時実行しない。
+GUI / interactive application でも、visual acceptance が不要なら headless validation を先に使う。
+保存・export・変換など検証用ファイルを生成する場合は、可能なら temporary / disposable workspace を使い作業ツリーへ混ぜない。
 検証コマンドが成功しても、`0 tests`・空走査・対象外のみの検査など、実質的に対象を確認していない場合は成功根拠にしない。
 source tree と最終成果物が異なる場合は、必要に応じて成果物生成後の起動・必須ファイル・初期化などを直接 smoke test する。
 ランダム性や時間依存がある場合は、可能なら seed / input / timestep / frame count などを固定する。
@@ -180,6 +184,8 @@ diff.patch
 - unrelated refactor を混ぜない。
 - 性能最適化は、対象の正しさを検証するテストや契約がない段階では現在タスクへ混ぜない。
 - validation は変更種別に応じて smallest sufficient evidence を選び、不要な全検証・大量ログを避ける。
+- GUI / interactive validation は Acceptance に必要な場合だけ使い、可能なら headless checks を先に使う。
+- 検証用生成物は可能なら disposable workspace へ隔離する。
 - 検証結果は exit code だけでなく、対象を実際に検査した evidence か確認する。
 - source と成果物が異なる場合は、必要なら生成成果物を直接検証する。
 - テストで確認できない UI / visual / runtime behavior を推測で補完しない。
