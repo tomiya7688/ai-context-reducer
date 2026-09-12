@@ -57,22 +57,26 @@ AI には次のように依頼できます。
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
 - Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
-- Source Structure Index / Code Atlas Integration: [`docs/source-structure-index.md`](docs/source-structure-index.md)
+- Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Context Pack テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
-## 外部ツールとの連携
+## 外部プロジェクトの扱い
 
-コード解析・構造抽出については、すべてをこのリポジトリへ実装するのではなく、専用ツールとの連携を優先します。
+Kadoka 系を含む外部リポジトリは、実運用の参考元・実例として扱います。
 
-`kadoka_code_atlas` は、言語固有の AST / parser を共通 IR へ正規化し、call graph や依存関係などを再利用する Source Structure Index の実装候補として扱います。
+- 外部プロジェクトそのものを標準仕様の必須依存にしない
+- 有効な手法だけを抽象化して取り込む
+- 特定ツールの CLI、ファイル形式、ディレクトリ構造を前提にしない
+- 外部プロジェクトが変更・停止・廃止されても、このリポジトリの方針だけで成立するようにする
+- 同等の機能を別のツールやプロジェクト内実装で置き換えられるようにする
 
-`ai-context-reducer` 側は、解析結果そのものの生成よりも、それをどの順番・範囲で AI のコンテキストへ投入するかを標準化します。
+たとえば Source Structure Index の考え方は `kadoka_code_atlas` を参考にしていますが、Code Atlas 自体への依存はありません。利用可能なら参考実装・補助ツールとして使える、という位置付けです。
 
 ## 想定用途
 
 Bitlang、ゲーム開発、AI 関連ツールなど、規模や言語が異なるプロジェクトでも共通利用できる方式を目指します。
 
-このリポジトリでは特定の AI 製品やプログラミング言語だけに依存しない方針を優先します。
+このリポジトリでは特定の AI 製品、プログラミング言語、外部プロジェクトだけに依存しない方針を優先します。
 
 標準仕様は固定物ではありません。実際のプロジェクトで有効だった方法を検証し、共通利用する価値があるものは段階的に取り込みます。ただし、既存の最小構成を壊す変更よりも、任意拡張として追加する方法を優先します。
