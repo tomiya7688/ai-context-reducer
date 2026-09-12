@@ -20,6 +20,18 @@ Issue や依頼文をそのまま大量転載せず、今回の作業に必要�
 
 現在の実装能力・制約を短くまとめた状態文書がある場合は参照だけを置く。詳細仕様を複製しない。
 
+## Remote Delta
+remote 側に別の AI / チャット / 開発者による変更があり得る場合だけ使う。
+
+- Local / remote state:
+- Ahead / behind:
+- Remote commit summary:
+- Relevant changed files:
+- Diff stat:
+- Bounded diff excerpt:
+
+full remote diff は必要な場合だけ読む。自動更新する場合は fast-forward のみに限定し、dirty / diverged 状態では停止する。
+
 ## Routed References
 タスクのラベル・種別・対象モジュールなどから選ばれた資料だけを列挙する。
 
@@ -82,6 +94,7 @@ full diff や長いログは実装・レビュー・問題調査に必要な場�
 
 ## Rules
 - リポジトリ全体、全 Issue、全 docs を無条件に含めない。
+- remote 変更確認では compact delta を先に使い、必要な changed files だけ読む。
 - タスクのメタデータから必要資料をルーティングできる場合はそれを優先する。
 - Issue 本文など長い入力は、原典への参照を残した上で compact summary にする。
 - generated artifacts は作業対象か判断に必要な場合だけ含める。
