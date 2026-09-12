@@ -40,6 +40,7 @@ AI には次のように依頼できます。
 - 情報の優先度・階層化
 - AI が最初に読む Context Map / Index
 - Git 差分を中心とした作業フロー
+- Remote Delta First による作業開始時の状態同期
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
 - Task Capsule と metadata-driven document routing
@@ -54,6 +55,7 @@ AI には次のように依頼できます。
 - 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
 - Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
+- Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Context Pack テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
