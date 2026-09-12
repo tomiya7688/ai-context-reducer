@@ -7,6 +7,7 @@ import (
     "io"
     "io/fs"
     "os"
+    "os/exec"
     "path/filepath"
     "regexp"
     "runtime"
@@ -52,7 +53,7 @@ func walk(root string) ([]fileInfo, error) {
     return out, err
 }
 
-func usage() { fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|env> ...") }
+func usage() { fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|language-env|env> ...") }
 
 func cmdAnalyze(args []string) int {
     root := "."; if len(args) > 0 { root = args[0] }
@@ -239,8 +240,80 @@ func cmdCompactLog(args []string) int {
     return 0
 }
 
+func gitOutput(root string, args ...string) string {
+    all := append([]string{"-C", root}, args...)
+    out, err := exec.Command("git", all...).CombinedOutput()
+    if err != nil { return "" }
+    return strings.TrimSpace(string(out))
+}
+
+func cmdCompactDiff(args []string) int {
+    root, base, head := ".", "HEAD~1", "HEAD"
+    if len(args) > 0 { root = args[0] }
+    if len(args) > 1 { base = args[1] }
+    if len(args) > 2 { head = args[2] }
+    fmt.Println("## commits")
+    if x := gitOutput(root, "log", "--oneline", base+".."+head); x != "" { fmt.Println(x) } else { fmt.Println("(none)") }
+    fmt.Println("\n## changed files")
+    if x := gitOutput(root, "diff", "--name-status", base, head); x != "" { fmt.Println(x) } else { fmt.Println("(none)") }
+    fmt.Println("\n## shortstat")
+    if x := gitOutput(root, "diff", "--shortstat", base, head); x != "" { fmt.Println(x) } else { fmt.Println("(none)") }
+    fmt.Println("\n## bounded diff")
+    lines := strings.Split(gitOutput(root, "diff", "--unified=2", base, head), "\n")
+    if len(lines) == 1 && lines[0] == "" { return 0 }
+    limit := len(lines); if limit > 120 { limit = 120 }
+    for _, line := range lines[:limit] { fmt.Println(line) }
+    if len(lines) > limit { fmt.Printf("... TRUNCATED %d lines; inspect full diff only if needed\n", len(lines)-limit) }
+    return 0
+}
+
+func cmdRemoteDelta(args []string) int {
+    root, base, remote := ".", "HEAD", "origin/HEAD"
+    if len(args) > 0 { root = args[0] }
+    if len(args) > 1 { remote = args[1] }
+    if len(args) > 2 { base = args[2] }
+    dirty := gitOutput(root, "status", "--short") != ""
+    if gitOutput(root, "rev-parse", "--verify", remote) == "" {
+        fmt.Println("remote=unavailable")
+        if dirty { fmt.Println("local_changes=yes") } else { fmt.Println("local_changes=no") }
+        return 0
+    }
+    ahead := gitOutput(root, "rev-list", "--count", remote+".."+base); if ahead == "" { ahead = "0" }
+    behind := gitOutput(root, "rev-list", "--count", base+".."+remote); if behind == "" { behind = "0" }
+    fmt.Printf("ahead=%s behind=%s dirty=%s\n", ahead, behind, map[bool]string{true:"yes", false:"no"}[dirty])
+    if stat := gitOutput(root, "diff", "--shortstat", base, remote); stat != "" { fmt.Println("diff=" + stat) }
+    names := strings.Split(gitOutput(root, "diff", "--name-only", base, remote), "\n")
+    fmt.Println("changed_files:")
+    limit := len(names); if limit > 40 { limit = 40 }
+    for _, n := range names[:limit] { if n != "" { fmt.Println("  " + n) } }
+    if len(names) > limit { fmt.Printf("  ... truncated %d more\n", len(names)-limit) }
+    if commits := gitOutput(root, "log", "--oneline", "--max-count=8", base+".."+remote); commits != "" {
+        fmt.Println("remote_commits:")
+        for _, line := range strings.Split(commits, "\n") { fmt.Println("  " + line) }
+    }
+    return 0
+}
+
+func firstAvailable(names ...string) string {
+    for _, name := range names { if p, err := exec.LookPath(name); err == nil { return p } }
+    return ""
+}
+
+func cmdLanguageEnv() int {
+    env := map[string]any{
+        "python": map[string]any{"available": firstAvailable("python3", "python") != "", "command": firstAvailable("python3", "python")},
+        "csharp": map[string]any{"available": firstAvailable("dotnet") != "", "command": firstAvailable("dotnet")},
+        "go": map[string]any{"available": firstAvailable("go") != "", "command": firstAvailable("go")},
+        "c": map[string]any{"available": firstAvailable("gcc", "clang", "cc") != "", "command": firstAvailable("gcc", "clang", "cc")},
+        "cpp": map[string]any{"available": firstAvailable("g++", "clang++", "c++") != "", "command": firstAvailable("g++", "clang++", "c++")},
+        "gdscript": map[string]any{"available": firstAvailable("godot4", "godot") != "", "command": firstAvailable("godot4", "godot")},
+    }
+    out := map[string]any{"os":runtime.GOOS, "arch":runtime.GOARCH, "languages":env, "policy":"enable language-specific tools only when the matching standard/runtime environment is available; otherwise skip without installing dependencies"}
+    enc := json.NewEncoder(os.Stdout); enc.SetIndent("","  "); enc.Encode(out); return 0
+}
+
 func cmdEnv() int {
-    out := map[string]any{"os":runtime.GOOS, "arch":runtime.GOARCH, "native":true}
+    out := map[string]any{"os":runtime.GOOS, "arch":runtime.GOARCH, "native":true, "git":firstAvailable("git") != "", "python":firstAvailable("python3", "python") != ""}
     enc := json.NewEncoder(os.Stdout); enc.SetIndent("","  "); enc.Encode(out); return 0
 }
 
@@ -256,6 +329,9 @@ func main() {
     case "doc-index": code = cmdDocIndex(os.Args[2:])
     case "slice": code = cmdSlice(os.Args[2:])
     case "compact-log": code = cmdCompactLog(os.Args[2:])
+    case "compact-diff": code = cmdCompactDiff(os.Args[2:])
+    case "remote-delta": code = cmdRemoteDelta(os.Args[2:])
+    case "language-env": code = cmdLanguageEnv()
     case "env": code = cmdEnv()
     default: usage(); code = 2
     }
