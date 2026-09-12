@@ -5,7 +5,8 @@
 
 ## Task
 - Goal:
-- Expected result:
+- Required:
+- Acceptance / completion condition:
 - Issue / Task:
 - Priority:
 - Labels / Type:
@@ -42,6 +43,7 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 
 ## Changes / Working Set
 - Changed files:
+- Changed symbols:
 - Target files:
 - Direct dependencies:
 
@@ -55,13 +57,23 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 
 - 
 
+## Exploration Status
+- Goal understood: yes / no
+- Required constraints known: yes / no
+- Acceptance known: yes / no
+- Target source/tests identified: yes / no
+
+すべて十分なら追加探索を止め、必要な実装・検証だけへ進む。
+
 ## Validation / Completion Gates
 - Build:
 - Tests:
 - Generated docs / consistency:
 - Other checks:
+- Unverified areas:
 
 成功時は結果だけを残す。失敗時のみ必要なログ範囲を追加する。
+未確認領域は隠さず明示する。
 
 ## Change Summary
 変更後の確認では、full diff より先に次を使う。
@@ -83,6 +95,18 @@ full diff や長いログは実装・レビュー・問題調査に必要な場�
 - P3: 参考情報
 - P4: 履歴・補助情報
 
+## Optional Packet Split
+Context Pack が長くなる場合は、1ファイルへ詰め込まず再生成可能な小ファイルへ分離してよい。
+
+例:
+```text
+task.md
+files.txt
+symbols.txt
+constraints.md
+diff.patch
+```
+
 ## Optional Extensions
 - current capabilities / limitations
 - performance notes
@@ -93,14 +117,19 @@ full diff や長いログは実装・レビュー・問題調査に必要な場�
 - project-specific metadata
 
 ## Rules
+- Search first, read second。検索・索引・changed files で候補を絞ってから全文を読む。
+- Goal / Required / Acceptance が実装可能な粒度まで揃ったら探索を止める。
 - リポジトリ全体、全 Issue、全 docs を無条件に含めない。
+- roadmap / backlog / index など非実装タスクを現在タスク候補から除外できる場合は除外する。
 - remote 変更確認では compact delta を先に使い、必要な changed files だけ読む。
 - タスクのメタデータから必要資料をルーティングできる場合はそれを優先する。
 - Issue 本文など長い入力は、原典への参照を残した上で compact summary にする。
+- diff は必要なら上限を設ける。
 - generated artifacts は作業対象か判断に必要な場合だけ含める。
 - 情報源ごとの責務を守り、同じ詳細情報を複数文書へ再掲しない。
 - 要約だけで判断できない場合は原典を参照する。
 - 状態や前提が曖昧な場合は推測で埋めず、原典確認へ戻る。
+- unrelated refactor を混ぜない。
 - 古い Context Pack を原典として扱わない。
 - 作業終了後に長期保存すべき内容は正式な設計文書・Issue・コードへ反映する。
 - このテンプレートは拡張可能とし、標準項目を壊さない範囲でプロジェクト固有項目を追加してよい。
