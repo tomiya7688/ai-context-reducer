@@ -46,6 +46,8 @@ AI には次のように依頼できます。
 - Git 差分を中心とした作業フロー
 - Remote Delta First による作業開始時の状態同期
 - Source Structure Index によるコード全体走査の削減
+- Responsibility Map による file / module 責務の直接ルーティング
+- 機械判定可能な規約を compact checker output へ移す運用
 - Search-first / Read-second と探索停止条件
 - Explicit Deferred / Out of Scope による作業境界
 - Change Routing Map による source / tests / docs の直接ルーティング
@@ -69,6 +71,7 @@ AI には次のように依頼できます。
 - Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
 - Exploration Control / Stop Conditions: [`docs/exploration-control.md`](docs/exploration-control.md)
 - Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
+- Responsibility Map / Policy Check: [`docs/responsibility-map.md`](docs/responsibility-map.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
@@ -93,6 +96,7 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 - `comfyUI_support_tools`: Search-first / Read-second、優先Issue選択、Acceptance 抽出、分割 Context Packet、bounded diff、探索停止条件
 - `kadocacio`: 変更対象 → source → targeted tests の対応表、巨大仕様書の見出し検索、重要 invariant、dry-run 付き再実行可能変換、簡潔な最終報告
 - `Kadoka-shougi-ai`: narrow task、明示的 deferred behavior、対象 subsystem / acceptance tests の固定、correctness tests 前の先行最適化を避ける運用
+- `Bitlang`: Responsibility Map、責務記述を使った肥大化検知、機械判定可能な規約の compact checker output、明示的 scoped exceptions
 
 これらがなくても各標準は成立します。
 
