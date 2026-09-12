@@ -19,7 +19,28 @@ analyze-and-recommend
 
 `tool-selector` はより低レベルな導入候補一覧が欲しい場合に使います。
 
-外部ツールが使える環境では `external-tool-probe` で確認し、自前の簡易解析より既存の高品質ツールを優先できます。
+## Zero-install 方針
+
+OSSとして導入しやすくするため、基本機能は可能な限り Python 標準ライブラリだけで動作させます。
+
+目標:
+
+```text
+必須: Python 3
+推奨: Git
+任意高速化: rg / fd / ctags / ast-grep / tree-sitter / scc / git-sizer / semgrep
+```
+
+外部ツールが無くても Search-first / Read-second を成立させるため、次の軽量fallbackを同梱します。
+
+- `text-search`: ripgrep の代替となる bounded text/regex search
+- `path-find`: fd 相当の bounded path search
+- `tree-view`: tree 相当の bounded repository tree
+- `repo-stats`: scc 相当の簡易 file / line / language stats
+
+これらは外部ツールと同等の速度・機能を目指すものではありません。外部ツールが存在する場合はそちらを高速・高精度 backend として利用し、無い環境では同梱fallbackで最低限の運用を成立させます。
+
+外部ツールの利用可否は `external-tool-probe` で確認できます。
 
 ## 分類
 
@@ -53,8 +74,12 @@ tools/
 | Small | `analyze-and-recommend` | repoを浅く分析し、導入すべき手法とtoolをまとめて推薦 |
 | Small | `tool-selector` | 規模・言語・project typeからtool候補を選択 |
 | Small | `repo-profile` | repo規模・主要言語・主要ディレクトリ |
+| Small | `repo-stats` | dependency-freeなfile / line / language統計 |
 | Small | `project-type-profile` | game / gui / compiler / data-tool 等を推定 |
 | Small | `external-tool-probe` | rg / fd / ctags / ast-grep 等の利用可否を確認 |
+| Small | `text-search` | dependency-free bounded text / regex search |
+| Small | `path-find` | dependency-free bounded path search |
+| Small | `tree-view` | dependency-free bounded repository tree |
 | Small | `doc-index` | Markdown見出しをcompact index化。Search-first / heading-first |
 | Small | `file-role-map` | source / tests / docs / generated / asset 等へ分類 |
 | Small | `source-of-truth-candidates` | 正式資料候補をファイル名から列挙。権威性は推測しない |
@@ -90,7 +115,8 @@ tools/
 
 ```text
 Search-first / Read-second
-  -> doc-index / target-slice / external rg/fd
+  -> text-search / path-find / tree-view / doc-index / target-slice
+  -> availableなら rg / fd を高速backendとして利用
 
 Exploration Stop Condition
   -> acceptance-extractor / exploration-stop-check
@@ -147,6 +173,7 @@ analyze-and-recommend
 
 external-tool-probe
   -> 高品質な既存toolがあれば優先
+  -> 無ければ同梱fallback
 
 Small tools
   -> current taskに必要なら Medium
@@ -176,7 +203,7 @@ Small tools
 - full source / full logs / full docs を再出力しない。
 - 大規模 repo では bounded / truncated output を明示する。
 - 解析結果は索引であり、判断に必要なら原典へ戻る。
-- optional dependency を増やしすぎず、可能な限り標準ライブラリで動かす。
+- optional dependency を増やしすぎず、基本機能は標準ライブラリで動かす。
 - 正規表現ベースの解析は完全な parser の代替ではない。
 - 高品質な外部toolが既にある場合は、軽量fallbackを維持しつつ外部toolを優先してよい。
 - toolの導入・維持コストが削減効果を上回る場合は導入しない。
