@@ -61,6 +61,26 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 
 - 
 
+## Policy Context
+現在タスクに適用される規約だけを強さ付きで記載する。
+
+- Required rules:
+- Recommended rules:
+- Advisory / review targets:
+- Checker result:
+
+### Active Exceptions
+規約例外がある場合だけ記載する。
+
+- Rule:
+- Reason:
+- Scope:
+- Mitigation / alternative:
+- Removal condition / review:
+- Source of truth:
+
+確定違反と警告候補を混同しない。規約全文は必要な場合だけ原典を読む。
+
 ## Relevant Architecture
 今回必要な構造だけを短く記載する。
 
@@ -83,12 +103,14 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 - Visual / interactive confirmation:
 - Generated docs / data consistency:
 - Performance measurement:
+- Policy checks:
 - Other checks:
 - Unverified areas:
 
 変更の性質に合う evidence だけを選ぶ。すべてを常時実行しない。
 ランダム性や時間依存がある場合は、可能なら seed / input / timestep / frame count などを固定する。
 UI・描画・レイアウトの正しさが Acceptance に含まれる場合は、テスト成功だけで断定せず visual confirmation を使う。
+Policy checker は confirmed violation と warning / review candidate を分けて扱う。
 成功時は結果だけを残す。失敗時のみ必要なログ範囲を追加する。
 未確認領域は隠さず明示する。
 
@@ -142,6 +164,9 @@ diff.patch
 - remote 変更確認では compact delta を先に使い、必要な changed files だけ読む。
 - タスクのメタデータから必要資料をルーティングできる場合はそれを優先する。
 - Issue 本文など長い入力は、原典への参照を残した上で compact summary にする。
+- 規約は Required / Recommended / Advisory を区別し、現在タスクに適用されるものだけ入れる。
+- checker の confirmed violation と warning / review candidate を分離する。
+- 規約例外は reason / scope / mitigation / removal condition を最小限に記録する。
 - diff は必要なら上限を設ける。
 - generated artifacts は作業対象か判断に必要な場合だけ含める。
 - 情報源ごとの責務を守り、同じ詳細情報を複数文書へ再掲しない。
