@@ -1,8 +1,8 @@
-# Source Structure Index / Code Atlas Integration
+# Source Structure Index
 
 この文書は、ソースコード全文を読む前に、構造化された解析結果を使って必要箇所へ到達するための標準方針を定義します。
 
-`kadoka_code_atlas` の設計・実装から、言語固有の構文解析結果を共通中間表現へ正規化し、その結果を複数の解析・可視化・評価処理で再利用する考え方を取り込みます。
+この考え方は `kadoka_code_atlas` など外部プロジェクトの設計・実装を参考にしていますが、AI Context Reducer は特定の外部ツールや外部リポジトリへ依存しません。外部プロジェクトは実例・参考元として扱い、標準へ取り込むのは再利用可能な手法だけです。
 
 ## 1. Source Structure Index
 
@@ -43,7 +43,7 @@ Context Routing / Diagram / Evaluation
 
 AI Context Reducer 自体が全言語パーサを抱える必要はありません。
 
-解析基盤は外部ツールへ任せ、標準側では「どのような構造情報を Context Routing に利用するか」を定義します。
+解析方法はプロジェクト内ツール、別ツール、IDE、静的解析器など何を使っても構いません。標準側では「どのような構造情報を Context Routing に利用するか」だけを定義します。
 
 ## 3. 解析結果を再利用する
 
@@ -121,19 +121,17 @@ LLM に推測させる必要がない情報を毎回 AI に再解析させない
 
 LLM 補助解析を使う場合は、決定論的解析結果と区別します。
 
-## 9. Kadoka Code Atlas の位置付け
+## 9. 外部ツール・外部プロジェクトの扱い
 
-`kadoka_code_atlas` は、この Source Structure Index を実現する外部ツール候補として扱います。
+外部リポジトリは参考実装として扱います。
 
-AI Context Reducer にコードを複製して統合することは現時点では行いません。
+- 標準仕様の必須依存にしない
+- 特定ツールのファイル形式や CLI を前提にしない
+- 外部ツールが停止・変更・廃止されても標準が成立するようにする
+- 有効な手法は抽象化して文書化する
+- 必要なら同等機能を別実装へ置き換えられるようにする
 
-理由:
-
-- `ai-context-reducer` は文書・標準設計を中心とする
-- コード解析ツールは独立して進化できる方がよい
-- 対応言語や解析機能の更新を一箇所へ閉じ込められる
-
-将来的には、Kadoka Code Atlas が生成する共通 IR / call graph / dependency data を Context Pack や Task Routing へ入力する連携を想定します。
+`kadoka_code_atlas` は Source Structure Index、共通 IR、call graph、bounded traversal などの参考元の一つです。利用できる場合に補助ツールとして使うことはできますが、AI Context Reducer の標準ワークフロー成立条件には含めません。
 
 ## 10. 標準推奨
 
@@ -144,3 +142,4 @@ AI Context Reducer にコードを複製して統合することは現時点で�
 - fan-in / fan-out / cycle を読む優先順位の補助情報として使う
 - generated diagrams を原典や IR の代替にしない
 - 機械取得可能な情報は deterministic analysis を優先する
+- 外部ツールを使う場合も標準仕様自体はそのツールに依存させない
