@@ -42,6 +42,8 @@ AI には次のように依頼できます。
 - Git 差分を中心とした作業フロー
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
+- Task Capsule と metadata-driven document routing
+- compact change summary / validation result を使った変更確認
 - 各プロジェクトへの導入方法
 - 実運用からの手法の逆輸入・標準化
 - 必要に応じた補助ツールの設計・実装
@@ -51,6 +53,7 @@ AI には次のように依頼できます。
 - 基本方針: [`docs/guide.md`](docs/guide.md)
 - 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
+- Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Context Pack テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
