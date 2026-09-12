@@ -1,277 +1,170 @@
 # AI Context Reducer - 基本説明書
 
-## 1. 概要
+## 1. 目的
 
-`ai-context-reducer` は、AI / Codex を利用した開発で発生するコンテキスト消費を抑えながら、必要な設計情報・実装情報へ正確に到達できるようにするための共通設計です。
+`ai-context-reducer` は、AIが毎回リポジトリ全体を読み直さず、必要な情報へ短い経路で到達するための共通方針です。
 
-目的は単純な「文字数削減」ではありません。
-
-重要なのは、AI が作業のたびに大量のコード・文書・履歴を読み直す状態を避け、必要な情報だけを段階的に取得できるようにすることです。
-
----
-
-## 2. 最上位原則
-
-### 2.1 必要情報を先に選別する
-
-AI に大量の情報を渡してから必要部分を探させるのではなく、AI に渡す前に必要情報を選別します。
-
-基本形は次の通りです。
+優先順位:
 
 ```text
-プロジェクト全体
-    ↓
-索引・Context Map
-    ↓
-現在の作業対象
-    ↓
-直接関係する依存情報
-    ↓
-必要になった場合のみ原典
+正確性 > 作業対象への到達速度 > コンテキスト削減量 > 自動化の多さ
 ```
 
-### 2.2 要約は原典の代替にしない
+## 2. 基本原則
 
-要約・圧縮情報だけを繰り返し参照すると、重要な条件や例外が失われる可能性があります。
+### Search first, read second
 
-そのため、要約は「原典へ到達するための索引」として扱います。
+検索、索引、changed files、task metadata で候補を絞ってから原典を読みます。
 
-判断に必要な場合は、元のコード・文書・Git 差分へ戻れる状態を維持します。
+### 要約は索引
 
-### 2.3 正確性を圧縮率より優先する
+要約、Current State、Context Pack、構造索引は source of truth の代替ではありません。必要なら source / tests / docs / diff へ戻ります。
 
-削減率を高めるために重要情報を削除してはいけません。
+### 探索停止条件
+
+次が実装可能な粒度で揃ったら広い探索を止めます。
+
+- Goal
+- Required constraints
+- Acceptance
+- Working set
+
+実装・検証中に具体的な不明点が出た場合だけ探索を再開します。
+
+### unrelated work を混ぜない
+
+現在タスクと無関係な refactor、legacy cleanup、将来作業を混ぜません。
+
+## 3. 情報源の役割
 
 ```text
-正確性 > 可読性 > 圧縮率
+README -> 人間向け概要
+AI_CONTEXT / agent guide -> AI向けrouting/index
+Current State -> 現在の能力・制約
+Detailed docs -> contracts / specification
+Issues / tasks -> requirement / priority
+Source / tests -> implementation / executable truth
+Generated artifacts -> 必要な場合だけ参照
 ```
 
-を基本優先順位とします。
+同じ詳細を複数箇所へコピーしないことを推奨します。
 
-### 2.4 導入コストも小さくする
+## 4. 最小コア
 
-コンテキスト削減方針そのものを導入するために、大量のコンテキストを消費してはいけません。
+ほぼ全プロジェクトで使うのは次です。
 
-利用者は、ChatGPT / Codex / Claude など任意の AI に対して、このリポジトリの入口となる短い文書と必要なテンプレートだけを読ませることで導入を開始できることを目標とします。
+- 小さいAI入口
+- Search first, read second
+- Source of Truth
+- exploration stop condition
+- targeted validation
+- Unverified areas
+- generated output / logs / history の通常除外
 
-理想的には、短期間の会話コンテキスト内で次を完了できる構成にします。
+小規模repoではこれだけで終了して構いません。
+
+## 5. 条件付きで追加するもの
+
+必要な場合だけ追加します。
+
+- Current State
+- Task Routing
+- Change Routing Map
+- Responsibility Map
+- Remote Delta First
+- Source Structure Index
+- changed-symbol routing
+- Validation Routing
+- Policy Routing / compact checker
+- headless-first validation
+- disposable validation workspace
+- deterministic seam
+- artifact validation
+- Boilerplate Generation
+
+導入優先度と対象プロジェクトの目安は [`adoption-priority.md`](adoption-priority.md) を参照してください。
+
+## 6. Context Pack
+
+現在タスク用の一時パケットです。
+
+最小構成:
 
 ```text
-README を読む
-    ↓
-基本方針を理解する
-    ↓
-AI_CONTEXT.md を生成する
-    ↓
-対象プロジェクトへ適用する
+Task
+Out of Scope
+Working Set
+Required Constraints
+Routed References
+Validation
+Change Summary
+Exploration Status
 ```
 
-AI がこのリポジトリ全体を精読しなければ導入できない構造にはしません。
+長くなる場合は小ファイルへ分割して構いません。Context Pack 自体を長期の source of truth にしません。
 
----
+## 7. Validation
 
-## 3. 情報の階層化
-
-すべての情報を常時 AI に読ませる必要はありません。
-
-情報をおおむね次の3段階に分けます。
-
-### 常時読む情報
-
-- プロジェクト概要
-- 現在の目的
-- 基本設計
-- コーディング規約
-- 現在の作業対象
-- 重要な制約
-
-### 必要時に読む情報
-
-- モジュール単位の設計
-- API 仕様
-- 依存関係
-- 関係するテスト
-- 詳細な設計資料
-
-### 原則として読まない情報
-
-- ビルド生成物
-- キャッシュ
-- 大量ログ
-- 大規模データセット
-- 現在の変更と無関係な実装詳細
-- 過去履歴の全文
-
-ただし、問題調査などで必要になった場合は原典を取得します。
-
----
-
-## 4. Context Map / Index
-
-各プロジェクトには、AI が最初に参照する小さな索引を置くことを推奨します。
-
-標準ファイル:
+変更種別から必要な evidence を選びます。
 
 ```text
-AI_CONTEXT.md
+change type -> smallest sufficient validation -> evidence validity check
 ```
-
-標準テンプレートは `templates/AI_CONTEXT.md` に置きます。
-
-Context Map 自体は巨大化させず、あくまで「どこを読めばよいか」を案内する役割にします。
-
----
-
-## 5. 差分中心の作業
-
-既存プロジェクトを編集するときは、毎回全体を再解析するよりも Git 差分を優先します。
-
-```text
-既知の状態
-    ↓
-remote の変更を取得
-    ↓
-git diff / changed files
-    ↓
-変更された部分を要約
-    ↓
-必要な周辺情報のみ取得
-    ↓
-AI が作業
-```
-
-これにより、複数の AI・ChatGPT・Codex・人間が同じリポジトリを編集する場合でも、変更点を中心に状態を追跡できます。
-
-差分だけでは判断できない場合のみ、周辺コードや設計資料を追加で参照します。
-
----
-
-## 6. コンテキスト優先度
-
-情報には優先度を持たせます。
 
 例:
 
-```text
-P0: 必須情報
-P1: 現在の変更対象
-P2: 直接依存するコード・設計
-P3: 参考資料
-P4: 過去履歴・補助情報
-```
+- pure logic -> targeted tests
+- GUI / editor -> headless checks + 必要なら visual confirmation
+- random / time dependent -> fixed input / deterministic seam
+- packaged app -> artifact smoke
+- export / conversion -> disposable workspace
+- rule-heavy code -> compact policy checker
 
-コンテキスト容量が不足した場合は、低い優先度から除外します。
+`0 tests` や空走査のように、対象を実際に確認していない成功は evidence として扱いません。
 
-P0 / P1 は原則として削除しません。
+## 8. 大規模repo
 
----
+対象箇所へ毎回広い探索が必要なら、Responsibility Map、Task / Change Routing、Current State を優先します。
 
-## 7. 要約する内容
+さらに大きい場合だけ Source Structure Index、changed-symbol routing、split Context Pack を追加します。
 
-ソースコードや設計資料を短く表現するときは、単純な文章要約ではなく構造化された情報を優先します。
+複数AI・複数チャット・複数人が同じremoteを更新する場合は、規模に関係なく Remote Delta First を優先します。
 
-例:
-
-- ファイル / モジュールの責務
-- 公開 API
-- 入力
-- 出力
-- 主な依存関係
-- 副作用
-- 重要な制約
-- 変更時の注意点
-
-関数本体や長いコードは、必要になった場合のみ取得します。
-
----
-
-## 8. Context Pack
-
-AI に作業を依頼する際、必要な情報をまとめた小さな単位を Context Pack として扱うことを想定します。
-
-例:
+## 9. AIによる自動導入
 
 ```text
-Context Pack
-├─ project summary
-├─ current task
-├─ changed files
-├─ relevant architecture
-├─ coding rules
-└─ required source excerpts
+README + adoption-priority + AI_CONTEXT template
+        ↓
+target repo shallow inspection
+        ↓
+project signals classification
+        ↓
+Core を導入
+        ↓
+効果が高い Optional だけ追加
+        ↓
+Adopted / Skipped / Why を報告
 ```
 
-Context Pack は固定された巨大ファイルではなく、その作業に応じて組み立てるものとします。
+最初から全source・全docs・全Issuesを読みません。
 
----
+## 10. 避けること
 
-## 9. 補助ツール
+- repo全体の常時走査
+- 巨大な単一AI文書
+- 要約の再要約を何世代も続けること
+- AI専用ファイルの大量追加
+- 小規模repoへの過剰なrouting/index
+- 効果を説明できない自動化
+- unrelated refactor
+- 未確認領域の推測補完
 
-このリポジトリは文書・設計を中心としますが、共通化する価値が高いものについては補助ツールを置くことがあります。
+## 11. 導入判断
 
-候補:
-
-- Git 差分の圧縮表示
-- changed files の分類
-- ソース構造の抽出
-- import / include 依存の簡易追跡
-- Context Map の生成補助
-- Context Pack の生成
-- 要約キャッシュ
-- 巨大ファイルから必要範囲だけを抽出する補助
-
-ツールは設計方針を補助するものであり、このプロジェクトの中心ではありません。
-
----
-
-## 10. 各プロジェクトへの導入
-
-このリポジトリの内容を各プロジェクトへそのまま大量コピーすることは避けます。
-
-基本構造は次のイメージです。
+追加手法は次を満たす場合だけ使います。
 
 ```text
-ai-context-reducer
-    ├─ 共通原則
-    ├─ 共通フォーマット
-    └─ 必要なら共通ツール
-
-各プロジェクト
-    ├─ AI_CONTEXT.md
-    ├─ プロジェクト固有設定
-    └─ 必要な adapter / config
+expected repeated context saving > adoption + maintenance cost
 ```
 
-各プロジェクト側には、そのプロジェクト固有の情報だけを置きます。
-
-導入時には、まず対象プロジェクトの概要・主要ディレクトリ・重要な設計文書・現在の作業対象だけを確認し、`AI_CONTEXT.md` を作成します。最初から全コードを読み込むことは推奨しません。
-
----
-
-## 11. 避けること
-
-次のような方式は原則として避けます。
-
-- 毎回リポジトリ全体を読む
-- 巨大な単一コンテキストファイルを作る
-- 要約だけを何世代も再要約する
-- AI 専用の特殊構造を増やしすぎる
-- コンテキスト削減のために複雑な処理を大量追加する
-- 元情報へ戻れない圧縮を行う
-- 現在の作業と無関係な履歴を常時入力する
-- この方針を導入するためだけに大量のコードや文書を AI に読ませる
-
----
-
-## 12. 今後の拡張
-
-必要に応じて以下を追加します。
-
-- Context Pack フォーマット
-- Git 差分取得の標準フロー
-- プロジェクト規模別の推奨構成
-- 複数 AI 間での状態共有方法
-- 実測によるコンテキスト削減効果の評価方法
-- 補助ツール仕様
-
-詳細化が必要になった項目は、この説明書から個別文書へ分離します。
+`ai-context-reducer` 自体も Core を小さく保ち、Optional を条件付きで追加できる構造を維持します。
