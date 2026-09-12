@@ -51,6 +51,7 @@ AI には次のように依頼できます。
 - Search-first / Read-second と探索停止条件
 - Explicit Deferred / Out of Scope による作業境界
 - Change Routing Map による source / tests / docs の直接ルーティング
+- Validation Routing による変更種別ごとの evidence 選択
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
 - Task Capsule と metadata-driven document routing
@@ -71,6 +72,7 @@ AI には次のように依頼できます。
 - Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
 - Exploration Control / Stop Conditions: [`docs/exploration-control.md`](docs/exploration-control.md)
 - Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
+- Validation Routing: [`docs/validation-routing.md`](docs/validation-routing.md)
 - Responsibility Map / Policy Check: [`docs/responsibility-map.md`](docs/responsibility-map.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
@@ -97,6 +99,7 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 - `kadocacio`: 変更対象 → source → targeted tests の対応表、巨大仕様書の見出し検索、重要 invariant、dry-run 付き再実行可能変換、簡潔な最終報告
 - `Kadoka-shougi-ai`: narrow task、明示的 deferred behavior、対象 subsystem / acceptance tests の固定、correctness tests 前の先行最適化を避ける運用
 - `Bitlang`: Responsibility Map、責務記述を使った肥大化検知、機械判定可能な規約の compact checker output、明示的 scoped exceptions
+- `obake-no-sumika`: 変更種別ごとの Validation Routing、固定 seed / bounded runtime、structured evaluation log、必要な場合だけ visual confirmation
 
 これらがなくても各標準は成立します。
 
