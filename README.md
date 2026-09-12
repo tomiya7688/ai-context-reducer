@@ -41,6 +41,7 @@ AI には次のように依頼できます。
 - AI が最初に読む Context Map / Index
 - Git 差分を中心とした作業フロー
 - Remote Delta First による作業開始時の状態同期
+- Source Structure Index によるコード全体走査の削減
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
 - Task Capsule と metadata-driven document routing
@@ -56,8 +57,17 @@ AI には次のように依頼できます。
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
 - Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
+- Source Structure Index / Code Atlas Integration: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Context Pack テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
+
+## 外部ツールとの連携
+
+コード解析・構造抽出については、すべてをこのリポジトリへ実装するのではなく、専用ツールとの連携を優先します。
+
+`kadoka_code_atlas` は、言語固有の AST / parser を共通 IR へ正規化し、call graph や依存関係などを再利用する Source Structure Index の実装候補として扱います。
+
+`ai-context-reducer` 側は、解析結果そのものの生成よりも、それをどの順番・範囲で AI のコンテキストへ投入するかを標準化します。
 
 ## 想定用途
 
