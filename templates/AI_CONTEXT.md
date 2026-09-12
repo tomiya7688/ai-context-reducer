@@ -28,6 +28,17 @@ AI が最初に読むべき資料だけを書く。
 
 詳細仕様や Issue 本文をここへ複製しない。
 
+## Remote Context
+複数の AI / チャット / 開発者が remote を変更する可能性がある場合に使う。
+
+- Remote context command / tool:
+- Base branch:
+- Auto-update policy:
+
+作業開始時は full remote diff を読む前に、commit subjects、changed files、diff stat、bounded diff excerpt などの compact remote context を優先する。
+
+自動更新を行う場合は fast-forward のみに限定し、dirty worktree や local divergence がある場合は停止する。
+
 ## Current Task Context
 現在の作業を短くまとめた Context Pack / Issue summary / handoff がある場合は、その場所を優先入口として指定する。
 
@@ -99,6 +110,8 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 
 ## Working Rules
 - リポジトリ全体を無条件に読まない。
+- remote 変更の可能性がある場合は、full diff より compact remote context を先に確認する。
+- remote changed files は現在タスクに関係するものだけ優先して読む。
 - Current Task Context がある場合は最初に読む。
 - Current State は現在の能力と制約の把握に使い、詳細仕様の代替にしない。
 - タスクのメタデータから必要資料を絞れる場合は Task Routing を使う。
