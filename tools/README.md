@@ -9,38 +9,81 @@ AI に渡す情報量を減らすための前処理ツール群です。
 ```text
 analyze-and-recommend
   -> repo規模 / 言語 / project type / docs / tests / Git状態を浅く判定
-  -> 推奨手法と推奨toolを出す
+  -> 実行環境も確認
+  -> 推奨手法 / tool / implementation を出す
   -> 必要なものだけ実行
 ```
 
-入口:
-
-`tools/common/small/analyze-and-recommend/script/analyze_and_recommend.py`
-
-`tool-selector` はより低レベルな導入候補一覧が欲しい場合に使います。
-
-## Zero-install 方針
-
-OSSとして導入しやすくするため、基本機能は可能な限り Python 標準ライブラリだけで動作させます。
-
-目標:
+入口はOS別wrapperから使えます。
 
 ```text
-必須: Python 3
-推奨: Git
-任意高速化: rg / fd / ctags / ast-grep / tree-sitter / scc / git-sizer / semgrep
+Windows: tools/analyze.bat
+Linux/macOS: tools/analyze.sh
 ```
+
+wrapper は `acr-toolbox` native binary を優先し、無ければ Python 版へ fallback します。
+
+詳細なportable方針は `docs/portable-tools.md` を参照してください。
+
+## Runtime / 配布方針
+
+OSSとして追加インストールを要求しすぎないため、Common tool は次の順で実行方法を選びます。
+
+```text
+prebuilt native binary
+  -> Python reference implementation
+  -> optional external high-quality tool
+```
+
+ただし `rg` / `fd` などが既にインストール済みなら、高速backendとして優先して構いません。
+
+`tools/common/native/acr-toolbox/` には Go 製の単一バイナリ実装を置きます。
+
+現在のnative subcommands:
+
+- `analyze`
+- `search`
+- `find`
+- `tree`
+- `stats`
+- `env`
+
+GitHub Actions で次をcross buildします。
+
+- Windows x64 / arm64 (`acr-toolbox.exe`)
+- Linux x64 / arm64
+- macOS x64 / arm64
+
+ローカルbuild用に `build.bat` と `build.sh` の両方を置きます。
+
+## Zero-install fallback
+
+native binaryが無い場合でも Python 3 があれば基本機能を使えます。
 
 外部ツールが無くても Search-first / Read-second を成立させるため、次の軽量fallbackを同梱します。
 
-- `text-search`: ripgrep の代替となる bounded text/regex search
-- `path-find`: fd 相当の bounded path search
-- `tree-view`: tree 相当の bounded repository tree
-- `repo-stats`: scc 相当の簡易 file / line / language stats
+- `text-search`: ripgrep の軽量代替
+- `path-find`: fd の軽量代替
+- `tree-view`: tree の軽量代替
+- `repo-stats`: scc の簡易代替
 
-これらは外部ツールと同等の速度・機能を目指すものではありません。外部ツールが存在する場合はそちらを高速・高精度 backend として利用し、無い環境では同梱fallbackで最低限の運用を成立させます。
+これらは外部ツールと同等の速度・機能を目指すものではありません。
 
-外部ツールの利用可否は `external-tool-probe` で確認できます。
+## Environment-aware selection
+
+`environment-plan` は OS / architecture / Python / Git / native binary / optional tools を確認します。
+
+原則として、不要なvariantを元リポジトリから削除するのではなく、**対象プロジェクトへ導入するときに使える実装だけ materialize する**方針です。
+
+```text
+environment probe
+  -> native available ?
+  -> Python available ?
+  -> optional rg/fd available ?
+  -> usable implementation only
+```
+
+これにより、Python無しWindowsなら `.exe`、Pythonがある環境なら script fallback、開発環境に `rg` があれば高速backend、という選択ができます。
 
 ## 分類
 
@@ -49,7 +92,8 @@ tools/
 ├─ common/
 │  ├─ small/
 │  ├─ medium/
-│  └─ large/
+│  ├─ large/
+│  └─ native/
 ├─ python/
 ├─ csharp/
 ├─ go/
@@ -71,7 +115,8 @@ tools/
 
 | Size | Tool | Purpose / supporting method |
 |---|---|---|
-| Small | `analyze-and-recommend` | repoを浅く分析し、導入すべき手法とtoolをまとめて推薦 |
+| Small | `analyze-and-recommend` | repoと実行環境を浅く分析し、導入手法/tool/implementationを推薦 |
+| Small | `environment-plan` | OS / arch / Python / Git / native / external toolから実行variantを選択 |
 | Small | `tool-selector` | 規模・言語・project typeからtool候補を選択 |
 | Small | `repo-profile` | repo規模・主要言語・主要ディレクトリ |
 | Small | `repo-stats` | dependency-freeなfile / line / language統計 |
@@ -166,10 +211,10 @@ Information responsibility / avoid duplicate docs
 ## 推奨選択フロー
 
 ```text
-analyze-and-recommend
-  -> project profile
-  -> recommended techniques
-  -> recommended tools
+analyze.bat / analyze.sh
+  -> native analyzer or Python analyzer
+  -> project profile + environment profile
+  -> recommended techniques/tools/implementation
 
 external-tool-probe
   -> 高品質な既存toolがあれば優先
@@ -203,7 +248,9 @@ Small tools
 - full source / full logs / full docs を再出力しない。
 - 大規模 repo では bounded / truncated output を明示する。
 - 解析結果は索引であり、判断に必要なら原典へ戻る。
-- optional dependency を増やしすぎず、基本機能は標準ライブラリで動かす。
+- Python / native / external tool のどれか1つに必須依存しない。
+- `.bat` の入口を追加する場合は可能なら `.sh` も用意する。
+- native binaryはGitへ大量commitせず、CI / Release artifactで配布する。
 - 正規表現ベースの解析は完全な parser の代替ではない。
 - 高品質な外部toolが既にある場合は、軽量fallbackを維持しつつ外部toolを優先してよい。
 - toolの導入・維持コストが削減効果を上回る場合は導入しない。
