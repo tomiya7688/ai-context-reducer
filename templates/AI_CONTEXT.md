@@ -39,6 +39,17 @@ AI が最初に読むべき資料だけを書く。
 
 自動更新を行う場合は fast-forward のみに限定し、dirty worktree や local divergence がある場合は停止する。
 
+## Source Structure Index
+ソース構造を機械解析した索引がある場合に指定する。
+
+- Index / atlas tool:
+- Output / cache:
+- Supported languages:
+- Refresh rule:
+
+利用可能な場合は、全ソースを先に読む代わりに module / class / function / call / dependency などの構造索引を使う。
+対象シンボルから callers / callees / direct dependencies / matching tests の順に、必要な範囲だけ段階的に広げる。
+
 ## Current Task Context
 現在の作業を短くまとめた Context Pack / Issue summary / handoff がある場合は、その場所を優先入口として指定する。
 
@@ -112,6 +123,9 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 - リポジトリ全体を無条件に読まない。
 - remote 変更の可能性がある場合は、full diff より compact remote context を先に確認する。
 - remote changed files は現在タスクに関係するものだけ優先して読む。
+- Source Structure Index がある場合は、全ソース走査より先に利用する。
+- 構造情報は必要箇所への索引として扱い、判断に必要なら原典へ戻る。
+- 呼び出し・依存グラフは bounded traversal を優先し、無制限に周辺コードを広げない。
 - Current Task Context がある場合は最初に読む。
 - Current State は現在の能力と制約の把握に使い、詳細仕様の代替にしない。
 - タスクのメタデータから必要資料を絞れる場合は Task Routing を使う。
