@@ -58,6 +58,16 @@ AI が最初に読むべき資料だけを書く。
 
 この入口がある場合、全 Issue や全ドキュメントを先に走査しない。
 
+## Exploration Stop Condition
+探索を続ける条件ではなく、止める条件を明示する。
+
+- Goal が理解できている
+- Required constraints が分かっている
+- Acceptance / completion condition が分かっている
+- 対象 source / tests が特定できている
+
+この条件を満たしたら、追加の資料読み込みは「実装・検証に必要な場合だけ」に切り替える。
+
 ## Task Routing
 Issue ラベル、タスク種別、対象モジュールなどから読む資料を限定できる場合に使う。
 
@@ -109,8 +119,10 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 - Tests:
 - Generated docs / consistency:
 - Other checks:
+- Unverified areas:
 
 成功時は結果だけを保持し、失敗時のみ必要なログを追加する。
+未確認領域が残る場合は、全体を追加走査する代わりに明示して引き継ぐ。
 
 ## Context Priority
 - P0: このファイル、現在タスク、必須制約
@@ -121,6 +133,9 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 
 ## Working Rules
 - リポジトリ全体を無条件に読まない。
+- Search first, read second。まず検索・索引・changed files で候補を絞り、全文読み込みは必要な対象だけにする。
+- Goal / Required / Acceptance が実装可能な粒度まで揃ったら探索を止める。
+- roadmap / backlog / index など、実装タスクではない項目を現在作業候補から除外できる場合は先に除外する。
 - remote 変更の可能性がある場合は、full diff より compact remote context を先に確認する。
 - remote changed files は現在タスクに関係するものだけ優先して読む。
 - Source Structure Index がある場合は、全ソース走査より先に利用する。
@@ -136,6 +151,8 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 - 必要な周辺情報だけ追加取得する。
 - 要約だけで判断できない場合は原典を確認する。
 - 状態や前提が曖昧な場合は推測で補完せず、追加の原典確認へ進む。
+- unrelated refactor を現在タスクへ混ぜない。
+- 新規・変更コードへ規約を適用するために、無関係な legacy code を一括改修しない。
 - 正確性をコンテキスト削減率より優先する。
 
 ## Source of Truth
