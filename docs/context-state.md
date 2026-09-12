@@ -1,0 +1,76 @@
+# Context State / Information Responsibilities
+
+実運用から取り込んだ、現在状態の圧縮と情報源の責務分離についてまとめます。
+
+## Compressed Project State
+
+プロジェクト全体を毎回読み直す代わりに、現在の主要機能・制約・未実装事項だけを短くまとめた状態サマリを置くことがあります。
+
+状態サマリは詳細仕様の代替ではなく、AI が「今どこまで出来ているか」を把握するための入口です。
+
+推奨内容:
+- 現在利用可能な主要機能
+- 現在の明確な制約
+- 既知の未実装事項
+- 必要なら現在の最重要ゴール
+
+## Stable policy と Current task を分ける
+
+```text
+AI_CONTEXT / agent guide
+  -> 長く有効な方針・索引・ルータ
+
+Current state summary
+  -> 現在の実装能力と制約
+
+Task Capsule / Context Pack
+  -> 今回の作業だけ
+```
+
+タスクが変わるたびに長期方針まで書き換えない構造を優先します。
+
+## Information source responsibilities
+
+同じ詳細情報を複数箇所へ再掲すると、更新漏れとコンテキスト増大の原因になります。
+
+例:
+- README: 人間向け概要、導入、利用方法
+- AI_CONTEXT.md: AI向け索引、読む順番、重要制約、ルーティング
+- state summary: 現在の実装能力と制約
+- docs: 詳細仕様・設計契約
+- Issue tracker: 要求、議論、優先度、未完了作業
+- source / tests: 実装と実際の振る舞い
+- generated artifacts: 必要時だけ参照する派生物
+
+## Read order
+
+実装タスクでは次の順が有効な場合があります。
+
+```text
+task area
+  -> target source
+  -> matching tests
+  -> detailed docs when needed
+```
+
+仕様判断が主目的の場合は正式な設計文書を優先します。読む順序は Task Routing で指定します。
+
+## Generated artifacts
+
+自動生成された図、レポート、キャッシュ、解析結果などは通常のタスクでは読みません。生成物や生成ロジック自体が対象の場合、または判断に必要な場合だけ参照します。
+
+## Completion gates
+
+完了条件は必要に応じて設定化します。
+
+例:
+- tests
+- compile / build
+- generated document consistency
+- diff sanity check
+
+成功時は結果だけを Context Pack に残し、失敗時のみ詳細を追加します。
+
+## Ambiguity
+
+状態や前提が不明な場合、コンテキスト削減のために推測で埋めることはしません。必要な原典を追加で確認します。
