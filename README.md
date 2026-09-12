@@ -1,128 +1,155 @@
 # ai-context-reducer
 
-AI / Codex を利用した開発で、必要以上にコンテキストを消費しないための設計方針・運用方法をまとめるリポジトリです。
+AI / Codex / Claude Code を利用した開発で、必要以上にコンテキストを消費せず、必要な設計・実装情報へ正確に到達するための共通方針です。
 
-このリポジトリ自体は **文書・設計を中心** とします。必要に応じて補助ツールを追加することはありますが、ツール実装そのものを主目的にはしません。
+このリポジトリ自体は **文書・設計中心** です。補助ツールは、繰り返し処理をAIのコンテキスト外へ移す価値がある場合だけ追加します。
 
-## 目的
+## 目標
 
-- AI に渡す情報量を減らす
-- 必要な情報や設計意図を失わない
-- 毎回リポジトリ全体を読み直さなくても作業できる状態を作る
-- 差分・索引・要約を使って必要な情報へ素早く到達できるようにする
-- 各プロジェクトで乱立したコンテキスト削減手法を共通方針として整理する
-- この方針自体を導入するためのコンテキスト消費も小さく保つ
-- 実際のプロジェクトで有効だった手法を後から共通仕様へ取り込める構造を保つ
+> AI に大量の情報を読ませて必要情報を探させるのではなく、必要情報を先に選別・ルーティングしてから AI へ渡す。
 
-## 基本原則
+さらに、必要情報が揃ったら探索を続けません。
 
-> AI に大量の情報を読ませて必要情報を探させるのではなく、必要情報を先に選別・要約してから AI へ渡す。
+> Goal / Required / Acceptance / working set が十分なら、追加探索を止める。
 
-また、要約は原典の代替ではなく **索引** として扱います。判断に必要な場合は、必ず元のコード・文書へ戻れる構造を維持します。
-
-もう一つ重要なのは、必要情報が揃った後も探索を続けないことです。
-
-> Goal / Required / Acceptance と必要な非対象範囲が実装可能な粒度まで揃ったら、追加探索を止める。
-
-## 最短導入
-
-別プロジェクトへ導入する場合は、まずこのリポジトリの README と `templates/AI_CONTEXT.md` だけを入口として使います。
-
-AI には次のように依頼できます。
+優先順位は次です。
 
 ```text
-このプロジェクトに ai-context-reducer の方針を導入してください。
-リポジトリ全体を無条件に読まず、README と AI_CONTEXT.md 相当の索引、現在の作業対象を優先してください。
-必要なら templates/AI_CONTEXT.md を参考に、対象プロジェクト用の AI_CONTEXT.md を最小構成で作成してください。
+正確性
+  > 作業対象への到達速度
+  > コンテキスト削減量
+  > 自動化の多さ
 ```
 
-詳しい導入例は [`docs/adoption-prompt.md`](docs/adoption-prompt.md) を参照してください。
+要約は原典の代替ではなく索引として扱い、必要なら source / tests / docs / diff へ戻れる状態を維持します。
 
-## このリポジトリで扱うもの
+## Codex / Claude Code へ導入させる
 
-- コンテキスト削減の基本原則
-- 情報の優先度・階層化
-- AI が最初に読む Context Map / Index
-- Git 差分を中心とした作業フロー
-- Remote Delta First による作業開始時の状態同期
-- Source Structure Index によるコード全体走査の削減
-- Responsibility Map による file / module 責務の直接ルーティング
-- 機械判定可能な規約を compact checker output へ移す運用
-- Policy Routing による Required / Recommended / Advisory の選別
-- 規約例外の compact exception record
-- Search-first / Read-second と探索停止条件
-- Explicit Deferred / Out of Scope による作業境界
-- Change Routing Map による source / tests / docs の直接ルーティング
-- Validation Routing による変更種別ごとの evidence 選択
-- evidence validity check による空検査・0件検査の排除
-- source と生成成果物を分けた artifact-boundary validation
-- canonical template + variables による定型文生成と generated diff 中心の確認
-- ソースコードや設計資料の要約方針
-- Context Pack の考え方
-- Task Capsule と metadata-driven document routing
-- Acceptance-first task packet と changed-symbol routing
-- compact change summary / validation result を使った変更確認
-- targeted tests と未確認領域を明示した限定的 validation
-- correctness boundary を作ってから必要な最適化へ進む運用
-- 再実行可能なデータ変換と dry-run
-- 各プロジェクトへの導入方法
-- 実運用からの手法の逆輸入・標準化
-- 必要に応じた補助ツールの設計・実装
+最初に読ませるのは基本的に次の3つだけです。
+
+1. この `README.md`
+2. [`docs/adoption-priority.md`](docs/adoption-priority.md)
+3. [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
+
+その上で対象repoを shallow inspection し、**全部ではなく効果が高い手法だけ**導入させます。
+
+そのまま使える依頼文は [`docs/adoption-prompt.md`](docs/adoption-prompt.md) にあります。
+
+## 最小コア
+
+ほぼ全プロジェクトで有効な Core は小さく保ちます。
+
+- 小さい `AI_CONTEXT.md` または同等のAI入口
+- Search first, read second
+- Goal / Required / Acceptance が揃ったら探索停止
+- Source of Truth の明示
+- unrelated refactor を現在タスクへ混ぜない
+- targeted validation
+- 未確認領域を `Unverified` として明示
+- logs / generated artifacts / history を通常コンテキストから除外
+
+小規模repoではここまでで終了して構いません。
+
+## 効果に応じて追加する
+
+追加手法は、対象プロジェクトの特徴から選びます。
+
+| 状況 | 優先する手法 |
+|---|---|
+| docs / Issues / subsystem が多い | Task Routing / Change Routing Map |
+| file / module の責務が分かりにくい | Responsibility Map |
+| 現在の能力・制約がREADMEだけでは分からない | Current State summary |
+| 複数AI・複数チャット・複数人がremoteを更新 | Remote Delta First |
+| 巨大codebase・call/dependency探索が重い | Source Structure Index / changed-symbol routing |
+| GUI / game / editor | headless-first + visual confirmation when needed |
+| random / time-dependent / simulation | deterministic seam / fixed input / bounded runtime |
+| package / distribution がsourceと異なる | artifact-boundary validation |
+| 保存・変換・exportで一時ファイルが増える | disposable validation workspace |
+| coding rules が多い | Policy Routing + compact policy checks |
+| license / NOTICE / header 等が反復する | Boilerplate Generation |
+
+詳細な優先度と「こういうプロジェクト向き」は [`docs/adoption-priority.md`](docs/adoption-priority.md) を参照してください。
+
+## 標準フロー
+
+```text
+AI_CONTEXT / existing agent guide
+        ↓
+shallow inspection
+        ↓
+project signals を分類
+        ↓
+current task: Goal / Required / Acceptance
+        ↓
+Search / Index / Routing
+        ↓
+必要十分なら探索停止
+        ↓
+target source / symbols / matching tests
+        ↓
+implementation
+        ↓
+smallest sufficient validation
+        ↓
+compact result + Unverified areas
+```
+
+remote競合があり得る場合は、実装前に compact remote delta を挟みます。
 
 ## 文書
 
-- 基本方針: [`docs/guide.md`](docs/guide.md)
+導入時に全部読む必要はありません。
+
+- 導入判断: [`docs/adoption-priority.md`](docs/adoption-priority.md)
 - 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
+- 基本方針: [`docs/guide.md`](docs/guide.md)
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
-- Task Routing / Compact Workflow: [`docs/task-routing.md`](docs/task-routing.md)
-- Exploration Control / Stop Conditions: [`docs/exploration-control.md`](docs/exploration-control.md)
+- Task Routing: [`docs/task-routing.md`](docs/task-routing.md)
+- Exploration Control: [`docs/exploration-control.md`](docs/exploration-control.md)
 - Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
 - Validation Routing: [`docs/validation-routing.md`](docs/validation-routing.md)
-- Responsibility Map / Policy Check: [`docs/responsibility-map.md`](docs/responsibility-map.md)
-- Policy Routing / Rule Strength: [`docs/policy-routing.md`](docs/policy-routing.md)
-- Boilerplate Generation / Canonical Templates: [`docs/boilerplate-generation.md`](docs/boilerplate-generation.md)
-- Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
+- Responsibility Map: [`docs/responsibility-map.md`](docs/responsibility-map.md)
+- Policy Routing: [`docs/policy-routing.md`](docs/policy-routing.md)
+- Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
-- AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
-- Context Pack テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
+- Boilerplate Generation: [`docs/boilerplate-generation.md`](docs/boilerplate-generation.md)
+- AI入口テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
+- Task用テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
-## 外部プロジェクトと実装例
+## 外部プロジェクトとの関係
 
-Kadoka 系を含む外部リポジトリは、実運用の参考元であり、手法の具体的な **実装例 / 参考実装** として紹介できます。
+Kadoka系を含む外部リポジトリは **実装例 / 参考実装** です。
 
-標準仕様そのものは外部プロジェクトに依存させません。
+- 有効な手法だけ一般化して取り込む
+- 外部repoを必須依存にしない
+- 特定CLI・ファイル形式・ディレクトリ構成を標準化しない
+- 同じ原則を別実装でも満たせるようにする
 
-- 有効な手法は抽象化して取り込む
-- 外部プロジェクトを必須依存にはしない
-- 特定ツールの CLI、ファイル形式、ディレクトリ構造を標準仕様にはしない
-- 同じ標準を別実装でも満たせるようにする
-- 実装例として外部リポジトリを紹介・参照することは許容する
-- 外部側の変更を自動的に標準へ追従させず、必要な手法だけ改めて評価して取り込む
+主な参考元:
 
-実装例:
+- `AI_game_player`: Current State、情報源の責務分離、巨大repo運用
+- `comfyUI_support_tools`: Search-first、探索停止、Acceptance-first、split packet
+- `kadoka_code_atlas`: Source Structure Index、bounded graph traversal
+- `kadocacio`: source / tests / docs の直接ルーティング
+- `Bitlang`: Responsibility Map、compact policy checks
+- `obake-no-sumika`: Validation Routing、structured runtime evidence
+- `upd-commander-base-design`: Policy Routing、rule strength、exception record
+- `kadoka_tetris_ai`: evidence validity、artifact smoke
+- `dot_editor`: headless-first、disposable validation workspace
+- `joke_programs`: RNG / clock 等の deterministic seam
+- `Obake_Lisense`: canonical template + variables の定型文生成
 
-- `kadoka_code_atlas`: Source Structure Index、共通 IR、call graph、bounded traversal
-- `comfyUI_support_tools`: Search-first / Read-second、優先Issue選択、Acceptance 抽出、分割 Context Packet、bounded diff、探索停止条件
-- `kadocacio`: 変更対象 → source → targeted tests の対応表、巨大仕様書の見出し検索、重要 invariant、dry-run 付き再実行可能変換、簡潔な最終報告
-- `Kadoka-shougi-ai`: narrow task、明示的 deferred behavior、対象 subsystem / acceptance tests の固定、correctness tests 前の先行最適化を避ける運用
-- `Bitlang`: Responsibility Map、責務記述を使った肥大化検知、機械判定可能な規約の compact checker output、明示的 scoped exceptions
-- `obake-no-sumika`: 変更種別ごとの Validation Routing、固定 seed / bounded runtime、structured evaluation log、必要な場合だけ visual confirmation
-- `upd-commander-base-design`: 説明文書と規定文書の分離、Required / Recommended の区別、確定違反と warning の分離、規約例外の reason / scope / mitigation 記録、言語別 checker adapter
-- `kadoka_tetris_ai`: 0件検査を成功扱いしない evidence validity、配布物を直接確認する artifact smoke、常時配布可能性を品質境界として扱う運用
-- `Obake_Lisense`: versioned license document と短い利用案内の分離、定型文を canonical template + variables として扱うための参考例
+これらがなくても標準は成立します。
 
-これらがなくても各標準は成立します。
+## 導入しすぎない
 
-## 将来の共通ツール候補
+このプロジェクトの方針そのものがコンテキスト肥大化を起こしてはいけません。
 
-文書中心の方針は維持しつつ、繰り返し処理を AI のコンテキスト外へ移せるものは `tools/<tool-name>/script/` 配下へ共通化できます。
+```text
+expected repeated context saving
+    > adoption + maintenance cost
+```
 
-候補として、ライセンス・著作権表記・定型通知などを承認済み template から生成する `boilerplate-generator` を検討できます。生成ツールは法的条件を独自判断せず、template 選択、変数展開、dry-run、placeholder 検査、generated diff、version metadata などを担当する想定です。
+を満たさない仕組みは追加しません。
 
-## 想定用途
-
-Bitlang、ゲーム開発、AI 関連ツールなど、規模や言語が異なるプロジェクトでも共通利用できる方式を目指します。
-
-このリポジトリでは特定の AI 製品、プログラミング言語、外部プロジェクトだけに依存しない方針を優先します。
-
-標準仕様は固定物ではありません。実際のプロジェクトで有効だった方法を検証し、共通利用する価値があるものは段階的に取り込みます。ただし、既存の最小構成を壊す変更よりも、任意拡張として追加する方法を優先します。
+小さいrepoには小さい仕組み、大きいrepoには必要なrouting/indexを追加する、という適応型の導入を標準とします。
