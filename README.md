@@ -48,6 +48,8 @@ AI には次のように依頼できます。
 - Source Structure Index によるコード全体走査の削減
 - Responsibility Map による file / module 責務の直接ルーティング
 - 機械判定可能な規約を compact checker output へ移す運用
+- Policy Routing による Required / Recommended / Advisory の選別
+- 規約例外の compact exception record
 - Search-first / Read-second と探索停止条件
 - Explicit Deferred / Out of Scope による作業境界
 - Change Routing Map による source / tests / docs の直接ルーティング
@@ -74,6 +76,7 @@ AI には次のように依頼できます。
 - Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
 - Validation Routing: [`docs/validation-routing.md`](docs/validation-routing.md)
 - Responsibility Map / Policy Check: [`docs/responsibility-map.md`](docs/responsibility-map.md)
+- Policy Routing / Rule Strength: [`docs/policy-routing.md`](docs/policy-routing.md)
 - Remote Context / Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
@@ -100,6 +103,7 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 - `Kadoka-shougi-ai`: narrow task、明示的 deferred behavior、対象 subsystem / acceptance tests の固定、correctness tests 前の先行最適化を避ける運用
 - `Bitlang`: Responsibility Map、責務記述を使った肥大化検知、機械判定可能な規約の compact checker output、明示的 scoped exceptions
 - `obake-no-sumika`: 変更種別ごとの Validation Routing、固定 seed / bounded runtime、structured evaluation log、必要な場合だけ visual confirmation
+- `upd-commander-base-design`: 説明文書と規定文書の分離、Required / Recommended の区別、確定違反と warning の分離、規約例外の reason / scope / mitigation 記録、言語別 checker adapter
 
 これらがなくても各標準は成立します。
 
