@@ -4,88 +4,77 @@ AI に渡す情報量を減らすための前処理ツール群です。
 
 ## 推奨入口
 
-通常はまず次を使います。
+通常は次だけ覚えれば十分です。
 
 ```text
-analyze-and-recommend
-  -> repo規模 / 言語 / project type / docs / tests / Git状態を浅く判定
-  -> 実行環境も確認
-  -> 推奨手法 / tool / implementation を出す
-  -> 必要なものだけ実行
+Windows: tools/setup.bat <project-root>
+Linux/macOS: tools/setup.sh <project-root>
 ```
 
-入口はOS別wrapperから使えます。
+セットアップは次を自動判定します。
+
+- project規模 / 主要言語 / project type
+- native `acr-toolbox` の利用可否
+- Python fallback の利用可否
+- Git
+- Python / .NET / Go / C / C++ / Godot の既存実行環境
+- optional external tools (`rg`, `fd`, `ctags`, `ast-grep` 等)
+
+不足runtimeやSDKを勝手にインストールしません。使えるtoolだけを候補化します。
+
+詳細は `docs/portable-tools.md` と `docs/language-tool-setup.md` を参照してください。
+
+## Native toolbox
+
+Commonで頻繁に使う機能は Go 製単一バイナリ `acr-toolbox` に統合します。
+
+現在のsubcommand:
 
 ```text
-Windows: tools/analyze.bat
-Linux/macOS: tools/analyze.sh
+analyze
+search
+find
+tree
+stats
+doc-index
+slice
+compact-log
+compact-diff
+remote-delta
+language-env
+env
 ```
 
-wrapper は `acr-toolbox` native binary を優先し、無ければ Python 版へ fallback します。
+主な対応:
 
-詳細なportable方針は `docs/portable-tools.md` を参照してください。
+- `search`: `rg` の軽量fallback
+- `find`: `fd` の軽量fallback
+- `tree`: bounded tree
+- `stats`: `scc` の簡易fallback
+- `doc-index`: Markdown見出し索引
+- `slice`: 必要箇所だけbounded excerpt
+- `compact-log`: failure/warning中心のログ圧縮
+- `compact-diff`: changed files / shortstat / bounded diff
+- `remote-delta`: compact remote context
+- `language-env`: 言語runtime/compiler検出
 
-## Runtime / 配布方針
+Windows / Linux / macOS の x64 / arm64 をGitHub Actionsでcross buildします。ローカルbuild用に `build.bat` / `build.sh` も置きます。
 
-OSSとして追加インストールを要求しすぎないため、Common tool は次の順で実行方法を選びます。
+Native対応状況は `tools/NATIVE_COVERAGE.md` を参照してください。
+
+## Runtime selection
 
 ```text
 prebuilt native binary
-  -> Python reference implementation
-  -> optional external high-quality tool
+  -> Python reference / fallback
+  -> optional installed external tool
 ```
 
-ただし `rg` / `fd` などが既にインストール済みなら、高速backendとして優先して構いません。
+ただし `rg` / `fd` / `ctags` / `ast-grep` 等が既にある場合は、高速・高精度backendとして優先して構いません。
 
-`tools/common/native/acr-toolbox/` には Go 製の単一バイナリ実装を置きます。
+元repoからvariantを勝手に削除するのではなく、対象プロジェクトへ導入するときに必要なvariantだけ materialize します。
 
-現在のnative subcommands:
-
-- `analyze`
-- `search`
-- `find`
-- `tree`
-- `stats`
-- `env`
-
-GitHub Actions で次をcross buildします。
-
-- Windows x64 / arm64 (`acr-toolbox.exe`)
-- Linux x64 / arm64
-- macOS x64 / arm64
-
-ローカルbuild用に `build.bat` と `build.sh` の両方を置きます。
-
-## Zero-install fallback
-
-native binaryが無い場合でも Python 3 があれば基本機能を使えます。
-
-外部ツールが無くても Search-first / Read-second を成立させるため、次の軽量fallbackを同梱します。
-
-- `text-search`: ripgrep の軽量代替
-- `path-find`: fd の軽量代替
-- `tree-view`: tree の軽量代替
-- `repo-stats`: scc の簡易代替
-
-これらは外部ツールと同等の速度・機能を目指すものではありません。
-
-## Environment-aware selection
-
-`environment-plan` は OS / architecture / Python / Git / native binary / optional tools を確認します。
-
-原則として、不要なvariantを元リポジトリから削除するのではなく、**対象プロジェクトへ導入するときに使える実装だけ materialize する**方針です。
-
-```text
-environment probe
-  -> native available ?
-  -> Python available ?
-  -> optional rg/fd available ?
-  -> usable implementation only
-```
-
-これにより、Python無しWindowsなら `.exe`、Pythonがある環境なら script fallback、開発環境に `rg` があれば高速backend、という選択ができます。
-
-## 分類
+## Tool categories
 
 ```text
 tools/
@@ -103,65 +92,57 @@ tools/
 └─ profiles/
 ```
 
-各言語カテゴリは原則 `small / medium / large` に分けます。
+- Small: shallow profile / symbols / cheap search
+- Medium: direct dependency / routing / task context
+- Large: bounded graph / structure index / context cost analysis
 
-- `small`: shallow profile / symbols。導入コストが低い
-- `medium`: direct dependencies / routing / task context
-- `large`: bounded graph / structure index / context cost analysis
+## Common tools
 
-スクリプト本体は `tools/<category>/<size>/<tool>/script/` に置きます。
+### Small
 
-## Common
+- `analyze-and-recommend`: repoと環境を浅く分析して推奨手法/toolを選ぶ
+- `environment-plan`: OS / arch / native / Python / external toolを判定
+- `language-environment-plan`: Python / .NET / Go / C / C++ / Godot環境を判定
+- `tool-selector`: 規模・言語・project typeからtool候補を選択
+- `repo-profile`, `repo-stats`, `project-type-profile`
+- `text-search`, `path-find`, `tree-view`, `doc-index`
+- `file-role-map`, `source-of-truth-candidates`
 
-| Size | Tool | Purpose / supporting method |
-|---|---|---|
-| Small | `analyze-and-recommend` | repoと実行環境を浅く分析し、導入手法/tool/implementationを推薦 |
-| Small | `environment-plan` | OS / arch / Python / Git / native / external toolから実行variantを選択 |
-| Small | `tool-selector` | 規模・言語・project typeからtool候補を選択 |
-| Small | `repo-profile` | repo規模・主要言語・主要ディレクトリ |
-| Small | `repo-stats` | dependency-freeなfile / line / language統計 |
-| Small | `project-type-profile` | game / gui / compiler / data-tool 等を推定 |
-| Small | `external-tool-probe` | rg / fd / ctags / ast-grep 等の利用可否を確認 |
-| Small | `text-search` | dependency-free bounded text / regex search |
-| Small | `path-find` | dependency-free bounded path search |
-| Small | `tree-view` | dependency-free bounded repository tree |
-| Small | `doc-index` | Markdown見出しをcompact index化。Search-first / heading-first |
-| Small | `file-role-map` | source / tests / docs / generated / asset 等へ分類 |
-| Small | `source-of-truth-candidates` | 正式資料候補をファイル名から列挙。権威性は推測しない |
-| Medium | `compact-diff` | changed files / shortstat / bounded diff |
-| Medium | `remote-delta` | Remote Delta First用のahead/behind/files/commit要約 |
-| Medium | `change-router` | changed fileからmatching tests/docs候補を出す |
-| Medium | `acceptance-extractor` | Goal / Required / Acceptance / Deferred をMarkdownから抽出 |
-| Medium | `exploration-stop-check` | broad explorationを止められる情報が揃ったか確認 |
-| Medium | `validation-plan` | 変更種別からsmallest sufficient evidenceを提案 |
-| Medium | `context-pack-builder` | Git stateから小さいContext Pack骨組みを生成 |
-| Medium | `policy-index` | 長い規約からmust/should/必須/推奨候補だけ索引化 |
-| Medium | `responsibility-candidates` | Responsibility Mapの空テンプレート候補を生成 |
-| Medium | `doc-duplicate-hints` | 複数文書に重複した長文候補を検出 |
-| Medium | `compact-log` | error/warning/failure行 + bounded tailだけ残す |
-| Medium | `ignore-candidates` | 通常コンテキストから外せそうなpath候補を列挙 |
-| Large | `context-manifest` | AIが読む候補を優先度付きmanifest化 |
-| Large | `hotspot-report` | 大きいファイル・深いpathを候補化 |
-| Large | `target-slice` | 検索hit周辺だけbounded excerptとして取得 |
-| Large | `context-budget` | 全文読みした場合の概算token量と巨大候補を表示 |
+### Medium
 
-## Language-specific
+- `compact-diff`, `remote-delta`
+- `change-router`
+- `acceptance-extractor`, `exploration-stop-check`
+- `validation-plan`, `compact-log`
+- `context-pack-builder`
+- `policy-index`, `responsibility-candidates`
+- `doc-duplicate-hints`, `ignore-candidates`
 
-| Language | Small | Medium | Large |
-|---|---|---|---|
-| Python | `python-symbols` | `python-import-map` | `python-module-graph` |
-| CSharp | `csharp-symbols` | `csharp-project-map` | `csharp-project-graph` |
-| Go | `go-symbols` | `go-import-map` | `go-package-graph` |
-| C | `c-symbols` | `c-include-map` | `c-include-graph` |
-| C++ | `cpp-symbols` | `cpp-include-map` | `cpp-include-graph` |
-| GDScript | `gdscript-symbols` | `gdscript-dependency-map` | `godot-scene-graph` |
+### Large
 
-## このリポジトリの手法との対応
+- `context-manifest`
+- `hotspot-report`
+- `target-slice`
+- `context-budget`
+
+## Language-specific tools
+
+| Language | Small | Medium | Large | Existing environment signal |
+|---|---|---|---|---|
+| Python | `python-symbols` | `python-import-map` | `python-module-graph` | `python3` / `python` |
+| C# | `csharp-symbols` | `csharp-project-map` | `csharp-project-graph` | `dotnet` |
+| Go | `go-symbols` | `go-import-map` | `go-package-graph` | `go` |
+| C | `c-symbols` | `c-include-map` | `c-include-graph` | `gcc` / `clang` / `cc` |
+| C++ | `cpp-symbols` | `cpp-include-map` | `cpp-include-graph` | `g++` / `clang++` / `c++` |
+| GDScript | `gdscript-symbols` | `gdscript-dependency-map` | `godot-scene-graph` | `godot4` / `godot` |
+
+環境が無ければ、その言語固有toolは自動導入しません。Common toolsだけで運用できます。
+
+## Method mapping
 
 ```text
 Search-first / Read-second
-  -> text-search / path-find / tree-view / doc-index / target-slice
-  -> availableなら rg / fd を高速backendとして利用
+  -> search / find / tree / doc-index / slice
 
 Exploration Stop Condition
   -> acceptance-extractor / exploration-stop-check
@@ -176,7 +157,7 @@ Change Routing Map
   -> change-router
 
 Policy Routing
-  -> policy-index / external Semgrep等
+  -> policy-index / external Semgrep etc.
 
 Validation Routing
   -> validation-plan / compact-log
@@ -185,72 +166,22 @@ Context Pack
   -> context-pack-builder
 
 Source Structure Index
-  -> language-specific symbols/dependency/graph tools
+  -> language-specific symbols / dependency / graph tools
 
-Context Priority / avoid full-repo reads
+Context Priority
   -> context-manifest / context-budget / hotspot-report
 
-Information responsibility / avoid duplicate docs
+Information responsibility
   -> source-of-truth-candidates / doc-duplicate-hints
 ```
 
-## Project type profiles
+## 基本方針
 
-`tools/profiles/README.md` にタイプ別推奨をまとめます。
-
-- Game: scene/resource map、deterministic validation、visual confirmation
-- GUI: headless-first + visual confirmation
-- Compiler / Language: symbol/index + dependency graph + regression tests
-- Data Tool: dry-run + disposable workspace + generated-data validation
-- Packaged App: artifact-boundary validation
-- Simulation / AI: deterministic seam + structured observation
-- Rule-heavy: Policy Routing + Responsibility Map + targeted checker
-
-複数タイプに該当して構いません。
-
-## 推奨選択フロー
-
-```text
-analyze.bat / analyze.sh
-  -> native analyzer or Python analyzer
-  -> project profile + environment profile
-  -> recommended techniques/tools/implementation
-
-external-tool-probe
-  -> 高品質な既存toolがあれば優先
-  -> 無ければ同梱fallback
-
-Small tools
-  -> current taskに必要なら Medium
-  -> 巨大repo / 高コスト領域だけ Large
-```
-
-最初から全toolやLarge解析を使いません。
-
-## 外部ツール
-
-既存ツールで代替した方が強い領域は再実装しません。詳細は `docs/external-tools.md` を参照してください。
-
-候補:
-
-- ripgrep
-- fd
-- ast-grep
-- Universal Ctags
-- Tree-sitter
-- scc
-- git-sizer
-- Semgrep
-
-## 方針
-
-- 出力は AI へ渡しやすい短い text / JSON を優先する。
-- full source / full logs / full docs を再出力しない。
-- 大規模 repo では bounded / truncated output を明示する。
-- 解析結果は索引であり、判断に必要なら原典へ戻る。
-- Python / native / external tool のどれか1つに必須依存しない。
-- `.bat` の入口を追加する場合は可能なら `.sh` も用意する。
-- native binaryはGitへ大量commitせず、CI / Release artifactで配布する。
-- 正規表現ベースの解析は完全な parser の代替ではない。
-- 高品質な外部toolが既にある場合は、軽量fallbackを維持しつつ外部toolを優先してよい。
-- toolの導入・維持コストが削減効果を上回る場合は導入しない。
+- full source / full logs / full docs を再出力しない
+- bounded / truncated output を明示する
+- 解析結果は索引であり、必要なら原典へ戻る
+- Python / native / external tool のどれか1つに必須依存しない
+- `.bat` を作る場合は可能なら `.sh` も用意する
+- missing runtime / SDKを自動インストールしない
+- Small repoへLarge解析を持ち込まない
+- toolの維持コストが削減効果を上回る場合は導入しない
