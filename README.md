@@ -54,6 +54,8 @@ AI には次のように依頼できます。
 - Explicit Deferred / Out of Scope による作業境界
 - Change Routing Map による source / tests / docs の直接ルーティング
 - Validation Routing による変更種別ごとの evidence 選択
+- evidence validity check による空検査・0件検査の排除
+- source と生成成果物を分けた artifact-boundary validation
 - ソースコードや設計資料の要約方針
 - Context Pack の考え方
 - Task Capsule と metadata-driven document routing
@@ -104,6 +106,7 @@ Kadoka 系を含む外部リポジトリは、実運用の参考元であり、�
 - `Bitlang`: Responsibility Map、責務記述を使った肥大化検知、機械判定可能な規約の compact checker output、明示的 scoped exceptions
 - `obake-no-sumika`: 変更種別ごとの Validation Routing、固定 seed / bounded runtime、structured evaluation log、必要な場合だけ visual confirmation
 - `upd-commander-base-design`: 説明文書と規定文書の分離、Required / Recommended の区別、確定違反と warning の分離、規約例外の reason / scope / mitigation 記録、言語別 checker adapter
+- `kadoka_tetris_ai`: 0件検査を成功扱いしない evidence validity、配布物を直接確認する artifact smoke、常時配布可能性を品質境界として扱う運用
 
 これらがなくても各標準は成立します。
 
