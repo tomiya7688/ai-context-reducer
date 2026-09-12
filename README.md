@@ -11,12 +11,27 @@ AI / Codex を利用した開発で、必要以上にコンテキストを消費
 - 毎回リポジトリ全体を読み直さなくても作業できる状態を作る
 - 差分・索引・要約を使って必要な情報へ素早く到達できるようにする
 - 各プロジェクトで乱立したコンテキスト削減手法を共通方針として整理する
+- この方針自体を導入するためのコンテキスト消費も小さく保つ
 
 ## 基本原則
 
 > AI に大量の情報を読ませて必要情報を探させるのではなく、必要情報を先に選別・要約してから AI へ渡す。
 
 また、要約は原典の代替ではなく **索引** として扱います。判断に必要な場合は、必ず元のコード・文書へ戻れる構造を維持します。
+
+## 最短導入
+
+別プロジェクトへ導入する場合は、まずこのリポジトリの README と `templates/AI_CONTEXT.md` だけを入口として使います。
+
+AI には次のように依頼できます。
+
+```text
+このプロジェクトに ai-context-reducer の方針を導入してください。
+リポジトリ全体を無条件に読まず、README と AI_CONTEXT.md 相当の索引、現在の作業対象を優先してください。
+必要なら templates/AI_CONTEXT.md を参考に、対象プロジェクト用の AI_CONTEXT.md を最小構成で作成してください。
+```
+
+詳しい導入例は [`docs/adoption-prompt.md`](docs/adoption-prompt.md) を参照してください。
 
 ## このリポジトリで扱うもの
 
@@ -31,7 +46,9 @@ AI / Codex を利用した開発で、必要以上にコンテキストを消費
 
 ## 文書
 
-基本方針は [`docs/guide.md`](docs/guide.md) にまとめています。
+- 基本方針: [`docs/guide.md`](docs/guide.md)
+- 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
+- AI Context テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 
 ## 想定用途
 
