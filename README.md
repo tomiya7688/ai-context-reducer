@@ -153,3 +153,11 @@ expected repeated context saving
 を満たさない仕組みは追加しません。
 
 小さいrepoには小さい仕組み、大きいrepoには必要なrouting/indexを追加する、という適応型の導入を標準とします。
+
+## License
+
+このリポジトリ本体は [MIT License](LICENSE) で提供します。
+
+ただし、外部プロジェクトを参照・引用・改変・同梱している部分については、それぞれの外部プロジェクトのライセンス条件が優先されます。このリポジトリの MIT License が第三者素材を再ライセンスするものではありません。
+
+第三者素材の扱いについては [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) も参照してください。
