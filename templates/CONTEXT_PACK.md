@@ -1,23 +1,32 @@
 # Context Pack
 
 > 作業ごとに必要な情報だけをまとめる一時的な入力パッケージ。
-> 固定の巨大文書にはしない。必要に応じて作り直す。
+> 固定の巨大文書にはしない。必要に応じて原典から再構築する。
 
 ## Task
 - Goal:
 - Expected result:
+- Issue / Task:
+- Priority:
+- Labels / Type:
+
+## Compact Summary
+Issue や依頼文をそのまま大量転載せず、今回の作業に必要な要点だけを短くまとめる。
 
 ## Project Context
 - Project:
 - Relevant area:
 - Current state:
 
-## Changes / Working Set
-現在の作業に直接関係する変更・ファイルだけを記載する。
+## Routed References
+タスクのラベル・種別・対象モジュールなどから選ばれた資料だけを列挙する。
 
+- 
+
+## Changes / Working Set
 - Changed files:
 - Target files:
-- Related issue / task:
+- Direct dependencies:
 
 ## Required Constraints
 今回の作業で必ず守る制約だけを記載する。
@@ -29,10 +38,20 @@
 
 - 
 
-## Required References
-判断に必要な原典への参照先。
+## Validation
+- Build:
+- Tests:
+- Other checks:
 
-- 
+## Change Summary
+変更後の確認では、full diff より先に次を使う。
+
+- Changed file names:
+- Diff stat / shortstat:
+- Commit summary:
+- Validation result:
+
+full diff や長いログは実装・レビュー・問題調査に必要な場合のみ追加する。
 
 ## Source Excerpts
 必要な場合のみ、コード・設定・ログなどの最小限の抜粋を入れる。
@@ -45,19 +64,17 @@
 - P4: 履歴・補助情報
 
 ## Optional Extensions
-プロジェクト固有の情報が必要な場合のみ追加する。
-
-例:
 - performance notes
-- test scope
 - runtime environment
 - generated summary
 - dependency notes
+- handoff notes
 - project-specific metadata
 
 ## Rules
-- リポジトリ全体を無条件に含めない。
-- 必要な情報だけを入れる。
+- リポジトリ全体、全 Issue、全 docs を無条件に含めない。
+- タスクのメタデータから必要資料をルーティングできる場合はそれを優先する。
+- Issue 本文など長い入力は、原典への参照を残した上で compact summary にする。
 - 要約だけで判断できない場合は原典を参照する。
 - 古い Context Pack を原典として扱わない。
 - 作業終了後に長期保存すべき内容は正式な設計文書・Issue・コードへ反映する。
