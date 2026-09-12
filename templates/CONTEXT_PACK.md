@@ -98,8 +98,11 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 ## Validation / Completion Gates
 - Build:
 - Targeted tests:
+- Evidence coverage / count:
 - Deterministic runtime / smoke:
 - Structured evaluation log:
+- Generated / distribution artifact:
+- Artifact smoke:
 - Visual / interactive confirmation:
 - Generated docs / data consistency:
 - Performance measurement:
@@ -108,6 +111,8 @@ full remote diff は必要な場合だけ読む。自動更新する場合は fa
 - Unverified areas:
 
 変更の性質に合う evidence だけを選ぶ。すべてを常時実行しない。
+検証コマンドが成功しても、`0 tests`・空走査・対象外のみの検査など、実質的に対象を確認していない場合は成功根拠にしない。
+source tree と最終成果物が異なる場合は、必要に応じて成果物生成後の起動・必須ファイル・初期化などを直接 smoke test する。
 ランダム性や時間依存がある場合は、可能なら seed / input / timestep / frame count などを固定する。
 UI・描画・レイアウトの正しさが Acceptance に含まれる場合は、テスト成功だけで断定せず visual confirmation を使う。
 Policy checker は confirmed violation と warning / review candidate を分けて扱う。
@@ -175,6 +180,8 @@ diff.patch
 - unrelated refactor を混ぜない。
 - 性能最適化は、対象の正しさを検証するテストや契約がない段階では現在タスクへ混ぜない。
 - validation は変更種別に応じて smallest sufficient evidence を選び、不要な全検証・大量ログを避ける。
+- 検証結果は exit code だけでなく、対象を実際に検査した evidence か確認する。
+- source と成果物が異なる場合は、必要なら生成成果物を直接検証する。
 - テストで確認できない UI / visual / runtime behavior を推測で補完しない。
 - 古い Context Pack を原典として扱わない。
 - 作業終了後に長期保存すべき内容は正式な設計文書・Issue・コードへ反映する。
