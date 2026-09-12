@@ -87,6 +87,24 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 
 巨大な README / SPEC / 設計文書は、最初から全文を読まず見出し・キーワード検索で対象節を特定してから読む。
 
+## Responsibility Map
+file / module ごとの責務を短くまとめた canonical map がある場合に指定する。
+
+- Responsibility map:
+- Update rule:
+
+AI はファイル名だけで責務を推測せず、利用可能ならこの map から候補を絞る。
+責務説明が短い1文で表せなくなった場合は、file / class / module の責務が広がりすぎていないか確認する signal として扱う。
+
+## Policy Checks
+coding rules のうち機械判定できる部分を checker / lint へ移している場合に指定する。
+
+- Checker command / tool:
+- Exception / ignore policy:
+
+成功時は長いログではなく `OK` 等の結果だけを保持し、問題がある場合だけ compact findings を読む。
+責務分離・semantic ownership など機械判定しにくい設計規約は、無理に checker 化せず targeted review に残す。
+
 ## Information Responsibilities
 同じ詳細情報を複数箇所へ重複させないため、情報源の役割を必要に応じて指定する。
 
@@ -135,10 +153,12 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 - Full / standard tests:
 - Generated docs / consistency:
 - Reproducibility conditions:
+- Policy checks:
 - Other checks:
 - Unverified areas:
 
 小変更では targeted tests を先に実行し、完了前に標準検証へ進む。
+機械判定可能な規約は checker 結果を利用し、成功時は長い規約全文やログを保持しない。
 成功時は結果だけを保持し、失敗時のみ必要なログを追加する。
 未確認領域が残る場合は、全体を追加走査する代わりに明示して引き継ぐ。
 
@@ -163,6 +183,8 @@ Issue ラベル、タスク種別、対象モジュールなどから読む資�
 - Current State は現在の能力と制約の把握に使い、詳細仕様の代替にしない。
 - タスクのメタデータから必要資料を絞れる場合は Task Routing を使う。
 - Change Routing Map がある場合は対象 source と matching tests を先に特定する。
+- Responsibility Map がある場合は file / module の責務確認と候補絞り込みに使う。
+- 機械判定可能な coding rules は可能なら checker / lint の compact result を優先し、規約全文を常時コンテキストへ入れない。
 - 大きな文書は全文読み込みより対象見出し検索を先に使う。
 - 変更確認では、まず changed files、diff stat、commit summary、validation result を見る。
 - full diff は実装・レビュー・問題調査に必要な場合だけ読む。
