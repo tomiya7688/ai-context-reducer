@@ -2,7 +2,7 @@
 
 変更内容に応じて、必要な検証手段だけを選ぶ方針です。
 
-この考え方は `obake-no-sumika` と `kadoka_tetris_ai` の実運用を参考にしています。外部プロジェクトは実装例であり、標準仕様そのものは依存しません。
+この考え方は `obake-no-sumika`、`kadoka_tetris_ai`、`dot_editor` の実運用を参考にしています。外部プロジェクトは実装例であり、標準仕様そのものは依存しません。
 
 ## 目的
 
@@ -70,6 +70,33 @@ UI / drawing / layout
 
 Context Pack には、可能なら「何件・何対象を検証したか」を短く残します。大量のログ全文は不要です。
 
+## Headless first
+
+GUI / interactive application でも、まず GUI を起動せず確認できるロジック・保存形式・CLI・生成物を自動検証します。
+
+```text
+headless checks
+  -> sufficientなら終了
+  -> visual / interactive acceptance がある場合だけ GUI confirmation
+```
+
+GUI起動は重い実行ログ、画像、手動操作など追加コンテキストを生みやすいため、必要な変更だけに限定します。
+
+ただし UI / visual correctness 自体が Acceptance の場合は headless 結果だけで完了扱いにしません。
+
+## Disposable validation workspace
+
+保存・変換・export・初期化など、ファイル生成を伴う検証は可能なら temporary directory / disposable workspace 内で行います。
+
+これにより:
+
+- 作業ツリーへ検証用ファイルを残さない
+- generated file を通常差分へ混ぜない
+- 毎回同じ初期状態から再現しやすくする
+- AI が無関係な生成物を changed files として読むことを防ぐ
+
+検証用成果物を長期保存する必要がある場合だけ明示的な保存先へ移します。
+
 ## Generated / distribution artifact boundary
 
 最終成果物が source tree と異なる場合、source 側の検証だけで完了としないことがあります。
@@ -127,6 +154,8 @@ source validation
 
 - 変更種別から必要な検証 evidence をルーティングする
 - smallest sufficient validation を先に使う
+- GUI / interactive validation は必要な変更だけに限定し、可能なら headless checks を先に使う
+- ファイル生成を伴う検証は disposable workspace を優先する
 - evidence が実際に対象を検査したか確認する
 - `0 tests` や空検査を成功根拠にしない
 - source と成果物が異なる場合は必要に応じて生成成果物を直接 smoke test する
