@@ -1,0 +1,296 @@
+# Adaptive Adoption / 導入優先度
+
+この文書は、Codex / Claude Code / ChatGPT などが対象プロジェクトを短時間で観察し、`ai-context-reducer` のどの手法を導入するか自律的に選ぶための判断基準です。
+
+目的は **全部導入することではありません**。
+
+> 最小コアを先に導入し、追加手法は期待効果が導入・維持コストを上回る場合だけ使う。
+
+## 1. 導入優先度
+
+### A — Core / 原則ほぼ全プロジェクト
+
+最初に導入する最小構成です。
+
+- 小さい `AI_CONTEXT.md` または同等のAI入口
+- Search first, read second
+- Goal / Required / Acceptance が揃ったら探索停止
+- Source of Truth の明示
+- 現在タスクと unrelated refactor の分離
+- targeted validation と Unverified areas
+- generated files / logs / history を通常コンテキストから除外
+
+Aだけで十分な小規模プロジェクトもあります。
+
+### B — High ROI / 条件が合えば優先導入
+
+比較的低コストで大きな削減効果が期待できます。
+
+| 手法 | 導入するとよい兆候 |
+|---|---|
+| Current State summary | 実装済み機能・制約・未実装が増え、READMEだけでは現状を把握しにくい |
+| Task Routing | Issue / docs / subsystem が多く、タスクごとに読む資料が変わる |
+| Change Routing Map | 変更カテゴリから source / tests / docs を対応付けられる |
+| Responsibility Map | file / module が増え、名前だけでは責務を判断しづらい |
+| Remote Delta First | 複数AI・複数チャット・複数開発者が同じremoteを更新する |
+| Validation Routing | 変更によって必要な検証方法が大きく異なる |
+| compact policy checks | 規約が長い、または機械判定できる規則が多い |
+
+### C — Conditional / 特定プロジェクト向け
+
+効果は大きいですが、必要なプロジェクトだけ導入します。
+
+| 手法 | 向いているプロジェクト |
+|---|---|
+| Source Structure Index | 非常に大きいコードベース、巨大ファイル、多数のcall/dependency関係 |
+| changed-symbol routing | 大きいファイル内の一部symbolだけを頻繁に変更する |
+| artifact-boundary validation | build / package / distribution がsource treeと異なる |
+| headless-first validation | GUI / editor / game / interactive application |
+| disposable validation workspace | export / save / conversion が多数の一時ファイルを生成する |
+| deterministic seam | random / clock / network / environment など非決定入力が多い |
+| structured runtime observation | runtime挙動を巨大ログではなく少数の状態値で確認できる |
+| Boilerplate Generation | license / NOTICE / header / 定型文を多数プロジェクトへ展開する |
+| Policy Routing | Required / Recommended / Advisory など規約の強さが複数ある |
+
+### D — Optional / 効果確認後
+
+次は標準必須にしません。
+
+- 高コストな生成索引
+- 常時更新する大規模call graph
+- 複雑な要約キャッシュ
+- AI専用ファイルの大量追加
+- 小規模repoへの過剰なrouting table
+- 導入・保守コストが削減効果より大きい自動化
+
+実測または明確な反復コストがある場合だけ追加します。
+
+## 2. プロジェクト規模別の目安
+
+LOCやファイル数だけで機械的に判定しません。AIが迷わず対象箇所へ到達できるかを基準にします。
+
+### Small
+
+特徴:
+
+- 主要実装が少数ファイル
+- docs が少ない
+- source と tests の対応が明白
+- 単独開発・単一セッション中心
+
+推奨:
+
+```text
+A Core
++ 必要なら Validation Routing
+```
+
+Task Routing や Source Structure Index は通常不要です。
+
+### Medium
+
+特徴:
+
+- 複数module / subsystem
+- docs / tests / scripts が増えている
+- Issueや変更カテゴリによって読む場所が異なる
+
+推奨:
+
+```text
+A Core
++ Responsibility Map
++ Change / Task Routing
++ Current State
++ Validation Routing
+```
+
+### Large
+
+特徴:
+
+- AIがroot listingだけでは対象箇所を判断しにくい
+- subsystem・docs・tests・generated artifacts が多数
+- 同じファイルを毎回読み直すコストが目立つ
+
+推奨:
+
+```text
+A Core
++ B High ROI の該当項目
++ Source Structure Index
++ changed-symbol routing
++ split Context Pack
+```
+
+### Multi-agent / Concurrent
+
+規模に関係なく、複数AIや人間が同じremoteを触る場合:
+
+```text
+Remote Delta First
++ compact change summary
++ current task / handoff reference
+```
+
+を優先します。
+
+## 3. 性質別プロファイル
+
+### GUI / Game / Editor
+
+優先:
+
+- headless-first validation
+- deterministic runtime
+- structured observation
+- visual confirmation は Acceptance に必要な場合だけ
+- disposable validation workspace
+
+### Compiler / Language / Static Tool
+
+優先:
+
+- Responsibility Map
+- Change Routing Map
+- targeted tests
+- Policy checker
+- Source Structure Index は規模が大きくなってから
+
+### Data / Conversion Tool
+
+優先:
+
+- dry-run
+- reproducible transformation
+- disposable workspace
+- bounded output / compact diff
+- source of truth の明示
+
+### Packaged / Distributed Application
+
+優先:
+
+- source validation
+- artifact generation
+- artifact smoke
+- required files / initialization validation
+
+### Random / Time-dependent / Simulation
+
+優先:
+
+- fixed seed / fixed input
+- deterministic seam で RNG / clock 等を注入可能にする
+- bounded runtime
+- structured evaluation output
+
+### Rule-heavy Project
+
+優先:
+
+- Policy Routing
+- machine-checkable rules -> checker
+- semantic / architectural rules -> targeted review
+- compact exception record
+
+## 4. AIによる自動導入手順
+
+Codex / Claude Code 等は、導入時に次の順で進めます。
+
+### Step 1: shallow inspection
+
+最初は次だけ確認します。
+
+- root file / directory names
+- README
+- 既存の `AGENTS.md` / `CLAUDE.md` / AI向け入口
+- docs のファイル名・見出し
+- test directory / test naming
+- build / package metadata
+- Git / remote の運用が分かる最小情報
+
+この時点で全source・全docs・全Issuesを読みません。
+
+### Step 2: classify signals
+
+次を短く判定します。
+
+```text
+size: small / medium / large
+concurrent remote edits: yes / no
+many docs or issues: yes / no
+routing ambiguity: low / high
+GUI / interactive: yes / no
+runtime nondeterminism: yes / no
+generated / packaged artifact: yes / no
+rule-heavy: yes / no
+```
+
+厳密な数値分類は不要です。
+
+### Step 3: choose smallest useful set
+
+必ず A Core から始め、B / C は該当signalがある場合だけ選択します。
+
+「将来便利そう」という理由だけで追加しません。
+
+### Step 4: modify minimally
+
+原則として最初の導入変更は小さくします。
+
+- 既存AI入口があれば改善する
+- なければ小さい `AI_CONTEXT.md` を作る
+- 既存docsを再配置しない
+- 詳細仕様を複製しない
+- 必要なrouting map等だけ追加する
+
+### Step 5: verify usefulness
+
+導入後、少なくとも次を確認します。
+
+- AI入口から現在の作業対象へ到達できる
+- source of truth が分かる
+- 無関係な巨大領域を読まずに済む
+- completion / validation の入口が分かる
+- 追加ファイル自身が過剰に大きくない
+
+## 5. 導入結果のcompact report
+
+AIは導入後、長い説明ではなく次を報告します。
+
+```text
+Adopted:
+- Core AI index
+- Change Routing Map
+- Validation Routing
+
+Skipped:
+- Source Structure Index: repository is still small
+- Remote Delta First: single-writer workflow
+
+Why:
+- source/test routing was the main repeated lookup cost
+```
+
+**導入しなかった手法と理由も短く残す**ことで、全部入りを防ぎます。
+
+## 6. 判断原則
+
+優先順位は次です。
+
+```text
+正確性
+  > 作業対象への到達速度
+  > コンテキスト削減量
+  > 自動化の多さ
+```
+
+そして、導入判断は次で行います。
+
+```text
+expected repeated context saving
+    > adoption + maintenance cost
+```
+
+を満たす手法だけ追加します。
