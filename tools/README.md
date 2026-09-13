@@ -55,6 +55,17 @@ tools/README.md
 - 解析結果から原典へ戻れるpath / symbol / reasonを残す
 - targeted validationを優先し、共有contract変更時だけbroader validationへ広げる
 
+新規・既存toolのレビューでは、機能が正しいだけでなく次も確認します。
+
+- 不要な全repo scanをしていないか
+- 既定出力が巨大にならないか
+- limit / scope / targetを指定できるか
+- 同じsourceを複数段で読み直していないか
+- success時に巨大logを残していないか
+- source-of-truthへ戻るpointerを失っていないか
+
+これらに反するtoolは、機能追加より先にcontext-efficientな形へ修正します。
+
 ## Native toolbox
 
 Commonで頻繁に使う機能は Go 製単一バイナリ `acr-toolbox` に統合します。
