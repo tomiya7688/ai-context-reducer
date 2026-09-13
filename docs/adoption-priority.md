@@ -35,6 +35,7 @@ Aだけで十分な小規模プロジェクトもあります。
 | Hierarchical Context | monorepo / multi-appでsubsystem固有ルールがあり、root AI guideが肥大化している |
 | Remote Delta First | 複数AI・複数チャット・複数開発者が同じremoteを更新する |
 | Validation Routing | 変更によって必要な検証方法が大きく異なる |
+| Change / Test Impact Routing | test suiteが大きい・遅い、source/test対応やdependency情報があり毎回full suiteを回している |
 | compact policy checks | 規約が長い、または機械判定できる規則が多い |
 
 ### C — Conditional / 特定プロジェクト向け
@@ -86,7 +87,7 @@ A Core
 + 必要なら Validation Routing
 ```
 
-Task Routing や Source Structure Index は通常不要です。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。
+Task Routing や Source Structure Index は通常不要です。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。test suiteが小さくfull runが安価ならChange / Test Impact Routingも不要です。
 
 ### Medium
 
@@ -104,6 +105,7 @@ A Core
 + Change / Task Routing
 + Current State
 + Validation Routing
++ test suiteが重い場合だけ Change / Test Impact Routing
 + subsystem固有ルールが多い場合だけ Hierarchical Context
 ```
 
@@ -121,6 +123,7 @@ A Core
 A Core
 + B High ROI の該当項目
 + Hierarchical Context（multi-app / local ruleがある場合）
++ Change / Test Impact Routing（test suiteが大きい場合）
 + Source Structure Index
 + changed-symbol routing
 + split Context Pack
@@ -148,6 +151,7 @@ Remote Delta First
 - Task / Change Routing
 - Responsibility Map
 - package / app単位のValidation Routing
+- test suiteが大きい場合はChange / Test Impact Routing
 
 rootへ全subsystemの詳細を集約せず、repository-wide invariantだけを残します。local guideは上位文書を複製せず、そのscope固有の差分だけを書きます。
 
@@ -168,6 +172,7 @@ rootへ全subsystemの詳細を集約せず、repository-wide invariantだけを
 - Responsibility Map
 - Change Routing Map
 - targeted tests
+- test suiteが大きい場合はChange / Test Impact Routing
 - Policy checker
 - Source Structure Index は規模が大きくなってから
 
@@ -237,6 +242,8 @@ many docs or issues: yes / no
 routing ambiguity: low / high
 multiple apps/packages: yes / no
 subsystem-specific instructions: yes / no
+test suite cost: low / high
+test impact mapping available: yes / no
 GUI / interactive: yes / no
 runtime nondeterminism: yes / no
 generated / packaged artifact: yes / no
@@ -253,6 +260,8 @@ rule-heavy: yes / no
 
 Hierarchical Contextは、複数scopeへ異なる指示を置く明確な理由がある場合だけ選択します。directory数が多いだけでは導入理由にしません。
 
+Change / Test Impact Routingは、full suiteが十分安価なら導入しません。導入する場合も、shared/core/public contract変更時のbroader fallbackを削りません。
+
 ### Step 4: modify minimally
 
 原則として最初の導入変更は小さくします。
@@ -263,6 +272,7 @@ Hierarchical Contextは、複数scopeへ異なる指示を置く明確な理由�
 - 詳細仕様を複製しない
 - 必要なrouting map等だけ追加する
 - local guideが必要なら、そのscope固有の差分だけを置く
+- test impact routingは既存の命名・dependency情報から始め、専用解析器を先に作らない
 
 ### Step 5: verify usefulness
 
@@ -274,6 +284,7 @@ Hierarchical Contextは、複数scopeへ異なる指示を置く明確な理由�
 - completion / validation の入口が分かる
 - 追加ファイル自身が過剰に大きくない
 - local guideを導入した場合、無関係なsubsystemの指示を読まずに済む
+- test impact routingを導入した場合、必要なbroader fallbackが残っている
 
 ## 5. 導入結果のcompact report
 
@@ -289,6 +300,7 @@ Skipped:
 - Source Structure Index: repository is still small
 - Remote Delta First: single-writer workflow
 - Hierarchical Context: no subsystem-specific rules
+- Change / Test Impact Routing: full test suite is already cheap
 
 Why:
 - source/test routing was the main repeated lookup cost
