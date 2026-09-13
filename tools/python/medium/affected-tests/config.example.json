@@ -1,0 +1,24 @@
+{
+  "mappings": [
+    {
+      "source": "src/parser/**",
+      "tests": ["tests/parser/**"],
+      "broader": false
+    },
+    {
+      "source": "src/core/**",
+      "tests": ["tests/core/**", "tests/integration/**"],
+      "broader": true
+    }
+  ],
+  "broader_patterns": [
+    "**/core/**",
+    "**/shared/**",
+    "**/schema.*",
+    "**/api/**",
+    "go.mod",
+    "go.sum",
+    "pyproject.toml",
+    "package.json"
+  ]
+}
