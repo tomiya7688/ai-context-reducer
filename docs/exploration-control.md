@@ -36,7 +36,56 @@ Detailed docs only if needed
 
 新しい不明点が実装・検証中に発生した場合だけ、対応する原典を追加で取得します。
 
-## 3. Explicit deferred scope
+## 3. Evidence Budget / Bounded Evidence Collection
+
+「十分」の判断が曖昧で探索が止まりにくいtaskでは、Required / Optional evidenceを分けます。
+
+例:
+
+```text
+Required evidence:
+- current task / issue requirements
+- target implementation
+- matching tests
+- applicable policy / design source
+
+Optional evidence:
+- history
+- adjacent modules
+- broad docs
+```
+
+追加のread / searchは、原則として次のいずれかを満たす場合に行います。
+
+- Required evidenceの欠落を埋める
+- 既存証拠の矛盾を解消する
+- Acceptance / validation判断に必要
+- 実装中に新しい依存・影響範囲が判明した
+- failure原因の特定に必要
+- security / compatibility等の重要未確認領域を解消する
+
+どれにも該当しない「念のため」の探索は止めます。
+
+必要なら短いEvidence Ledgerを持ちます。
+
+```text
+Known:
+- implementation: src/foo.py
+- tests: tests/test_foo.py
+- policy: docs/foo.md
+
+Missing:
+- none
+
+Unverified:
+- Windows packaging
+```
+
+これはtoken数のhard capではありません。正確性を犠牲にして上限で停止する仕組みにしません。
+
+詳細は [`evidence-budget.md`](evidence-budget.md) を参照してください。
+
+## 4. Explicit deferred scope
 
 タスクには「今回やること」だけでなく「今回はやらないこと」を短く持てます。
 
@@ -51,7 +100,7 @@ Deferred: repetition / search / optimization
 
 これは将来作業を否定するものではなく、現在の Context Pack の境界を固定するための情報です。将来作業は Issue や正式な計画へ参照を残します。
 
-## 4. Non-task filtering
+## 5. Non-task filtering
 
 Issue tracker には、実装作業以外の項目も混ざります。
 
@@ -68,7 +117,7 @@ Issue tracker には、実装作業以外の項目も混ざります。
 
 AI に全 Issue を読ませて「どれが実装タスクか」を毎回判断させる必要はありません。
 
-## 5. Acceptance-first task packet
+## 6. Acceptance-first task packet
 
 Task Capsule / Context Pack では、Issue 本文全体より次の情報を優先します。
 
@@ -86,7 +135,7 @@ Source of truth reference
 
 Acceptance と deferred scope を早い段階で持つことで、探索の終了条件・検証条件・非対象範囲を同時に決められます。
 
-## 6. Reproducible split packet
+## 7. Reproducible split packet
 
 Context Pack は必ず1ファイルである必要はありません。
 
@@ -103,13 +152,13 @@ context/<task-id>/
 
 必要な部分だけ読め、機械生成情報を個別に更新できます。このディレクトリ名やファイル名は標準仕様ではありません。
 
-## 7. Changed symbols
+## 8. Changed symbols
 
 changed files だけでなく、変更対象ファイル内の class / function / method などの symbol 一覧を機械抽出できる場合は利用します。
 
 これにより、1ファイルが大きい場合でも working set を先に絞れます。
 
-## 8. Bounded diff
+## 9. Bounded diff
 
 Task Packet に diff を含める場合、無制限に全文を複製しません。
 
@@ -118,7 +167,7 @@ Task Packet に diff を含める場合、無制限に全文を複製しませ�
 - truncated であることを明示する
 - 判断に必要なら原典の full diff へ戻る
 
-## 9. Unverified areas
+## 10. Unverified areas
 
 安全性のために全リポジトリを読むのではなく、確認できていない範囲を明示します。
 
@@ -129,7 +178,9 @@ Validation
 - platform-specific path: unverified
 ```
 
-## 10. Scope containment
+Evidence Budgetを使う場合も、Unverifiedを無理にゼロにするためだけの探索は行いません。現在taskの正確性に必要な未確認領域だけRequired evidenceへ昇格させます。
+
+## 11. Scope containment
 
 現在タスクと無関係な refactor は混ぜません。
 
@@ -137,17 +188,21 @@ Validation
 
 これは変更量、レビュー量、必要コンテキストを抑え、最適化によって未確定仕様まで探索対象になることを防ぎます。
 
-## 11. 実装例
+## 12. 実装例
 
 - `comfyUI_support_tools`: Search-first / Read-second、Acceptance 抽出、bounded packet、探索停止条件
 - `Kadoka-shougi-ai`: narrow task、明示的 deferred behavior、対象 subsystem / tests の固定、correctness tests 前の先行最適化を避ける運用
 
 これらは参考例であり、同じ標準を別の Issue tracker、別言語、別ツールで実装して構いません。
 
-## 12. 標準推奨
+## 13. 標準推奨
 
 - Search first, read second
 - Goal / Required / Acceptance を探索停止条件として使う
+- 探索が止まりにくいtaskではRequired / Optional evidenceを分ける
+- 次のread/searchがどの不足・矛盾・Acceptance確認を埋めるか説明できないなら停止を優先する
+- Evidence Ledgerを使う場合はpointer中心・短量にする
+- token数のhard capで正確性を犠牲にしない
 - 必要に応じて Deferred / Out of Scope を明示する
 - 非実装タスクを次タスク候補から先に除外する
 - Acceptance を Context Pack の早い段階に含める
