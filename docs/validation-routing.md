@@ -57,6 +57,43 @@ UI / drawing / layout
 
 テスト成功だけでは確認できない性質を、テスト結果から推測して済ませないことを推奨します。
 
+## Change Impact / Test Impact Routing
+
+変更種別からevidence typeを選んだ後、test suiteが大きいrepoでは **changed file / symbol / packageから実行範囲を絞る** ことができます。
+
+```text
+changed files / symbols
+        ↓
+responsibility / dependency / ownership information
+        ↓
+likely affected tests
+        ↓
+smallest sufficient validation
+        ↓
+shared/public/unknown impactなら broader fallback
+```
+
+利用候補:
+
+- source ↔ test の命名対応
+- explicit mapping table
+- Responsibility / Change Routing Map
+- import / dependency relation
+- changed-symbol routing
+- 既存coverage data（補助信号）
+
+専用coverage SaaSや巨大dependency graphは必須ではありません。
+
+安全側fallbackを必ず持ちます。
+
+- shared/core変更 -> subsystem-wide / broader tests
+- public API / schema / config contract変更 -> producer + consumer / compatibility tests
+- build/package変更 -> artifact-level validation
+- dependency relation不明 -> subsystem/full tests または `Unverified`
+- impact selectionの確信が低い -> broader validation
+
+詳細は [`change-impact-routing.md`](change-impact-routing.md) を参照してください。
+
 ## Evidence validity
 
 検証コマンドが終了コード 0 でも、実際に対象を検査していなければ十分な evidence ではありません。
@@ -153,6 +190,8 @@ source validation
 ## 標準推奨
 
 - 変更種別から必要な検証 evidence をルーティングする
+- test suiteが大きい場合はchange/test impact routingで実行範囲を絞る
+- impactがshared/public/unknownならbroader fallbackする
 - smallest sufficient validation を先に使う
 - GUI / interactive validation は必要な変更だけに限定し、可能なら headless checks を先に使う
 - ファイル生成を伴う検証は disposable workspace を優先する
