@@ -8,14 +8,14 @@ from processing import build_manifest
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Build a prioritized context manifest.')
+    parser = argparse.ArgumentParser(description='Build a prioritized context manifest as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
     parser.add_argument('--limit', type=int, default=400)
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
     result = build_manifest(collect_files(root), args.limit)
-    result['root'] = root.name
+    result['root_path'] = str(root)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
