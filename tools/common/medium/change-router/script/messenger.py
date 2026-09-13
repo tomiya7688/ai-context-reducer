@@ -11,13 +11,12 @@ IGNORE_DIRS = {
 DOC_EXTS = {'.md', '.rst', '.txt'}
 
 
-def changed_files(root: Path, base: str | None) -> list[str]:
-    cmd = ['git', '-C', str(root), 'diff', '--name-only']
-    cmd.append(base or 'HEAD')
+def changed_files(root: Path, base: str | None) -> tuple[bool, list[str]]:
+    cmd = ['git', '-C', str(root), 'diff', '--name-only', base or 'HEAD']
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        return []
-    return [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        return False, []
+    return True, [line.strip() for line in result.stdout.splitlines() if line.strip()]
 
 
 def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]], bool]:
@@ -46,7 +45,7 @@ def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]]
                 'is_test': is_test,
                 'is_doc': is_doc,
             })
-            if len(rows) >= max_files:
+            if max_files > 0 and len(rows) >= max_files:
                 truncated = True
                 return rows, truncated
 
