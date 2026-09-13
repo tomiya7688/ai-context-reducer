@@ -56,6 +56,19 @@ UPD Commander等の外部設計手法は、これらの内部実装規律を考�
 - missing runtime / SDK / packageを勝手にinstallしない
 - Small repoへ高コスト解析を持ち込まない
 
+### Internal scan budget
+
+出力だけをtruncateして内部で全repoを無制限に読む実装は、Context Reducerの目的に反する。
+
+- generated / dependency / cache directoryは、結果から除外するだけでなくtraversal自体をpruneする
+- repo-wide scanが必要なtoolは、`--max-files` / `--max-visited` / depth / scope等のscan budgetを持つ
+- scan上限へ到達した場合は、結果が不完全であることを明示する
+- changed itemごとに同じrepo scanを繰り返さず、必要なら1回のbounded indexを再利用する
+- explicit paths / scopeが与えられた場合はrepo rootへ勝手に探索を広げない
+- broader scanは安全性や精度上必要な場合にだけ、利用者が意図的に拡張できる形にする
+
+`bounded output != bounded work` であることを常に区別する。
+
 ## Python / Go
 
 - Python: build不要。stdlib中心。必要なら `run.bat` / `run.sh`
@@ -80,7 +93,7 @@ shared contract  -> Python/Goのfixture結果比較
 - 既存toolで代用できないか
 - external toolの方が保守コストが低くないか
 - repeated context saving > adoption + maintenance cost か
-- outputをboundedにできるか
+- outputだけでなくinternal scanもboundedか
 - targeted validationを定義できるか
 
 満たさない場合は実装しない。
