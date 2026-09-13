@@ -31,7 +31,7 @@ def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str
             for role, words in NAMES.items():
                 if not any(word in low for word in words):
                     continue
-                if len(hits[role]) < per_role_limit:
+                if per_role_limit == 0 or len(hits[role]) < per_role_limit:
                     hits[role].append(rel)
                 else:
                     truncated[role] = True
@@ -43,7 +43,7 @@ def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str
 def main():
     parser = argparse.ArgumentParser(description='Find filename-based source-of-truth candidates as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
-    parser.add_argument('--per-role-limit', type=int, default=20)
+    parser.add_argument('--per-role-limit', type=int, default=20, help='Maximum candidates per role. 0 means unlimited.')
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
