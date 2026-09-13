@@ -9,14 +9,23 @@ def render_context_pack(task: dict[str, str], state: dict[str, object]) -> str:
     text += f"- Required: {task.get('required', '')}\n"
     text += f"- Acceptance: {task.get('acceptance', '')}\n"
     text += f"- Deferred / out of scope: {task.get('deferred', '')}\n"
+
     text += '\n## Working Set\n- Changed files:\n'
-    text += ''.join(f'  - {item}\n' for item in changed) or '  - none detected\n'
-    if state.get('changed_truncated'):
-        text += '  - ... truncated\n'
+    if not state.get('changed_query_ok', True):
+        text += '  - unavailable: git diff query failed\n'
+    else:
+        text += ''.join(f'  - {item}\n' for item in changed) or '  - none detected\n'
+        if state.get('changed_truncated'):
+            text += '  - ... truncated\n'
+
     text += '\n## Git Status\n'
-    text += ''.join(f'- {item}\n' for item in status) or '- clean / unavailable\n'
-    if state.get('status_truncated'):
-        text += '- ... truncated\n'
+    if not state.get('status_query_ok', True):
+        text += '- unavailable: git status query failed\n'
+    else:
+        text += ''.join(f'- {item}\n' for item in status) or '- clean\n'
+        if state.get('status_truncated'):
+            text += '- ... truncated\n'
+
     text += '\n## Required Constraints\n- \n'
     text += '\n## Validation\n- Targeted evidence:\n- Unverified areas:\n'
     text += '\n## Rules\n- Search first, read second.\n'
