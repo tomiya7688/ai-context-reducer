@@ -24,6 +24,37 @@ Linux/macOS: tools/setup.sh <project-root>
 
 詳細は `docs/portable-tools.md` と `docs/language-tool-setup.md` を参照してください。
 
+## Tools自身にもContext Reducerを適用する
+
+`tools/` の開発・保守自体もこのrepositoryの原則に従います。
+
+AIがtoolを変更するときは、最初から `tools/` 全体を読みません。
+
+```text
+tools/README.md
+  -> tools/AI_CONTEXT.md
+  -> target language/subtree local guide
+  -> target tool README / source / tests / build-or-run script
+  -> direct dependency only if needed
+```
+
+主なlocal guide:
+
+- `tools/AI_CONTEXT.md`: tools全体のrouting / stop condition / Source of Truth / validation
+- `tools/python/AI_CONTEXT.local.md`: Python tool固有の差分
+- `tools/go/AI_CONTEXT.local.md`: Go tool固有の差分
+
+対象toolのGoal・入出力契約・変更箇所・必要validationが揃ったら探索を止めます。別言語版、別category、全tool一覧は、互換性・依存・重複確認が必要な場合だけ追加で読みます。
+
+ツール自身の出力も同じ考え方を守ります。
+
+- summary / index first
+- bounded output
+- full source / full logs / full treeを既定出力にしない
+- truncation / uncertainty / fallbackを明示する
+- 解析結果から原典へ戻れるpath / symbol / reasonを残す
+- targeted validationを優先し、共有contract変更時だけbroader validationへ広げる
+
 ## Native toolbox
 
 Commonで頻繁に使う機能は Go 製単一バイナリ `acr-toolbox` に統合します。
