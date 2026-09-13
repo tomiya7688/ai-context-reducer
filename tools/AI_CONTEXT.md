@@ -43,11 +43,85 @@ Goal / 入出力契約 / 直接変更対象 / validation / 既存toolとの重�
 
 UPD Commander等の外部設計手法は内部実装規律の参考にしてよい。ただし、ai-context-reducerはそれらの適合checkerではなく、固有layer名・class名・命名規則を要求しない。逆に外部設計手法そのものをContext Reducerとして扱わない。
 
-## When to split a tool
+## Context Reducerを使った分割基準
 
-小さい単一責務toolを形式だけで分割しない。CLI/orchestration、external I/O、analysis、formattingが独立した変更理由を持ち、分割後にworking setが小さくなる場合だけ分ける。
+分割判断は一般的な「綺麗な設計」ではなく、**このrepository自身のContext Reducer手法をtools開発へ適用できるか**で行う。
 
-複数境界を持つtoolでは、必要に応じて次の内部構造を使える。
+分割後、典型的な変更タスクについて次が成立するなら分割価値がある。
+
+### 1. Task Routing
+
+変更内容から最初に読むfileを直接絞れる。
+
+```text
+CLI option / dispatch変更
+  -> entrypoint / commander相当
+
+Git / filesystem境界変更
+  -> messenger相当
+
+解析ロジック変更
+  -> processing相当
+
+output contract変更
+  -> formatter / serializer + contract test
+```
+
+変更理由が違うのに毎回同じ巨大fileを読む必要があるなら、分割候補とする。
+
+### 2. Responsibility Map
+
+各file/moduleの責務を短い1文で説明できることを目標にする。
+
+責務説明が `A and B and C` のように複数の独立責務を並べないと書けない場合、理解負債のsignalとして分割を検討する。
+
+### 3. Hierarchical Context
+
+root policyを読んだ後、対象tool内でさらに局所的なworking setへ絞れる構造にする。
+
+小変更のために同じtool directory内の全sourceを読む必要がある構造は避ける。ただし、分割によって逆に読むfile数や契約数が増えるだけなら分割しない。
+
+### 4. Exploration Stop
+
+agentが次を把握した時点で追加探索を止められる構造にする。
+
+- 変更責務
+- target file/module
+- direct contract
+- targeted validation
+
+無関係な責務を確認しないと安全性を判断できない場合は、責務境界を見直す。
+
+### 5. Change / Validation Routing
+
+変更責務からtargeted test / build / smokeへ直接到達できるようにする。
+
+```text
+processing変更 -> processing tests
+boundary変更   -> boundary contract tests
+CLI変更        -> CLI smoke / parsing tests
+shared contract変更 -> broader compatibility test
+```
+
+毎回full suiteしか安全なvalidation routeがない場合は、test responsibilityも見直す。
+
+### 6. Source of Truthを増やしすぎない
+
+分割のために同じ仕様・定数・schemaを複数fileへ複製しない。
+
+分割後もcanonical contractを1箇所に保ち、他moduleはそれを参照する。Context Reducerのための分割がSource of Truthの分散を起こすなら採用しない。
+
+### 分割しない条件
+
+次の場合は小さい単一責務toolのまま保つ。
+
+- 1fileを読むだけで責務全体を短く理解できる
+- 変更理由がほぼ同じ
+- targeted validationも同じ
+- 分割するとimport / contract / file traversalが増えてagentのworking setが広がる
+- cosmeticなCommander / Messenger / Processing分割にしかならない
+
+必要な場合は内部構造として次を使える。
 
 ```text
 entrypoint
@@ -56,7 +130,9 @@ entrypoint
   -> Processing相当: concrete analysis / transformation
 ```
 
-これは内部構造であり、公開CLIや対象repoへUPD構造を要求しない。
+これはtools開発のworking setを狭めるための内部設計であり、公開CLIや解析対象repoへUPD構造を要求するものではない。
+
+この基準により、`tools/` は「Context Reducerを提供するだけでなく、自身の開発にもTask Routing / Responsibility Map / Hierarchical Context / Exploration Stop / Targeted Validationを適用している」と説明できる状態を維持する。
 
 ## Tool implementation rules
 
@@ -115,5 +191,7 @@ shared contract  -> Python/Goのfixture結果比較
 - broad scanがagent探索を置き換える価値を持つか
 - outputはagent向けにcompactか
 - 不完全解析ならその事実を明示できるか
-- 分割するならworking setが実際に小さくなるか
-- targeted validationを定義できるか
+- Task Routingで最初に読むfileを絞れるか
+- Responsibility Mapとして責務を短く説明できるか
+- targeted validationへ直接routingできるか
+- 分割するならagent working setが実際に小さくなるか
