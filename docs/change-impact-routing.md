@@ -211,6 +211,15 @@ targeted failure
 
 逆にtargeted testが成功しても、fallback条件に該当するならbroader validationを省略しません。
 
+## 外部ツールの具体例
+
+既にbuild graph / dependency graphを持つプロジェクトでは、独自のimpact analyzerを作るより既存ツールを使う方が有利です。
+
+- **Nx / `nx affected`**: Git差分とproject graphから、変更されたprojectとその依存先を計算し、affected projectだけにtest / build / lint等を実行できる。JS/TS中心のmonorepoだけでなく、project graphを活かしたCI削減の具体例として分かりやすい。
+- **Pants / `--changed-since` + `--changed-dependents`**: Git基準のchanged targetsに対し、direct / transitive dependentsまで含めてtest等を実行できる。merge-baseからPR影響範囲を選ぶ運用も公式に案内されており、Change Impact Routingにかなり近い。
+
+これらを導入済みなら、そのproject graph / target graphをSource of Truthとして使い、同じ依存解析を別ツールで二重実装しないことを優先します。ただしdynamic dependencyやpublic contract変更など、ツールのgraphだけで十分でないケースでは本書のbroader fallbackを残します。
+
 ## Context削減との関係
 
 目的はtest実行時間だけではありません。
