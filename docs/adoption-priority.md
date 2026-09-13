@@ -32,6 +32,7 @@ Aだけで十分な小規模プロジェクトもあります。
 | Task Routing | Issue / docs / subsystem が多く、タスクごとに読む資料が変わる |
 | Change Routing Map | 変更カテゴリから source / tests / docs を対応付けられる |
 | Responsibility Map | file / module が増え、名前だけでは責務を判断しづらい |
+| Hierarchical Context | monorepo / multi-appでsubsystem固有ルールがあり、root AI guideが肥大化している |
 | Remote Delta First | 複数AI・複数チャット・複数開発者が同じremoteを更新する |
 | Validation Routing | 変更によって必要な検証方法が大きく異なる |
 | compact policy checks | 規約が長い、または機械判定できる規則が多い |
@@ -85,7 +86,7 @@ A Core
 + 必要なら Validation Routing
 ```
 
-Task Routing や Source Structure Index は通常不要です。
+Task Routing や Source Structure Index は通常不要です。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。
 
 ### Medium
 
@@ -103,6 +104,7 @@ A Core
 + Change / Task Routing
 + Current State
 + Validation Routing
++ subsystem固有ルールが多い場合だけ Hierarchical Context
 ```
 
 ### Large
@@ -118,6 +120,7 @@ A Core
 ```text
 A Core
 + B High ROI の該当項目
++ Hierarchical Context（multi-app / local ruleがある場合）
 + Source Structure Index
 + changed-symbol routing
 + split Context Pack
@@ -136,6 +139,17 @@ Remote Delta First
 を優先します。
 
 ## 3. 性質別プロファイル
+
+### Monorepo / Multi-app
+
+優先:
+
+- Hierarchical Context / Scoped AI Instructions
+- Task / Change Routing
+- Responsibility Map
+- package / app単位のValidation Routing
+
+rootへ全subsystemの詳細を集約せず、repository-wide invariantだけを残します。local guideは上位文書を複製せず、そのscope固有の差分だけを書きます。
 
 ### GUI / Game / Editor
 
@@ -221,6 +235,8 @@ size: small / medium / large
 concurrent remote edits: yes / no
 many docs or issues: yes / no
 routing ambiguity: low / high
+multiple apps/packages: yes / no
+subsystem-specific instructions: yes / no
 GUI / interactive: yes / no
 runtime nondeterminism: yes / no
 generated / packaged artifact: yes / no
@@ -235,6 +251,8 @@ rule-heavy: yes / no
 
 「将来便利そう」という理由だけで追加しません。
 
+Hierarchical Contextは、複数scopeへ異なる指示を置く明確な理由がある場合だけ選択します。directory数が多いだけでは導入理由にしません。
+
 ### Step 4: modify minimally
 
 原則として最初の導入変更は小さくします。
@@ -244,6 +262,7 @@ rule-heavy: yes / no
 - 既存docsを再配置しない
 - 詳細仕様を複製しない
 - 必要なrouting map等だけ追加する
+- local guideが必要なら、そのscope固有の差分だけを置く
 
 ### Step 5: verify usefulness
 
@@ -254,6 +273,7 @@ rule-heavy: yes / no
 - 無関係な巨大領域を読まずに済む
 - completion / validation の入口が分かる
 - 追加ファイル自身が過剰に大きくない
+- local guideを導入した場合、無関係なsubsystemの指示を読まずに済む
 
 ## 5. 導入結果のcompact report
 
@@ -268,6 +288,7 @@ Adopted:
 Skipped:
 - Source Structure Index: repository is still small
 - Remote Delta First: single-writer workflow
+- Hierarchical Context: no subsystem-specific rules
 
 Why:
 - source/test routing was the main repeated lookup cost
