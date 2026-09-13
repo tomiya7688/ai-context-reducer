@@ -72,6 +72,16 @@
 
 以下は効果がある場合だけ残す。導入判断は `docs/adoption-priority.md` を参照する。
 
+## Local Instructions
+monorepo / multi-app等でsubsystem固有ルールがある場合。
+
+- 作業対象のsubtreeにlocal AI guideが存在する場合だけ読む。
+- rootの共通ルールをlocal guideへ複製しない。
+- local guideにはそのscope固有のbuild / test / architecture / ownership等の差分だけを書く。
+- 特定の `AGENTS.md` / `CLAUDE.md` 等のファイル名へ依存しない。
+
+詳細: `docs/hierarchical-context.md`
+
 ## Current State
 READMEだけでは現在の能力・制約・未実装を把握しにくい場合。
 
