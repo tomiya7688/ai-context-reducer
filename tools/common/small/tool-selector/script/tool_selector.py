@@ -25,9 +25,9 @@ TYPE_SIGNALS = {
 
 def files(root: Path):
     for current, dirs, names in os.walk(root):
-        dirs[:] = [d for d in dirs if d.lower() not in IGNORE]
+        dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
         current_path = Path(current)
-        for name in names:
+        for name in sorted(names):
             yield current_path / name
 
 
@@ -72,7 +72,8 @@ def build_selection(root: Path) -> dict[str, object]:
     docs = sum(1 for p in paths if p.suffix.lower() in {'.md', '.rst', '.txt'})
     tests = sum(1 for p in paths if 'test' in p.name.lower() or 'tests' in {x.lower() for x in p.parts})
     types = detect_types(paths)
-    recommended, conditional = recommend(size, langs.most_common(), types, docs, tests, (root / '.git').exists())
+    has_git = (root / '.git').exists()
+    recommended, conditional = recommend(size, langs.most_common(), types, docs, tests, has_git)
     return {
         'tool': 'tool-selector',
         'status': 'ok',
@@ -83,6 +84,7 @@ def build_selection(root: Path) -> dict[str, object]:
         'detected_project_types': types,
         'documentation_file_count': docs,
         'test_file_count': tests,
+        'git_repository_detected': has_git,
         'recommended_tools': recommended,
         'conditional_tools': conditional,
     }
