@@ -1,16 +1,64 @@
 #!/usr/bin/env python3
-import argparse,json,re
+import argparse
+import json
+import os
+import re
 from pathlib import Path
-INC=re.compile(r'^\s*#\s*include\s*"([^"]+)"',re.M)
+
+INCLUDE = re.compile(r'^\s*#\s*include\s*"([^"]+)"', re.M)
+IGNORE_DIRS = {
+    '.git', '.hg', '.svn', '.venv', 'venv', 'node_modules', '__pycache__',
+    'bin', 'obj', 'build', 'dist', 'vendor', '.idea', '.vs',
+}
+EXTENSIONS = {'.c', '.h'}
+
+
+def source_files(root: Path, limit: int):
+    found = []
+    for current, dirs, files in os.walk(root):
+        dirs[:] = [d for d in dirs if d.lower() not in IGNORE_DIRS]
+        current_path = Path(current)
+        for name in files:
+            path = current_path / name
+            if path.suffix.lower() not in EXTENSIONS:
+                continue
+            found.append(path)
+            if len(found) >= limit:
+                return found, True
+    return found, False
+
+
+def build_edges(root: Path, files: list[Path]):
+    relmap = {path.relative_to(root).as_posix(): path for path in files}
+    byname = {path.name: rel for rel, path in relmap.items()}
+    edges = []
+
+    for rel, path in relmap.items():
+        text = path.read_text(encoding='utf-8', errors='ignore')
+        for include in INCLUDE.findall(text):
+            target = include if include in relmap else byname.get(Path(include).name)
+            if target:
+                edges.append({'from': rel, 'to': target})
+    return edges
+
+
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('root',nargs='?',default='.'); ap.add_argument('--limit',type=int,default=1500); a=ap.parse_args(); root=Path(a.root).resolve(); files=[]
-    for p in sorted(root.rglob('*')):
-        if p.is_file() and p.suffix.lower() in {'.c','.h'}: files.append(p)
-        if len(files)>=a.limit: break
-    relmap={p.relative_to(root).as_posix():p for p in files}; byname={p.name:rel for rel,p in relmap.items()}; edges=[]
-    for rel,p in relmap.items():
-        for inc in INC.findall(p.read_text(encoding='utf-8',errors='ignore')):
-            target=inc if inc in relmap else byname.get(Path(inc).name)
-            if target: edges.append({'from':rel,'to':target})
-    print(json.dumps({'root':root.name,'files':len(files),'edges':edges,'truncated':len(files)>=a.limit},ensure_ascii=False,indent=2))
-if __name__=='__main__': main()
+    parser = argparse.ArgumentParser(description='Build a bounded local C include graph.')
+    parser.add_argument('root', nargs='?', default='.')
+    parser.add_argument('--limit', type=int, default=1500)
+    args = parser.parse_args()
+
+    root = Path(args.root).resolve()
+    files, truncated = source_files(root, args.limit)
+    edges = build_edges(root, files)
+
+    print(json.dumps({
+        'root': root.name,
+        'files': len(files),
+        'edges': edges,
+        'truncated': truncated,
+    }, ensure_ascii=False, indent=2))
+
+
+if __name__ == '__main__':
+    main()
