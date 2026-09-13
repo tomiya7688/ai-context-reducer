@@ -215,10 +215,30 @@ targeted failure
 
 既にbuild graph / dependency graphを持つプロジェクトでは、独自のimpact analyzerを作るより既存ツールを使う方が有利です。
 
-- **Nx / `nx affected`**: Git差分とproject graphから、変更されたprojectとその依存先を計算し、affected projectだけにtest / build / lint等を実行できる。JS/TS中心のmonorepoだけでなく、project graphを活かしたCI削減の具体例として分かりやすい。
-- **Pants / `--changed-since` + `--changed-dependents`**: Git基準のchanged targetsに対し、direct / transitive dependentsまで含めてtest等を実行できる。merge-baseからPR影響範囲を選ぶ運用も公式に案内されており、Change Impact Routingにかなり近い。
+- **Nx / `nx affected`**: Git差分とproject graphから、変更されたprojectとその依存先を計算し、affected projectだけにtest / build / lint等を実行できる。
+- **Pants / `--changed-since` + `--changed-dependents`**: Git基準のchanged targetsに対し、direct / transitive dependentsまで含めてtest等を実行できる。
 
 これらを導入済みなら、そのproject graph / target graphをSource of Truthとして使い、同じ依存解析を別ツールで二重実装しないことを優先します。ただしdynamic dependencyやpublic contract変更など、ツールのgraphだけで十分でないケースでは本書のbroader fallbackを残します。
+
+## Repository-local fallback
+
+外部build graph toolを導入しないrepo向けに、このrepositoryでは軽量な `affected-tests` を用意します。
+
+- Python: `tools/python/medium/affected-tests/affected_tests.py`
+- Go: `tools/go/medium/affected-tests/`
+
+Go版はPython版と共有コードを持たない独立実装で、`build.bat` / `build.sh` から単一binaryを生成できます。
+
+対応範囲:
+
+- Git changed files / explicit changed files
+- source↔test explicit mapping
+- naming conventionによるtest候補
+- broad-impact patternによるbroader fallback
+- confidence / fallback reason
+- `python-import-map` / `go-import-map` 互換JSONを使ったdirect consumer補助
+
+高精度project graphの完全代替ではなく、Nx / Pants等が無い環境向けのportable fallbackとして扱います。
 
 ## Context削減との関係
 
