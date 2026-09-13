@@ -23,7 +23,7 @@ TYPE_SIGNALS = {
 }
 
 
-def files(root: Path):
+def iter_files(root: Path):
     for current, dirs, names in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
         current_path = Path(current)
@@ -31,9 +31,13 @@ def files(root: Path):
             yield current_path / name
 
 
-def detect_types(paths):
-    hay = ' '.join(str(p).lower() for p in paths)
-    return [name for name, words in TYPE_SIGNALS.items() if any(word in hay for word in words)]
+def detect_types_from_relative_path(relative_path: str, detected: set[str]) -> None:
+    low = relative_path.lower()
+    for project_type, words in TYPE_SIGNALS.items():
+        if project_type in detected:
+            continue
+        if any(word in low for word in words):
+            detected.add(project_type)
 
 
 def recommend(size, languages, project_types, docs, tests, has_git):
@@ -92,26 +96,44 @@ def recommend(size, languages, project_types, docs, tests, has_git):
 
 
 def build_selection(root: Path) -> dict[str, object]:
-    paths = list(files(root))
-    langs = Counter(LANG.get(p.suffix.lower(), 'other') for p in paths)
-    size = 'small' if len(paths) < 200 else 'medium' if len(paths) < 2000 else 'large'
-    docs = sum(1 for p in paths if p.suffix.lower() in {'.md', '.rst', '.txt'})
-    tests = sum(1 for p in paths if 'test' in p.name.lower() or 'tests' in {x.lower() for x in p.parts})
-    types = detect_types(paths)
+    languages = Counter()
+    detected_types: set[str] = set()
+    file_count = 0
+    documentation_file_count = 0
+    test_file_count = 0
+
+    for path in iter_files(root):
+        file_count += 1
+        languages[LANG.get(path.suffix.lower(), 'other')] += 1
+        if path.suffix.lower() in {'.md', '.rst', '.txt'}:
+            documentation_file_count += 1
+        relative = path.relative_to(root)
+        if 'test' in path.name.lower() or 'tests' in {part.lower() for part in relative.parts}:
+            test_file_count += 1
+        detect_types_from_relative_path(relative.as_posix(), detected_types)
+
+    size = 'small' if file_count < 200 else 'medium' if file_count < 2000 else 'large'
+    project_types = sorted(detected_types)
     has_git = (root / '.git').exists()
     recommended_tools, conditional_tools, recommended_groups, conditional_groups = recommend(
-        size, langs.most_common(), types, docs, tests, has_git
+        size,
+        languages.most_common(),
+        project_types,
+        documentation_file_count,
+        test_file_count,
+        has_git,
     )
     return {
         'tool': 'tool-selector',
         'status': 'ok',
         'project_root': str(root),
         'project_size_class': size,
-        'files_scanned': len(paths),
-        'language_file_counts': dict(langs.most_common()),
-        'detected_project_types': types,
-        'documentation_file_count': docs,
-        'test_file_count': tests,
+        'files_scanned': file_count,
+        'scan_truncated': False,
+        'language_file_counts': dict(languages.most_common()),
+        'detected_project_types': project_types,
+        'documentation_file_count': documentation_file_count,
+        'test_file_count': test_file_count,
         'git_repository_detected': has_git,
         'recommended_tool_paths': recommended_tools,
         'conditional_tool_paths': conditional_tools,
