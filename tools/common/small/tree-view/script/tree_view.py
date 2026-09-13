@@ -1,40 +1,68 @@
 #!/usr/bin/env python3
 """Bounded repository tree view using only the Python standard library."""
 import argparse
+import json
 from pathlib import Path
 
 IGNORE = {'.git', '.hg', '.svn', '.venv', 'venv', 'node_modules', '__pycache__', 'bin', 'obj', 'build', 'dist', '.godot', '.idea', '.vs'}
 
 
-def walk(path: Path, root: Path, depth: int, max_depth: int, budget: list[int]):
-    if depth > max_depth or budget[0] <= 0:
+def collect_tree(path: Path, root: Path, depth: int, max_depth: int, max_entries: int, state: dict[str, object]):
+    if depth > max_depth or (max_entries > 0 and state['entries_scanned'] >= max_entries):
         return
     try:
         children = sorted(path.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     except OSError:
+        state['read_error_paths'].append(path.relative_to(root).as_posix() if path != root else '.')
         return
     for child in children:
         if child.name in IGNORE:
             continue
-        rel = child.relative_to(root).as_posix()
-        print('  ' * depth + ('[D] ' if child.is_dir() else '[F] ') + rel)
-        budget[0] -= 1
-        if budget[0] <= 0:
-            print('-- truncated --')
+        if max_entries > 0 and state['entries_scanned'] >= max_entries:
+            state['entries_truncated'] = True
             return
-        if child.is_dir():
-            walk(child, root, depth + 1, max_depth, budget)
+        rel = child.relative_to(root).as_posix()
+        is_dir = child.is_dir()
+        state['entries'].append({'path': rel, 'kind': 'directory' if is_dir else 'file', 'depth': depth})
+        state['entries_scanned'] += 1
+        if is_dir:
+            collect_tree(child, root, depth + 1, max_depth, max_entries, state)
+            if state['entries_truncated']:
+                return
+
+
+def build_tree(root: Path, max_depth: int, max_entries: int) -> dict[str, object]:
+    state = {
+        'entries': [],
+        'entries_scanned': 0,
+        'entries_truncated': False,
+        'read_error_paths': [],
+    }
+    collect_tree(root, root, 1, max_depth, max_entries, state)
+    return {
+        'tool': 'tree-view',
+        'status': 'ok',
+        'project_root': str(root),
+        'max_depth': max_depth,
+        'max_entries': max_entries,
+        **state,
+    }
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Portable bounded repository tree.')
+    ap = argparse.ArgumentParser(description='Portable bounded repository tree as self-describing JSON.')
     ap.add_argument('root', nargs='?', default='.')
     ap.add_argument('--max-depth', type=int, default=3)
-    ap.add_argument('--max-entries', type=int, default=300)
+    ap.add_argument('--max-entries', type=int, default=300, help='Output limit. 0 means unlimited within max-depth.')
     args = ap.parse_args()
     root = Path(args.root).resolve()
-    print(root.name + '/')
-    walk(root, root, 1, args.max_depth, [args.max_entries])
+    if not root.exists():
+        result = {'tool': 'tree-view', 'status': 'input_missing', 'project_root': str(root)}
+    elif not root.is_dir():
+        result = {'tool': 'tree-view', 'status': 'input_not_directory', 'project_root': str(root)}
+    else:
+        result = build_tree(root, max(0, args.max_depth), max(0, args.max_entries))
+    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
