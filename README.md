@@ -59,9 +59,11 @@ AI / Codex / Claude Code を利用した開発で、必要以上にコンテキ�
 | docs / Issues / subsystem が多い | Task Routing / Change Routing Map |
 | file / module の責務が分かりにくい | Responsibility Map |
 | monorepo / multi-appで局所ルールが多い | Hierarchical Context / Scoped AI Instructions |
+| Required evidenceが揃っても探索が止まりにくい | Evidence Budget / bounded evidence collection |
 | 現在の能力・制約がREADMEだけでは分からない | Current State summary |
 | 複数AI・複数チャット・複数人がremoteを更新 | Remote Delta First |
 | 巨大codebase・call/dependency探索が重い | Source Structure Index / changed-symbol routing |
+| test suiteが大きく毎回full runしている | Change / Test Impact Routing |
 | GUI / game / editor | headless-first + visual confirmation when needed |
 | random / time-dependent / simulation | deterministic seam / fixed input / bounded runtime |
 | package / distribution がsourceと異なる | artifact-boundary validation |
@@ -107,9 +109,11 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 - Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
 - Task Routing: [`docs/task-routing.md`](docs/task-routing.md)
 - Exploration Control: [`docs/exploration-control.md`](docs/exploration-control.md)
+- Evidence Budget: [`docs/evidence-budget.md`](docs/evidence-budget.md)
 - Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
 - Hierarchical Context: [`docs/hierarchical-context.md`](docs/hierarchical-context.md)
 - Validation Routing: [`docs/validation-routing.md`](docs/validation-routing.md)
+- Change / Test Impact Routing: [`docs/change-impact-routing.md`](docs/change-impact-routing.md)
 - Responsibility Map: [`docs/responsibility-map.md`](docs/responsibility-map.md)
 - Policy Routing: [`docs/policy-routing.md`](docs/policy-routing.md)
 - Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
