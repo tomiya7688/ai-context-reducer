@@ -37,32 +37,58 @@ def detect_types(paths):
 
 
 def recommend(size, languages, project_types, docs, tests, has_git):
-    recommended = ['common/small/analyze-and-recommend', 'common/small/repo-profile', 'common/small/source-of-truth-candidates']
-    conditional = ['common/small/doc-index'] if docs else []
+    recommended_tools = [
+        'common/small/analyze-and-recommend',
+        'common/small/repo-profile',
+        'common/small/source-of-truth-candidates',
+    ]
+    conditional_tools = ['common/small/doc-index'] if docs else []
+    recommended_groups = []
+    conditional_groups = []
+
     if has_git:
-        recommended.append('common/medium/compact-diff')
-        conditional.extend(['common/medium/remote-delta', 'common/medium/change-router', 'common/medium/context-pack-builder'])
+        recommended_tools.append('common/medium/compact-diff')
+        conditional_tools.extend([
+            'common/medium/remote-delta',
+            'common/medium/change-router',
+            'common/medium/context-pack-builder',
+        ])
     if tests:
-        conditional.extend(['common/medium/validation-plan', 'common/medium/compact-log'])
+        conditional_tools.extend(['common/medium/validation-plan', 'common/medium/compact-log'])
     if docs:
-        conditional.extend(['common/medium/acceptance-extractor', 'common/medium/exploration-stop-check'])
+        conditional_tools.extend(['common/medium/acceptance-extractor', 'common/medium/exploration-stop-check'])
     if size in {'medium', 'large'}:
-        recommended.append('common/medium/change-router')
-        conditional.extend(['common/medium/responsibility-candidates', 'common/medium/doc-duplicate-hints', 'common/large/hotspot-report'])
+        recommended_tools.append('common/medium/change-router')
+        conditional_tools.extend([
+            'common/medium/responsibility-candidates',
+            'common/medium/doc-duplicate-hints',
+            'common/large/hotspot-report',
+        ])
     if size == 'large':
-        recommended.extend(['common/large/context-manifest', 'common/large/target-slice', 'common/large/context-budget'])
+        recommended_tools.extend([
+            'common/large/context-manifest',
+            'common/large/target-slice',
+            'common/large/context-budget',
+        ])
     if 'rule_heavy' in project_types:
-        conditional.append('common/medium/policy-index')
+        conditional_tools.append('common/medium/policy-index')
+
     for lang, _ in languages[:3]:
         if lang not in {'other', 'rust', 'javascript', 'typescript', 'java'}:
-            recommended.append(f'{lang}/small')
+            recommended_groups.append(f'{lang}/small')
             if size in {'medium', 'large'}:
-                conditional.append(f'{lang}/medium')
+                conditional_groups.append(f'{lang}/medium')
             if size == 'large':
-                conditional.append(f'{lang}/large')
+                conditional_groups.append(f'{lang}/large')
     if project_types:
-        conditional.append('profiles/project-type-profile')
-    return sorted(dict.fromkeys(recommended)), sorted(dict.fromkeys(conditional))
+        conditional_groups.append('profiles/project-type-profile')
+
+    return (
+        sorted(dict.fromkeys(recommended_tools)),
+        sorted(dict.fromkeys(conditional_tools)),
+        sorted(dict.fromkeys(recommended_groups)),
+        sorted(dict.fromkeys(conditional_groups)),
+    )
 
 
 def build_selection(root: Path) -> dict[str, object]:
@@ -73,7 +99,9 @@ def build_selection(root: Path) -> dict[str, object]:
     tests = sum(1 for p in paths if 'test' in p.name.lower() or 'tests' in {x.lower() for x in p.parts})
     types = detect_types(paths)
     has_git = (root / '.git').exists()
-    recommended, conditional = recommend(size, langs.most_common(), types, docs, tests, has_git)
+    recommended_tools, conditional_tools, recommended_groups, conditional_groups = recommend(
+        size, langs.most_common(), types, docs, tests, has_git
+    )
     return {
         'tool': 'tool-selector',
         'status': 'ok',
@@ -85,8 +113,10 @@ def build_selection(root: Path) -> dict[str, object]:
         'documentation_file_count': docs,
         'test_file_count': tests,
         'git_repository_detected': has_git,
-        'recommended_tools': recommended,
-        'conditional_tools': conditional,
+        'recommended_tool_paths': recommended_tools,
+        'conditional_tool_paths': conditional_tools,
+        'recommended_tool_group_paths': recommended_groups,
+        'conditional_tool_group_paths': conditional_groups,
     }
 
 
