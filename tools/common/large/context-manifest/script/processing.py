@@ -23,13 +23,19 @@ def priority(path: Path) -> str:
 
 def build_manifest(entries: list[dict[str, object]], limit: int) -> dict[str, object]:
     rows = [
-        {'priority': priority(entry['path']), 'path': entry['path'].as_posix(), 'bytes': entry['bytes']}
+        {
+            'context_priority': priority(entry['path']),
+            'path': entry['path'].as_posix(),
+            'bytes': entry['bytes'],
+        }
         for entry in entries
     ]
-    rows.sort(key=lambda row: (ORDER[row['priority']], row['path']))
+    rows.sort(key=lambda row: (ORDER[row['context_priority']], row['path']))
     return {
+        'tool': 'context-manifest',
+        'status': 'ok',
         'total_files': len(rows),
-        'shown': min(len(rows), limit),
-        'truncated': len(rows) > limit,
+        'returned_files': min(len(rows), limit),
+        'files_truncated': len(rows) > limit,
         'files': rows[:limit],
     }
