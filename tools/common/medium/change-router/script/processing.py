@@ -31,7 +31,7 @@ def route_candidates(rel: str, index: list[dict[str, object]], limit: int) -> di
                 break
 
     return {
-        'changed': rel,
-        'tests': tests,
-        'docs': docs,
+        'changed_file': rel,
+        'candidate_tests': tests,
+        'candidate_docs': docs,
     }
