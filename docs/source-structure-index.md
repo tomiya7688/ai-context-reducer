@@ -127,6 +127,13 @@ LLM 補助解析を使う場合は、決定論的解析結果と区別します�
 
 `kadoka_code_atlas` は、Source Structure Index、共通 IR、call graph、bounded traversal などを実装する参考例の一つです。
 
+外部ツールでは次が有力です。
+
+- **Sourcegraph Precise Code Navigation / SCIP**: definitions / references / implementationsを言語横断のcode intelligence indexとして扱える。SCIPはlanguage-agnosticなindex protocolで、対応言語では既存indexerを利用できるため、すでに導入可能な環境なら独自symbol/reference indexを一から作る必要がない。
+- **Tree-sitter**: 多数の言語を高速に構文解析できるparser generator / incremental parsing library。Source Structure Index用のlanguage adapterを自作する場合でも、字句・構文解析そのものを独自実装せず、Tree-sitterのsyntax treeを入力にする選択肢がある。
+
+Sourcegraph / SCIPはよりsemanticで高精度なnavigationが必要な場合、Tree-sitterは軽量な構文構造抽出を自前toolへ組み込みたい場合の具体例として扱えます。プロジェクトのIDE / language server / build systemが同等情報を既に持つなら、そちらを再利用する方を優先します。
+
 この位置付けでは次を守ります。
 
 - 標準仕様の成立条件にはしない
@@ -136,7 +143,7 @@ LLM 補助解析を使う場合は、決定論的解析結果と区別します�
 - 有効な新手法が見つかった場合だけ改めて一般化して取り込む
 - 同じ標準を別実装でも満たせるようにする
 
-つまり、`kadoka_code_atlas` は「この考え方を実際に実装している例」として利用できますが、AI Context Reducer の必須コンポーネントではありません。
+つまり、`kadoka_code_atlas` や外部indexing toolは「この考え方を実際に実装している例」として利用できますが、AI Context Reducer の必須コンポーネントではありません。
 
 ## 10. 標準推奨
 
@@ -147,4 +154,5 @@ LLM 補助解析を使う場合は、決定論的解析結果と区別します�
 - fan-in / fan-out / cycle を読む優先順位の補助情報として使う
 - generated diagrams を原典や IR の代替にしない
 - 機械取得可能な情報は deterministic analysis を優先する
+- 既存の高品質なcode intelligence / parserが使える場合は独自実装より再利用を優先する
 - 実装例は参考にできるが、標準仕様自体は特定実装へ依存させない
