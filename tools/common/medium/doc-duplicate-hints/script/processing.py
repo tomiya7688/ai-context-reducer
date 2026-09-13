@@ -12,16 +12,22 @@ def normalize(line: str) -> str:
 
 def collect_duplicates(documents: list[tuple[str, list[str]]], min_chars: int):
     seen = defaultdict(list)
+    representative = {}
     for path, lines in documents:
         for number, line in enumerate(lines, 1):
             norm = normalize(line)
             if len(norm) < min_chars:
                 continue
             key = hashlib.sha1(norm.encode()).hexdigest()
-            seen[key].append((path, number, line.strip()))
+            representative.setdefault(key, line.strip())
+            seen[key].append({'path': path, 'line': number})
 
     groups = []
-    for items in seen.values():
-        if len({item[0] for item in items}) >= 2:
-            groups.append(items)
+    for key, occurrences in seen.items():
+        if len({item['path'] for item in occurrences}) < 2:
+            continue
+        groups.append({
+            'repeated_text': representative[key][:180],
+            'occurrences': occurrences,
+        })
     return groups
