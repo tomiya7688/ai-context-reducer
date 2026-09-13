@@ -57,15 +57,21 @@ def main():
         result = {'tool': 'source-of-truth-candidates', 'status': 'input_not_directory', 'project_root': str(root)}
     else:
         candidates, truncated, scanned = candidate_paths(root, max(0, args.per_role_limit))
+        roles = {
+            role: {
+                'candidate_paths': candidates[role],
+                'candidate_paths_truncated': truncated[role],
+            }
+            for role in NAMES
+        }
         result = {
             'tool': 'source-of-truth-candidates',
             'status': 'ok',
             'project_root': str(root),
-            'authority': 'candidate_only_not_verified_source_of_truth',
+            'candidate_authority': 'filename_hint_only_not_verified_source_of_truth',
             'document_files_scanned': scanned,
             'scan_truncated': False,
-            'candidates_by_role': candidates,
-            'candidates_truncated_by_role': truncated,
+            'roles': roles,
         }
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
