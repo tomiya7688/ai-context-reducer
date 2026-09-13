@@ -16,9 +16,11 @@ DOC_EXTS = {'.md', '.txt', '.rst'}
 SKIP = {'.git', '.venv', 'venv', 'node_modules', 'build', 'dist', 'bin', 'obj', '__pycache__', 'vendor'}
 
 
-def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str]], dict[str, bool]]:
+def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str]], dict[str, bool], int]:
     hits = {key: [] for key in NAMES}
     truncated = {key: False for key in NAMES}
+    document_files_scanned = 0
+
     for current, dirs, files in os.walk(root):
         dirs[:] = [d for d in dirs if d.lower() not in SKIP]
         current_path = Path(current)
@@ -26,6 +28,7 @@ def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str
             path = current_path / name
             if path.suffix.lower() not in DOC_EXTS:
                 continue
+            document_files_scanned += 1
             low = name.lower()
             rel = path.relative_to(root).as_posix()
             for role, words in NAMES.items():
@@ -35,9 +38,10 @@ def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str
                     hits[role].append(rel)
                 else:
                     truncated[role] = True
+
     for values in hits.values():
         values.sort()
-    return hits, truncated
+    return hits, truncated, document_files_scanned
 
 
 def main():
@@ -52,12 +56,14 @@ def main():
     elif not root.is_dir():
         result = {'tool': 'source-of-truth-candidates', 'status': 'input_not_directory', 'project_root': str(root)}
     else:
-        candidates, truncated = candidate_paths(root, max(0, args.per_role_limit))
+        candidates, truncated, scanned = candidate_paths(root, max(0, args.per_role_limit))
         result = {
             'tool': 'source-of-truth-candidates',
             'status': 'ok',
             'project_root': str(root),
             'authority': 'candidate_only_not_verified_source_of_truth',
+            'document_files_scanned': scanned,
+            'scan_truncated': False,
             'candidates_by_role': candidates,
             'candidates_truncated_by_role': truncated,
         }
