@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 
-def classify(path):
+def classify(path: str) -> list[str]:
     p = path.lower()
     out = []
     if any(x in p for x in ('ui', 'view', 'scene', 'widget', 'layout', '.gd')):
@@ -23,18 +23,23 @@ def classify(path):
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Suggest smallest sufficient validation for changed files.')
-    ap.add_argument('files', nargs='+')
-    ap.add_argument('--json', action='store_true')
-    args = ap.parse_args()
-    rows = [{'file': f, 'evidence': classify(f)} for f in args.files]
-    if args.json:
-        print(json.dumps(rows, ensure_ascii=False, indent=2))
-    else:
-        for row in rows:
-            print(row['file'])
-            for ev in row['evidence']:
-                print(f'  - {ev}')
+    parser = argparse.ArgumentParser(description='Suggest the smallest sufficient validation for changed files as self-describing JSON.')
+    parser.add_argument('files', nargs='+')
+    args = parser.parse_args()
+
+    result = {
+        'tool': 'validation-plan',
+        'status': 'ok',
+        'validation_by_file': [
+            {
+                'changed_file': path,
+                'recommended_validation': classify(path),
+            }
+            for path in args.files
+        ],
+    }
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
 
 if __name__ == '__main__':
     main()
