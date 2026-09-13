@@ -6,6 +6,10 @@
 
 対象toolと直接依存だけで変更を完結できる構造を維持し、tools全体を毎回読み直さない。
 
+最適化対象は **agentへ渡るcontext量と、必要情報へ到達するまでのagent側探索量** です。
+
+Tool自身がagentの代わりに広くファイルを読むことは問題ありません。広い解析によってcompactな結果を返せるなら、それはContext Reducerとして有効です。
+
 ## Read routing
 
 1. `tools/README.md`
@@ -17,13 +21,7 @@
 
 ## Stop condition
 
-次が揃ったら探索を止める。
-
-- Goal
-- 入出力契約
-- 直接変更対象
-- 必要なvalidation
-- 既存toolとの重複有無
+Goal / 入出力契約 / 直接変更対象 / validation / 既存toolとの重複有無が揃ったら探索を止める。
 
 ## Source of Truth
 
@@ -43,63 +41,53 @@
 - 無関係な複数機能を1ファイル理解へ強制する構造を避ける
 - 共通化は理解・保守コストを実際に下げる場合だけ行う
 
-UPD Commander等の外部設計手法は、これらの内部実装規律を考える参考には使ってよい。ただし、ai-context-reducerはそれらの適合checkerではなく、固有layer名・class名・命名規則を要求しない。
+UPD Commander等の外部設計手法は内部実装規律の参考にしてよい。ただし、ai-context-reducerはそれらの適合checkerではなく、固有layer名・class名・命名規則を要求しない。逆に外部設計手法そのものをContext Reducerとして扱わない。
 
-逆に、UPD Commander等の外部設計手法そのものをContext Reducerとして扱わない。設計手法側へAI_CONTEXTやcontext削減機能を必須導入することもしない。
+## When to split a tool
 
-### When to split a tool
+小さい単一責務toolを形式だけで分割しない。CLI/orchestration、external I/O、analysis、formattingが独立した変更理由を持ち、分割後にworking setが小さくなる場合だけ分ける。
 
-小さい単一責務toolを形式だけで分割しない。次のうち複数が独立して変更される場合に分割を検討する。
-
-- CLI / dispatch / orchestration
-- external boundary I/O: filesystem / Git / process / environment
-- parsing / analysis / matching等の実処理
-- output formatting / serialization
-
-複数境界を持つtoolでは、必要に応じてUPD設計を内部構造へ適用できる。
+複数境界を持つtoolでは、必要に応じて次の内部構造を使える。
 
 ```text
 entrypoint
-  -> Commander相当: orchestration / routing only
+  -> Commander相当: orchestration / routing
   -> Messenger相当: external boundary I/O
   -> Processing相当: concrete analysis / transformation
 ```
 
-これは内部責務の分離方法であり、公開CLIや対象repositoryへUPD構造を要求するものではない。
-
-分割後に「1つの小変更で読むfile数が増えるだけ」であれば分割しない。分割により変更理由ごとのworking setが小さくなる場合だけ採用する。
+これは内部構造であり、公開CLIや対象repoへUPD構造を要求しない。
 
 ## Tool implementation rules
 
-- full source / full log / full treeを既定出力にしない
-- bounded / compact / summary-firstを既定にする
+- full source / full log / full treeをagent向け既定出力にしない
+- bounded / compact / summary-firstをagent向け既定出力にする
 - truncation / uncertainty / fallbackを明示する
 - index / analysis resultは原典の代替にしない
 - missing runtime / SDK / packageを勝手にinstallしない
-- Small repoへ高コスト解析を持ち込まない
+- 精度のためにtool内部で広く読むことと、agentへ大量情報を渡すことを混同しない
 
-### Scan classes
+## Scan classes
 
-repo traversalは目的で区別する。
+- `targeted`: explicit pathだけを見る。
+- `routing-index`: routingのためscopeを横断し、candidate / reason / pointerへ圧縮する。
+- `whole-scope-analysis`: graph / stats / hotspot等のため指定scope全体を読んでよい。
+- `exact-analysis`: token estimate / dependency resolution / policy check等、精度のため実内容を読んでよい。
 
-1. `targeted`: explicit file/pathだけを見る。repo rootへ広げない。
-2. `bounded-index`: routing/index作成のためscopeを走査する。prune + scan budget必須。
-3. `whole-scope-analysis`: graph/stats/hotspot等、指定scope全体を見ること自体が目的。全走査は許容するがprune + budget + truncation表示を持つ。
+scan budgetは正しさを損なう必須制限ではなく、安全弁・performance optionとして扱う。
 
-`whole-scope-analysis` だからといってdependency/generated/cacheを読む理由にはならない。必要な場合だけ明示optionで含める。
+- 完全性が必要ならscope全体を読めるようにする
+- `--max-files` 等を持つ場合は unlimited を選択可能にする
+- limit到達時は不完全であることを明示する
+- 不要なgenerated / dependency / cacheはpruneしてよい
+- 必要なら明示optionで含められるようにする
+- 同じ情報の無意味な再scanは避ける
 
-### Internal scan budget
-
-出力だけをtruncateして内部で全repoを無制限に読む実装は、Context Reducerの目的に反する。
-
-- generated / dependency / cache directoryは、結果から除外するだけでなくtraversal自体をpruneする
-- repo-wide scanが必要なtoolは、`--max-files` / `--max-visited` / depth / scope等のscan budgetを持つ
-- scan上限へ到達した場合は、結果が不完全であることを明示する
-- changed itemごとに同じrepo scanを繰り返さず、必要なら1回のbounded indexを再利用する
-- explicit paths / scopeが与えられた場合はrepo rootへ勝手に探索を広げない
-- broader scanは安全性や精度上必要な場合にだけ、利用者が意図的に拡張できる形にする
-
-`bounded output != bounded work` であることを常に区別する。
+```text
+agent context should be bounded
+internal work may be broad
+accuracy > internal scan minimization
+```
 
 ## Python / Go
 
@@ -118,16 +106,14 @@ build scripts    -> script構文 + output path
 shared contract  -> Python/Goのfixture結果比較
 ```
 
-共通CLI契約やJSON schemaを変えた場合だけbroader validationへ広げる。
-
 ## New tool checklist
 
 - 既存toolで代用できないか
 - external toolの方が保守コストが低くないか
-- repeated context saving > adoption + maintenance cost か
+- repeated agent-context saving > adoption + maintenance cost か
 - scan classが明確か
-- outputだけでなくinternal scanもboundedか
+- broad scanがagent探索を置き換える価値を持つか
+- outputはagent向けにcompactか
+- 不完全解析ならその事実を明示できるか
 - 分割するならworking setが実際に小さくなるか
 - targeted validationを定義できるか
-
-満たさない場合は実装しない。
