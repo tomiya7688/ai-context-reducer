@@ -173,12 +173,15 @@ tools/
 
 - `compact-diff`, `remote-delta`
 - `change-router`
+- `architecture-boundary-router`: architecture profileからlayer / role / boundaryを分類し、最初に読むscopeを絞る
 - `affected-tests`: changed filesからtest候補 / confidence / broader fallbackを選ぶ
 - `acceptance-extractor`, `exploration-stop-check`
 - `validation-plan`, `compact-log`
 - `context-pack-builder`
 - `policy-index`, `responsibility-candidates`
 - `doc-duplicate-hints`, `ignore-candidates`
+
+`architecture-boundary-router` は UPD Commander の責務境界と正式通信経路の考え方を一般化したものです。`tools/profiles/upd-commander.json` が最初の実例で、profileは原典の設計書を置き換えずrouting hintとして使います。
 
 ### Large
 
@@ -216,7 +219,10 @@ Responsibility Map
   -> responsibility-candidates
 
 Change Routing Map
-  -> change-router
+  -> change-router / architecture-boundary-router
+
+Architecture boundary routing
+  -> architecture-boundary-router + optional profile
 
 Change / Test Impact Routing
   -> affected-tests / external Nx or Pants
