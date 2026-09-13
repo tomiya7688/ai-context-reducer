@@ -18,9 +18,12 @@ affected-tests --root .
 affected-tests --root . --base origin/main...HEAD
 affected-tests --changed src/parser/lexer.py --changed src/parser/parser.py
 affected-tests --config affected-tests.json --json
+affected-tests --dependency-map import-map.json --changed pkg/parser/lexer.py
 ```
 
 `--changed` は複数回指定できます。省略時は `git diff --name-only [base]` を利用します。
+
+`--dependency-map` には `python-import-map` / `go-import-map` と同じ `files: [{file, imports}]` 形式のJSONを渡せます。直接importしているconsumerを補助信号として拾い、そのconsumerのtest候補も追加します。
 
 ## Config
 
@@ -46,6 +49,7 @@ affected-tests --config affected-tests.json --json
 
 - explicit mapping hit: `high`
 - naming/default candidate: `medium`
+- dependency-map consumer: 補助候補としてtestを追加
 - broad-impact path: `medium` + `broader`
 - no reliable candidate: `low` + `subsystem-or-full`
 
