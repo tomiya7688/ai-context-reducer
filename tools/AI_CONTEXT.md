@@ -42,6 +42,19 @@
 
 生成済みbinary、`dist/`、一時出力はSource of Truthにしない。
 
+## Internal architecture rules
+
+`tools/` の内部実装では、責務境界を明示して理解負債を増やさない。
+
+- CLI dispatcher / entrypoint は routing に徹し、実処理を抱え込まない
+- filesystem / Git / environment / parsing / formatting 等の責務を必要に応じて分離する
+- module間の越境は明示的な関数・データ契約を通す
+- 実処理はその責務を所有するmoduleへ置く
+- 1ファイルを読むだけで無関係な複数機能まで理解させる構造を避ける
+- 共通化は、実際に複数箇所の理解・保守コストを下げる場合だけ行う
+
+この内部設計には `upd-commander-base-design` の責務分離・routingと実処理の分離という考え方を参考にしてよい。ただし、AI Context ReducerのtoolsはUPD Commanderへの適合性を判定するcheckerではなく、UPD固有のlayer名・class名・命名規則を標準要求にしない。
+
 ## Tool implementation rules
 
 - full source / full log / full tree を既定出力にしない
