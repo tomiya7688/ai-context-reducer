@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 cd "$(dirname "$0")"
+go test ./...
 mkdir -p ../../../../bin
 OUT=../../../../bin/acr-toolbox
 GOOS=${GOOS:-$(go env GOOS)}
