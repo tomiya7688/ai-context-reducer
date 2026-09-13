@@ -9,7 +9,9 @@ Common tools の portable Go implementation です。
 | Concern | File |
 |---|---|
 | CLI subcommand dispatch | `main.go` |
-| repository walk / analyze / search / find / tree / stats / docs | `repo_commands.go` |
+| repository walk / ignore / language metadata | `repo_commands.go` |
+| repository analysis / recommendation | `analyze_command.go` |
+| search / find / tree / stats / docs index | `browse_commands.go` |
 | bounded excerpt / compact log | `text_commands.go` |
 | Git diff / remote delta | `git_commands.go` |
 | runtime / language environment detection | `env_commands.go` |
