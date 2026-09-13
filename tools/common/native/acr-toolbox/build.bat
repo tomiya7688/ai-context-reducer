@@ -1,6 +1,8 @@
 @echo off
 setlocal
 cd /d %~dp0
+go test ./...
+if errorlevel 1 exit /b 1
 if not exist ..\..\..\..\bin mkdir ..\..\..\..\bin
 if "%GOOS%"=="" for /f %%i in ('go env GOOS') do set GOOS=%%i
 if "%GOARCH%"=="" for /f %%i in ('go env GOARCH') do set GOARCH=%%i
