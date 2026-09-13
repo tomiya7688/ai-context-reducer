@@ -19,20 +19,53 @@ Linux/macOS: tools/setup.sh <project-root>
 tools/README.md
   -> tools/AI_CONTEXT.md
   -> target subtree local guide
-  -> target tool README / source / tests / run-or-build script
+  -> target tool README
+  -> taskに対応するsource / tests / run-or-build script
   -> direct dependency only if needed
 ```
 
 Goal・入出力契約・変更対象・validationが揃ったら探索を止めます。
 
+分割もこの目的で行います。一般的な設計美ではなく、変更内容から必要fileへ直接routingでき、無関係な責務を読まずtargeted validationまで進める構造を優先します。
+
+### Self-application examples
+
+次のtoolは、このrepositoryの Task Routing / Responsibility Map / Hierarchical Context / Exploration Stop の考え方を開発構造そのものへ適用しています。
+
+```text
+change-router
+context-pack-builder
+remote-delta
+architecture-boundary-router
+```
+
+複数の変更理由を持つ場合、必要に応じて次の責務へ分離します。
+
+```text
+entrypoint      -> CLI / compact output
+commander       -> orchestration / routing
+messenger       -> Git / filesystem / profile等のboundary I/O
+processing      -> matching / analysis / rendering
+```
+
+小さい単一責務toolは形式だけでは分割しません。分割後にagentのworking setが実際に小さくなる場合だけ採用します。
+
 ## Output policy
 
 - summary / index first
-- bounded / truncated output
+- agent向け出力はbounded / compact
 - full source / full log / full treeを既定出力にしない
 - uncertainty / fallback / truncationを明示する
 - 原典へ戻れるpath / symbol / reasonを残す
 - targeted validationを優先する
+
+Tool内部では、agentの探索を置き換えるためにscope全体やfile本文を読んで構いません。精度を落としてまで内部I/Oを減らすことは目的ではありません。
+
+```text
+agent context should be bounded
+internal work may be broad
+accuracy > internal scan minimization
+```
 
 ## Python / Go
 
@@ -59,7 +92,7 @@ compact-log compact-diff remote-delta language-env env
 ```text
 common/small   shallow profile / cheap search
 common/medium  routing / direct dependency / task context
-common/large   bounded graph / context-cost analysis
+common/large   graph / context-cost / whole-scope analysis
 python         Python-specific analysis
 go             Go-specific analysis
 csharp/c/cpp/gdscript
@@ -89,11 +122,11 @@ UPD Commanderを含む外部設計手法は、tools内部の責務分離や実�
 
 ## Core rules
 
-- full source / logs / docsを再出力しない
+- full source / logs / docsをagentへ再出力しない
 - generated outputをSource of Truthにしない
 - runtime / SDK / packageを勝手にinstallしない
-- Small repoへLarge解析を持ち込まない
+- Small repoへ不要なLarge解析を持ち込まない
 - external toolが既にある場合は高品質backendとして使ってよい
-- toolの維持コストが削減効果を上回るなら追加しない
+- toolの維持コストがagent-context削減効果を上回るなら追加しない
 
 詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/NATIVE_COVERAGE.md`、`docs/portable-tools.md` を参照してください。
