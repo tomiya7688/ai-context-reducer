@@ -14,17 +14,9 @@
 
 ## Architecture routing profiles
 
-Project typeとは別に、責務境界や正式な通信経路が明確な設計では architecture routing profile を置けます。
+Project typeとは別に、責務境界や正式な通信経路が明確な設計では、project側が必要に応じて architecture routing profile を用意できます。
 
-最初の実例として `upd-commander.json` を用意しています。
-
-このprofileは UI / Process / Data と Commander / Messenger / Processing を分類し、変更箇所から最初に読むscopeを絞るために使います。
-
-```text
-python tools/common/medium/architecture-boundary-router/script/architecture_boundary_router.py \
-  --profile tools/profiles/upd-commander.json \
-  src/ui/MenuCommander.cs src/process/GameMessenger.cs
-```
+このrepositoryは特定architectureの適合checkerを提供しません。profileは、対象project自身が既に持つarchitecture情報を `architecture-boundary-router` へ渡すための任意入力です。
 
 profileは原典のarchitecture/specificationを置き換えません。あくまで最初のworking setを選ぶrouting hintです。分類できない場合やcontract変更が疑われる場合は、原典へ戻って確認します。
 
@@ -35,7 +27,7 @@ repo-profile
   -> project size
 project-type-profile
   -> project characteristics
-architecture routing profile
+architecture routing profile (project-provided, optional)
   -> responsibility / boundary hints when available
 language-specific tool
   -> symbols / dependencies / graph
