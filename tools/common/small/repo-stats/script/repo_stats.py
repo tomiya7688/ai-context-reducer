@@ -16,15 +16,12 @@ LANG = {
 }
 
 
-def main():
-    ap = argparse.ArgumentParser(description='Compact repository file/line statistics.')
-    ap.add_argument('root', nargs='?', default='.')
-    ap.add_argument('--json', action='store_true')
-    ap.add_argument('--max-file-bytes', type=int, default=5_000_000)
-    args = ap.parse_args()
-    root = Path(args.root).resolve()
-    stats = defaultdict(lambda: {'files': 0, 'lines': 0, 'bytes': 0})
-    skipped = 0
+def build_stats(root: Path, max_file_bytes: int) -> dict[str, object]:
+    stats = defaultdict(lambda: {'file_count': 0, 'line_count': 0, 'byte_count': 0})
+    oversized_file_count = 0
+    read_error_count = 0
+    binary_like_file_count = 0
+    recognized_files_seen = 0
 
     for p in root.rglob('*'):
         if not p.is_file():
@@ -35,38 +32,54 @@ def main():
         lang = LANG.get(p.suffix.lower())
         if not lang:
             continue
+        recognized_files_seen += 1
         try:
             size = p.stat().st_size
-            if size > args.max_file_bytes:
-                skipped += 1
+            if max_file_bytes > 0 and size > max_file_bytes:
+                oversized_file_count += 1
                 continue
             raw = p.read_bytes()
         except OSError:
-            skipped += 1
+            read_error_count += 1
             continue
         if b'\x00' in raw[:4096]:
-            skipped += 1
+            binary_like_file_count += 1
             continue
         lines = raw.count(b'\n') + (1 if raw and not raw.endswith(b'\n') else 0)
         row = stats[lang]
-        row['files'] += 1
-        row['lines'] += lines
-        row['bytes'] += size
+        row['file_count'] += 1
+        row['line_count'] += lines
+        row['byte_count'] += size
 
-    ordered = dict(sorted(stats.items(), key=lambda kv: (-kv[1]['lines'], kv[0])))
-    out = {
-        'root': root.name,
-        'total_files': sum(v['files'] for v in stats.values()),
-        'total_lines': sum(v['lines'] for v in stats.values()),
-        'skipped_files': skipped,
+    ordered = dict(sorted(stats.items(), key=lambda kv: (-kv[1]['line_count'], kv[0])))
+    return {
+        'tool': 'repo-stats',
+        'status': 'ok',
+        'project_root': str(root),
+        'recognized_files_seen': recognized_files_seen,
+        'analyzed_file_count': sum(v['file_count'] for v in stats.values()),
+        'analyzed_line_count': sum(v['line_count'] for v in stats.values()),
+        'oversized_file_count': oversized_file_count,
+        'read_error_count': read_error_count,
+        'binary_like_file_count': binary_like_file_count,
+        'max_file_bytes': max_file_bytes,
         'languages': ordered,
     }
-    if args.json:
-        print(json.dumps(out, ensure_ascii=False, indent=2))
+
+
+def main():
+    ap = argparse.ArgumentParser(description='Compact repository file/line statistics as self-describing JSON.')
+    ap.add_argument('root', nargs='?', default='.')
+    ap.add_argument('--max-file-bytes', type=int, default=5_000_000, help='Per-file safety limit. 0 means unlimited.')
+    args = ap.parse_args()
+    root = Path(args.root).resolve()
+    if not root.exists():
+        out = {'tool': 'repo-stats', 'status': 'input_missing', 'project_root': str(root)}
+    elif not root.is_dir():
+        out = {'tool': 'repo-stats', 'status': 'input_not_directory', 'project_root': str(root)}
     else:
-        print(f"files={out['total_files']} lines={out['total_lines']} skipped={skipped}")
-        for lang, row in ordered.items():
-            print(f"{lang}: files={row['files']} lines={row['lines']} bytes={row['bytes']}")
+        out = build_stats(root, max(0, args.max_file_bytes))
+    print(json.dumps(out, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
