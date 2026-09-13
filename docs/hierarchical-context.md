@@ -220,6 +220,15 @@ root AI入口へ、必要なら次だけ追加します。
 
 local guideを列挙するrouting mapが既にある場合は、重複して一覧を増やさずそこから辿ります。
 
+## 外部ツールの具体例
+
+この原則を製品側で既に実装している場合は、その仕組みを優先して利用できます。
+
+- **Claude Code / `CLAUDE.md`**: project-levelの指示に加え、現在の作業ディレクトリから上位の `CLAUDE.md` を読み、subtree内の `CLAUDE.md` はそのsubtreeのファイルを扱うときに取り込む仕組みを持つ。Hierarchical Contextの具体例として非常に近い。
+- **OpenAI系 coding agent / `AGENTS.md`**: `AGENTS.md` のようなrepository instruction fileを利用できる環境では、rootへ全情報を詰め込まず、agent側の現在仕様に従ってscopeを分離する候補になる。厳密な探索順・優先順位は各製品の最新仕様をSource of Truthとする。
+
+これらは便利な既存実装ですが、標準側では `CLAUDE.md` / `AGENTS.md` という名前や製品固有のprecedenceを必須仕様にしません。既存agentが十分なscope解決を提供しているなら、自前のinstruction loaderを追加する必要はありません。
+
 ## 完了条件
 
 Hierarchical Contextが有効に機能している状態は次です。
