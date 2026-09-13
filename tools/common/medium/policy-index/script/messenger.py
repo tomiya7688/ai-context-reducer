@@ -5,15 +5,23 @@ from pathlib import Path
 DOC_EXTS = {'.md', '.txt', '.rst'}
 
 
-def iter_policy_files(paths: list[str]):
+def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str]]:
+    files: list[Path] = []
+    missing: list[str] = []
     for raw in paths:
         path = Path(raw)
-        if path.is_file():
-            yield path
+        if not path.exists():
+            missing.append(raw)
             continue
-        for child in path.rglob('*'):
-            if child.is_file() and child.suffix.lower() in DOC_EXTS:
-                yield child
+        if path.is_file():
+            if path.suffix.lower() in DOC_EXTS:
+                files.append(path)
+            continue
+        files.extend(
+            child for child in path.rglob('*')
+            if child.is_file() and child.suffix.lower() in DOC_EXTS
+        )
+    return files, missing
 
 
 def read_lines(path: Path) -> list[str] | None:
