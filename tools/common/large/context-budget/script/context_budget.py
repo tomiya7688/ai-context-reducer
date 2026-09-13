@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 from pathlib import Path
 
 from messenger import iter_text_files
@@ -32,7 +33,9 @@ def main():
             truncated = True
             break
 
-    print(summarize(rows, args.top, args.mode, scanned, truncated))
+    result = summarize(rows, args.top, args.mode, scanned, truncated)
+    result['root_path'] = str(root)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
