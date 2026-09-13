@@ -4,12 +4,10 @@ import subprocess
 from pathlib import Path
 
 
-def git_text(root: Path, *args: str) -> str:
-    try:
-        return subprocess.check_output(
-            ['git', '-C', str(root), *args],
-            text=True,
-            stderr=subprocess.DEVNULL,
-        ).strip()
-    except Exception:
-        return ''
+def git_result(root: Path, *args: str) -> tuple[bool, str]:
+    result = subprocess.run(
+        ['git', '-C', str(root), *args],
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0, result.stdout.strip()
