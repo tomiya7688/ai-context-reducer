@@ -92,6 +92,10 @@ Detailed policy text only if needed
 
 また Python checker では、機械的に確定できる違反と、静的解析だけでは断定できない項目を warning として分離しています。
 
+外部ツールでは **Semgrep** が有力な具体例です。コードパターンに対するcustom ruleを比較的軽量に記述でき、CIへ組み込み、禁止API・危険パターン・組織固有のreview ruleなどを機械判定へ移せます。PR/MRではdiff-aware scanningも利用できるため、現在変更に関係するfindingへ絞る運用とも相性があります。
+
+Semgrepのような成熟したrule engineで十分表現できる規則は、自前parser/checkerを増やす前に既存ツールで実現できないか確認します。一方、architecture semanticsやproject固有IRが必要でSemgrepでは不自然になる規則は、専用checkerへ分離して構いません。
+
 ## 8. 標準推奨
 
 - 説明と規定を必要に応じて分離する
@@ -100,3 +104,4 @@ Detailed policy text only if needed
 - checker は confirmed violation と warning を分離する
 - 例外は reason / scope / mitigation / removal condition を短く残す
 - 共通規約と language-specific checker を分離する
+- 既存rule engineで十分な規則は、自前checkerより既存ツール再利用を優先する
