@@ -33,14 +33,14 @@ def build_profile(root: Path, max_files: int) -> dict[str, object]:
     code_files = sum(v for k, v in langs.items() if k != 'Other')
 
     if truncated:
-        size = 'large-or-unknown'
+        size = 'large_or_unknown_due_to_scan_limit'
     else:
         size = 'small' if len(files) < 200 else 'medium' if len(files) < 2000 else 'large'
 
     top_dirs = set()
     for path in files:
         rel = path.relative_to(root)
-        if rel.parts:
+        if len(rel.parts) > 1:
             top_dirs.add(rel.parts[0])
 
     return {
@@ -52,8 +52,8 @@ def build_profile(root: Path, max_files: int) -> dict[str, object]:
         'scan_truncated': truncated,
         'code_files_scanned': code_files,
         'language_file_counts': dict(langs.most_common()),
-        'top_level_entries': sorted(top_dirs)[:30],
-        'top_level_entries_truncated': len(top_dirs) > 30,
+        'top_level_directories': sorted(top_dirs)[:30],
+        'top_level_directories_truncated': len(top_dirs) > 30,
     }
 
 
