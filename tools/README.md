@@ -74,6 +74,25 @@ prebuilt native binary
 
 元repoからvariantを勝手に削除するのではなく、対象プロジェクトへ導入するときに必要なvariantだけ materialize します。
 
+## Python / Go implementation policy
+
+Python版とGo版は共有実装にせず、**完全に独立した実装**として扱います。
+
+- Python版は build 不要の script を基本とし、必要なら `run.bat` / `run.sh` を置く
+- Go版は `build.bat` / `build.sh` で一発buildできる単一binaryを基本とする
+- generic toolをPython側へ追加した場合、Go側で同等機能を実装できない明確な理由がなければ、Go版も積極的に追加する
+- 片側のbugや仕様変更をもう片側へ自動コピーせず、入出力契約とtestで互換性を保つ
+- language-specific toolは言語差を尊重し、名前だけを機械的に一致させない
+
+現在の主要対応:
+
+```text
+Python affected-tests  <-> Go affected-tests
+python-symbols         <-> go-symbols
+python-import-map      <-> go-import-map
+python-module-graph    <-> go-package-graph
+```
+
 ## Tool categories
 
 ```text
@@ -112,6 +131,7 @@ tools/
 
 - `compact-diff`, `remote-delta`
 - `change-router`
+- `affected-tests`: changed filesからtest候補 / confidence / broader fallbackを選ぶ
 - `acceptance-extractor`, `exploration-stop-check`
 - `validation-plan`, `compact-log`
 - `context-pack-builder`
@@ -156,8 +176,11 @@ Responsibility Map
 Change Routing Map
   -> change-router
 
+Change / Test Impact Routing
+  -> affected-tests / external Nx or Pants
+
 Policy Routing
-  -> policy-index / external Semgrep etc.
+  -> policy-index / external ast-grep etc.
 
 Validation Routing
   -> validation-plan / compact-log
@@ -181,6 +204,8 @@ Information responsibility
 - bounded / truncated output を明示する
 - 解析結果は索引であり、必要なら原典へ戻る
 - Python / native / external tool のどれか1つに必須依存しない
+- Python版はbuildを要求しない
+- Go版toolは可能な限り `build.bat` / `build.sh` で一発build可能にする
 - `.bat` を作る場合は可能なら `.sh` も用意する
 - missing runtime / SDKを自動インストールしない
 - Small repoへLarge解析を持ち込まない
