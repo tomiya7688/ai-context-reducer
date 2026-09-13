@@ -58,6 +58,7 @@ AI / Codex / Claude Code を利用した開発で、必要以上にコンテキ�
 |---|---|
 | docs / Issues / subsystem が多い | Task Routing / Change Routing Map |
 | file / module の責務が分かりにくい | Responsibility Map |
+| monorepo / multi-appで局所ルールが多い | Hierarchical Context / Scoped AI Instructions |
 | 現在の能力・制約がREADMEだけでは分からない | Current State summary |
 | 複数AI・複数チャット・複数人がremoteを更新 | Remote Delta First |
 | 巨大codebase・call/dependency探索が重い | Source Structure Index / changed-symbol routing |
@@ -107,6 +108,7 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 - Task Routing: [`docs/task-routing.md`](docs/task-routing.md)
 - Exploration Control: [`docs/exploration-control.md`](docs/exploration-control.md)
 - Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
+- Hierarchical Context: [`docs/hierarchical-context.md`](docs/hierarchical-context.md)
 - Validation Routing: [`docs/validation-routing.md`](docs/validation-routing.md)
 - Responsibility Map: [`docs/responsibility-map.md`](docs/responsibility-map.md)
 - Policy Routing: [`docs/policy-routing.md`](docs/policy-routing.md)
