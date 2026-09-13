@@ -20,19 +20,24 @@ def estimate_accurate(path: Path):
     return max(1, len(text) // 4), size
 
 
-def summarize(rows: list[tuple[int, int, str]], top: int, mode: str, scanned: int, truncated: bool) -> str:
+def summarize(rows: list[tuple[int, int, str]], top: int, mode: str, scanned: int, truncated: bool) -> dict[str, object]:
     rows.sort(reverse=True)
     total = sum(row[0] for row in rows)
-    lines = [
-        f'mode={mode}',
-        f'estimated_total_tokens_if_all_candidates_read={total}',
-        f'scanned_text_files={scanned}',
-        f'truncated={str(truncated).lower()}',
-        'largest_candidates:',
-    ]
-    suffix = '' if mode == 'accurate' else '~'
-    for tokens, size, path in rows[:top]:
-        lines.append(f'  {tokens:>8} tok{suffix}  {size:>10} bytes  {path}')
-    if len(rows) > top:
-        lines.append(f'  ... {len(rows) - top} more analyzed files')
-    return '\n'.join(lines)
+    return {
+        'tool': 'context-budget',
+        'status': 'ok',
+        'mode': mode,
+        'estimated_total_tokens_if_all_candidates_read': total,
+        'scanned_text_files': scanned,
+        'scan_truncated': truncated,
+        'largest_context_candidates': [
+            {
+                'path': path,
+                'estimated_tokens': tokens,
+                'token_estimate_is_approximate': mode != 'accurate',
+                'bytes': size,
+            }
+            for tokens, size, path in rows[:top]
+        ],
+        'largest_context_candidates_truncated': len(rows) > top,
+    }
