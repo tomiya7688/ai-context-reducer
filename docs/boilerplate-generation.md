@@ -117,6 +117,12 @@ tools/boilerplate-generator/script/
 
 `Obake_Lisense` は、利用案内を README に短く置き、詳細条件を versioned license document に分離しています。対象、許諾、再配布、禁止事項、免責、違反時、バージョンといった章構造が明確で、定型 template 化を検討しやすい構造です。
 
+外部ツールでは **Copier** が有力です。Jinja2ベースのtemplateと変数からproject scaffoldを生成できるだけでなく、template自体が更新された後に既存projectへ更新を適用するlifecycle managementも主目的としているため、単発生成より長期運用が必要なcanonical templateと相性があります。
+
+単純な初期scaffoldだけで十分なら Cookiecutter 等の既存template generatorも候補です。重要なのは製品名ではなく、既存ツールで `template + variables -> generated artifact` が十分実現できるなら、自前generatorを追加しないことです。
+
+特にproject skeleton、CI設定、共通README、設定ファイル群などはCopier等へ任せ、AI Context Reducer側は「生成物全文ではなくtemplate version・入力差分・validation結果を見る」というcontext運用に集中できます。
+
 ## 標準推奨
 
 - 定型文は canonical template + variables へ分離する
@@ -125,4 +131,5 @@ tools/boilerplate-generator/script/
 - template version と生成元を追跡可能にする
 - placeholder / required section など機械検査できる項目は generator 側で確認する
 - 法的内容の妥当性そのものを generator の責務にしない
+- 成熟したtemplate generatorで十分なら自前generatorより再利用を優先する
 - 共通 generator を作る場合も特定ライセンスや外部リポジトリへの必須依存を避ける
