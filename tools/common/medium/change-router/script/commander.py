@@ -14,19 +14,40 @@ def route_changes(
     max_index_files: int,
     candidate_limit: int,
 ) -> dict[str, object]:
-    changed = explicit_changed or changed_files(root, base)
-    changed_truncated = len(changed) > max_changed
-    changed = changed[:max_changed]
+    if explicit_changed:
+        changed_ok = True
+        changed = explicit_changed
+        changed_source = 'explicit'
+    else:
+        changed_ok, changed = changed_files(root, base)
+        changed_source = 'git_diff'
+
+    if not changed_ok:
+        return {
+            'tool': 'change-router',
+            'status': 'git_diff_unavailable',
+            'changed_source': changed_source,
+            'changed_files': [],
+            'changed_files_truncated': False,
+            'index_candidates': 0,
+            'index_truncated': False,
+            'routes': [],
+        }
+
+    changed_truncated = max_changed > 0 and len(changed) > max_changed
+    if max_changed > 0:
+        changed = changed[:max_changed]
 
     index, index_truncated = candidate_index(root, max_index_files)
     routes = [route_candidates(rel, index, candidate_limit) for rel in changed]
 
     return {
-        'routes': routes,
-        'changed_count': len(changed),
+        'tool': 'change-router',
+        'status': 'ok',
+        'changed_source': changed_source,
+        'changed_files': changed,
+        'changed_files_truncated': changed_truncated,
         'index_candidates': len(index),
-        'truncated': {
-            'changed': changed_truncated,
-            'index': index_truncated,
-        },
+        'index_truncated': index_truncated,
+        'routes': routes,
     }
