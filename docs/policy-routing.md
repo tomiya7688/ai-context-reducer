@@ -22,8 +22,6 @@ AI は通常、現在タスクに関係する規定だけを先に読み、背�
 
 規約は同じ重さとして扱いません。
 
-推奨区分:
-
 - Required: 必須。違反すると受け入れ不可
 - Recommended: 原則推奨。理由があれば変更可能
 - Advisory: 判断補助。違反とは断定しない
@@ -92,9 +90,11 @@ Detailed policy text only if needed
 
 また Python checker では、機械的に確定できる違反と、静的解析だけでは断定できない項目を warning として分離しています。
 
-外部ツールでは **Semgrep** が有力な具体例です。コードパターンに対するcustom ruleを比較的軽量に記述でき、CIへ組み込み、禁止API・危険パターン・組織固有のreview ruleなどを機械判定へ移せます。PR/MRではdiff-aware scanningも利用できるため、現在変更に関係するfindingへ絞る運用とも相性があります。
+外部ツールでは [ast-grep](https://github.com/ast-grep/ast-grep) が具体例です。ASTベースのstructural search / lint / rewriteをCLIで行え、custom ruleを使って禁止パターンやproject固有の静的規則を機械判定へ移せます。npm / pip / cargo / Homebrew / Scoop 等から導入できます。
 
-Semgrepのような成熟したrule engineで十分表現できる規則は、自前parser/checkerを増やす前に既存ツールで実現できないか確認します。一方、architecture semanticsやproject固有IRが必要でSemgrepでは不自然になる規則は、専用checkerへ分離して構いません。
+成熟したrule engineで十分表現できる規則は、自前parser/checkerを増やす前に既存ツールで実現できないか確認します。一方、architecture semanticsやproject固有IRが必要で不自然になる規則は、専用checkerへ分離して構いません。
+
+外部ツールリンクは [`external-tool-reference-policy.md`](external-tool-reference-policy.md) の掲載条件を満たすものだけに限定します。
 
 ## 8. 標準推奨
 
