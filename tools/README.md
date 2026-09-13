@@ -37,6 +37,10 @@ change-router
 context-pack-builder
 remote-delta
 architecture-boundary-router
+context-manifest
+context-budget
+policy-index
+doc-duplicate-hints
 ```
 
 複数の変更理由を持つ場合、必要に応じて次の責務へ分離します。
@@ -52,12 +56,17 @@ processing      -> matching / analysis / rendering
 
 ## Output policy
 
-- summary / index first
+Machine outputの共通契約は `tools/JSON_CONTRACT.md` をSource of Truthとします。
+
+- JSONが自然な結果形式なら、README/helpを毎回読まなくても意味が分かる自己説明的JSONを優先する
+- 同じ事実をprose summaryとstructured fieldへ二重に入れない
+- successful empty / unavailable / failure / truncated / unknownを区別する
 - agent向け出力はbounded / compact
 - full source / full log / full treeを既定出力にしない
 - uncertainty / fallback / truncationを明示する
 - 原典へ戻れるpath / symbol / reasonを残す
 - targeted validationを優先する
+- Markdown生成など成果物形式自体が目的のtoolは、無理にJSON化しない
 
 Tool内部では、agentの探索を置き換えるためにscope全体やfile本文を読んで構いません。精度を落としてまで内部I/Oを減らすことは目的ではありません。
 
@@ -129,4 +138,4 @@ UPD Commanderを含む外部設計手法は、tools内部の責務分離や実�
 - external toolが既にある場合は高品質backendとして使ってよい
 - toolの維持コストがagent-context削減効果を上回るなら追加しない
 
-詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/NATIVE_COVERAGE.md`、`docs/portable-tools.md` を参照してください。
+詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/portable-tools.md` を参照してください。
