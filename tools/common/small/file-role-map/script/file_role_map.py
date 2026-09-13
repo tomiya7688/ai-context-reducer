@@ -41,10 +41,19 @@ def build_role_map(root: Path, max_files: int, example_limit: int) -> dict[str, 
             rel = (Path(current) / name).relative_to(root)
             group = groups[role(rel)]
             group['file_count'] += 1
-            if len(group['example_paths']) < example_limit:
+            if example_limit == 0 or len(group['example_paths']) < example_limit:
                 group['example_paths'].append(rel.as_posix())
         if truncated:
             break
+
+    roles = {}
+    for key, value in sorted(groups.items()):
+        paths = value['example_paths']
+        roles[key] = {
+            'file_count': value['file_count'],
+            'example_paths': paths,
+            'example_paths_truncated': example_limit > 0 and value['file_count'] > len(paths),
+        }
 
     return {
         'tool': 'file-role-map',
@@ -52,7 +61,7 @@ def build_role_map(root: Path, max_files: int, example_limit: int) -> dict[str, 
         'project_root': str(root),
         'files_scanned': scanned,
         'scan_truncated': truncated,
-        'roles': {key: value for key, value in sorted(groups.items())},
+        'roles': roles,
     }
 
 
@@ -60,7 +69,7 @@ def main():
     parser = argparse.ArgumentParser(description='Classify repository files by likely context role as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
     parser.add_argument('--max-files', type=int, default=0, help='Optional safety limit. 0 means unlimited.')
-    parser.add_argument('--examples', type=int, default=12)
+    parser.add_argument('--examples', type=int, default=12, help='Example paths per role. 0 means unlimited.')
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
