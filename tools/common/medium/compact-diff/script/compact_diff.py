@@ -1,31 +1,50 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import subprocess
 
 
-def run(*args):
-    return subprocess.run(args, text=True, capture_output=True, check=False).stdout.strip()
+def run_git(*args: str) -> tuple[bool, str]:
+    result = subprocess.run(['git', *args], text=True, capture_output=True, check=False)
+    return result.returncode == 0, result.stdout.strip()
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--base', default='HEAD~1')
-    ap.add_argument('--head', default='HEAD')
-    ap.add_argument('--max-lines', type=int, default=120)
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description='Return compact Git diff evidence as self-describing JSON.')
+    parser.add_argument('--base', default='HEAD~1')
+    parser.add_argument('--head', default='HEAD')
+    parser.add_argument('--max-lines', type=int, default=120)
+    args = parser.parse_args()
 
-    print('## commits')
-    print(run('git','log','--oneline',f'{args.base}..{args.head}') or '(none)')
-    print('\n## changed files')
-    print(run('git','diff','--name-status',args.base,args.head) or '(none)')
-    print('\n## shortstat')
-    print(run('git','diff','--shortstat',args.base,args.head) or '(none)')
-    print('\n## bounded diff')
-    diff = run('git','diff','--unified=2',args.base,args.head).splitlines()
-    for line in diff[:args.max_lines]:
-        print(line)
-    if len(diff) > args.max_lines:
-        print(f'... TRUNCATED {len(diff)-args.max_lines} lines; inspect full diff only if needed')
+    log_ok, commits = run_git('log', '--oneline', f'{args.base}..{args.head}')
+    files_ok, changed = run_git('diff', '--name-status', args.base, args.head)
+    stat_ok, shortstat = run_git('diff', '--shortstat', args.base, args.head)
+    diff_ok, diff_text = run_git('diff', '--unified=2', args.base, args.head)
+
+    if not all((log_ok, files_ok, stat_ok, diff_ok)):
+        result = {
+            'tool': 'compact-diff',
+            'status': 'git_query_failed',
+            'base': args.base,
+            'head': args.head,
+        }
+    else:
+        diff_lines = diff_text.splitlines()
+        result = {
+            'tool': 'compact-diff',
+            'status': 'ok',
+            'base': args.base,
+            'head': args.head,
+            'commits': [line for line in commits.splitlines() if line],
+            'changed_files': [line for line in changed.splitlines() if line],
+            'diff_stat': shortstat or None,
+            'diff_lines': diff_lines[:args.max_lines],
+            'diff_truncated': len(diff_lines) > args.max_lines,
+            'diff_total_lines': len(diff_lines),
+        }
+
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
 
 if __name__ == '__main__':
     main()
