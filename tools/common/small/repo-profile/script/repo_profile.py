@@ -29,8 +29,14 @@ def walk(root: Path, max_files: int):
 
 def build_profile(root: Path, max_files: int) -> dict[str, object]:
     files, truncated = walk(root, max_files)
-    langs = Counter(LANG.get(path.suffix.lower(), 'Other') for path in files)
-    code_files = sum(v for k, v in langs.items() if k != 'Other')
+    languages = Counter()
+    non_language_files = 0
+    for path in files:
+        language = LANG.get(path.suffix.lower())
+        if language is None:
+            non_language_files += 1
+        else:
+            languages[language] += 1
 
     if truncated:
         size = 'large_or_unknown_due_to_scan_limit'
@@ -50,8 +56,9 @@ def build_profile(root: Path, max_files: int) -> dict[str, object]:
         'project_size_class': size,
         'files_scanned': len(files),
         'scan_truncated': truncated,
-        'code_files_scanned': code_files,
-        'language_file_counts': dict(langs.most_common()),
+        'recognized_source_files_scanned': sum(languages.values()),
+        'non_language_files_scanned': non_language_files,
+        'language_file_counts': dict(languages.most_common()),
         'top_level_directories': sorted(top_dirs)[:30],
         'top_level_directories_truncated': len(top_dirs) > 30,
     }
