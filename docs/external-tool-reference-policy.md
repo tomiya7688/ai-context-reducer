@@ -15,6 +15,30 @@ MIT / BSD / Apache-2.0 等で、ツール本体を再配布する場合にライ
 
 導入性は、単体バイナリ、package manager、repository-local wrapper等で簡単に利用できることを優先します。
 
+## 現在の具体例
+
+現在の文書で具体例として扱う候補は、次のような無料・商用利用可能・導入容易なOSSを優先します。
+
+- [Nx](https://github.com/nrwl/nx): affected project / test routing
+- [Pants](https://github.com/pantsbuild/pants): changed target / dependency based validation routing
+- [SCIP](https://github.com/scip-code/scip): code intelligence index
+- [Tree-sitter](https://github.com/tree-sitter/tree-sitter): portable syntax parsing
+- [ast-grep](https://github.com/ast-grep/ast-grep): structural search / lint / rewrite
+- [Copier](https://github.com/copier-org/copier): versioned project templates
+- [Cookiecutter](https://github.com/cookiecutter/cookiecutter): lightweight project templates
+
+個別文書では、その手法と直接関係するものだけを具体例として掲載します。
+
+## 掲載しない例
+
+次のような場合は、ツール自体が優秀でも具体例リンクから外します。
+
+- 無料利用が保証されない
+- 商用利用条件が用途によって制限される
+- 利用時に明示的なクレジット表示が必要
+- 導入に常時サービス契約や重いサーバー構築が必要で、同等の軽量代替がある
+- ライセンスや利用条件を確認できない
+
 外部ツールを追加する前に、公式情報を優先して無料利用、商用利用、表示義務、導入方法を確認します。条件変更が判明した場合は掲載を削除または置換します。
 
 標準の原則自体は外部ツールに依存させません。
