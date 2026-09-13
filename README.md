@@ -119,6 +119,7 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 - Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - Boilerplate Generation: [`docs/boilerplate-generation.md`](docs/boilerplate-generation.md)
+- 外部ツール掲載基準: [`docs/external-tool-reference-policy.md`](docs/external-tool-reference-policy.md)
 - AI入口テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Task用テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
@@ -130,6 +131,8 @@ Kadoka系を含む外部リポジトリは **実装例 / 参考実装** です�
 - 外部repoを必須依存にしない
 - 特定CLI・ファイル形式・ディレクトリ構成を標準化しない
 - 同じ原則を別実装でも満たせるようにする
+
+外部ツールへ具体的にリンクする場合は、原則として **無料 / 商用利用可能 / 通常利用時のクレジット明示不要 / ポータブルまたは導入容易** の4条件をすべて満たすものだけに限定します。詳細は [`docs/external-tool-reference-policy.md`](docs/external-tool-reference-policy.md) を参照してください。
 
 主な参考元:
 
