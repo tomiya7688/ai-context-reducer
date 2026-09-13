@@ -142,7 +142,7 @@ Kadoka系を含む外部リポジトリは **実装例 / 参考実装** です�
 - `kadocacio`: source / tests / docs の直接ルーティング
 - `Bitlang`: Responsibility Map、compact policy checks
 - `obake-no-sumika`: Validation Routing、structured runtime evidence
-- `upd-commander-base-design`: Policy Routing、rule strength、exception record
+- `upd-commander-base-design`: UI / Process / Data と Commander / Messenger / Processing の責務分離、正式な通信経路、Application境界、Policy Routing、rule strength、exception record。責務と依存経路が限定されることで、AIが読むべき実装・規定・影響範囲を絞る参考例
 - `kadoka_tetris_ai`: evidence validity、artifact smoke
 - `dot_editor`: headless-first、disposable validation workspace
 - `joke_programs`: RNG / clock 等の deterministic seam
