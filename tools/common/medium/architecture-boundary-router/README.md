@@ -1,0 +1,12 @@
+# architecture-boundary-router
+
+Project-provided architecture profileを、agentの最初のworking setを選ぶrouting hintへ変換します。特定architectureの適合checkerではありません。
+
+## Development routing
+
+- CLI / output変更: `script/architecture_boundary_router.py`
+- profile読込・外部I/O変更: `script/messenger.py`
+- path分類・hint意味論変更: `script/processing.py`
+- profile→routesのflow変更: `script/commander.py`
+
+この構造により、Task Routing / Responsibility Map / Exploration Stopをtool開発自身へ適用できます。
