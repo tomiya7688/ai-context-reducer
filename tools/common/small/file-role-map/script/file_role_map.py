@@ -14,62 +14,63 @@ SKIP = {
 def role(path):
     low = '/'.join(part.lower() for part in path.parts)
     if path.suffix.lower() in {'.md', '.rst', '.txt'} or 'docs/' in low or 'doc/' in low:
-        return 'docs'
+        return 'documentation'
     if 'test' in path.name.lower() or '/tests/' in low or '/test/' in low:
         return 'tests'
     if path.suffix.lower() in {'.py', '.cs', '.go', '.c', '.h', '.cpp', '.cc', '.cxx', '.hpp', '.hh', '.gd', '.rs', '.java', '.js', '.ts'}:
         return 'source'
     if path.suffix.lower() in {'.json', '.yaml', '.yml', '.toml', '.ini', '.cfg', '.xml'}:
-        return 'config'
+        return 'configuration'
     if path.suffix.lower() in {'.png', '.jpg', '.jpeg', '.webp', '.gif', '.wav', '.mp3', '.ogg', '.mp4', '.zip', '.7z'}:
-        return 'asset/binary'
+        return 'asset_or_binary'
     return 'other'
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Classify repository files by likely context role using a bounded scan.')
-    parser.add_argument('root', nargs='?', default='.')
-    parser.add_argument('--max-files', type=int, default=15000)
-    parser.add_argument('--examples', type=int, default=12)
-    parser.add_argument('--json', action='store_true')
-    args = parser.parse_args()
-
-    root = Path(args.root).resolve()
-    groups = defaultdict(lambda: {'count': 0, 'examples': []})
+def build_role_map(root: Path, max_files: int, example_limit: int) -> dict[str, object]:
+    groups = defaultdict(lambda: {'file_count': 0, 'example_paths': []})
     scanned = 0
     truncated = False
 
     for current, dirs, files in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d.lower() not in SKIP)
         for name in sorted(files):
-            scanned += 1
-            if scanned > args.max_files:
+            if max_files > 0 and scanned >= max_files:
                 truncated = True
                 break
+            scanned += 1
             rel = (Path(current) / name).relative_to(root)
             group = groups[role(rel)]
-            group['count'] += 1
-            if len(group['examples']) < args.examples:
-                group['examples'].append(rel.as_posix())
+            group['file_count'] += 1
+            if len(group['example_paths']) < example_limit:
+                group['example_paths'].append(rel.as_posix())
         if truncated:
             break
 
-    data = {
-        'roles': {key: value for key, value in sorted(groups.items())},
-        'files_scanned': min(scanned, args.max_files),
+    return {
+        'tool': 'file-role-map',
+        'status': 'ok',
+        'project_root': str(root),
+        'files_scanned': scanned,
         'scan_truncated': truncated,
+        'roles': {key: value for key, value in sorted(groups.items())},
     }
 
-    if args.json:
-        print(json.dumps(data, ensure_ascii=False, indent=2))
-        return
 
-    if truncated:
-        print(f'[scan truncated at {args.max_files} files; narrow root or raise --max-files intentionally]')
-    for key, value in data['roles'].items():
-        print(f"{key}: {value['count']}")
-        for example in value['examples']:
-            print(f'  - {example}')
+def main():
+    parser = argparse.ArgumentParser(description='Classify repository files by likely context role as self-describing JSON.')
+    parser.add_argument('root', nargs='?', default='.')
+    parser.add_argument('--max-files', type=int, default=0, help='Optional safety limit. 0 means unlimited.')
+    parser.add_argument('--examples', type=int, default=12)
+    args = parser.parse_args()
+
+    root = Path(args.root).resolve()
+    if not root.exists():
+        result = {'tool': 'file-role-map', 'status': 'input_missing', 'project_root': str(root)}
+    elif not root.is_dir():
+        result = {'tool': 'file-role-map', 'status': 'input_not_directory', 'project_root': str(root)}
+    else:
+        result = build_role_map(root, args.max_files, max(0, args.examples))
+    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
