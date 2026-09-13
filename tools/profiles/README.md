@@ -12,6 +12,22 @@
 | Simulation / AI | random, physics, eval, seed | deterministic seam, fixed inputs, structured observation |
 | Rule-heavy | rules, protocols, specifications | Policy Routing, Responsibility Map, targeted checkers |
 
+## Architecture routing profiles
+
+Project typeとは別に、責務境界や正式な通信経路が明確な設計では architecture routing profile を置けます。
+
+最初の実例として `upd-commander.json` を用意しています。
+
+このprofileは UI / Process / Data と Commander / Messenger / Processing を分類し、変更箇所から最初に読むscopeを絞るために使います。
+
+```text
+python tools/common/medium/architecture-boundary-router/script/architecture_boundary_router.py \
+  --profile tools/profiles/upd-commander.json \
+  src/ui/MenuCommander.cs src/process/GameMessenger.cs
+```
+
+profileは原典のarchitecture/specificationを置き換えません。あくまで最初のworking setを選ぶrouting hintです。分類できない場合やcontract変更が疑われる場合は、原典へ戻って確認します。
+
 ## Selection order
 
 ```text
@@ -19,6 +35,8 @@ repo-profile
   -> project size
 project-type-profile
   -> project characteristics
+architecture routing profile
+  -> responsibility / boundary hints when available
 language-specific tool
   -> symbols / dependencies / graph
 ```
