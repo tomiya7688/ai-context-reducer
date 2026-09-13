@@ -29,11 +29,12 @@ def walk(root):
             yield p
 
 
-def git(root, *args):
+def git_result(root, *args):
     try:
-        return subprocess.check_output(['git','-C',str(root),*args], text=True, stderr=subprocess.DEVNULL).strip()
-    except Exception:
-        return ''
+        result = subprocess.run(['git','-C',str(root),*args], text=True, capture_output=True, check=False)
+    except OSError:
+        return False, ''
+    return result.returncode == 0, result.stdout.strip()
 
 
 def implementation_plan(repo_root):
@@ -50,31 +51,48 @@ def implementation_plan(repo_root):
     unused = []
     if preferred == 'native': unused.append('python runtime is optional for deployed common tools')
     if preferred == 'python': unused.append('native binary is optional but recommended for Python-free hosts')
-    return {'os': system, 'arch': arch, 'preferred': preferred, 'native_binary': native, 'python': python_available, 'unused_variants': unused}
+    return {'os': system, 'arch': arch, 'preferred_implementation': preferred, 'native_binary_path': native, 'python_executable_path': python_available, 'unused_variants': unused}
 
 
-def main():
-    ap = argparse.ArgumentParser(description='Analyze a repo and recommend ai-context-reducer techniques/tools.')
-    ap.add_argument('root', nargs='?', default='.')
-    ap.add_argument('--json', action='store_true')
-    args = ap.parse_args()
-    root = Path(args.root).resolve()
+def analyze(root: Path) -> dict[str, object]:
     paths = list(walk(root))
-    langs = Counter(LANG.get(p.suffix.lower(),'other') for p in paths)
+    langs = Counter()
+    non_language_files = 0
+    stat_error_count = 0
+    large_files = 0
+    for p in paths:
+        lang = LANG.get(p.suffix.lower())
+        if lang is None:
+            non_language_files += 1
+        else:
+            langs[lang] += 1
+        try:
+            if p.stat().st_size >= 100_000:
+                large_files += 1
+        except OSError:
+            stat_error_count += 1
+
     size = 'small' if len(paths) < 200 else 'medium' if len(paths) < 2000 else 'large'
     hay = ' '.join(str(p.relative_to(root)).lower() for p in paths)
     types = [k for k, words in TYPE_SIGNALS.items() if any(w in hay for w in words)]
     docs = [p for p in paths if p.suffix.lower() in {'.md','.rst','.txt'}]
     tests = [p for p in paths if 'test' in p.name.lower() or any(x.lower() in {'test','tests'} for x in p.parts)]
-    large_files = sum(1 for p in paths if p.stat().st_size >= 100_000)
-    has_git = (root / '.git').exists() and bool(shutil.which('git'))
-    dirty = bool(git(root,'status','--porcelain')) if has_git else False
+    git_repository_present = (root / '.git').exists()
+    git_executable_available = bool(shutil.which('git'))
+    git_status = 'not_repository'
+    dirty = None
+    if git_repository_present and git_executable_available:
+        ok, text = git_result(root,'status','--porcelain')
+        git_status = 'ok' if ok else 'query_failed'
+        dirty = bool(text) if ok else None
+    elif git_repository_present:
+        git_status = 'git_unavailable'
     external = [x for x in EXTERNAL if shutil.which(x)]
     runtime_plan = implementation_plan(root)
 
     techniques = ['AI_CONTEXT minimum core','Search-first / Read-second','Exploration stop condition','Source of Truth','Targeted validation']
     tools = ['common/small/doc-index','common/small/file-role-map','common/small/environment-plan']
-    if has_git:
+    if git_repository_present:
         techniques += ['Diff-first workflow','Remote Delta First']
         tools += ['common/medium/compact-diff','common/medium/remote-delta','common/medium/change-router']
     if docs:
@@ -100,31 +118,46 @@ def main():
             if size in {'medium','large'}: tools.append(f'{lang}/medium')
             if size == 'large': tools.append(f'{lang}/large')
 
-    out = {
-        'project': root.name, 'size': size, 'files': len(paths), 'docs': len(docs), 'tests': len(tests),
-        'large_files_100kb_plus': large_files, 'languages': dict(langs.most_common()), 'project_types': types,
-        'git': {'available': has_git, 'dirty': dirty}, 'external_tools_available': external,
+    return {
+        'tool': 'analyze-and-recommend',
+        'status': 'ok',
+        'project_root': str(root),
+        'project_size_class': size,
+        'files_scanned': len(paths),
+        'scan_truncated': False,
+        'recognized_source_files_scanned': sum(langs.values()),
+        'non_language_files_scanned': non_language_files,
+        'documentation_file_count': len(docs),
+        'test_file_count': len(tests),
+        'large_files_100kb_plus_count': large_files,
+        'file_stat_error_count': stat_error_count,
+        'language_file_counts': dict(langs.most_common()),
+        'detected_project_types': types,
+        'git': {
+            'repository_present': git_repository_present,
+            'executable_available': git_executable_available,
+            'status': git_status,
+            'dirty': dirty,
+        },
+        'external_tools_available': external,
         'runtime_plan': runtime_plan,
         'recommended_techniques': list(dict.fromkeys(techniques)),
-        'recommended_tools': list(dict.fromkeys(tools)),
-        'next_step': 'Keep only implementations usable in this environment; create/update minimal AI_CONTEXT.md; then run only tools needed for the current task.'
+        'recommended_tool_paths': list(dict.fromkeys(tools)),
     }
-    if args.json:
-        print(json.dumps(out, ensure_ascii=False, indent=2))
+
+
+def main():
+    ap = argparse.ArgumentParser(description='Analyze a repository and recommend Context Reducer techniques/tools as self-describing JSON.')
+    ap.add_argument('root', nargs='?', default='.')
+    args = ap.parse_args()
+    root = Path(args.root).resolve()
+    if not root.exists():
+        out = {'tool': 'analyze-and-recommend', 'status': 'input_missing', 'project_root': str(root)}
+    elif not root.is_dir():
+        out = {'tool': 'analyze-and-recommend', 'status': 'input_not_directory', 'project_root': str(root)}
     else:
-        print(f"project={out['project']} size={size} files={len(paths)} docs={len(docs)} tests={len(tests)}")
-        print('languages=' + ', '.join(f'{k}:{v}' for k,v in langs.most_common()))
-        print('types=' + (', '.join(types) if types else 'unknown'))
-        print('external=' + (', '.join(external) if external else 'none detected'))
-        print(f"runtime={runtime_plan['os']}/{runtime_plan['arch']} preferred={runtime_plan['preferred']}")
-        print('\nrecommended techniques:')
-        for x in out['recommended_techniques']: print('  - ' + x)
-        print('\nrecommended tools:')
-        for x in out['recommended_tools']: print('  - ' + x)
-        if runtime_plan['unused_variants']:
-            print('\nimplementation notes:')
-            for x in runtime_plan['unused_variants']: print('  - ' + x)
-        print('\nnext: ' + out['next_step'])
+        out = analyze(root)
+    print(json.dumps(out, ensure_ascii=False, indent=2))
 
 if __name__ == '__main__':
     main()
