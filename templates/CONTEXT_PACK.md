@@ -66,6 +66,24 @@ full diff は実装・レビュー・問題調査に必要な場合だけ読む�
 
 該当する場合だけ追加する。
 
+## Evidence Budget
+探索が長くなりやすいtaskだけ使う。token数のhard capではなく、必要証拠の不足を管理する。
+
+### Required evidence
+- 
+
+### Optional evidence
+- 
+
+### Evidence ledger
+- Known:
+- Missing:
+- Conflicts:
+- Unverified:
+
+`Missing: none` かつ矛盾が解消され、Acceptance判断に十分なら追加探索を止める。
+新しいread/searchは、Required evidenceの不足・矛盾・Acceptance確認・新たに判明した影響範囲のいずれかを埋める場合だけ行う。
+
 ## Project / Current State
 - State summary reference:
 
@@ -136,4 +154,5 @@ diff.patch
 - unrelated refactor を混ぜない。
 - validation は smallest sufficient evidence を選ぶ。
 - UI / visual correctness をテスト結果だけで推測しない。
+- Evidence Budgetを使う場合、次のread/searchの理由を明示できなければ探索停止を優先する。
 - 古い Context Pack を source of truth にしない。
