@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import re
 from pathlib import Path
 
 CHECKS = {
@@ -14,9 +15,15 @@ CHECKS = {
 REQUIRED = ('goal', 'required', 'acceptance', 'source', 'tests')
 
 
+def term_present(text: str, term: str) -> bool:
+    if any(ord(char) > 127 for char in term):
+        return term in text
+    return re.search(rf'(?<![a-z0-9_]){re.escape(term)}(?![a-z0-9_])', text) is not None
+
+
 def evaluate(text: str) -> dict[str, object]:
     lowered = text.lower()
-    checks = {key: any(word in lowered for word in words) for key, words in CHECKS.items()}
+    checks = {key: any(term_present(lowered, word) for word in words) for key, words in CHECKS.items()}
     missing = [key for key in REQUIRED if not checks[key]]
     return {
         'checks': checks,
@@ -36,6 +43,12 @@ def main():
         result = {
             'tool': 'exploration-stop-check',
             'status': 'input_missing',
+            'input_file': str(path),
+        }
+    elif not path.is_file():
+        result = {
+            'tool': 'exploration-stop-check',
+            'status': 'input_not_file',
             'input_file': str(path),
         }
     else:
