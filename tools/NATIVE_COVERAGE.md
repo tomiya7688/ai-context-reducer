@@ -18,6 +18,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | compact validation logs | `compact-log` | `acr-toolbox compact-log` |
 | compact Git diff | `compact-diff` | `acr-toolbox compact-diff` |
 | remote delta | `remote-delta` | `acr-toolbox remote-delta` |
+| context-size routing estimate | `context-budget` | `acr-toolbox context-budget` |
+| large/deep file routing | `hotspot-report` | `acr-toolbox hotspot-report` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
 | safe portable tool materialization | `materialize-tools` | `acr-toolbox materialize` |
 | language runtime detection | `language-environment-plan` | `acr-toolbox language-env` |
@@ -32,6 +34,8 @@ Windows / Linux / macOS では prebuilt/native binaryを優先し、利用でき
 Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildできる形を基本とします。
 
 `materialize-tools` はbootstrap用途でも使えるよう、Python版とは独立して `acr-toolbox materialize` を持ちます。native版は実行中のtoolbox自身とOS向けwrapperを `bin/` + root wrapper layoutへ配置し、preview / conflict protection / hash manifestを同じ契約で提供します。
+
+`context-budget` / `hotspot-report` もPythonとGoで実装コードを共有せず、自己説明的JSON契約とtargeted testで意味を揃えます。内部scanは既定でunlimited、agentへの返却だけをboundedにする方針です。
 
 ## Python-only / not yet native
 
@@ -53,8 +57,6 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 ### Common large
 - `context-manifest`
-- `hotspot-report`
-- `context-budget`
 
 ### Language-specific
 - Python symbols / import / graph
@@ -79,11 +81,10 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 
 次の統合優先順位を推奨します。
 
-1. `context-budget` / `hotspot-report`
-2. `acceptance-extractor` / `exploration-stop-check`
-3. `context-manifest` / `context-pack-builder`
-4. `change-router` / `validation-plan`
-5. project-specific / language-specific analysis only when maintenance cost is justified
+1. `acceptance-extractor` / `exploration-stop-check`
+2. `context-manifest` / `context-pack-builder`
+3. `change-router` / `validation-plan`
+4. project-specific / language-specific analysis only when maintenance cost is justified
 
 Python側へgenericな新規toolを追加した場合、Go側に同等機能を実装できるなら積極的に追加します。ただし共有コード化はせず、入出力契約とtestで対応を保ちます。
 
