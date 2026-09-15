@@ -63,13 +63,18 @@ changed symbol
 
 ただし巨大な完全call graphを必須にしません。既存のSource Structure Indexや言語標準toolで十分ならそれを利用します。
 
-### bounded traversal
+このrepositoryでは `source-structure-index affected` が、index済み `contains_file` / `depends_on` 関係から changed file のmodule/packageとtransitive dependentsを求める軽量fallbackを提供します。Python版とnative Go版が同じ `acr-source-structure-index-v1` を利用します。
 
-影響探索は無制限に広げません。
+### bounded output / complete internal closure
 
-- direct consumerを優先
-- public/shared contractならbroader validationへ切り替える
-- traversal上限を超えたら「影響が広い」と判断し、full/subsystem suiteへfallbackする
+影響探索でfalse negativeを作るために内部traversalを早期停止してはいけません。
+
+- internal dependency closureは全体を計算する
+- agentへ返すaffected modulesだけをboundedにする
+- 返却上限を超えた場合は「影響が広い」と判断する
+- indexがtruncated、changed fileがindex外、ownership不明ならbroader validationへ倒す
+
+つまりboundedなのはagent contextであり、正確性に必要なtool内部解析ではありません。
 
 ## Level 3: Coverage-assisted
 
@@ -222,12 +227,12 @@ targeted failure
 
 ## Repository-local fallback
 
-外部build graph toolを導入しないrepo向けに、このrepositoryでは軽量な `affected-tests` を用意します。
+外部build graph toolを導入しないrepo向けに、このrepositoryでは2段階の軽量fallbackを用意します。
+
+### file -> likely tests
 
 - Python: `tools/python/medium/affected-tests/affected_tests.py`
 - Go: `tools/go/medium/affected-tests/`
-
-Go版はPython版と共有コードを持たない独立実装で、`build.bat` / `build.sh` から単一binaryを生成できます。
 
 対応範囲:
 
@@ -238,7 +243,24 @@ Go版はPython版と共有コードを持たない独立実装で、`build.bat` 
 - confidence / fallback reason
 - `python-import-map` / `go-import-map` 互換JSONを使ったdirect consumer補助
 
-高精度project graphの完全代替ではなく、Nx / Pants等が無い環境向けのportable fallbackとして扱います。
+### changed file -> dependent modules/packages
+
+再利用可能なstructure indexがある場合:
+
+```text
+source-structure-index affected
+acr-toolbox structure-index affected
+```
+
+対応範囲:
+
+- changed file -> containing module/package
+- reverse `depends_on` traversal
+- transitive dependents
+- complete internal closure + bounded agent output
+- index/truncation/mapping uncertaintyによるbroader fallback
+
+高精度project graphの完全代替ではありません。Nx / Pants等が既にある環境ではそちらを優先します。
 
 ## Context削減との関係
 
