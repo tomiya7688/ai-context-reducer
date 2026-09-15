@@ -2,9 +2,9 @@
 
 既存のlanguage-specific analyzerが出したsymbol / dependency graph JSONを、再利用可能な共通IRへ束ねます。
 
-目的は巨大なindexをagentへ毎回読ませることではありません。indexはfileへ保存し、agentには `query` / `expand` で必要な候補・周辺graphだけを返します。
+目的は巨大なindexをagentへ毎回読ませることではありません。indexはfileへ保存し、agentには `query` / `expand` / `affected` で必要な候補・周辺graphだけを返します。
 
-このtoolは `docs/source-structure-index.md` の次の既存手法を最小実装します。
+このtoolは `docs/source-structure-index.md` と `docs/change-impact-routing.md` の次の既存手法を最小実装します。
 
 - language-specific parser と common IR の分離
 - deterministic analysis result の再利用
@@ -12,8 +12,9 @@
 - bounded graph traversal
 - fan-in / fan-out
 - cycle group detection
+- changed fileからのdependency-based affected scope
 
-SCIPやTree-sitterそのものを再実装するものではありません。既存analyzer / IDE / indexerが利用可能なら、その出力をrouting用IRへ変換して再利用するための軽量層です。
+SCIPやTree-sitterそのもの、Nx/Pantsのbuild graphそのものを再実装するものではありません。既存analyzer / IDE / indexer / build graphが利用可能なら、その結果を再利用することを優先します。
 
 ## Implementations
 
@@ -22,7 +23,7 @@ SCIPやTree-sitterそのものを再実装するものではありません。�
 - Python: `script/source_structure_index.py`
 - native Go: `tools/common/native/acr-toolbox structure-index`
 
-片方でbuildしたindexを、もう片方の `query` / `expand` で読める契約です。
+片方でbuildしたindexを、もう片方の `query` / `expand` / `affected` で読める契約です。
 
 Python版は追加のinput adapterとして `ast-grep outline` JSONを直接受けられます。これはindex format自体を変えるものではなく、既存external analyzerの結果を共通IRへ入れるためのboundary adapterです。
 
@@ -113,6 +114,33 @@ acr-toolbox structure-index expand --depth 2 --max-nodes 80 --direction both \
 
 曖昧なtargetでは勝手に1つを選ばず `status=target_ambiguous` と候補だけを返します。
 
+## Dependency-based affected scope
+
+Nx / Pants等で使われる「changed targetからdependentを求める」考え方の軽量fallbackです。既存のbuild graphがある場合はそちらをSource of Truthとして優先します。
+
+Python:
+
+```sh
+python tools/common/large/source-structure-index/script/source_structure_index.py affected \
+  .acr/source-structure-index.json \
+  --changed src/core.py \
+  --changed src/schema.py \
+  --max-results 80
+```
+
+native:
+
+```sh
+acr-toolbox structure-index affected \
+  --changed src/core.go \
+  --max-results 80 \
+  .acr/source-structure-index.json
+```
+
+内部では `contains_file` からchanged fileのmodule/packageを特定し、`depends_on` edgeを逆向きに**全transitive closure**まで辿ります。`--max-results` はagentへ返す件数だけを制限し、内部のimpact計算自体は途中で打ち切りません。
+
+返却上限を超えた、changed fileがindexに無い、module ownershipが無い、index自体がtruncated、dependency edgeが無い場合は `impact_uncertain=true` とし、`recommended_validation_scope=broader_or_full` へ倒します。削減率よりfalse negative回避を優先します。
+
 ## Input contract
 
 ### Symbol analyzer
@@ -169,11 +197,15 @@ go test ./...
 - Python CLI / command contract: `script/source_structure_index.py`
 - Python JSON file I/O: `script/messenger.py`
 - external outline input adaptation: `script/outline_adapter.py`
-- Python IR normalization / query / graph expansion / cycle detection: `script/processing.py`
+- IR normalization / query / graph expansion / cycle detection: `script/processing.py`
+- affected-scope logic: `script/impact.py`
 - outline adapter validation: `tests/test_outline_adapter.py`
+- affected-scope validation: `tests/test_impact.py`
 - Python deterministic contract validation: `tests/test_processing.py`
 - Python end-to-end CLI smoke: `tests/test_cli.py`
-- native implementation: `tools/common/native/acr-toolbox/structure_index_command.go`
-- native contract validation: `tools/common/native/acr-toolbox/structure_index_command_test.go`
+- native build/query/expand: `tools/common/native/acr-toolbox/structure_index_command.go`
+- native affected scope: `tools/common/native/acr-toolbox/structure_affected_command.go`
+- native structure command routing: `tools/common/native/acr-toolbox/structure_index_router.go`
+- native affected validation: `tools/common/native/acr-toolbox/structure_affected_command_test.go`
 
 この分割は形式上のlayeringではなく、Context Reducer自身の Task Routing / Responsibility Map / Exploration Stop をtool開発へ適用するためです。
