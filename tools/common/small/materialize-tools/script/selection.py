@@ -42,12 +42,11 @@ def choose(source: Path, system: str | None = None, python_executable: str | Non
         mode = 'unavailable'
 
     wrapper = tools_root / ('analyze.bat' if system_name == 'windows' else 'analyze.sh')
-    if wrapper.exists():
+    if mode != 'unavailable' and wrapper.exists():
         selected.append({
             'source': wrapper,
             'destination': Path(wrapper.name),
             'role': 'entry_wrapper',
         })
 
-    selected = [row for row in selected if Path(row['source']).exists()]
     return mode, selected
