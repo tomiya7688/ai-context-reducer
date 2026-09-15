@@ -20,6 +20,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | remote delta | `remote-delta` | `acr-toolbox remote-delta` |
 | context-size routing estimate | `context-budget` | `acr-toolbox context-budget` |
 | large/deep file routing | `hotspot-report` | `acr-toolbox hotspot-report` |
+| Goal/Required/Acceptance/Deferred extraction | `acceptance-extractor` | `acr-toolbox acceptance-extractor` |
+| exploration stop heuristic | `exploration-stop-check` | `acr-toolbox exploration-stop-check` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
 | safe portable tool materialization | `materialize-tools` | `acr-toolbox materialize` |
 | language runtime detection | `language-environment-plan` | `acr-toolbox language-env` |
@@ -37,14 +39,14 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 `context-budget` / `hotspot-report` もPythonとGoで実装コードを共有せず、自己説明的JSON契約とtargeted testで意味を揃えます。内部scanは既定でunlimited、agentへの返却だけをboundedにする方針です。
 
+`acceptance-extractor` / `exploration-stop-check` も独立実装です。英語termのword-boundary semantics、日本語term、truncation、missing/read errorをtestで合わせます。
+
 ## Python-only / not yet native
 
 現時点で次は Python implementation が中心です。
 
 ### Common medium
 - `change-router`
-- `acceptance-extractor`
-- `exploration-stop-check`
 - `validation-plan`
 - `context-pack-builder`
 - `policy-index`
@@ -81,10 +83,9 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 
 次の統合優先順位を推奨します。
 
-1. `acceptance-extractor` / `exploration-stop-check`
-2. `context-manifest` / `context-pack-builder`
-3. `change-router` / `validation-plan`
-4. project-specific / language-specific analysis only when maintenance cost is justified
+1. `context-manifest` / `context-pack-builder`
+2. `change-router` / `validation-plan`
+3. project-specific / language-specific analysis only when maintenance cost is justified
 
 Python側へgenericな新規toolを追加した場合、Go側に同等機能を実装できるなら積極的に追加します。ただし共有コード化はせず、入出力契約とtestで対応を保ちます。
 
