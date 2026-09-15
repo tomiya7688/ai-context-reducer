@@ -98,8 +98,8 @@ def analyze(root: Path) -> dict[str, object]:
     if docs:
         techniques.append('Document routing / heading-first reading')
     if len(paths) >= 200:
-        techniques += ['Responsibility Map','Change Routing Map']
-        tools += ['common/medium/responsibility-candidates','common/medium/context-pack-builder']
+        techniques += ['Responsibility Map','Change Routing Map','Structural search before broad source reads']
+        tools += ['common/medium/structural-search','common/medium/responsibility-candidates','common/medium/context-pack-builder']
     if len(paths) >= 2000 or large_files:
         techniques += ['Source Structure Index','Bounded excerpts','Context manifest']
         tools += ['common/large/context-manifest','common/large/hotspot-report','common/large/target-slice','common/large/context-budget','common/large/source-structure-index']
