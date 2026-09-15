@@ -41,6 +41,7 @@ context-manifest
 context-budget
 policy-index
 doc-duplicate-hints
+source-structure-index
 ```
 
 複数の変更理由を持つ場合、必要に応じて次の責務へ分離します。
@@ -121,9 +122,11 @@ Affected tests           -> affected-tests
 Policy routing           -> policy-index
 Validation               -> validation-plan / compact-log
 Context pack             -> context-pack-builder
-Source structure         -> language-specific symbols / dependency / graph tools
+Source structure         -> language-specific symbols / dependency / graph tools -> source-structure-index
 Context priority         -> context-manifest / context-budget / hotspot-report
 ```
+
+`source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。
 
 `architecture-boundary-router` は特定architectureへの適合checkerではありません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使います。
 
