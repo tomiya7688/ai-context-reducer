@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from messenger import load_json, write_json
+from outline_adapter import normalize_symbol_payload
 from processing import build_index, expand, query_nodes, resolve_target
 
 TOOL = 'source-structure-index'
@@ -34,7 +35,7 @@ def build_command(args: argparse.Namespace) -> int:
     failures = []
     for path in args.symbols:
         try:
-            symbol_payloads.append((path, load_json(path)))
+            symbol_payloads.append((path, normalize_symbol_payload(load_json(path))))
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             failures.append({'path': path, 'error': str(exc)})
     for path in args.graph:
@@ -123,7 +124,7 @@ def parser() -> argparse.ArgumentParser:
     sub = ap.add_subparsers(dest='command', required=True)
 
     build = sub.add_parser('build', help='Normalize language-specific symbol/graph JSON into a reusable common index.')
-    build.add_argument('--symbols', action='append', default=[], metavar='JSON', help='Symbol JSON from a language-specific analyzer. Repeatable.')
+    build.add_argument('--symbols', action='append', default=[], metavar='JSON', help='Symbol JSON from a language-specific analyzer or ast-grep outline. Repeatable.')
     build.add_argument('--graph', action='append', default=[], metavar='JSON', help='Dependency/call graph JSON. Repeatable.')
     build.add_argument('--root', help='Optional repository root used to make absolute symbol paths relative.')
     build.add_argument('--output', required=True, help='Index file to write. The full index is not printed to stdout.')
