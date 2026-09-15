@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 
+def _git_failure_line(error_kind: object, query_name: str) -> str:
+    if error_kind == 'git_unavailable':
+        return '- Git unavailable\n'
+    return f'- unavailable: {query_name} query failed\n'
+
+
 def render_context_pack(task: dict[str, str], state: dict[str, object]) -> str:
     changed = list(state.get('changed', []))
     status = list(state.get('status', []))
@@ -12,7 +18,10 @@ def render_context_pack(task: dict[str, str], state: dict[str, object]) -> str:
 
     text += '\n## Working Set\n- Changed files:\n'
     if not state.get('changed_query_ok', True):
-        text += '  - unavailable: git diff query failed\n'
+        if state.get('changed_error_kind') == 'git_unavailable':
+            text += '  - Git unavailable\n'
+        else:
+            text += '  - unavailable: git diff query failed\n'
     else:
         text += ''.join(f'  - {item}\n' for item in changed) or '  - none detected\n'
         if state.get('changed_truncated'):
@@ -20,7 +29,7 @@ def render_context_pack(task: dict[str, str], state: dict[str, object]) -> str:
 
     text += '\n## Git Status\n'
     if not state.get('status_query_ok', True):
-        text += '- unavailable: git status query failed\n'
+        text += _git_failure_line(state.get('status_error_kind'), 'git status')
     else:
         text += ''.join(f'- {item}\n' for item in status) or '- clean\n'
         if state.get('status_truncated'):
