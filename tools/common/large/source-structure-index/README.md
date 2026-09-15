@@ -24,6 +24,8 @@ SCIPやTree-sitterそのものを再実装するものではありません。�
 
 片方でbuildしたindexを、もう片方の `query` / `expand` で読める契約です。
 
+Python版は追加のinput adapterとして `ast-grep outline` JSONを直接受けられます。これはindex format自体を変えるものではなく、既存external analyzerの結果を共通IRへ入れるためのboundary adapterです。
+
 ## Build
 
 Python symbols + Python module graph:
@@ -49,6 +51,18 @@ python tools/common/large/source-structure-index/script/source_structure_index.p
   --root . \
   --output .acr/source-structure-index.json
 ```
+
+既に `ast-grep` が利用可能な環境では、そのoutlineを再利用できます。追加installは行いません。
+
+```sh
+ast-grep outline src --json=compact > /tmp/outline.json
+python tools/common/large/source-structure-index/script/source_structure_index.py build \
+  --symbols /tmp/outline.json \
+  --root . \
+  --output .acr/source-structure-index.json
+```
+
+adapterはoutlineのnested `members` をflattenしつつ、`owner_qualified_name` を共通IRの `owns` edgeへ変換します。そのため class / method等のownershipを失わずbounded expansionできます。line numberは共通IRでは1-basedです。signatureはbounded metadataとして保持します。
 
 native版:
 
@@ -116,6 +130,8 @@ acr-toolbox structure-index expand --depth 2 --max-nodes 80 --direction both \
 ]
 ```
 
+Python版では `ast-grep outline --json=compact` のfile/item形式も自動判定します。通常のsymbol payloadは変換せずそのまま扱います。
+
 ### Graph analyzer
 
 既存module/package graph形式を受けます。`kind` が無いedgeは `depends_on` として扱います。
@@ -152,7 +168,9 @@ go test ./...
 
 - Python CLI / command contract: `script/source_structure_index.py`
 - Python JSON file I/O: `script/messenger.py`
+- external outline input adaptation: `script/outline_adapter.py`
 - Python IR normalization / query / graph expansion / cycle detection: `script/processing.py`
+- outline adapter validation: `tests/test_outline_adapter.py`
 - Python deterministic contract validation: `tests/test_processing.py`
 - Python end-to-end CLI smoke: `tests/test_cli.py`
 - native implementation: `tools/common/native/acr-toolbox/structure_index_command.go`
