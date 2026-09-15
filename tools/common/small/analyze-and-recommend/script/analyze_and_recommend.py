@@ -102,7 +102,7 @@ def analyze(root: Path) -> dict[str, object]:
         tools += ['common/medium/responsibility-candidates','common/medium/context-pack-builder']
     if len(paths) >= 2000 or large_files:
         techniques += ['Source Structure Index','Bounded excerpts','Context manifest']
-        tools += ['common/large/context-manifest','common/large/hotspot-report','common/large/target-slice','common/large/context-budget']
+        tools += ['common/large/context-manifest','common/large/hotspot-report','common/large/target-slice','common/large/context-budget','common/large/source-structure-index']
     if tests:
         techniques.append('Validation Routing')
         tools.append('common/medium/validation-plan')
