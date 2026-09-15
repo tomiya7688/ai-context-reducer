@@ -17,6 +17,10 @@ Common tools の portable Go implementation です。
 | context-size estimation | `context_budget_command.go` |
 | large/deep file routing | `hotspot_command.go` |
 | context analysis validation | `context_analysis_commands_test.go` |
+| acceptance section extraction | `acceptance_command.go` |
+| exploration-stop heuristic | `exploration_stop_command.go` |
+| shared task-context term matching | `task_context_terms.go` |
+| task-context validation | `task_context_commands_test.go` |
 | source-structure build / query / expand | `structure_index_command.go` |
 | source-structure affected scope | `structure_index_affected.go` |
 | existing SCIP index adaptation / external SCIP boundary | `structure_scip_adapter.go` |
@@ -51,6 +55,17 @@ acr-toolbox hotspot-report . --limit 30
 `context-budget` のtoken数は常にrouting estimateです。`accurate` はfile内容を読むmodeですがtokenizer exactではなく、JSONの `token_estimate.approximate=true` と算定式で明示します。
 
 両commandとも既定では内部file-count scan limitを持ちません。明示した `--max-files` はperformance/safety capで、実際に未走査候補が残った時だけ `scan_truncated=true` になります。
+
+## acceptance-extractor / exploration-stop-check
+
+```text
+acr-toolbox acceptance-extractor --max-lines-per-section 40 task.md
+acr-toolbox exploration-stop-check context.md
+```
+
+Python版とは実装を共有せず、JSON fieldとheuristic semanticsを合わせます。英語termはword boundaryで判定し、`goalkeeper` / `latest` のようなsubstring false positiveを避けます。日本語termも対応します。
+
+`acceptance-extractor` は `goal / required / acceptance / deferred` heading sectionをboundedに返します。`exploration-stop-check` は `goal / required / acceptance / source / tests` が揃った時だけ `stop_broad_exploration=true` にします。
 
 ## structure-index
 
