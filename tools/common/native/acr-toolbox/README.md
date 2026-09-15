@@ -14,6 +14,7 @@ Common tools の portable Go implementation です。
 | search / find / tree / stats / docs index | `browse_commands.go` |
 | bounded excerpt / compact log | `text_commands.go` |
 | Git diff / remote delta | `git_commands.go` |
+| reusable source structure index / bounded graph expansion | `structure_index_command.go` |
 | runtime / language environment detection | `env_commands.go` |
 | build | `build.bat` / `build.sh` |
 
@@ -28,6 +29,18 @@ Common tools の portable Go implementation です。
 - full sourceやfull logを再出力しない
 - 新しい共有abstractionは、2箇所以上で明確に重複を減らす場合だけ作る
 - 成功時はcompact result、失敗時だけ必要なdiagnosticを増やす
+
+## structure-index
+
+Python common implementationと同じ `acr-source-structure-index-v1` を読み書きします。実装コードは共有せず、JSON contractだけを合わせます。
+
+```text
+acr-toolbox structure-index build --symbols symbols.json --graph graph.json --output index.json
+acr-toolbox structure-index query --max-results 40 index.json Service
+acr-toolbox structure-index expand --depth 2 --max-nodes 80 index.json module:pkg.service
+```
+
+`build` はfull indexをstdoutへ出さずfileへ保存します。`query` / `expand` だけがbounded resultをstdoutへ返します。
 
 ## Validation
 
