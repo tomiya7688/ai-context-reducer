@@ -73,24 +73,30 @@ func TestNormalizeSCIPPrintBuildsRoutingDependencies(t *testing.T) {
 
     first := symbols[0].(map[string]any)
     symbolRows := first["symbols"].([]any)
-    byName := map[string]map[string]any{}
-    for _, raw := range symbolRows {
-        row := raw.(map[string]any)
-        byName[row["name"].(string)] = row
+    if len(symbolRows) != 1 {
+        t.Fatalf("nested symbols should be routed through explicit ownership graph nodes: %#v", symbolRows)
     }
-    if byName["A"]["line"] != 1 {
-        t.Fatalf("expected one-based line, got %#v", byName["A"])
+    topLevel := symbolRows[0].(map[string]any)
+    if topLevel["name"] != "A" || topLevel["line"] != 1 {
+        t.Fatalf("unexpected top-level symbol: %#v", topLevel)
     }
-    if byName["do"]["owner_qualified_name"] != "scip-python python pkg 1.0 A#" {
-        t.Fatalf("missing owner: %#v", byName["do"])
+
+    nodes := graph["nodes"].([]any)
+    foundMethod := false
+    for _, raw := range nodes {
+        node := raw.(map[string]any)
+        if node["id"] == "symbol:scip-python python pkg 1.0 A#do()." {
+            foundMethod = node["name"] == "do" && node["line"] == 0
+        }
     }
-    if byName["do"]["signature"] != "def do(self) -> B" {
-        t.Fatalf("missing signature: %#v", byName["do"])
+    if !foundMethod {
+        t.Fatalf("nested method node missing: %#v", nodes)
     }
 
     edges := graph["edges"].([]any)
     foundDependency := false
     foundContains := false
+    foundOwner := false
     for _, raw := range edges {
         edge := raw.(map[string]any)
         if edge["from"] == "module:scip:pkg/a.py" && edge["to"] == "module:scip:pkg/b.py" && edge["kind"] == "depends_on" {
@@ -99,9 +105,12 @@ func TestNormalizeSCIPPrintBuildsRoutingDependencies(t *testing.T) {
         if edge["from"] == "module:scip:pkg/a.py" && edge["to"] == "file:pkg/a.py" && edge["kind"] == "contains_file" {
             foundContains = true
         }
+        if edge["from"] == "symbol:scip-python python pkg 1.0 A#" && edge["to"] == "symbol:scip-python python pkg 1.0 A#do()." && edge["kind"] == "owns" {
+            foundOwner = true
+        }
     }
-    if !foundDependency || !foundContains {
-        t.Fatalf("expected routing edges, got %#v", edges)
+    if !foundDependency || !foundContains || !foundOwner {
+        t.Fatalf("expected routing and ownership edges, got %#v", edges)
     }
 
     second := symbols[1].(map[string]any)
@@ -111,7 +120,7 @@ func TestNormalizeSCIPPrintBuildsRoutingDependencies(t *testing.T) {
     }
 }
 
-func TestPrepareStructureSCIPBuildArgsUsesExistingJSON(t *testing.T) {
+func TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex(t *testing.T) {
     root := t.TempDir()
     input := filepath.Join(root, "index.json")
     output := filepath.Join(root, "index.acr.json")
@@ -128,9 +137,42 @@ func TestPrepareStructureSCIPBuildArgsUsesExistingJSON(t *testing.T) {
         t.Fatalf("unexpected failure: %#v", failure)
     }
     defer cleanup()
+
     joined := strings.Join(prepared, " ")
     if !strings.Contains(joined, "--symbols") || !strings.Contains(joined, "--graph") || !strings.Contains(joined, "--output "+output) {
         t.Fatalf("unexpected prepared args: %#v", prepared)
+    }
+
+    symbolPath := ""
+    graphPath := ""
+    for i := 0; i+1 < len(prepared); i++ {
+        if prepared[i] == "--symbols" {
+            symbolPath = prepared[i+1]
+        }
+        if prepared[i] == "--graph" {
+            graphPath = prepared[i+1]
+        }
+    }
+    if symbolPath == "" || graphPath == "" {
+        t.Fatalf("prepared paths missing: %#v", prepared)
+    }
+
+    index, err := buildStructureIndex([]string{symbolPath}, []string{graphPath}, "")
+    if err != nil {
+        t.Fatal(err)
+    }
+    ownerEdge := false
+    fileOwnsNested := false
+    for _, edge := range index.Edges {
+        if edge.From == "symbol:scip-python python pkg 1.0 A#" && edge.To == "symbol:scip-python python pkg 1.0 A#do()." && edge.Kind == "owns" {
+            ownerEdge = true
+        }
+        if edge.From == "file:pkg/a.py" && edge.To == "symbol:scip-python python pkg 1.0 A#do()." && edge.Kind == "owns" {
+            fileOwnsNested = true
+        }
+    }
+    if !ownerEdge || fileOwnsNested {
+        t.Fatalf("ownership was not preserved cleanly: owner=%v fileOwnsNested=%v edges=%#v", ownerEdge, fileOwnsNested, index.Edges)
     }
 }
 
