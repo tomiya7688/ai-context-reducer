@@ -36,6 +36,10 @@ func scanHotspots(root string, maxFiles int) ([]hotspotRow, int, int, bool, erro
             }
             return nil
         }
+        if maxFiles > 0 && len(rows) >= maxFiles {
+            truncated = true
+            return errStopHotspotScan
+        }
         info, infoErr := entry.Info()
         if infoErr != nil {
             statErrors++
@@ -52,10 +56,6 @@ func scanHotspots(root string, maxFiles int) ([]hotspotRow, int, int, bool, erro
             Bytes: info.Size(),
             Depth: strings.Count(slash, "/") + 1,
         })
-        if maxFiles > 0 && len(rows) >= maxFiles {
-            truncated = true
-            return errStopHotspotScan
-        }
         return nil
     })
     if walkErr != nil && !errors.Is(walkErr, errStopHotspotScan) {
