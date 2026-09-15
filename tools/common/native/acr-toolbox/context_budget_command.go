@@ -96,6 +96,10 @@ func cmdContextBudget(args []string) int {
         if !contextTextExtensions[strings.ToLower(filepath.Ext(file.Path))] {
             continue
         }
+        if *maxFiles > 0 && scanned >= *maxFiles {
+            truncated = true
+            break
+        }
         row, ok := contextEstimate(file, *mode)
         if !ok {
             estimationErrors++
@@ -110,10 +114,6 @@ func cmdContextBudget(args []string) int {
         rows = append(rows, row)
         total += row.EstimatedTokens
         scanned++
-        if *maxFiles > 0 && scanned >= *maxFiles {
-            truncated = true
-            break
-        }
     }
 
     sort.Slice(rows, func(i, j int) bool {
