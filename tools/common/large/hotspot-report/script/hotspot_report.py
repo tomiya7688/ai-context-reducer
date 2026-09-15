@@ -10,6 +10,10 @@ SKIP = {
 }
 
 
+def emit(payload: dict[str, object]) -> None:
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser(description='Report large/deep repository hotspots as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
@@ -19,19 +23,23 @@ def main():
 
     root = Path(args.root).resolve()
     if not root.exists():
-        print(json.dumps({
-            'tool': 'hotspot-report',
-            'status': 'root_missing',
-            'root': str(root),
-        }, ensure_ascii=False, indent=2))
+        emit({'tool': 'hotspot-report', 'status': 'input_missing', 'root': str(root)})
+        return
+    if not root.is_dir():
+        emit({'tool': 'hotspot-report', 'status': 'input_not_directory', 'root': str(root)})
         return
 
     rows = []
     scanned = 0
     scan_truncated = False
     stat_error_count = 0
+    walk_error_count = 0
 
-    for current, dirs, files in os.walk(root):
+    def on_walk_error(_error):
+        nonlocal walk_error_count
+        walk_error_count += 1
+
+    for current, dirs, files in os.walk(root, onerror=on_walk_error):
         dirs[:] = [d for d in dirs if d.lower() not in SKIP]
         current_path = Path(current)
         for name in files:
@@ -55,17 +63,20 @@ def main():
             break
 
     rows.sort(key=lambda row: (row['bytes'], row['depth'], row['path']), reverse=True)
-    print(json.dumps({
+    limit = max(0, args.limit)
+    errors = stat_error_count + walk_error_count
+    emit({
         'tool': 'hotspot-report',
-        'status': 'ok',
+        'status': 'ok_with_warnings' if errors else 'ok',
         'root': str(root),
         'scanned_file_count': scanned,
         'stat_error_count': stat_error_count,
+        'walk_error_count': walk_error_count,
         'scan_truncated': scan_truncated,
         'hotspot_count': len(rows),
-        'hotspots': rows[:args.limit],
-        'hotspots_truncated': len(rows) > args.limit,
-    }, ensure_ascii=False, indent=2))
+        'hotspots': rows[:limit] if limit > 0 else [],
+        'hotspots_truncated': limit == 0 and bool(rows) or (limit > 0 and len(rows) > limit),
+    })
 
 
 if __name__ == '__main__':
