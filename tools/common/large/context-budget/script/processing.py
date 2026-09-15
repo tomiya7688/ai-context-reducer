@@ -27,6 +27,7 @@ def summarize(
     scanned: int,
     truncated: bool,
     estimation_error_count: int = 0,
+    walk_error_count: int = 0,
 ) -> dict[str, object]:
     rows.sort(reverse=True)
     total = sum(row[0] for row in rows)
@@ -37,14 +38,16 @@ def summarize(
         'reads_file_contents': mode == 'accurate',
         'note': 'This is a routing estimate, not tokenizer-exact token counting.',
     }
+    warning_count = estimation_error_count + walk_error_count
     return {
         'tool': 'context-budget',
-        'status': 'ok_with_warnings' if estimation_error_count else 'ok',
+        'status': 'ok_with_warnings' if warning_count else 'ok',
         'mode': mode,
         'token_estimate': estimator,
         'estimated_total_tokens_if_all_candidates_read': total,
         'scanned_text_files': scanned,
         'estimation_error_count': estimation_error_count,
+        'walk_error_count': walk_error_count,
         'scan_truncated': truncated,
         'largest_context_candidates': [
             {
