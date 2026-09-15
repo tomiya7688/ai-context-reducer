@@ -5,8 +5,22 @@ from pathlib import Path
 
 
 def git_lines(root: Path, args: list[str]) -> dict[str, object]:
-    result = subprocess.run(['git', '-C', str(root), *args], capture_output=True, text=True)
+    try:
+        result = subprocess.run(['git', '-C', str(root), *args], capture_output=True, text=True, check=False)
+    except OSError:
+        return {
+            'ok': False,
+            'lines': [],
+            'error_kind': 'git_unavailable',
+        }
+    if result.returncode != 0:
+        return {
+            'ok': False,
+            'lines': [],
+            'error_kind': 'git_query_failed',
+        }
     return {
-        'ok': result.returncode == 0,
-        'lines': [line.strip() for line in result.stdout.splitlines() if line.strip()] if result.returncode == 0 else [],
+        'ok': True,
+        'lines': [line.strip() for line in result.stdout.splitlines() if line.strip()],
+        'error_kind': None,
     }
