@@ -12,10 +12,11 @@ SKIP = {
 
 
 def role(path: Path) -> str:
+    parts = {part.lower() for part in path.parts}
     low = '/'.join(part.lower() for part in path.parts)
-    if 'test' in path.name.lower() or '/tests/' in low or '/test/' in low:
+    if 'test' in path.name.lower() or 'tests' in parts or 'test' in parts:
         return 'tests'
-    if path.suffix.lower() in {'.md', '.rst', '.txt'} or 'docs/' in low or 'doc/' in low:
+    if path.suffix.lower() in {'.md', '.rst', '.txt'} or 'docs' in parts or 'doc' in parts:
         return 'documentation'
     if path.suffix.lower() in {'.py', '.cs', '.go', '.c', '.h', '.cpp', '.cc', '.cxx', '.hpp', '.hh', '.gd', '.rs', '.java', '.js', '.ts'}:
         return 'source'
