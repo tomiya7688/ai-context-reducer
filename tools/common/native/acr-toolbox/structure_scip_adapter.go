@@ -9,10 +9,20 @@ import (
     "strings"
 )
 
+const structureSCIPErrorLimit = 2000
+
 type structureSCIPFailure struct {
     Status string
     Path   string
     Error  string
+}
+
+func boundedSCIPError(text string) string {
+    text = strings.TrimSpace(text)
+    if len(text) <= structureSCIPErrorLimit {
+        return text
+    }
+    return text[:structureSCIPErrorLimit] + "... truncated"
 }
 
 func scipMapField(row map[string]any, camel, snake string) any {
@@ -130,10 +140,17 @@ func normalizeSCIPPrint(raw any) ([]any, map[string]any, error) {
             if name == "" {
                 name = qualified
             }
+            kind := "unknown"
+            if rawKind, exists := symbol["kind"]; exists && rawKind != nil {
+                text := fmt.Sprint(rawKind)
+                if text != "" && text != "<nil>" {
+                    kind = text
+                }
+            }
             item := map[string]any{
-                "name": name,
+                "name":           name,
                 "qualified_name": qualified,
-                "kind": fmt.Sprint(symbol["kind"]),
+                "kind":           kind,
             }
             if language := structureString(doc.Raw["language"]); language != "" {
                 item["language"] = language
@@ -188,9 +205,9 @@ func normalizeSCIPPrint(raw any) ([]any, map[string]any, error) {
         edgeList = append(edgeList, edge)
     }
     graph := map[string]any{
-        "nodes": nodeList,
-        "edges": edgeList,
-        "truncated": false,
+        "nodes":         nodeList,
+        "edges":         edgeList,
+        "truncated":     false,
         "source_format": "scip-print-json",
     }
     return symbolRows, graph, nil
@@ -200,7 +217,7 @@ func loadSCIPPrintJSON(path string, invokeCLI bool) (any, *structureSCIPFailure)
     if !invokeCLI {
         raw, err := loadStructureRaw(path)
         if err != nil {
-            return nil, &structureSCIPFailure{Status: "read_failed", Path: path, Error: err.Error()}
+            return nil, &structureSCIPFailure{Status: "read_failed", Path: path, Error: boundedSCIPError(err.Error())}
         }
         return raw, nil
     }
@@ -213,11 +230,11 @@ func loadSCIPPrintJSON(path string, invokeCLI bool) (any, *structureSCIPFailure)
     }
     output, err := exec.Command(executable, "print", "--json", path).CombinedOutput()
     if err != nil {
-        return nil, &structureSCIPFailure{Status: "command_failed", Path: path, Error: strings.TrimSpace(string(output))}
+        return nil, &structureSCIPFailure{Status: "command_failed", Path: path, Error: boundedSCIPError(string(output))}
     }
     var raw any
     if err := json.Unmarshal(output, &raw); err != nil {
-        return nil, &structureSCIPFailure{Status: "invalid_backend_output", Path: path, Error: err.Error()}
+        return nil, &structureSCIPFailure{Status: "invalid_backend_output", Path: path, Error: boundedSCIPError(err.Error())}
     }
     return raw, nil
 }
@@ -263,7 +280,7 @@ func prepareStructureSCIPBuildArgs(args []string) ([]string, func(), *structureS
 
     tempDir, err := os.MkdirTemp("", "acr-scip-*")
     if err != nil {
-        return nil, func() {}, &structureSCIPFailure{Status: "adapter_failed", Error: err.Error()}
+        return nil, func() {}, &structureSCIPFailure{Status: "adapter_failed", Error: boundedSCIPError(err.Error())}
     }
     cleanup := func() { _ = os.RemoveAll(tempDir) }
 
@@ -293,17 +310,17 @@ func prepareStructureSCIPBuildArgs(args []string) ([]string, func(), *structureS
         symbols, graph, err := normalizeSCIPPrint(raw)
         if err != nil {
             cleanup()
-            return nil, func() {}, &structureSCIPFailure{Status: "invalid_backend_output", Path: input.Path, Error: err.Error()}
+            return nil, func() {}, &structureSCIPFailure{Status: "invalid_backend_output", Path: input.Path, Error: boundedSCIPError(err.Error())}
         }
         symbolPath := filepath.Join(tempDir, fmt.Sprintf("symbols-%d.json", i))
         graphPath := filepath.Join(tempDir, fmt.Sprintf("graph-%d.json", i))
         if err := writeSCIPAdapterJSON(symbolPath, symbols); err != nil {
             cleanup()
-            return nil, func() {}, &structureSCIPFailure{Status: "adapter_failed", Path: input.Path, Error: err.Error()}
+            return nil, func() {}, &structureSCIPFailure{Status: "adapter_failed", Path: input.Path, Error: boundedSCIPError(err.Error())}
         }
         if err := writeSCIPAdapterJSON(graphPath, graph); err != nil {
             cleanup()
-            return nil, func() {}, &structureSCIPFailure{Status: "adapter_failed", Path: input.Path, Error: err.Error()}
+            return nil, func() {}, &structureSCIPFailure{Status: "adapter_failed", Path: input.Path, Error: boundedSCIPError(err.Error())}
         }
         remaining = append(remaining, "--symbols", symbolPath, "--graph", graphPath)
     }
