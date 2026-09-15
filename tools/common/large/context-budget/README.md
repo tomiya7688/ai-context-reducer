@@ -16,9 +16,11 @@ python script/context_budget.py . --mode accurate --top 40
 Native:
 
 ```sh
-acr-toolbox context-budget . --mode fast --top 40
-acr-toolbox context-budget . --mode accurate --top 40
+acr-toolbox context-budget --mode fast --top 40 .
+acr-toolbox context-budget --mode accurate --top 40 .
 ```
+
+native版はGo標準flag parserを使うため、optionはrepository pathより前に置きます。
 
 `fast` はfile size bytes / 4、`accurate` は実際にtextを読みdecoded character count / 4で見積もります。`accurate` という名前は「file内容を読むmode」という意味で、tokenizer exactではありません。
 
