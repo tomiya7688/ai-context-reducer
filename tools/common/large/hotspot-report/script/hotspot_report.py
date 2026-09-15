@@ -43,6 +43,9 @@ def main():
         dirs[:] = [d for d in dirs if d.lower() not in SKIP]
         current_path = Path(current)
         for name in files:
+            if args.max_files > 0 and scanned >= args.max_files:
+                scan_truncated = True
+                break
             path = current_path / name
             try:
                 size = path.stat().st_size
@@ -56,9 +59,6 @@ def main():
                 'depth': len(rel.parts),
             })
             scanned += 1
-            if args.max_files > 0 and scanned >= args.max_files:
-                scan_truncated = True
-                break
         if scan_truncated:
             break
 
