@@ -36,6 +36,9 @@ def main():
     scan_stats = {'walk_error_count': 0}
 
     for path in iter_text_files(root, args.include_ignored, scan_stats):
+        if args.max_files > 0 and scanned >= args.max_files:
+            truncated = True
+            break
         result = estimator(path)
         if result is None:
             estimation_errors += 1
@@ -43,9 +46,6 @@ def main():
         tokens, size = result
         rows.append((tokens, size, path.relative_to(root).as_posix()))
         scanned += 1
-        if args.max_files > 0 and scanned >= args.max_files:
-            truncated = True
-            break
 
     result = summarize(
         rows,
