@@ -3,6 +3,7 @@ package main
 import (
     "flag"
     "io"
+    "io/fs"
     "os"
     "path/filepath"
     "sort"
@@ -16,18 +17,18 @@ type hotspotRow struct {
 }
 
 func cmdHotspotReport(args []string) int {
-    fs := flag.NewFlagSet("hotspot-report", flag.ContinueOnError)
-    fs.SetOutput(io.Discard)
-    limit := fs.Int("limit", 30, "maximum hotspots returned; 0 returns none")
-    maxFiles := fs.Int("max-files", 0, "optional safety limit; 0 means unlimited")
-    if err := fs.Parse(args); err != nil {
+    flags := flag.NewFlagSet("hotspot-report", flag.ContinueOnError)
+    flags.SetOutput(io.Discard)
+    limit := flags.Int("limit", 30, "maximum hotspots returned; 0 returns none")
+    maxFiles := flags.Int("max-files", 0, "optional safety limit; 0 means unlimited")
+    if err := flags.Parse(args); err != nil {
         emitStructureJSON(map[string]any{"tool": "hotspot-report", "status": "invalid_arguments", "error": err.Error()})
         return 2
     }
 
     root := "."
-    if fs.NArg() > 0 {
-        root = fs.Arg(0)
+    if flags.NArg() > 0 {
+        root = flags.Arg(0)
     }
     rootAbs, err := filepath.Abs(root)
     if err != nil {
@@ -48,30 +49,53 @@ func cmdHotspotReport(args []string) int {
         return 2
     }
 
-    walked, err := walkWithOptions(rootAbs, false)
-    if err != nil {
-        emitStructureJSON(map[string]any{"tool": "hotspot-report", "status": "input_read_failed", "root": rootAbs, "error": err.Error()})
-        return 2
-    }
-
     rows := []hotspotRow{}
+    statErrors := 0
+    walkErrors := 0
     truncated := false
-    for _, file := range walked.Files {
-        rel, relErr := filepath.Rel(rootAbs, file.Path)
+    stopWalk := false
+    walkErr := filepath.WalkDir(rootAbs, func(path string, entry fs.DirEntry, visitErr error) error {
+        if stopWalk {
+            if entry != nil && entry.IsDir() {
+                return filepath.SkipDir
+            }
+            return nil
+        }
+        if visitErr != nil {
+            walkErrors++
+            return nil
+        }
+        if entry.IsDir() {
+            if path != rootAbs && ignoreDirs[strings.ToLower(entry.Name())] {
+                return filepath.SkipDir
+            }
+            return nil
+        }
+        info, infoErr := entry.Info()
+        if infoErr != nil {
+            statErrors++
+            return nil
+        }
+        rel, relErr := filepath.Rel(rootAbs, path)
         if relErr != nil {
-            walked.ErrorCount++
-            continue
+            walkErrors++
+            return nil
         }
         slash := filepath.ToSlash(rel)
-        depth := 1
-        if slash != "." && slash != "" {
-            depth = strings.Count(slash, "/") + 1
-        }
-        rows = append(rows, hotspotRow{Path: slash, Bytes: file.Size, Depth: depth})
+        rows = append(rows, hotspotRow{
+            Path: slash,
+            Bytes: info.Size(),
+            Depth: strings.Count(slash, "/") + 1,
+        })
         if *maxFiles > 0 && len(rows) >= *maxFiles {
-            truncated = len(walked.Files) > len(rows)
-            break
+            truncated = true
+            stopWalk = true
         }
+        return nil
+    })
+    if walkErr != nil {
+        emitStructureJSON(map[string]any{"tool": "hotspot-report", "status": "input_read_failed", "root": rootAbs, "error": walkErr.Error()})
+        return 2
     }
 
     sort.Slice(rows, func(i, j int) bool {
@@ -95,7 +119,7 @@ func cmdHotspotReport(args []string) int {
         returned = returned[:resultLimit]
     }
     status := "ok"
-    if walked.ErrorCount > 0 {
+    if statErrors+walkErrors > 0 {
         status = "ok_with_warnings"
     }
     emitStructureJSON(map[string]any{
@@ -103,8 +127,8 @@ func cmdHotspotReport(args []string) int {
         "status": status,
         "root": rootAbs,
         "scanned_file_count": len(rows),
-        "stat_error_count": 0,
-        "walk_error_count": walked.ErrorCount,
+        "stat_error_count": statErrors,
+        "walk_error_count": walkErrors,
         "scan_truncated": truncated,
         "hotspot_count": len(rows),
         "hotspots": returned,
