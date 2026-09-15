@@ -16,6 +16,7 @@ Common tools の portable Go implementation です。
 | Git diff / remote delta | `git_commands.go` |
 | source-structure build / query / expand | `structure_index_command.go` |
 | source-structure affected scope | `structure_index_affected.go` |
+| existing SCIP index adaptation / external SCIP boundary | `structure_scip_adapter.go` |
 | source-structure subcommand routing | `structure_index_router.go` |
 | materialize CLI / apply orchestration | `materialize_command.go` |
 | materialize selection / hash / plan / manifest model | `materialize_plan.go` |
@@ -48,6 +49,24 @@ acr-toolbox structure-index affected --changed pkg/a.py index.json
 ```
 
 `build` はfull indexをstdoutへ出さずfileへ保存します。`query` / `expand` / `affected` はagentへ必要な範囲だけ返します。
+
+### Existing SCIP index reuse
+
+既存 `index.scip` と `scip` CLIがある場合は、SCIP protobuf parserをtoolbox内へ複製せず、external boundaryとして `scip print --json` を利用します。
+
+```text
+acr-toolbox structure-index build --scip index.scip --output index.json
+```
+
+すでに `scip print --json` の結果がある場合は、SCIP CLI自体も不要です。
+
+```text
+acr-toolbox structure-index build --scip-json index.scip.json --output index.json
+```
+
+`scip` がPATHに無ければ自動installせず `external_backend_unavailable` を返します。external commandの失敗出力もboundedにして、巨大ログをagent contextへ流しません。
+
+SCIP documentを `module:scip:<relative_path>` routing unitへ変換し、cross-document reference / relationshipを `depends_on`、nested symbolを `owns` として保持します。そのため変換後は通常の `query / expand / affected` を再利用できます。
 
 `affected` は内部dependency closureを出力上限で打ち切りません。まず全closureを計算し、stdoutだけをboundedにします。index truncation / changed-file mapping failure / returned-scope truncationがある場合は `impact_uncertain=true` とbroader validation fallbackを返します。
 
