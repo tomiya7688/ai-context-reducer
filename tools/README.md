@@ -94,7 +94,7 @@ Python版とGo版は独立実装です。
 
 ```text
 analyze search find tree stats doc-index slice
-compact-log compact-diff remote-delta language-env env
+compact-log compact-diff remote-delta structure-index language-env env
 ```
 
 ## Categories
@@ -126,7 +126,7 @@ Source structure         -> language-specific symbols / dependency / graph tools
 Context priority         -> context-manifest / context-budget / hotspot-report
 ```
 
-`source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。
+`source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
 
 `architecture-boundary-router` は特定architectureへの適合checkerではありません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使います。
 
