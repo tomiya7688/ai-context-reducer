@@ -18,7 +18,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | compact validation logs | `compact-log` | `acr-toolbox compact-log` |
 | compact Git diff | `compact-diff` | `acr-toolbox compact-diff` |
 | remote delta | `remote-delta` | `acr-toolbox remote-delta` |
-| reusable source structure index / bounded graph expansion | `source-structure-index` | `acr-toolbox structure-index` |
+| reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
+| safe portable tool materialization | `materialize-tools` | `acr-toolbox materialize` |
 | language runtime detection | `language-environment-plan` | `acr-toolbox language-env` |
 | runtime/environment check | `environment-plan` の一部 | `acr-toolbox env` |
 | affected test selection | Python `affected-tests` | standalone Go `affected-tests` |
@@ -29,6 +30,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 Windows / Linux / macOS では prebuilt/native binaryを優先し、利用できない場合は対応するPython implementationまたは別fallbackへ切り替えます。
 
 Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildできる形を基本とします。
+
+`materialize-tools` はbootstrap用途でも使えるよう、Python版とは独立して `acr-toolbox materialize` を持ちます。native版は実行中のtoolbox自身とOS向けwrapperを `bin/` + root wrapper layoutへ配置し、preview / conflict protection / hash manifestを同じ契約で提供します。
 
 ## Python-only / not yet native
 
@@ -44,7 +47,6 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 - `responsibility-candidates`
 - `doc-duplicate-hints`
 - `ignore-candidates`
-- `materialize-tools`
 - `structural-search`
 
 `structural-search` は外部 `ast-grep` が存在すればそのnative parserをbackendとして再利用し、無い場合だけPython stdlib AST fallbackを使います。Goで低品質な独自multi-language parserを重複実装するより、この境界を維持します。
