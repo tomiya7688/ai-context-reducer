@@ -39,6 +39,20 @@ Context Routing / Diagram / Evaluation
 
 AI Context Reducer 自体が全言語パーサを抱える必要はありません。解析方法はプロジェクト内ツール、別ツール、IDE、静的解析器など何を使っても構いません。
 
+既にsemantic indexが存在する場合は、sourceを再parseするよりそのindexを再利用します。たとえばSCIPが既に生成されているrepoでは、SCIP protobuf parserをContext Reducer側へ複製するのではなく、利用可能な公式CLIや既存exportをboundary adapterとして使い、routingに必要な情報だけ共通IRへ変換します。
+
+```text
+existing semantic index
+    ↓
+small boundary adapter
+    ↓
+Common IR
+    ↓
+query / expand / affected
+```
+
+ここでもexternal index全文をagentへ渡すことは目的ではありません。tool内部では広く読んでよく、agent-visible resultだけを必要範囲へ削減します。
+
 ## 3. 解析結果を再利用する
 
 共通 IR や構造インデックスから、必要に応じて次を生成できます。
@@ -51,6 +65,7 @@ AI Context Reducer 自体が全言語パーサを抱える必要はありませ�
 - fan-in / fan-out
 - cycle detection
 - task-specific working set
+- changed fileからのaffected scope
 
 同じコードを AI が繰り返し読み直す代わりに、解析結果を索引として再利用します。
 
@@ -65,6 +80,8 @@ Target symbol
 ```
 
 探索深度を制限できる場合は bounded traversal を優先します。
+
+ただし変更影響を判定する内部closureをagent-visible output上限と混同しません。false negative回避に必要ならtool内部では全transitive dependentsを計算し、返却件数だけをboundedにします。
 
 ## 5. Fan-in / Fan-out
 
@@ -103,7 +120,7 @@ AST、シンボル、呼び出し関係、依存関係など機械的に取得�
 
 このrepositoryでは `tools/common/large/source-structure-index` を軽量な共通IR / routing層として提供します。
 
-これはSCIPやTree-sitterそのものを再実装するものではありません。既存のlanguage-specific analyzerが生成したsymbol / dependency graph JSONを共通IRへ正規化し、full indexはfileへ保存します。agentへは `query` または `expand` で必要な部分だけを返します。
+これはSCIPやTree-sitterそのものを再実装するものではありません。既存のlanguage-specific analyzerが生成したsymbol / dependency graph JSON、`ast-grep outline`、既存SCIP index等を共通IRへ正規化し、full indexはfileへ保存します。agentへは `query` / `expand` / `affected` で必要な部分だけを返します。
 
 現在の最小実装では次を扱います。
 
@@ -113,9 +130,11 @@ AST、シンボル、呼び出し関係、依存関係など機械的に取得�
 - bounded in/out/both traversal
 - fan-in / fan-out
 - traversal範囲内のcycle group
+- changed fileからのreverse dependency affected scope
 - input側のtruncation伝播
+- external backend unavailable / malformed outputの明示
 
-Pythonでは `python-symbols` と `python-module-graph`、Goでは `go-symbols` と `go-package-graph` の出力をそのまま材料にできます。将来call graph等を追加する場合も、共通IR側へ明示的なnode / edge kindを渡す形で拡張します。
+Pythonでは `python-symbols` と `python-module-graph`、Goでは `go-symbols` と `go-package-graph` の出力をそのまま材料にできます。既存SCIP indexは、SCIP CLIが利用可能なら外部boundary経由で読みます。CLIやindexerを自動installしません。
 
 外部ツールリンクは [`external-tool-reference-policy.md`](external-tool-reference-policy.md) の掲載条件を満たすものだけに限定します。
 
@@ -131,8 +150,10 @@ Pythonでは `python-symbols` と `python-module-graph`、Goでは `go-symbols` 
 
 - ソース全文を読む前に構造インデックスを利用できるなら利用する
 - 言語固有 parser と共通 IR を分離する
+- 既存semantic indexがある場合は再parseより再利用を優先する
 - 同じ解析結果を複数用途で再利用する
 - 対象シンボルから bounded graph traversal で周辺情報を広げる
+- impact correctnessに必要な内部closureとagent-visible output上限を分離する
 - fan-in / fan-out / cycle を読む優先順位の補助情報として使う
 - generated diagrams を原典や IR の代替にしない
 - 機械取得可能な情報は deterministic analysis を優先する
