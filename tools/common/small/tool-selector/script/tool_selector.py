@@ -83,6 +83,7 @@ def recommend(size, languages, project_types, docs, tests, has_git):
             item('common/large/context-manifest', 'large repository benefits from prioritized context routing'),
             item('common/large/target-slice', 'read bounded excerpts instead of full files'),
             item('common/large/context-budget', 'estimate likely agent context cost before broad reads'),
+            item('common/large/source-structure-index', 'reuse language-specific symbol/dependency analysis and expand only the target neighborhood'),
         ])
     if 'rule_heavy' in project_types:
         conditional.append(item('common/medium/policy-index', 'rule-heavy project detected; extract likely policy lines before reading full documents'))
