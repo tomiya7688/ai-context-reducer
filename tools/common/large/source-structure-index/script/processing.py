@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import defaultdict, deque
 from pathlib import Path
 
+NODE_METADATA_LIMIT = 200
+
 
 def _relpath(raw: str, root: Path | None) -> str:
     path = Path(raw)
@@ -30,6 +32,13 @@ def _go_package(module: str, path: str) -> str | None:
     if parent in ('', '.'):
         return module
     return module.rstrip('/') + '/' + parent
+
+
+def _bounded_metadata(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value)
+    return text if len(text) <= NODE_METADATA_LIMIT else text[:NODE_METADATA_LIMIT]
 
 
 def _add_node(nodes: dict[str, dict], node: dict) -> None:
@@ -74,9 +83,12 @@ def build_index(symbol_payloads: list[dict], graph_payloads: list[dict], root: P
                 edge = {'from': module_id, 'to': file_id, 'kind': 'contains_file'}
                 edges[_edge_key(edge)] = edge
 
-            for symbol in row.get('symbols', []):
-                if not isinstance(symbol, dict) or not symbol.get('name'):
-                    continue
+            symbols = [symbol for symbol in row.get('symbols', []) if isinstance(symbol, dict) and symbol.get('name')]
+            qualified_names = {
+                str(symbol.get('qualified_name') or f"{path}::{symbol['name']}")
+                for symbol in symbols
+            }
+            for symbol in symbols:
                 name = str(symbol['name'])
                 qualified_name = str(symbol.get('qualified_name') or f'{path}::{name}')
                 symbol_id = f'symbol:{qualified_name}'
@@ -92,8 +104,22 @@ def build_index(symbol_payloads: list[dict], graph_payloads: list[dict], root: P
                     node['line'] = symbol['line']
                 if isinstance(symbol.get('end_line'), int):
                     node['end_line'] = symbol['end_line']
+                language = _bounded_metadata(symbol.get('language'))
+                signature = _bounded_metadata(symbol.get('signature'))
+                owner_qualified_name = _bounded_metadata(symbol.get('owner_qualified_name'))
+                if language:
+                    node['language'] = language
+                if signature:
+                    node['signature'] = signature
+                if owner_qualified_name:
+                    node['owner_qualified_name'] = owner_qualified_name
                 _add_node(nodes, node)
-                edge = {'from': file_id, 'to': symbol_id, 'kind': 'owns'}
+
+                if owner_qualified_name and owner_qualified_name in qualified_names:
+                    owner_id = f'symbol:{owner_qualified_name}'
+                else:
+                    owner_id = file_id
+                edge = {'from': owner_id, 'to': symbol_id, 'kind': 'owns'}
                 edges[_edge_key(edge)] = edge
 
     for source_name, payload in graph_payloads:
