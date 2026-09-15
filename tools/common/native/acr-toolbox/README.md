@@ -44,12 +44,16 @@ Common tools の portable Go implementation です。
 - 新しい共有abstractionは、2箇所以上で明確に重複を減らす場合だけ作る
 - 成功時はcompact result、失敗時だけ必要なdiagnosticを増やす
 
+## Go flag ordering
+
+Go標準 `flag` parserを使うcommandでは、optionをpositional pathより前に置きます。READMEの例もこの順序をSource of Truthにします。
+
 ## context-budget / hotspot-report
 
 ```text
-acr-toolbox context-budget . --mode fast --top 40
-acr-toolbox context-budget . --mode accurate --top 40
-acr-toolbox hotspot-report . --limit 30
+acr-toolbox context-budget --mode fast --top 40 .
+acr-toolbox context-budget --mode accurate --top 40 .
+acr-toolbox hotspot-report --limit 30 .
 ```
 
 `context-budget` のtoken数は常にrouting estimateです。`accurate` はfile内容を読むmodeですがtokenizer exactではなく、JSONの `token_estimate.approximate=true` と算定式で明示します。
@@ -100,8 +104,8 @@ SCIP documentを `module:scip:<relative_path>` routing unitへ変換し、cross-
 Python版 `materialize-tools` と共有コードを持たないnative implementationです。
 
 ```text
-acr-toolbox materialize /path/to/ai-context-reducer --out ./portable-tools
-acr-toolbox materialize /path/to/ai-context-reducer --out ./portable-tools --apply
+acr-toolbox materialize --out ./portable-tools /path/to/ai-context-reducer
+acr-toolbox materialize --out ./portable-tools --apply /path/to/ai-context-reducer
 ```
 
 既定はpreview onlyです。既存fileが異なる場合はconflictにし、`--overwrite` を明示しない限り置換しません。apply成功時は `.acr-materialized-tools.json` にsource revision / path / role / source path / SHA-256を残します。
