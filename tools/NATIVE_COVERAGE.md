@@ -45,6 +45,9 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 - `doc-duplicate-hints`
 - `ignore-candidates`
 - `materialize-tools`
+- `structural-search`
+
+`structural-search` は外部 `ast-grep` が存在すればそのnative parserをbackendとして再利用し、無い場合だけPython stdlib AST fallbackを使います。Goで低品質な独自multi-language parserを重複実装するより、この境界を維持します。
 
 ### Common large
 - `context-manifest`
