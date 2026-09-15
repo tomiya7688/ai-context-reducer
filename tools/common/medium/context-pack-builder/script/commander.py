@@ -16,6 +16,8 @@ def build_context_pack(root: Path, task: dict[str, str], limit: int = 60) -> str
         'status': status_all[:limit],
         'changed_query_ok': changed_result['ok'],
         'status_query_ok': status_result['ok'],
+        'changed_error_kind': changed_result.get('error_kind'),
+        'status_error_kind': status_result.get('error_kind'),
         'changed_truncated': len(changed_all) > limit,
         'status_truncated': len(status_all) > limit,
     }
