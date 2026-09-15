@@ -23,10 +23,18 @@ def estimate_accurate(path: Path):
 def summarize(rows: list[tuple[int, int, str]], top: int, mode: str, scanned: int, truncated: bool) -> dict[str, object]:
     rows.sort(reverse=True)
     total = sum(row[0] for row in rows)
+    estimator = {
+        'unit': 'estimated_tokens',
+        'approximate': True,
+        'formula': 'file_size_bytes_div_4' if mode == 'fast' else 'decoded_text_characters_div_4',
+        'reads_file_contents': mode == 'accurate',
+        'note': 'This is a routing estimate, not tokenizer-exact token counting.',
+    }
     return {
         'tool': 'context-budget',
         'status': 'ok',
         'mode': mode,
+        'token_estimate': estimator,
         'estimated_total_tokens_if_all_candidates_read': total,
         'scanned_text_files': scanned,
         'scan_truncated': truncated,
@@ -34,7 +42,6 @@ def summarize(rows: list[tuple[int, int, str]], top: int, mode: str, scanned: in
             {
                 'path': path,
                 'estimated_tokens': tokens,
-                'token_estimate_is_approximate': mode != 'accurate',
                 'bytes': size,
             }
             for tokens, size, path in rows[:top]
