@@ -41,6 +41,32 @@ class SourceStructureProcessingTests(unittest.TestCase):
         self.assertIn(('module:pkg.a', 'module:pkg.b', 'depends_on'), edge_keys)
         self.assertFalse(index['input_truncated'])
 
+    def test_build_bridges_go_package_to_file(self):
+        symbols = [
+            ('go-symbols.json', [
+                {
+                    'file': 'internal/store/store.go',
+                    'symbols': [
+                        {'kind': 'package', 'name': 'store', 'line': 1},
+                        {'kind': 'func', 'name': 'Open', 'line': 8},
+                    ],
+                }
+            ])
+        ]
+        graphs = [
+            ('go-graph.json', {
+                'module': 'example.com/project',
+                'edges': [],
+                'truncated': False,
+            })
+        ]
+        index = module.build_index(symbols, graphs)
+        edge_keys = {(row['from'], row['to'], row['kind']) for row in index['edges']}
+        self.assertIn(
+            ('module:example.com/project/internal/store', 'file:internal/store/store.go', 'contains_file'),
+            edge_keys,
+        )
+
     def test_query_prefers_exact_name(self):
         index = {
             'nodes': [
