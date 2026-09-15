@@ -18,6 +18,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | compact validation logs | `compact-log` | `acr-toolbox compact-log` |
 | compact Git diff | `compact-diff` | `acr-toolbox compact-diff` |
 | remote delta | `remote-delta` | `acr-toolbox remote-delta` |
+| reusable source structure index / bounded graph expansion | `source-structure-index` | `acr-toolbox structure-index` |
 | language runtime detection | `language-environment-plan` | `acr-toolbox language-env` |
 | runtime/environment check | `environment-plan` の一部 | `acr-toolbox env` |
 | affected test selection | Python `affected-tests` | standalone Go `affected-tests` |
