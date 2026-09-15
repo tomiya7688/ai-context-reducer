@@ -7,6 +7,10 @@ from messenger import iter_text_files
 from processing import estimate_accurate, estimate_fast, summarize
 
 
+def emit(payload: dict[str, object]) -> None:
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser(description='Estimate how much agent context candidate text would consume.')
     parser.add_argument('root', nargs='?', default='.')
@@ -17,14 +21,23 @@ def main():
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
+    if not root.exists():
+        emit({'tool': 'context-budget', 'status': 'input_missing', 'root_path': str(root)})
+        return
+    if not root.is_dir():
+        emit({'tool': 'context-budget', 'status': 'input_not_directory', 'root_path': str(root)})
+        return
+
     estimator = estimate_accurate if args.mode == 'accurate' else estimate_fast
     rows = []
     scanned = 0
+    estimation_errors = 0
     truncated = False
 
     for path in iter_text_files(root, args.include_ignored):
         result = estimator(path)
         if result is None:
+            estimation_errors += 1
             continue
         tokens, size = result
         rows.append((tokens, size, path.relative_to(root).as_posix()))
@@ -33,9 +46,9 @@ def main():
             truncated = True
             break
 
-    result = summarize(rows, args.top, args.mode, scanned, truncated)
+    result = summarize(rows, max(0, args.top), args.mode, scanned, truncated, estimation_errors)
     result['root_path'] = str(root)
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    emit(result)
 
 
 if __name__ == '__main__':
