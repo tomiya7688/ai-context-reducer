@@ -37,6 +37,7 @@ change-router
 context-pack-builder
 remote-delta
 architecture-boundary-router
+structural-search
 context-manifest
 context-budget
 policy-index
@@ -49,7 +50,7 @@ source-structure-index
 ```text
 entrypoint      -> CLI / compact output
 commander       -> orchestration / routing
-messenger       -> Git / filesystem / profile等のboundary I/O
+messenger       -> Git / filesystem / external process / profile等のboundary I/O
 processing      -> matching / analysis / rendering
 ```
 
@@ -86,6 +87,17 @@ Python版とGo版は独立実装です。
 - generic toolは合理的なら両方へ実装する
 - 共有コードではなくCLI契約・fixture・testで整合を取る
 
+## Validation
+
+`.github/workflows/test-tools.yml` は `tools/**` 更新時に次を検証します。
+
+```text
+Python -> compileall + 各 tests/test_*.py をstdlibだけで実行
+Go     -> tools配下の全 go.mod を列挙して go test ./...
+```
+
+portable binary buildも `go test ./...` 成功後だけartifact buildへ進みます。
+
 ## Native toolbox
 
 `tools/common/native/acr-toolbox` はCommon機能のportable Go binaryです。
@@ -112,7 +124,7 @@ profiles       optional project-type / routing input
 ## Main routing tools
 
 ```text
-Search-first             -> search / find / tree / doc-index / slice
+Search-first             -> search / find / structural-search / tree / doc-index / slice
 Exploration stop         -> acceptance-extractor / exploration-stop-check
 Remote delta             -> remote-delta / compact-diff
 Responsibility           -> responsibility-candidates
@@ -125,6 +137,8 @@ Context pack             -> context-pack-builder
 Source structure         -> language-specific symbols / dependency / graph tools -> source-structure-index
 Context priority         -> context-manifest / context-budget / hotspot-report
 ```
+
+`structural-search` はplain text searchでは候補が広すぎる場合に構文形状で絞ります。既に `ast-grep` があればbackendとして再利用し、無ければPython sourceだけstdlib AST fallbackを使います。外部toolは自動installしません。
 
 `source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
 
