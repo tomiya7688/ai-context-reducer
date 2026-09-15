@@ -155,11 +155,14 @@ func normalizeSCIPPrint(raw any) ([]any, map[string]any, error) {
             if language := structureString(doc.Raw["language"]); language != "" {
                 item["language"] = language
             }
-            if line := definitionLines[qualified]; line[0] > 0 {
-                item["line"] = line[0]
-                item["end_line"] = line[1]
+            line, endLine := 0, 0
+            if location := definitionLines[qualified]; location[0] > 0 {
+                line, endLine = location[0], location[1]
+                item["line"] = line
+                item["end_line"] = endLine
             }
-            if owner := structureString(scipMapField(symbol, "enclosingSymbol", "enclosing_symbol")); owner != "" {
+            owner := structureString(scipMapField(symbol, "enclosingSymbol", "enclosing_symbol"))
+            if owner != "" {
                 item["owner_qualified_name"] = owner
             }
             if signature, ok := scipMapField(symbol, "signatureDocumentation", "signature_documentation").(map[string]any); ok {
@@ -167,7 +170,26 @@ func normalizeSCIPPrint(raw any) ([]any, map[string]any, error) {
                     item["signature"] = text
                 }
             }
-            symbolsOut = append(symbolsOut, item)
+
+            // The existing native builder owns top-level symbols from their file.
+            // Nested SCIP symbols are emitted as explicit graph nodes so their
+            // owner edge survives without widening the generic builder contract.
+            if owner == "" {
+                symbolsOut = append(symbolsOut, item)
+            } else {
+                symbolID := "symbol:" + qualified
+                nodes[symbolID] = map[string]any{
+                    "id":             symbolID,
+                    "kind":           "symbol",
+                    "name":           name,
+                    "qualified_name": qualified,
+                    "path":           doc.Path,
+                    "symbol_kind":    kind,
+                    "line":           line,
+                    "end_line":       endLine,
+                }
+                addEdge("symbol:"+owner, symbolID, "owns")
+            }
 
             relationships, _ := symbol["relationships"].([]any)
             for _, rawRelationship := range relationships {
