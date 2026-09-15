@@ -50,6 +50,7 @@ class ToolSelectorTests(unittest.TestCase):
             'large', [('python', 100)], ['rule_heavy'], docs=5, tests=10, has_git=True
         )
         self.assertIn('common/large/context-manifest', paths(recommended, 'tool_path'))
+        self.assertIn('common/large/source-structure-index', paths(recommended, 'tool_path'))
         self.assertIn('common/medium/policy-index', paths(conditional, 'tool_path'))
         self.assertIn('python/small', paths(recommended_groups, 'tool_group_path'))
         self.assertIn('python/large', paths(conditional_groups, 'tool_group_path'))
