@@ -26,7 +26,7 @@ var ignoreDirs = map[string]bool{
 
 var languageByExt = map[string]string{
     ".py": "Python", ".cs": "CSharp", ".go": "Go", ".c": "C", ".h": "C/C++",
-    ".cpp": "C++", ".cc": "C++", ".cxx": "C++", ".hpp": "C++", ".hh": "C/C++",
+    ".cpp": "C++", ".cc": "C++", ".cxx": "C++", ".hpp": "C++", ".hh": "C++",
     ".gd": "GDScript", ".rs": "Rust", ".js": "JavaScript", ".ts": "TypeScript", ".java": "Java",
 }
 
