@@ -1,0 +1,52 @@
+name: Test tools
+
+on:
+  push:
+    paths:
+      - 'tools/**'
+      - '.github/workflows/test-tools.yml'
+  pull_request:
+    paths:
+      - 'tools/**'
+      - '.github/workflows/test-tools.yml'
+  workflow_dispatch:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile Python tools
+        run: python -m compileall -q tools
+      - name: Run stdlib Python tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t tests < <(find tools -type f -path '*/tests/test_*.py' | sort)
+          printf 'discovered %s Python test files\n' "${#tests[@]}"
+          for file in "${tests[@]}"; do
+            echo "==> $file"
+            python "$file"
+          done
+
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      - name: Test every Go tool module
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t modules < <(find tools -type f -name go.mod -print | sort)
+          printf 'discovered %s Go modules\n' "${#modules[@]}"
+          for mod in "${modules[@]}"; do
+            dir="$(dirname "$mod")"
+            echo "==> $dir"
+            (cd "$dir" && go test ./...)
+          done
