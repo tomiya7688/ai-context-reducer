@@ -15,9 +15,12 @@ class RenderContextPackTests(unittest.TestCase):
             {
                 'changed': [],
                 'status': [],
+                'changed_query_ok': True,
+                'status_query_ok': True,
+                'changed_error_kind': None,
+                'status_error_kind': None,
                 'changed_truncated': False,
                 'status_truncated': False,
-                'git_available': True,
             },
         )
 
@@ -25,19 +28,43 @@ class RenderContextPackTests(unittest.TestCase):
         self.assertIn('clean', text)
         self.assertNotIn('Git unavailable', text)
 
-    def test_git_failure_is_explicit(self):
+    def test_git_unavailable_is_explicit(self):
         text = render_context_pack(
             {'goal': 'g', 'required': '', 'acceptance': '', 'deferred': ''},
             {
                 'changed': [],
                 'status': [],
+                'changed_query_ok': False,
+                'status_query_ok': False,
+                'changed_error_kind': 'git_unavailable',
+                'status_error_kind': 'git_unavailable',
                 'changed_truncated': False,
                 'status_truncated': False,
-                'git_available': False,
             },
         )
 
         self.assertIn('Git unavailable', text)
+        self.assertNotIn('- clean', text)
+        self.assertNotIn('none detected', text)
+
+    def test_git_query_failure_is_not_clean_state(self):
+        text = render_context_pack(
+            {'goal': 'g', 'required': '', 'acceptance': '', 'deferred': ''},
+            {
+                'changed': [],
+                'status': [],
+                'changed_query_ok': False,
+                'status_query_ok': False,
+                'changed_error_kind': 'git_query_failed',
+                'status_error_kind': 'git_query_failed',
+                'changed_truncated': False,
+                'status_truncated': False,
+            },
+        )
+
+        self.assertIn('git diff query failed', text)
+        self.assertIn('git status query failed', text)
+        self.assertNotIn('- clean', text)
 
     def test_truncation_is_explicit(self):
         text = render_context_pack(
@@ -45,9 +72,12 @@ class RenderContextPackTests(unittest.TestCase):
             {
                 'changed': ['a.py'],
                 'status': ['M a.py'],
+                'changed_query_ok': True,
+                'status_query_ok': True,
+                'changed_error_kind': None,
+                'status_error_kind': None,
                 'changed_truncated': True,
                 'status_truncated': True,
-                'git_available': True,
             },
         )
 
