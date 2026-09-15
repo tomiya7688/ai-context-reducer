@@ -6,6 +6,7 @@ import json
 import sys
 from pathlib import Path
 
+from impact import affected_scope
 from messenger import load_json, write_json
 from outline_adapter import normalize_symbol_payload
 from processing import build_index, expand, query_nodes, resolve_target
@@ -117,6 +118,24 @@ def expand_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def affected_command(args: argparse.Namespace) -> int:
+    try:
+        index = load_index(args.index)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        emit({'tool': TOOL, 'status': 'index_read_failed', 'index_path': args.index, 'error': str(exc)})
+        return 2
+
+    result = affected_scope(index, args.changed, args.max_results)
+    emit({
+        'tool': TOOL,
+        'status': 'ok_with_uncertainty' if result['impact_uncertain'] else 'ok',
+        'index_path': args.index,
+        'index_input_truncated': bool(index.get('input_truncated')),
+        **result,
+    })
+    return 0
+
+
 def parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         description='Build and query a reusable source-structure index without dumping the full index into agent context.'
@@ -144,6 +163,12 @@ def parser() -> argparse.ArgumentParser:
     neighborhood.add_argument('--direction', choices=['in', 'out', 'both'], default='both')
     neighborhood.add_argument('--max-candidates', type=int, default=20, help='Maximum candidates returned for an ambiguous target.')
     neighborhood.set_defaults(func=expand_command)
+
+    affected = sub.add_parser('affected', help='Compute transitive dependent modules from changed files using the reusable dependency graph.')
+    affected.add_argument('index')
+    affected.add_argument('--changed', action='append', required=True, metavar='PATH', help='Changed repository-relative file path. Repeatable.')
+    affected.add_argument('--max-results', type=int, default=80, help='Maximum affected modules returned to the caller. The internal dependency closure is still complete. 0 means unlimited.')
+    affected.set_defaults(func=affected_command)
     return ap
 
 
