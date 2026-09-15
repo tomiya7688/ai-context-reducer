@@ -13,8 +13,10 @@ python script/hotspot_report.py . --limit 30
 Native:
 
 ```sh
-acr-toolbox hotspot-report . --limit 30
+acr-toolbox hotspot-report --limit 30 .
 ```
+
+native版はGo標準flag parserを使うため、optionはrepository pathより前に置きます。
 
 既定ではfile-count scan limitを設けません。tool内部の広いscanは許容し、agentへ返す `hotspots` だけを `--limit` でboundedにします。
 
