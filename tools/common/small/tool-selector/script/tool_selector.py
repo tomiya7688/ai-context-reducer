@@ -74,6 +74,7 @@ def recommend(size, languages, project_types, docs, tests, has_git):
     if size in {'medium', 'large'}:
         recommended.append(item('common/medium/change-router', f'{size} repository benefits from change-to-test/doc routing'))
         conditional.extend([
+            item('common/medium/structural-search', 'use syntax-shaped search when plain text search returns too many unrelated matches'),
             item('common/medium/responsibility-candidates', 'use to locate likely responsibility boundaries'),
             item('common/medium/doc-duplicate-hints', 'use when duplicated documentation may inflate context'),
             item('common/large/hotspot-report', 'use to find large/deep repository hotspots'),
