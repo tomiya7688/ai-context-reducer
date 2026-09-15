@@ -7,9 +7,10 @@ import sys
 from pathlib import Path
 
 from impact import affected_scope
-from messenger import load_json, write_json
+from messenger import load_json, scip_print_json, write_json
 from outline_adapter import normalize_symbol_payload
 from processing import build_index, expand, query_nodes, resolve_target
+from scip_adapter import normalize_scip_print
 
 TOOL = 'source-structure-index'
 FORMAT = 'acr-source-structure-index-v1'
@@ -26,27 +27,78 @@ def load_index(path: str) -> dict:
     return payload
 
 
+def _append_scip_input(symbol_payloads, graph_payloads, metadata_rows, source: str, mode: str, payload: object) -> None:
+    symbols, graph, metadata = normalize_scip_print(payload)
+    symbol_payloads.append((f'{source}#scip-symbols', symbols))
+    graph_payloads.append((f'{source}#scip-graph', graph))
+    indexer = metadata.get('indexer') if isinstance(metadata.get('indexer'), dict) else {}
+    metadata_rows.append({
+        'source': source,
+        'mode': mode,
+        'document_count': metadata.get('document_count', 0),
+        'defined_symbol_count': metadata.get('defined_symbol_count', 0),
+        'indexer_name': indexer.get('name'),
+        'indexer_version': indexer.get('version'),
+    })
+
+
 def build_command(args: argparse.Namespace) -> int:
-    if not args.symbols and not args.graph:
-        emit({'tool': TOOL, 'status': 'no_inputs', 'required_input': '--symbols and/or --graph'})
+    if not args.symbols and not args.graph and not args.scip and not args.scip_json:
+        emit({
+            'tool': TOOL,
+            'status': 'no_inputs',
+            'required_input': '--symbols, --graph, --scip-json, and/or --scip',
+        })
         return 2
 
     symbol_payloads = []
     graph_payloads = []
     failures = []
+    scip_inputs = []
+
     for path in args.symbols:
         try:
             symbol_payloads.append((path, normalize_symbol_payload(load_json(path))))
         except (OSError, ValueError, json.JSONDecodeError) as exc:
-            failures.append({'path': path, 'error': str(exc)})
+            failures.append({'path': path, 'input_kind': 'symbols', 'status': 'read_failed', 'error': str(exc)})
     for path in args.graph:
         try:
             graph_payloads.append((path, load_json(path)))
         except (OSError, ValueError, json.JSONDecodeError) as exc:
-            failures.append({'path': path, 'error': str(exc)})
+            failures.append({'path': path, 'input_kind': 'graph', 'status': 'read_failed', 'error': str(exc)})
+    for path in args.scip_json:
+        try:
+            _append_scip_input(symbol_payloads, graph_payloads, scip_inputs, path, 'scip_print_json_file', load_json(path))
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            failures.append({'path': path, 'input_kind': 'scip_json', 'status': 'read_failed', 'error': str(exc)})
+    for path in args.scip:
+        result = scip_print_json(path)
+        if not result.get('ok'):
+            failures.append({
+                'path': path,
+                'input_kind': 'scip_index',
+                'status': result.get('status', 'read_failed'),
+                'backend': result.get('backend', 'scip'),
+                'error': result.get('error', 'SCIP backend failed'),
+            })
+            continue
+        try:
+            _append_scip_input(
+                symbol_payloads,
+                graph_payloads,
+                scip_inputs,
+                path,
+                'scip_cli',
+                result.get('payload'),
+            )
+        except ValueError as exc:
+            failures.append({'path': path, 'input_kind': 'scip_index', 'status': 'invalid_backend_output', 'error': str(exc)})
 
     if failures:
-        emit({'tool': TOOL, 'status': 'input_read_failed', 'input_errors': failures})
+        status = 'external_backend_unavailable' if all(
+            row.get('status') == 'backend_unavailable' for row in failures
+        ) else 'input_read_failed'
+        emit({'tool': TOOL, 'status': status, 'input_errors': failures})
         return 2
 
     root = Path(args.root).resolve() if args.root else None
@@ -62,6 +114,7 @@ def build_command(args: argparse.Namespace) -> int:
         'edge_count': len(index['edges']),
         'input_truncated': index['input_truncated'],
         'input_errors': index['input_errors'],
+        'scip_inputs': scip_inputs,
     })
     return 0
 
@@ -142,9 +195,11 @@ def parser() -> argparse.ArgumentParser:
     )
     sub = ap.add_subparsers(dest='command', required=True)
 
-    build = sub.add_parser('build', help='Normalize language-specific symbol/graph JSON into a reusable common index.')
+    build = sub.add_parser('build', help='Normalize existing analyzer/index outputs into a reusable common index.')
     build.add_argument('--symbols', action='append', default=[], metavar='JSON', help='Symbol JSON from a language-specific analyzer or ast-grep outline. Repeatable.')
     build.add_argument('--graph', action='append', default=[], metavar='JSON', help='Dependency/call graph JSON. Repeatable.')
+    build.add_argument('--scip-json', action='append', default=[], metavar='JSON', help='JSON previously produced by scip print --json. Repeatable.')
+    build.add_argument('--scip', action='append', default=[], metavar='INDEX.SCIP', help='Existing SCIP index. Requires an already-installed scip CLI; nothing is auto-installed. Repeatable.')
     build.add_argument('--root', help='Optional repository root used to make absolute symbol paths relative.')
     build.add_argument('--output', required=True, help='Index file to write. The full index is not printed to stdout.')
     build.set_defaults(func=build_command)
