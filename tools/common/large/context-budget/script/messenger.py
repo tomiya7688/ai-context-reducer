@@ -7,8 +7,12 @@ IGNORE = {'.git', '.hg', '.svn', '.venv', 'venv', 'node_modules', 'bin', 'obj', 
 TEXT = {'.py', '.cs', '.go', '.c', '.h', '.cpp', '.cc', '.cxx', '.hpp', '.hh', '.gd', '.md', '.txt', '.rst', '.json', '.yaml', '.yml', '.toml', '.xml', '.ini'}
 
 
-def iter_text_files(root: Path, include_ignored: bool):
-    for current, dirs, files in os.walk(root):
+def iter_text_files(root: Path, include_ignored: bool, stats: dict[str, int] | None = None):
+    def on_error(_error):
+        if stats is not None:
+            stats['walk_error_count'] = stats.get('walk_error_count', 0) + 1
+
+    for current, dirs, files in os.walk(root, onerror=on_error):
         if not include_ignored:
             dirs[:] = [d for d in dirs if d.lower() not in IGNORE]
         current_path = Path(current)
