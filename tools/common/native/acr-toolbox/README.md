@@ -14,6 +14,9 @@ Common tools の portable Go implementation です。
 | search / find / tree / stats / docs index | `browse_commands.go` |
 | bounded excerpt / compact log | `text_commands.go` |
 | Git diff / remote delta | `git_commands.go` |
+| context-size estimation | `context_budget_command.go` |
+| large/deep file routing | `hotspot_command.go` |
+| context analysis validation | `context_analysis_commands_test.go` |
 | source-structure build / query / expand | `structure_index_command.go` |
 | source-structure affected scope | `structure_index_affected.go` |
 | existing SCIP index adaptation / external SCIP boundary | `structure_scip_adapter.go` |
@@ -37,6 +40,18 @@ Common tools の portable Go implementation です。
 - 新しい共有abstractionは、2箇所以上で明確に重複を減らす場合だけ作る
 - 成功時はcompact result、失敗時だけ必要なdiagnosticを増やす
 
+## context-budget / hotspot-report
+
+```text
+acr-toolbox context-budget . --mode fast --top 40
+acr-toolbox context-budget . --mode accurate --top 40
+acr-toolbox hotspot-report . --limit 30
+```
+
+`context-budget` のtoken数は常にrouting estimateです。`accurate` はfile内容を読むmodeですがtokenizer exactではなく、JSONの `token_estimate.approximate=true` と算定式で明示します。
+
+両commandとも既定では内部file-count scan limitを持ちません。明示した `--max-files` はperformance/safety capで、実際に未走査候補が残った時だけ `scan_truncated=true` になります。
+
 ## structure-index
 
 Python common implementationと同じ `acr-source-structure-index-v1` を読み書きします。実装コードは共有せず、JSON contractだけを合わせます。
@@ -56,11 +71,6 @@ acr-toolbox structure-index affected --changed pkg/a.py index.json
 
 ```text
 acr-toolbox structure-index build --scip index.scip --output index.json
-```
-
-すでに `scip print --json` の結果がある場合は、SCIP CLI自体も不要です。
-
-```text
 acr-toolbox structure-index build --scip-json index.scip.json --output index.json
 ```
 
