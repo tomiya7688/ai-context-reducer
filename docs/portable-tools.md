@@ -13,7 +13,7 @@ prebuilt native binary
   -> external optional tool
 ```
 
-ただし `rg` など高品質な外部ツールが既に存在する場合は、同等用途の内蔵実装より優先してよいものとします。
+ただし `rg` や `ast-grep` など高品質な外部ツールが既に存在する場合は、同等用途の内蔵実装より優先してよいものとします。
 
 ## 配布単位
 
@@ -78,6 +78,42 @@ environment probe
 ```
 
 すでに導入済みのtool setを整理する場合も、削除は対象tool directory内だけに限定し、dry-runを標準とします。
+
+## Safe materialization
+
+portable toolのmaterializationは、単なるcopy scriptではなく **preview可能なdeterministic plan** として扱います。
+
+```text
+selection
+  -> preview
+  -> create / unchanged / conflict / overwrite
+  -> explicit apply
+  -> provenance manifest
+```
+
+既定ではfileを書き換えません。既存destinationが異なる場合はconflictとして止め、`--overwrite` が明示された場合だけ置換します。
+
+実装:
+
+```text
+Python: tools/common/small/materialize-tools/script/materialize_tools.py
+Native: acr-toolbox materialize
+```
+
+Native版はPython runtimeが無い環境でも、実行中の `acr-toolbox` 自身とOS向けwrapperをmaterializeできます。
+
+layoutはwrapperの相対path契約をSource of Truthとして保持します。
+
+```text
+portable-tools/
+├─ analyze.sh or analyze.bat
+└─ bin/
+   └─ acr-toolbox(.exe)
+```
+
+apply成功時は `.acr-materialized-tools.json` にmaterialized fileのpath / role / source path / SHA-256と、取得可能ならsource Git revisionを残します。timestampは入れず、同じsourceから同じselectionを行ったときmanifest内容が安定することを優先します。
+
+Windowsを含む既存file置換では、destinationを先にtruncateしません。temporary fileへ書き、直接replaceできないplatformでは旧destinationを一時backupへ退避し、install失敗時にrestoreします。
 
 ## 推奨 native 化対象
 
