@@ -15,6 +15,15 @@
 
 SCIPやTree-sitterそのものを再実装するものではありません。既存analyzer / IDE / indexerが利用可能なら、その出力をrouting用IRへ変換して再利用するための軽量層です。
 
+## Implementations
+
+同じ `acr-source-structure-index-v1` を、共有コードなしで2実装します。
+
+- Python: `script/source_structure_index.py`
+- native Go: `tools/common/native/acr-toolbox structure-index`
+
+片方でbuildしたindexを、もう片方の `query` / `expand` で読める契約です。
+
 ## Build
 
 Python symbols + Python module graph:
@@ -41,12 +50,29 @@ python tools/common/large/source-structure-index/script/source_structure_index.p
   --output .acr/source-structure-index.json
 ```
 
+native版:
+
+```sh
+acr-toolbox structure-index build \
+  --symbols /tmp/symbols.json \
+  --graph /tmp/graph.json \
+  --root . \
+  --output .acr/source-structure-index.json
+```
+
 `build` はfull indexをstdoutへ出しません。stdoutは `node_count` / `edge_count` / `input_truncated` などのcompact JSONだけです。
 
 ## Query
 
 ```sh
 python tools/common/large/source-structure-index/script/source_structure_index.py query \
+  .acr/source-structure-index.json Service
+```
+
+native版ではflagをpositional引数より前に置きます。
+
+```sh
+acr-toolbox structure-index query --max-results 40 \
   .acr/source-structure-index.json Service
 ```
 
@@ -60,6 +86,13 @@ python tools/common/large/source-structure-index/script/source_structure_index.p
   --depth 2 \
   --max-nodes 80 \
   --direction both
+```
+
+native版:
+
+```sh
+acr-toolbox structure-index expand --depth 2 --max-nodes 80 --direction both \
+  .acr/source-structure-index.json module:pkg.service
 ```
 
 出力には各nodeの `distance` / `fan_in` / `fan_out`、選択範囲内の `cycle_groups`、`nodes_truncated` が含まれます。
@@ -98,13 +131,31 @@ python tools/common/large/source-structure-index/script/source_structure_index.p
 
 将来のcall graph等は、明示的な `nodes` と `edges[].kind` を持つJSONを入力できます。
 
+## Validation
+
+Python:
+
+```sh
+python -m unittest discover tools/common/large/source-structure-index/tests
+```
+
+native Go:
+
+```sh
+cd tools/common/native/acr-toolbox
+go test ./...
+```
+
 ## Development routing
 
 変更理由から最初に読むfileを絞ります。
 
-- CLI / command contract: `script/source_structure_index.py`
-- JSON file I/O: `script/messenger.py`
-- IR normalization / query / graph expansion / cycle detection: `script/processing.py`
-- deterministic contract validation: `tests/test_processing.py`
+- Python CLI / command contract: `script/source_structure_index.py`
+- Python JSON file I/O: `script/messenger.py`
+- Python IR normalization / query / graph expansion / cycle detection: `script/processing.py`
+- Python deterministic contract validation: `tests/test_processing.py`
+- Python end-to-end CLI smoke: `tests/test_cli.py`
+- native implementation: `tools/common/native/acr-toolbox/structure_index_command.go`
+- native contract validation: `tools/common/native/acr-toolbox/structure_index_command_test.go`
 
 この分割は形式上のlayeringではなく、Context Reducer自身の Task Routing / Responsibility Map / Exploration Stop をtool開発へ適用するためです。
