@@ -38,7 +38,7 @@ func main() {
     case "remote-delta":
         code = cmdRemoteDelta(os.Args[2:])
     case "structure-index":
-        code = cmdStructureIndex(os.Args[2:])
+        code = cmdStructureIndexEntry(os.Args[2:])
     case "language-env":
         code = cmdLanguageEnv()
     case "env":
