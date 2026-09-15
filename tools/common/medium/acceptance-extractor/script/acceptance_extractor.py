@@ -12,7 +12,14 @@ HEADINGS = {
 }
 
 
+def term_present(text: str, term: str) -> bool:
+    if any(ord(char) > 127 for char in term):
+        return term in text
+    return re.search(rf'(?<![a-z0-9_]){re.escape(term)}(?![a-z0-9_])', text) is not None
+
+
 def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
+    limit = max(0, limit)
     out = []
     for i in range(start + 1, len(lines)):
         if re.match(r'^#{1,6}\s+', lines[i]):
@@ -20,6 +27,22 @@ def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
         if lines[i].strip():
             out.append(lines[i].rstrip())
     return out[:limit], len(out) > limit
+
+
+def extract_sections(lines: list[str], limit: int) -> tuple[dict[str, list[str]], dict[str, bool]]:
+    sections = {key: [] for key in HEADINGS}
+    truncated = {key: False for key in HEADINGS}
+    for i, line in enumerate(lines):
+        match = re.match(r'^#{1,6}\s+(.+)$', line.strip())
+        if not match:
+            continue
+        title = match.group(1).lower()
+        for key, words in HEADINGS.items():
+            if any(term_present(title, word) for word in words):
+                values, was_truncated = section(lines, i, limit)
+                sections[key].extend(values)
+                truncated[key] = truncated[key] or was_truncated
+    return sections, truncated
 
 
 def main():
@@ -36,6 +59,13 @@ def main():
             'input_file': str(path),
         }, ensure_ascii=False, indent=2))
         return
+    if not path.is_file():
+        print(json.dumps({
+            'tool': 'acceptance-extractor',
+            'status': 'input_not_file',
+            'input_file': str(path),
+        }, ensure_ascii=False, indent=2))
+        return
 
     try:
         lines = path.read_text(encoding='utf-8', errors='ignore').splitlines()
@@ -47,19 +77,7 @@ def main():
         }, ensure_ascii=False, indent=2))
         return
 
-    sections = {key: [] for key in HEADINGS}
-    truncated = {key: False for key in HEADINGS}
-    for i, line in enumerate(lines):
-        match = re.match(r'^#{1,6}\s+(.+)$', line.strip())
-        if not match:
-            continue
-        title = match.group(1).lower()
-        for key, words in HEADINGS.items():
-            if any(word in title for word in words):
-                values, was_truncated = section(lines, i, args.max_lines_per_section)
-                sections[key].extend(values)
-                truncated[key] = truncated[key] or was_truncated
-
+    sections, truncated = extract_sections(lines, max(0, args.max_lines_per_section))
     print(json.dumps({
         'tool': 'acceptance-extractor',
         'status': 'ok',
