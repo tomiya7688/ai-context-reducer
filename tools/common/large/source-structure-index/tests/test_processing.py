@@ -41,6 +41,49 @@ class SourceStructureProcessingTests(unittest.TestCase):
         self.assertIn(('module:pkg.a', 'module:pkg.b', 'depends_on'), edge_keys)
         self.assertFalse(index['input_truncated'])
 
+    def test_build_preserves_nested_symbol_ownership_and_metadata(self):
+        symbols = [
+            ('outline.json', {
+                'files': [{
+                    'file': 'src/service.py',
+                    'symbols': [
+                        {
+                            'kind': 'Class',
+                            'name': 'Service',
+                            'qualified_name': 'src/service.py::Service',
+                            'line': 5,
+                            'end_line': 12,
+                            'language': 'Python',
+                            'signature': 'class Service:',
+                        },
+                        {
+                            'kind': 'Method',
+                            'name': 'run',
+                            'qualified_name': 'src/service.py::Service::run',
+                            'owner_qualified_name': 'src/service.py::Service',
+                            'line': 7,
+                            'end_line': 9,
+                            'language': 'Python',
+                            'signature': 'def run(self):',
+                        },
+                    ],
+                }],
+                'truncated': False,
+            })
+        ]
+        index = module.build_index(symbols, [])
+        edge_keys = {(row['from'], row['to'], row['kind']) for row in index['edges']}
+        nodes = {row['id']: row for row in index['nodes']}
+
+        self.assertIn(
+            ('symbol:src/service.py::Service', 'symbol:src/service.py::Service::run', 'owns'),
+            edge_keys,
+        )
+        method = nodes['symbol:src/service.py::Service::run']
+        self.assertEqual(method['language'], 'Python')
+        self.assertEqual(method['signature'], 'def run(self):')
+        self.assertEqual(method['owner_qualified_name'], 'src/service.py::Service')
+
     def test_build_bridges_go_package_to_file(self):
         symbols = [
             ('go-symbols.json', [
