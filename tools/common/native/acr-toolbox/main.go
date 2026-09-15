@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|language-env|env> ...")
+    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|structure-index|language-env|env> ...")
 }
 
 func main() {
@@ -37,6 +37,8 @@ func main() {
         code = cmdCompactDiff(os.Args[2:])
     case "remote-delta":
         code = cmdRemoteDelta(os.Args[2:])
+    case "structure-index":
+        code = cmdStructureIndex(os.Args[2:])
     case "language-env":
         code = cmdLanguageEnv()
     case "env":
