@@ -45,12 +45,13 @@ class ToolSelectorTests(unittest.TestCase):
         self.assertIn('compiler', detected)
         self.assertNotIn('simulation', detected)
 
-    def test_large_rule_heavy_repo_gets_large_and_policy_tools(self):
+    def test_large_rule_heavy_repo_gets_structure_tools(self):
         recommended, conditional, recommended_groups, conditional_groups = module.recommend(
             'large', [('python', 100)], ['rule_heavy'], docs=5, tests=10, has_git=True
         )
         self.assertIn('common/large/context-manifest', paths(recommended, 'tool_path'))
         self.assertIn('common/large/source-structure-index', paths(recommended, 'tool_path'))
+        self.assertIn('common/medium/structural-search', paths(conditional, 'tool_path'))
         self.assertIn('common/medium/policy-index', paths(conditional, 'tool_path'))
         self.assertIn('python/small', paths(recommended_groups, 'tool_group_path'))
         self.assertIn('python/large', paths(conditional_groups, 'tool_group_path'))
