@@ -99,6 +99,24 @@ AST、シンボル、呼び出し関係、依存関係など機械的に取得�
 
 既存のIDE / language server / build systemが同等情報を既に持つなら、そちらを再利用する方を優先します。
 
+### Repository-owned minimal implementation
+
+このrepositoryでは `tools/common/large/source-structure-index` を軽量な共通IR / routing層として提供します。
+
+これはSCIPやTree-sitterそのものを再実装するものではありません。既存のlanguage-specific analyzerが生成したsymbol / dependency graph JSONを共通IRへ正規化し、full indexはfileへ保存します。agentへは `query` または `expand` で必要な部分だけを返します。
+
+現在の最小実装では次を扱います。
+
+- file / module / symbol node
+- ownership / dependency edge
+- exact / partial node query
+- bounded in/out/both traversal
+- fan-in / fan-out
+- traversal範囲内のcycle group
+- input側のtruncation伝播
+
+Pythonでは `python-symbols` と `python-module-graph`、Goでは `go-symbols` と `go-package-graph` の出力をそのまま材料にできます。将来call graph等を追加する場合も、共通IR側へ明示的なnode / edge kindを渡す形で拡張します。
+
 外部ツールリンクは [`external-tool-reference-policy.md`](external-tool-reference-policy.md) の掲載条件を満たすものだけに限定します。
 
 この位置付けでは次を守ります。
