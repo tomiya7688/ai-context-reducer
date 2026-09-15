@@ -33,8 +33,9 @@ def main():
     scanned = 0
     estimation_errors = 0
     truncated = False
+    scan_stats = {'walk_error_count': 0}
 
-    for path in iter_text_files(root, args.include_ignored):
+    for path in iter_text_files(root, args.include_ignored, scan_stats):
         result = estimator(path)
         if result is None:
             estimation_errors += 1
@@ -46,7 +47,15 @@ def main():
             truncated = True
             break
 
-    result = summarize(rows, max(0, args.top), args.mode, scanned, truncated, estimation_errors)
+    result = summarize(
+        rows,
+        max(0, args.top),
+        args.mode,
+        scanned,
+        truncated,
+        estimation_errors,
+        scan_stats['walk_error_count'],
+    )
     result['root_path'] = str(root)
     emit(result)
 
