@@ -1,0 +1,74 @@
+package main
+
+import (
+    "os"
+    "path/filepath"
+    "testing"
+)
+
+func TestNativeMaterializeSelectionPreservesWrapperLayout(t *testing.T) {
+    source := t.TempDir()
+    wrapper := filepath.Join(source, "tools", "analyze.sh")
+    if err := os.MkdirAll(filepath.Dir(wrapper), 0o755); err != nil { t.Fatal(err) }
+    if err := os.WriteFile(wrapper, []byte("#!/usr/bin/env sh\n"), 0o755); err != nil { t.Fatal(err) }
+    executable := filepath.Join(source, "acr-toolbox-test")
+    if err := os.WriteFile(executable, []byte("binary"), 0o755); err != nil { t.Fatal(err) }
+
+    rows := nativeMaterializeSelection(source, executable, "linux")
+    got := map[string]bool{}
+    for _, row := range rows { got[row.Destination] = true }
+    if !got["bin/acr-toolbox"] || !got["analyze.sh"] {
+        t.Fatalf("unexpected destinations: %#v", got)
+    }
+}
+
+func TestPlanNativeMaterializationProtectsDifferentDestination(t *testing.T) {
+    source := t.TempDir()
+    out := t.TempDir()
+    executable := filepath.Join(source, "acr-toolbox")
+    if err := os.WriteFile(executable, []byte("source"), 0o755); err != nil { t.Fatal(err) }
+    destination := filepath.Join(out, "bin", "acr-toolbox")
+    if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil { t.Fatal(err) }
+    if err := os.WriteFile(destination, []byte("local"), 0o755); err != nil { t.Fatal(err) }
+
+    selected := []materializeSelection{{
+        Source: executable,
+        SourcePath: "<current-executable>",
+        Destination: "bin/acr-toolbox",
+        Role: "native_toolbox",
+    }}
+    actions, missing, err := planNativeMaterialization(out, selected, false)
+    if err != nil { t.Fatal(err) }
+    if len(missing) != 0 { t.Fatalf("unexpected missing sources: %#v", missing) }
+    if actions[0].PlannedAction != "conflict" {
+        t.Fatalf("expected conflict, got %#v", actions[0])
+    }
+
+    overwriteActions, _, err := planNativeMaterialization(out, selected, true)
+    if err != nil { t.Fatal(err) }
+    if overwriteActions[0].PlannedAction != "overwrite" {
+        t.Fatalf("expected overwrite, got %#v", overwriteActions[0])
+    }
+}
+
+func TestNativeMaterializeManifestMatchesPythonFormat(t *testing.T) {
+    revision := "abc123"
+    actions := []materializeAction{{
+        SourcePath: "<current-executable>",
+        DestinationPath: "bin/acr-toolbox",
+        Role: "native_toolbox",
+        SourceSHA256: "deadbeef",
+        DestinationState: "missing",
+        PlannedAction: "create",
+    }}
+    manifest := nativeMaterializeManifest(&revision, actions)
+    if manifest.Format != materializeManifestFormat {
+        t.Fatalf("unexpected manifest format: %s", manifest.Format)
+    }
+    if manifest.ImplementationMode != "native" {
+        t.Fatalf("unexpected mode: %s", manifest.ImplementationMode)
+    }
+    if len(manifest.Files) != 1 || manifest.Files[0].Path != "bin/acr-toolbox" {
+        t.Fatalf("unexpected manifest files: %#v", manifest.Files)
+    }
+}
