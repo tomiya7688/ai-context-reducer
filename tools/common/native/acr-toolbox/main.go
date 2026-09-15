@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|structure-index|context-budget|hotspot-report|materialize|language-env|env> ...")
+    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|structure-index|context-budget|hotspot-report|acceptance-extractor|exploration-stop-check|materialize|language-env|env> ...")
 }
 
 func main() {
@@ -43,6 +43,10 @@ func main() {
         code = cmdContextBudget(os.Args[2:])
     case "hotspot-report":
         code = cmdHotspotReport(os.Args[2:])
+    case "acceptance-extractor":
+        code = cmdAcceptanceExtractor(os.Args[2:])
+    case "exploration-stop-check":
+        code = cmdExplorationStopCheck(os.Args[2:])
     case "materialize":
         code = cmdMaterialize(os.Args[2:])
     case "language-env":
