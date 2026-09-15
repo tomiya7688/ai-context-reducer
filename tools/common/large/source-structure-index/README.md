@@ -13,6 +13,7 @@
 - fan-in / fan-out
 - cycle group detection
 - changed fileからのdependency-based affected scope
+- 既存SCIP indexの再利用
 
 SCIPやTree-sitterそのもの、Nx/Pantsのbuild graphそのものを再実装するものではありません。既存analyzer / IDE / indexer / build graphが利用可能なら、その結果を再利用することを優先します。
 
@@ -25,7 +26,7 @@ SCIPやTree-sitterそのもの、Nx/Pantsのbuild graphそのものを再実装�
 
 片方でbuildしたindexを、もう片方の `query` / `expand` / `affected` で読める契約です。
 
-Python版は追加のinput adapterとして `ast-grep outline` JSONを直接受けられます。これはindex format自体を変えるものではなく、既存external analyzerの結果を共通IRへ入れるためのboundary adapterです。
+Python版は追加input adapterとして `ast-grep outline` JSONとSCIP JSONを受けられます。これらはindex format自体を変えるものではなく、既存external analyzer/indexerの結果を共通IRへ入れるためのboundary adapterです。
 
 ## Build
 
@@ -53,6 +54,8 @@ python tools/common/large/source-structure-index/script/source_structure_index.p
   --output .acr/source-structure-index.json
 ```
 
+### ast-grep outline
+
 既に `ast-grep` が利用可能な環境では、そのoutlineを再利用できます。追加installは行いません。
 
 ```sh
@@ -65,7 +68,37 @@ python tools/common/large/source-structure-index/script/source_structure_index.p
 
 adapterはoutlineのnested `members` をflattenしつつ、`owner_qualified_name` を共通IRの `owns` edgeへ変換します。そのため class / method等のownershipを失わずbounded expansionできます。line numberは共通IRでは1-basedです。signatureはbounded metadataとして保持します。
 
-native版:
+### SCIP
+
+既に `index.scip` と公式 `scip` CLIがある場合は、その既存semantic indexを再利用できます。toolは `scip print --json` を内部boundaryとして使い、JSON全文をagentへ出しません。
+
+```sh
+python tools/common/large/source-structure-index/script/source_structure_index.py build \
+  --scip index.scip \
+  --output .acr/source-structure-index.json
+```
+
+`scip` がPATHに無い場合は自動installせず `status=external_backend_unavailable` を返します。
+
+既に `scip print --json` の結果がfileにある場合はCLI自体も不要です。
+
+```sh
+python tools/common/large/source-structure-index/script/source_structure_index.py build \
+  --scip-json /tmp/index.scip.json \
+  --output .acr/source-structure-index.json
+```
+
+SCIP adapterは次をrouting用IRへ変換します。
+
+- `Document.symbols` -> symbol nodes
+- definition occurrence -> 1-based line / end line
+- `enclosing_symbol` -> symbol ownership
+- signature documentation -> bounded signature metadata
+- 別documentで定義されたsymbolへのoccurrence / relationship -> document-level `depends_on`
+
+SCIP documentごとに `module:scip:<relative_path>` routing unitを作るため、既存package graphが無い言語でも `affected` のreverse dependency traversalへ利用できます。
+
+### Native build
 
 ```sh
 acr-toolbox structure-index build \
@@ -195,11 +228,14 @@ go test ./...
 変更理由から最初に読むfileを絞ります。
 
 - Python CLI / command contract: `script/source_structure_index.py`
-- Python JSON file I/O: `script/messenger.py`
+- Python JSON file I/O / external SCIP process boundary: `script/messenger.py`
 - external outline input adaptation: `script/outline_adapter.py`
+- SCIP print JSON adaptation: `script/scip_adapter.py`
 - IR normalization / query / graph expansion / cycle detection: `script/processing.py`
 - affected-scope logic: `script/impact.py`
 - outline adapter validation: `tests/test_outline_adapter.py`
+- SCIP adapter validation: `tests/test_scip_adapter.py`
+- external SCIP availability validation: `tests/test_scip_messenger.py`
 - affected-scope validation: `tests/test_impact.py`
 - Python deterministic contract validation: `tests/test_processing.py`
 - Python end-to-end CLI smoke: `tests/test_cli.py`
