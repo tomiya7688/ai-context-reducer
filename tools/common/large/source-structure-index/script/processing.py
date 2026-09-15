@@ -23,6 +23,15 @@ def _python_module(path: str) -> str | None:
     return '.'.join(parts) if parts else None
 
 
+def _go_package(module: str, path: str) -> str | None:
+    if not module or not path.endswith('.go'):
+        return None
+    parent = Path(path).parent.as_posix()
+    if parent in ('', '.'):
+        return module
+    return module.rstrip('/') + '/' + parent
+
+
 def _add_node(nodes: dict[str, dict], node: dict) -> None:
     node_id = node['id']
     current = nodes.get(node_id)
@@ -97,6 +106,19 @@ def build_index(symbol_payloads: list[dict], graph_payloads: list[dict], root: P
         for node in payload.get('nodes', []):
             if isinstance(node, dict) and node.get('id') and node.get('kind'):
                 _add_node(nodes, dict(node))
+
+        go_module = str(payload.get('module') or '')
+        if go_module:
+            for node in list(nodes.values()):
+                if node.get('kind') != 'file' or not node.get('path'):
+                    continue
+                package_name = _go_package(go_module, str(node['path']))
+                if not package_name:
+                    continue
+                package_id = f'module:{package_name}'
+                _add_node(nodes, {'id': package_id, 'kind': 'module', 'name': package_name})
+                edge = {'from': package_id, 'to': node['id'], 'kind': 'contains_file'}
+                edges[_edge_key(edge)] = edge
 
         for raw_edge in payload.get('edges', []):
             if not isinstance(raw_edge, dict) or not raw_edge.get('from') or not raw_edge.get('to'):
