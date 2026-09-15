@@ -20,7 +20,14 @@ def estimate_accurate(path: Path):
     return max(1, len(text) // 4), size
 
 
-def summarize(rows: list[tuple[int, int, str]], top: int, mode: str, scanned: int, truncated: bool) -> dict[str, object]:
+def summarize(
+    rows: list[tuple[int, int, str]],
+    top: int,
+    mode: str,
+    scanned: int,
+    truncated: bool,
+    estimation_error_count: int = 0,
+) -> dict[str, object]:
     rows.sort(reverse=True)
     total = sum(row[0] for row in rows)
     estimator = {
@@ -32,11 +39,12 @@ def summarize(rows: list[tuple[int, int, str]], top: int, mode: str, scanned: in
     }
     return {
         'tool': 'context-budget',
-        'status': 'ok',
+        'status': 'ok_with_warnings' if estimation_error_count else 'ok',
         'mode': mode,
         'token_estimate': estimator,
         'estimated_total_tokens_if_all_candidates_read': total,
         'scanned_text_files': scanned,
+        'estimation_error_count': estimation_error_count,
         'scan_truncated': truncated,
         'largest_context_candidates': [
             {
