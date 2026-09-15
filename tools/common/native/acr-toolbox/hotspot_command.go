@@ -1,6 +1,7 @@
 package main
 
 import (
+    "errors"
     "flag"
     "io"
     "io/fs"
@@ -14,6 +15,53 @@ type hotspotRow struct {
     Path  string `json:"path"`
     Bytes int64  `json:"bytes"`
     Depth int    `json:"depth"`
+}
+
+var errStopHotspotScan = errors.New("hotspot scan limit reached")
+
+func scanHotspots(root string, maxFiles int) ([]hotspotRow, int, int, bool, error) {
+    rows := []hotspotRow{}
+    statErrors := 0
+    walkErrors := 0
+    truncated := false
+
+    walkErr := filepath.WalkDir(root, func(path string, entry fs.DirEntry, visitErr error) error {
+        if visitErr != nil {
+            walkErrors++
+            return nil
+        }
+        if entry.IsDir() {
+            if path != root && ignoreDirs[strings.ToLower(entry.Name())] {
+                return filepath.SkipDir
+            }
+            return nil
+        }
+        info, infoErr := entry.Info()
+        if infoErr != nil {
+            statErrors++
+            return nil
+        }
+        rel, relErr := filepath.Rel(root, path)
+        if relErr != nil {
+            walkErrors++
+            return nil
+        }
+        slash := filepath.ToSlash(rel)
+        rows = append(rows, hotspotRow{
+            Path: slash,
+            Bytes: info.Size(),
+            Depth: strings.Count(slash, "/") + 1,
+        })
+        if maxFiles > 0 && len(rows) >= maxFiles {
+            truncated = true
+            return errStopHotspotScan
+        }
+        return nil
+    })
+    if walkErr != nil && !errors.Is(walkErr, errStopHotspotScan) {
+        return nil, statErrors, walkErrors, truncated, walkErr
+    }
+    return rows, statErrors, walkErrors, truncated, nil
 }
 
 func cmdHotspotReport(args []string) int {
@@ -49,52 +97,9 @@ func cmdHotspotReport(args []string) int {
         return 2
     }
 
-    rows := []hotspotRow{}
-    statErrors := 0
-    walkErrors := 0
-    truncated := false
-    stopWalk := false
-    walkErr := filepath.WalkDir(rootAbs, func(path string, entry fs.DirEntry, visitErr error) error {
-        if stopWalk {
-            if entry != nil && entry.IsDir() {
-                return filepath.SkipDir
-            }
-            return nil
-        }
-        if visitErr != nil {
-            walkErrors++
-            return nil
-        }
-        if entry.IsDir() {
-            if path != rootAbs && ignoreDirs[strings.ToLower(entry.Name())] {
-                return filepath.SkipDir
-            }
-            return nil
-        }
-        info, infoErr := entry.Info()
-        if infoErr != nil {
-            statErrors++
-            return nil
-        }
-        rel, relErr := filepath.Rel(rootAbs, path)
-        if relErr != nil {
-            walkErrors++
-            return nil
-        }
-        slash := filepath.ToSlash(rel)
-        rows = append(rows, hotspotRow{
-            Path: slash,
-            Bytes: info.Size(),
-            Depth: strings.Count(slash, "/") + 1,
-        })
-        if *maxFiles > 0 && len(rows) >= *maxFiles {
-            truncated = true
-            stopWalk = true
-        }
-        return nil
-    })
-    if walkErr != nil {
-        emitStructureJSON(map[string]any{"tool": "hotspot-report", "status": "input_read_failed", "root": rootAbs, "error": walkErr.Error()})
+    rows, statErrors, walkErrors, truncated, err := scanHotspots(rootAbs, *maxFiles)
+    if err != nil {
+        emitStructureJSON(map[string]any{"tool": "hotspot-report", "status": "input_read_failed", "root": rootAbs, "error": err.Error()})
         return 2
     }
 
