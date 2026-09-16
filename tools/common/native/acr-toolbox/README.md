@@ -39,6 +39,7 @@ Common tools の portable Go implementation です。
 | source-structure build / query / expand | `structure_index_command.go` |
 | source-structure affected scope | `structure_index_affected.go` |
 | existing SCIP index adaptation / external SCIP boundary | `structure_scip_adapter.go` |
+| existing Universal Ctags adaptation / external Ctags boundary | `structure_ctags_adapter.go` |
 | source-structure subcommand routing | `structure_index_router.go` |
 | materialize CLI / apply orchestration | `materialize_command.go` |
 | materialize selection / hash / plan / manifest model | `materialize_plan.go` |
@@ -162,6 +163,19 @@ acr-toolbox structure-index build --scip-json index.scip.json --output index.jso
 `scip` がPATHに無ければ自動installせず `external_backend_unavailable` を返します。external commandの失敗出力もboundedにして、巨大ログをagent contextへ流しません。
 
 SCIP documentを `module:scip:<relative_path>` routing unitへ変換し、cross-document reference / relationshipを `depends_on`、nested symbolを `owns` として保持します。そのため変換後は通常の `query / expand / affected` を再利用できます。
+
+### Existing Universal Ctags reuse
+
+既存Universal CtagsのJSON Lines出力、またはPATH上のJSON対応Universal Ctagsを再利用できます。
+
+```text
+acr-toolbox structure-index build --ctags-json tags.jsonl --root . --output index.json
+acr-toolbox structure-index build --ctags-source . --root . --output index.json
+```
+
+`--ctags-source` は `ctags --list-output-formats` でJSON対応を確認し、未導入またはJSON非対応なら自動installせず `external_backend_unavailable` を返します。full Ctags JSONをstdoutへ返さず、file / symbol / definition line / kind / scope ownershipを共通IRへ変換します。
+
+Ctagsはsymbol indexでありcross-file dependency graphを必ず持つわけではないため、`affected` を高精度に使う場合は既存dependency/package graphやSCIP入力と併用します。SCIPとCtagsは同じ `build` invocationへ混在できます。
 
 `affected` は内部dependency closureを出力上限で打ち切りません。まず全closureを計算し、stdoutだけをboundedにします。index truncation / changed-file mapping failure / returned-scope truncationがある場合は `impact_uncertain=true` とbroader validation fallbackを返します。
 
