@@ -167,7 +167,12 @@ def run_scc(root: Path) -> tuple[dict[str, object] | None, str | None, str]:
 
 def build_stats(root: Path, max_file_bytes: int, backend: str = 'portable') -> dict[str, object]:
     max_file_bytes = max(0, max_file_bytes)
-    if backend in {'auto', 'scc'} and max_file_bytes == 0:
+    scc_available = shutil.which('scc') is not None
+    should_try_scc = (
+        max_file_bytes == 0
+        and (backend == 'scc' or (backend == 'auto' and scc_available))
+    )
+    if should_try_scc:
         scc_stats, error, backend_status = run_scc(root)
         if scc_stats is not None:
             return {
@@ -192,8 +197,16 @@ def build_stats(root: Path, max_file_bytes: int, backend: str = 'portable') -> d
             }
         portable = build_portable_stats(root, max_file_bytes)
         portable['status'] = 'partial' if portable['status'] == 'partial' else 'ok_with_backend_fallback'
-        portable['backend_fallback'] = {'backend': 'scc', 'status': backend_status, 'error': error}
+        portable['backend_fallback'] = {'backend': 'scc', 'status': 'failed', 'error': error}
         return portable
+    if backend == 'scc':
+        return {
+            'tool': TOOL,
+            'status': 'external_backend_unavailable' if not scc_available else 'backend_query_unsupported',
+            'project_root': str(root),
+            'backend': 'scc',
+            'error': 'scc executable was not found on PATH' if not scc_available else 'max_file_bytes is not supported by the scc backend',
+        }
     return build_portable_stats(root, max_file_bytes)
 
 
@@ -223,7 +236,9 @@ def main() -> int:
 
     result = build_stats(root, args.max_file_bytes, args.backend)
     emit(result)
-    return 2 if result.get('status') in {'external_backend_unavailable', 'external_backend_failed'} else 0
+    return 2 if result.get('status') in {
+        'external_backend_unavailable', 'external_backend_failed', 'backend_query_unsupported'
+    } else 0
 
 
 if __name__ == '__main__':
