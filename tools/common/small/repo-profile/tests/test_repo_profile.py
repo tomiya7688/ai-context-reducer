@@ -13,16 +13,51 @@ def test_build_profile_separates_language_and_other_files(tmp_path):
     result = module.build_profile(tmp_path, 0)
     assert result['tool'] == 'repo-profile'
     assert result['status'] == 'ok'
+    assert result['backend'] == 'portable'
     assert result['files_scanned'] == 2
     assert result['language_file_counts'] == {'Python': 1}
     assert result['recognized_source_files_scanned'] == 1
     assert result['non_language_files_scanned'] == 1
     assert result['scan_truncated'] is False
+    assert result['language_metrics'][0]['lines'] is None
 
 
-def test_build_profile_marks_truncated_size_unknown(tmp_path):
+def test_build_profile_marks_only_real_truncation_unknown(tmp_path):
     (tmp_path / 'a.py').write_text('', encoding='utf-8')
+    exact = module.build_profile(tmp_path, 1)
+    assert exact['scan_truncated'] is False
+    assert exact['project_size_class'] == 'small'
+
     (tmp_path / 'b.py').write_text('', encoding='utf-8')
-    result = module.build_profile(tmp_path, 1)
-    assert result['scan_truncated'] is True
-    assert result['project_size_class'] == 'large_or_unknown_due_to_scan_limit'
+    truncated = module.build_profile(tmp_path, 1)
+    assert truncated['scan_truncated'] is True
+    assert truncated['project_size_class'] == 'large_or_unknown_due_to_scan_limit'
+
+
+def test_parse_scc_payload_keeps_compact_language_metrics():
+    counts, metrics = module.parse_scc_payload([
+        {
+            'Name': 'Go',
+            'Count': 3,
+            'Lines': 120,
+            'Code': 90,
+            'Comment': 20,
+            'Blank': 10,
+            'Complexity': 7,
+            'Files': [{'Location': 'should-not-be-forwarded.go'}],
+        },
+        {
+            'Name': 'Python',
+            'Count': 1,
+            'Lines': 30,
+            'Code': 20,
+            'Comment': 5,
+            'Blank': 5,
+            'Complexity': 2,
+        },
+    ])
+    assert counts == {'Go': 3, 'Python': 1}
+    assert metrics == [
+        {'language': 'Go', 'files': 3, 'lines': 120, 'code': 90, 'comment': 20, 'blank': 10, 'complexity': 7},
+        {'language': 'Python', 'files': 1, 'lines': 30, 'code': 20, 'comment': 5, 'blank': 5, 'complexity': 2},
+    ]
