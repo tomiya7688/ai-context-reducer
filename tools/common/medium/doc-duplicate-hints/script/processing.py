@@ -11,9 +11,10 @@ def normalize(line: str) -> str:
 
 
 def collect_duplicates(documents: list[tuple[str, list[str]]], min_chars: int):
+    min_chars = max(0, min_chars)
     seen = defaultdict(list)
     representative = {}
-    for path, lines in documents:
+    for path, lines in sorted(documents, key=lambda item: item[0]):
         for number, line in enumerate(lines, 1):
             norm = normalize(line)
             if len(norm) < min_chars:
@@ -26,8 +27,10 @@ def collect_duplicates(documents: list[tuple[str, list[str]]], min_chars: int):
     for key, occurrences in seen.items():
         if len({item['path'] for item in occurrences}) < 2:
             continue
+        occurrences.sort(key=lambda item: (item['path'], item['line']))
         groups.append({
             'repeated_text': representative[key][:180],
             'occurrences': occurrences,
         })
+    groups.sort(key=lambda group: (-len(group['occurrences']), group['repeated_text'].lower()))
     return groups
