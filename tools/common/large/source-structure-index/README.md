@@ -30,6 +30,8 @@ existing build / semantic index
 - `ast-grep outline --json=compact` JSON（Python adapter）
 - `scip print --json` JSON（Python / native）
 - existing `index.scip` + already-installed `scip` CLI（Python / native）
+- Universal Ctags JSON Lines（Python / native）
+- source path + already-installed Universal Ctags JSON backend（Python / native）
 
 外部runtime / package / CLIは自動installしません。
 
@@ -107,6 +109,52 @@ SCIP adapterはroutingに必要な次を抽出します。
 
 各SCIP documentを `module:scip:<relative_path>` routing unitとして扱うため、package graphが無い言語でも `affected` に利用できます。native版もnested symbolを明示node + `owns` edgeへ変換し、generic builderで平坦化しません。
 
+### Universal Ctags
+
+Universal Ctagsを既に利用できる場合は、そのmulti-language symbol indexを再利用します。Ctags parserそのものはrepository内へ再実装しません。
+
+Source pathから直接build:
+
+```sh
+python tools/common/large/source-structure-index/script/source_structure_index.py build \
+  --ctags-source . \
+  --root . \
+  --output .acr/source-structure-index.json
+
+acr-toolbox structure-index build \
+  --ctags-source . \
+  --root . \
+  --output .acr/source-structure-index.json
+```
+
+既にUniversal Ctags JSON Lines出力を持つ場合はCtags CLIも不要です。
+
+```sh
+ctags --output-format=json --fields=+nSlesp --recurse=yes -o - . > /tmp/tags.jsonl
+
+python tools/common/large/source-structure-index/script/source_structure_index.py build \
+  --ctags-json /tmp/tags.jsonl \
+  --root . \
+  --output .acr/source-structure-index.json
+
+acr-toolbox structure-index build \
+  --ctags-json /tmp/tags.jsonl \
+  --root . \
+  --output .acr/source-structure-index.json
+```
+
+`--ctags-source` はPATH上の既存 `ctags` を使い、`--list-output-formats` でJSON対応を確認します。Ctagsが無い、またはJSON対応Universal Ctagsでない場合は自動installせず `external_backend_unavailable` を返します。
+
+Ctags JSON Linesからroutingに必要な次だけを共通IRへ変換します。
+
+- file / symbol
+- definition line / end line（backendが返す場合）
+- language / kind
+- scopeから得られるnested ownership
+- bounded signature metadata（Python adapter）
+
+full Ctags outputをagent stdoutへ流さず、build後は通常の `query / expand` を使います。Ctagsはsymbol indexでありcross-file dependency graphを必ず提供するものではないため、`affected` を高精度に使う場合は既存package/dependency graphやSCIP等のdependency inputと併用します。
+
 `build` はfull indexをstdoutへ出しません。stdoutはstatus / counts / truncation / compact input metadataだけです。
 
 ## Query
@@ -171,9 +219,10 @@ false negative回避を削減率より優先します。
 Python:
 
 - CLI / command contract: `script/source_structure_index.py`
-- JSON I/O / external SCIP process: `script/messenger.py`
+- JSON I/O / external SCIP/Ctags process: `script/messenger.py`
 - ast-grep outline adaptation: `script/outline_adapter.py`
 - SCIP JSON adaptation: `script/scip_adapter.py`
+- Universal Ctags JSON adaptation: `script/ctags_adapter.py`
 - common IR / query / expansion / cycles: `script/processing.py`
 - affected scope: `script/impact.py`
 
@@ -182,14 +231,17 @@ Native:
 - build / query / expand: `tools/common/native/acr-toolbox/structure_index_command.go`
 - affected scope: `structure_index_affected.go`
 - SCIP adaptation / external process: `structure_scip_adapter.go`
+- Universal Ctags adaptation / external process: `structure_ctags_adapter.go`
 - subcommand routing: `structure_index_router.go`
 
 Tests:
 
 - Python adapter/processing/CLI: `tests/`
+- Python Ctags adapter: `tests/test_ctags_adapter.py`
 - native common contract: `structure_index_command_test.go`
 - native affected: `structure_affected_command_test.go`
 - native SCIP: `structure_scip_adapter_test.go`
+- native Ctags: `structure_ctags_adapter_test.go`
 
 この分割は形式上のlayeringではなく、Context Reducer自身の Task Routing / Responsibility Map / Exploration Stop / Targeted Validation をtool開発へ適用するためです。
 
