@@ -1,14 +1,29 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 DOC_EXTS = {'.md', '.txt', '.rst'}
+IGNORE_DIRS = {
+    '.git', '.hg', '.svn', '.venv', 'venv', 'node_modules', '__pycache__',
+    'bin', 'obj', 'build', 'dist', '.godot', '.idea', '.vs', 'vendor', 'generated',
+}
 
 
-def iter_documents(root: Path):
-    for path in root.rglob('*'):
-        if path.is_file() and path.suffix.lower() in DOC_EXTS:
-            yield path
+def iter_documents(root: Path, scan_stats: dict[str, int] | None = None):
+    stats = scan_stats if scan_stats is not None else {'walk_error_count': 0}
+    stats.setdefault('walk_error_count', 0)
+
+    def on_walk_error(_error: OSError) -> None:
+        stats['walk_error_count'] += 1
+
+    for current, dirs, files in os.walk(root, onerror=on_walk_error):
+        dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE_DIRS)
+        current_path = Path(current)
+        for name in sorted(files):
+            path = current_path / name
+            if path.suffix.lower() in DOC_EXTS:
+                yield path
 
 
 def read_lines(path: Path) -> list[str] | None:
