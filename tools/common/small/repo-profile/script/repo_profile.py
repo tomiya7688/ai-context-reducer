@@ -128,7 +128,12 @@ def build_profile(
     language_metrics = portable_metrics
     backend_fallback: dict[str, object] | None = None
 
-    if backend in {'auto', 'scc'} and max(0, max_files) == 0:
+    scc_available = shutil.which('scc') is not None
+    should_try_scc = (
+        max(0, max_files) == 0
+        and (backend == 'scc' or (backend == 'auto' and scc_available))
+    )
+    if should_try_scc:
         counts, metrics, error = run_scc(root)
         if error is None and counts is not None and metrics is not None:
             selected_backend = 'scc'
@@ -137,13 +142,21 @@ def build_profile(
         elif backend == 'scc':
             return {
                 'tool': TOOL,
-                'status': 'external_backend_unavailable' if shutil.which('scc') is None else 'external_backend_failed',
+                'status': 'external_backend_unavailable' if not scc_available else 'external_backend_failed',
                 'project_root': str(root),
                 'backend': 'scc',
                 'error': error,
             }
         else:
-            backend_fallback = {'backend': 'scc', 'status': 'unavailable_or_failed', 'error': error}
+            backend_fallback = {'backend': 'scc', 'status': 'failed', 'error': error}
+    elif backend == 'scc':
+        return {
+            'tool': TOOL,
+            'status': 'external_backend_unavailable' if not scc_available else 'backend_query_unsupported',
+            'project_root': str(root),
+            'backend': 'scc',
+            'error': 'scc executable was not found on PATH' if not scc_available else 'max_files is not supported by the scc backend',
+        }
 
     recognized = sum(language_counts.values())
     non_language_files = max(0, len(files) - recognized)
@@ -211,7 +224,9 @@ def main() -> int:
 
     result = build_profile(root, args.max_files, args.backend)
     emit(result)
-    return 0 if result.get('status') not in {'external_backend_unavailable', 'external_backend_failed'} else 2
+    return 0 if result.get('status') not in {
+        'external_backend_unavailable', 'external_backend_failed', 'backend_query_unsupported'
+    } else 2
 
 
 if __name__ == '__main__':
