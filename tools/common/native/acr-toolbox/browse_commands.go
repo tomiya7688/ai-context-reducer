@@ -9,69 +9,6 @@ import (
     "strings"
 )
 
-func cmdSearch(args []string) int {
-    if len(args) < 1 {
-        fmt.Fprintln(os.Stderr, "usage: acr-toolbox search PATTERN [ROOT]")
-        return 2
-    }
-    pattern := strings.ToLower(args[0])
-    root := "."
-    if len(args) > 1 {
-        root = args[1]
-    }
-    files, _ := walk(root)
-    count := 0
-    for _, f := range files {
-        if f.Size > 2*1024*1024 {
-            continue
-        }
-        h, err := os.Open(f.Path)
-        if err != nil {
-            continue
-        }
-        s := bufio.NewScanner(h)
-        line := 0
-        for s.Scan() {
-            line++
-            if strings.Contains(strings.ToLower(s.Text()), pattern) {
-                rel, _ := filepath.Rel(root, f.Path)
-                fmt.Printf("%s:%d:%s\n", filepath.ToSlash(rel), line, s.Text())
-                count++
-                if count >= 200 {
-                    _ = h.Close()
-                    return 0
-                }
-            }
-        }
-        _ = h.Close()
-    }
-    return 0
-}
-
-func cmdFind(args []string) int {
-    query := ""
-    root := "."
-    if len(args) > 0 {
-        query = strings.ToLower(args[0])
-    }
-    if len(args) > 1 {
-        root = args[1]
-    }
-    files, _ := walk(root)
-    n := 0
-    for _, f := range files {
-        rel, _ := filepath.Rel(root, f.Path)
-        if query == "" || strings.Contains(strings.ToLower(rel), query) {
-            fmt.Println(filepath.ToSlash(rel))
-            n++
-            if n >= 500 {
-                break
-            }
-        }
-    }
-    return 0
-}
-
 func cmdTree(args []string) int {
     root := "."
     const maxDepth = 3
