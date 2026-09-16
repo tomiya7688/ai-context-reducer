@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|acceptance-extractor|exploration-stop-check|materialize|language-env|env> ...")
+    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|acceptance-extractor|exploration-stop-check|materialize|language-env|env> ...")
 }
 
 func main() {
@@ -51,6 +51,8 @@ func main() {
         code = cmdChangeRouter(os.Args[2:])
     case "validation-plan":
         code = cmdValidationPlan(os.Args[2:])
+    case "responsibility-candidates":
+        code = cmdResponsibilityCandidates(os.Args[2:])
     case "acceptance-extractor":
         code = cmdAcceptanceExtractor(os.Args[2:])
     case "exploration-stop-check":
