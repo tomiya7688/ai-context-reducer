@@ -21,9 +21,15 @@ Common tools の portable Go implementation です。
 | change -> test/doc routing | `change_router_command.go` |
 | file -> validation-kind routing | `validation_plan_command.go` |
 | Responsibility Map starter Markdown | `responsibility_candidates_command.go` |
+| policy document discovery / CLI | `policy_index_command.go` |
+| policy rule detection | `policy_index_detection.go` |
+| duplicate documentation discovery / CLI | `doc_duplicate_command.go` |
+| duplicate documentation normalization / detection | `doc_duplicate_detection.go` |
 | context analysis / generation validation | `context_analysis_commands_test.go` / `context_generation_commands_test.go` |
 | change/validation routing validation | `change_validation_commands_test.go` |
 | responsibility candidate validation | `responsibility_candidates_command_test.go` |
+| policy validation | `policy_index_command_test.go` |
+| duplicate documentation validation | `doc_duplicate_command_test.go` |
 | acceptance section extraction | `acceptance_command.go` |
 | exploration-stop heuristic | `exploration_stop_command.go` |
 | shared task-context term matching | `task_context_terms.go` |
@@ -101,6 +107,19 @@ acr-toolbox responsibility-candidates --max 120 --max-scan-files 50000 .
 Responsibility Map starterそのものが成果物なのでMarkdown-onlyです。内部code-file scanは既定unlimited、`--max` は返却table rowsだけをboundedにします。`--max-scan-files` は明示的なperformance/safety capです。
 
 size metadata / filesystem walk failureはMarkdown commentで明示し、read errorをsize=0へ偽装しません。responsibility本文そのものは推測せずTODOのまま残します。
+
+## policy-index / doc-duplicate-hints
+
+```text
+acr-toolbox policy-index --max-findings 120 AI_CONTEXT.md docs
+acr-toolbox doc-duplicate-hints --max-groups 80 --max-occurrences-per-group 10 .
+```
+
+`policy-index` はpolicy全文をagentへ入れず、path / line / heading / rule_textへ圧縮します。dependency/generated docsを除外し、英語rule語はword boundaryで判定します。`--max-findings 0` はunlimitedで、内部finding検出を返却上限で打ち切りません。
+
+`doc-duplicate-hints` はdocumentationを内部で全scanしてからduplicate group / occurrenceだけをboundedにします。重複本文はgroupごとに1回だけ返し、`occurrence_count_total` と `occurrences_truncated` で省略を明示します。`--max-groups 0` と `--max-occurrences-per-group 0` はunlimitedです。
+
+両commandともmissing/read/walk errorを成功した0件と区別し、Python版とは共有コードを持たずJSON contractとtargeted testで意味を合わせます。
 
 ## acceptance-extractor / exploration-stop-check
 
