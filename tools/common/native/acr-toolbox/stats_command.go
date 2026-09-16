@@ -173,11 +173,15 @@ func parseSCCStats(data []byte) (map[string]statsLanguageMetrics, int, int, erro
         if raw.Name == "" {
             continue
         }
+        name := raw.Name
+        if name == "C#" {
+            name = "CSharp"
+        }
         code := raw.Code
         comment := raw.Comment
         blank := raw.Blank
         complexity := raw.Complexity
-        languages[raw.Name] = statsLanguageMetrics{
+        languages[name] = statsLanguageMetrics{
             FileCount: raw.Count, LineCount: raw.Lines, ByteCount: raw.Bytes,
             CodeCount: &code, CommentCount: &comment, BlankCount: &blank, Complexity: &complexity,
         }
@@ -221,6 +225,31 @@ func runSCCStats(root string) (map[string]statsLanguageMetrics, int, int, string
         return nil, 0, 0, "failed", boundedStatsError(parseErr.Error())
     }
     return languages, files, lines, "ok", ""
+}
+
+func emitPortableStats(root string, limit int64, portable portableStatsResult, status string, fallback map[string]any) {
+    payload := map[string]any{
+        "tool": "repo-stats", "status": status, "project_root": root, "backend": "portable",
+        "recognized_files_seen": portable.RecognizedFilesSeen,
+        "analyzed_file_count": portable.AnalyzedFileCount,
+        "analyzed_line_count": portable.AnalyzedLineCount,
+        "oversized_file_count": portable.OversizedFileCount,
+        "read_error_count": portable.ReadErrorCount,
+        "walk_error_count": portable.WalkErrorCount,
+        "binary_like_file_count": portable.BinaryLikeFileCount,
+        "max_file_bytes": limit,
+        "languages": portable.Languages,
+    }
+    if len(portable.ReadErrorPaths) > 0 {
+        payload["read_error_paths"] = portable.ReadErrorPaths
+    }
+    if len(portable.WalkErrorPaths) > 0 {
+        payload["walk_error_paths"] = portable.WalkErrorPaths
+    }
+    if fallback != nil {
+        payload["backend_fallback"] = fallback
+    }
+    emitStatsJSON(payload)
 }
 
 func cmdStats(args []string) int {
@@ -270,7 +299,10 @@ func cmdStats(args []string) int {
         return 2
     }
 
-    if (*backend == "auto" || *backend == "scc") && limit == 0 {
+    _, lookupErr := exec.LookPath("scc")
+    sccAvailable := lookupErr == nil
+    shouldTrySCC := limit == 0 && (*backend == "scc" || (*backend == "auto" && sccAvailable))
+    if shouldTrySCC {
         languages, files, lines, backendStatus, backendError := runSCCStats(absoluteRoot)
         if backendStatus == "ok" {
             emitStatsJSON(map[string]any{
@@ -292,7 +324,6 @@ func cmdStats(args []string) int {
             })
             return 2
         }
-
         portable, portableErr := buildPortableStats(absoluteRoot, limit)
         if portableErr != nil {
             emitStatsJSON(map[string]any{"tool": "repo-stats", "status": "stats_failed", "project_root": absoluteRoot, "backend": "portable", "error": boundedStatsError(portableErr.Error())})
@@ -302,27 +333,22 @@ func cmdStats(args []string) int {
         if portable.ReadErrorCount+portable.WalkErrorCount > 0 {
             status = "partial"
         }
-        payload := map[string]any{
-            "tool": "repo-stats", "status": status, "project_root": absoluteRoot, "backend": "portable",
-            "recognized_files_seen": portable.RecognizedFilesSeen,
-            "analyzed_file_count": portable.AnalyzedFileCount,
-            "analyzed_line_count": portable.AnalyzedLineCount,
-            "oversized_file_count": portable.OversizedFileCount,
-            "read_error_count": portable.ReadErrorCount,
-            "walk_error_count": portable.WalkErrorCount,
-            "binary_like_file_count": portable.BinaryLikeFileCount,
-            "max_file_bytes": limit,
-            "languages": portable.Languages,
-            "backend_fallback": map[string]any{"backend": "scc", "status": backendStatus, "error": backendError},
-        }
-        if len(portable.ReadErrorPaths) > 0 {
-            payload["read_error_paths"] = portable.ReadErrorPaths
-        }
-        if len(portable.WalkErrorPaths) > 0 {
-            payload["walk_error_paths"] = portable.WalkErrorPaths
-        }
-        emitStatsJSON(payload)
+        emitPortableStats(absoluteRoot, limit, portable, status, map[string]any{"backend": "scc", "status": "failed", "error": backendError})
         return 0
+    }
+
+    if *backend == "scc" {
+        status := "external_backend_unavailable"
+        errorText := "scc executable was not found on PATH"
+        if sccAvailable {
+            status = "backend_query_unsupported"
+            errorText = "max_file_bytes is not supported by the scc backend"
+        }
+        emitStatsJSON(map[string]any{
+            "tool": "repo-stats", "status": status, "project_root": absoluteRoot,
+            "backend": "scc", "error": errorText,
+        })
+        return 2
     }
 
     portable, portableErr := buildPortableStats(absoluteRoot, limit)
@@ -334,24 +360,6 @@ func cmdStats(args []string) int {
     if portable.ReadErrorCount+portable.WalkErrorCount > 0 {
         status = "partial"
     }
-    payload := map[string]any{
-        "tool": "repo-stats", "status": status, "project_root": absoluteRoot, "backend": "portable",
-        "recognized_files_seen": portable.RecognizedFilesSeen,
-        "analyzed_file_count": portable.AnalyzedFileCount,
-        "analyzed_line_count": portable.AnalyzedLineCount,
-        "oversized_file_count": portable.OversizedFileCount,
-        "read_error_count": portable.ReadErrorCount,
-        "walk_error_count": portable.WalkErrorCount,
-        "binary_like_file_count": portable.BinaryLikeFileCount,
-        "max_file_bytes": limit,
-        "languages": portable.Languages,
-    }
-    if len(portable.ReadErrorPaths) > 0 {
-        payload["read_error_paths"] = portable.ReadErrorPaths
-    }
-    if len(portable.WalkErrorPaths) > 0 {
-        payload["walk_error_paths"] = portable.WalkErrorPaths
-    }
-    emitStatsJSON(payload)
+    emitPortableStats(absoluteRoot, limit, portable, status, nil)
     return 0
 }
