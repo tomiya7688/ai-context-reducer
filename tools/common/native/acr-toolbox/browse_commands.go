@@ -5,7 +5,6 @@ import (
     "fmt"
     "os"
     "path/filepath"
-    "sort"
     "strings"
 )
 
@@ -34,42 +33,6 @@ func cmdTree(args []string) int {
             }
         }
     }
-    return 0
-}
-
-func cmdStats(args []string) int {
-    root := "."
-    if len(args) > 0 {
-        root = args[0]
-    }
-    files, _ := walk(root)
-    counts := map[string]int{}
-    lines := map[string]int{}
-    for _, f := range files {
-        lang := languageByExt[strings.ToLower(filepath.Ext(f.Path))]
-        if lang == "" {
-            continue
-        }
-        counts[lang]++
-        h, err := os.Open(f.Path)
-        if err != nil {
-            continue
-        }
-        s := bufio.NewScanner(h)
-        for s.Scan() {
-            lines[lang]++
-        }
-        _ = h.Close()
-    }
-    keys := make([]string, 0, len(counts))
-    for k := range counts {
-        keys = append(keys, k)
-    }
-    sort.Strings(keys)
-    for _, k := range keys {
-        fmt.Printf("%s files=%d lines=%d\n", k, counts[k], lines[k])
-    }
-    fmt.Printf("total_files=%d\n", len(files))
     return 0
 }
 
