@@ -10,12 +10,12 @@
 |---|---|---|---|
 | `ripgrep (rg)` | 高速テキスト検索 | ほぼ全repo | Search-first / Read-second の第一候補 |
 | `fd` | 高速ファイル探索 | ファイル数が多いrepo | 対象ファイル候補の絞り込み |
-| `ast-grep` | AST構造検索・置換 | 中〜大規模、多言語 | regexより正確な構造検索 |
-| `Universal Ctags` | symbol index | 中〜大規模、多言語 | Source Structure Index の軽量実装 |
-| `Tree-sitter` | 構文木生成 | 精密解析ツールを作る場合 | 言語固有parserの共通基盤候補 |
+| `ast-grep` | AST構造検索・outline | 中〜大規模、多言語 | `structural-search` backend / Source Structure Index inputとして再利用 |
+| `Universal Ctags` | multi-language symbol index | 中〜大規模、多言語 | `source-structure-index` の既存symbol backendとして再利用 |
+| `SCIP` | semantic code intelligence index | semantic indexを既に生成できるrepo | `source-structure-index` のsymbol/dependency backendとして再利用 |
+| `Tree-sitter` | 構文木生成 | 精密解析ツールを作る場合 | 言語固有parserの共通基盤候補。低品質な再実装はしない |
 | `scc` | LOC・言語・複雑度概要 | 導入前のrepo分析 | repo-profile の高機能代替/補助 |
 | `git-sizer` | Git履歴・repoサイズ健全性 | 巨大/長寿命repo | 大容量履歴・巨大blob検出 |
-| `Semgrep` | 静的解析・policy check | 規約が多いrepo | 機械判定可能な規約をAI文脈外へ移す |
 
 ## 選び方
 
@@ -27,15 +27,21 @@
 
 ### 中〜大規模コードベース
 
-symbol探索が多い場合は `ctags`、構文ベース検索が必要なら `ast-grep` を推奨します。
+symbol探索が多い場合はUniversal Ctags、構文ベース検索が必要なら `ast-grep` を優先候補にします。
 
-自前の regex-based symbol tools は依存なしのfallbackとして残し、外部ツールが利用できる場合はそちらを優先できます。
+`source-structure-index` は、既存Universal Ctags JSON Linesを `--ctags-json`、既にインストール済みのUniversal Ctagsを `--ctags-source` で利用できます。full tag outputをagentへ流さず、file / symbol / scope ownershipへ圧縮して `query` / `expand` から再利用します。
+
+SCIP indexがある場合は `--scip` / `--scip-json` で同じ共通IRへ取り込めます。SCIPはcross-file dependencyも持てるため、`affected` routingではCtags単独より高精度なSource of Truthになり得ます。
+
+`ast-grep` は `structural-search` の高品質backendとして利用し、`ast-grep outline` のJSONはSource Structure Index inputとしても利用できます。
+
+自前のregex/stdlib-based toolsは依存なしfallbackとして残します。外部toolを自動インストールはしません。
 
 ### 独自解析ツールを作る場合
 
 複数言語を正確に解析したい場合は `Tree-sitter` を候補にします。
 
-ただし、小規模repoの導入時に parser runtime や grammar を大量追加する必要はありません。導入コストが削減効果を上回る場合は使いません。
+ただし、小規模repoの導入時にparser runtimeやgrammarを大量追加する必要はありません。既存parser/indexerが利用可能なら再利用し、Context Reducer内に別のmulti-language parserを複製しないことを優先します。
 
 ### 巨大repo
 
@@ -45,13 +51,13 @@ symbol探索が多い場合は `ctags`、構文ベース検索が必要なら `a
 
 ### 規約が多いrepo
 
-機械判定できる規約は `Semgrep` や既存lint/checkerへ移し、AIには成功結果またはcompact findingsだけ渡します。
+機械判定できる規約はrepository標準のlint/checkerへ移し、AIには成功結果またはcompact findingsだけ渡します。
 
-semantic ownership や設計責務など自動判定しにくいものは targeted review に残します。
+semantic ownershipや設計責務など自動判定しにくいものはtargeted reviewに残します。
 
 ## 外部ツール検出
 
-`tools/common/small/external-tool-probe/script/external_tool_probe.py` で代表ツールが PATH 上にあるか確認できます。
+`tools/common/small/external-tool-probe/script/external_tool_probe.py` で代表ツールがPATH上にあるか確認できます。
 
 ```text
 python tools/common/small/external-tool-probe/script/external_tool_probe.py
@@ -65,4 +71,4 @@ python tools/common/small/external-tool-probe/script/external_tool_probe.py
 - 既存のrepo標準ツールがある場合はそれを優先する。
 - 外部ツール出力も bounded / compact に扱う。
 - 解析結果は原典への索引であり、Source of Truth にはしない。
-- security scanner の結果は用途と解析範囲を理解した上で扱う。
+- 高品質な外部index/parserを再利用できる場合、同じ解析器を別実装しない。
