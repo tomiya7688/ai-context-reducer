@@ -9,6 +9,7 @@ IGNORE_DIRS = {
     'bin', 'obj', 'build', 'dist', '.godot', '.idea', '.vs', 'vendor',
 }
 DOC_EXTS = {'.md', '.rst', '.txt'}
+TEST_DIRS = {'test', 'tests', 'spec', 'specs'}
 
 
 def changed_files(root: Path, base: str | None) -> dict[str, object]:
@@ -24,6 +25,19 @@ def changed_files(root: Path, base: str | None) -> dict[str, object]:
         'lines': [line.strip() for line in result.stdout.splitlines() if line.strip()],
         'error_kind': None,
     }
+
+
+def is_test_candidate(path: Path, rel_parts: set[str]) -> bool:
+    if rel_parts & TEST_DIRS:
+        return True
+    name = path.name.lower()
+    stem = path.stem.lower()
+    return (
+        stem.startswith(('test_', 'test-', 'spec_', 'spec-'))
+        or stem.endswith(('_test', '-test', '_spec', '-spec'))
+        or '.test.' in name
+        or '.spec.' in name
+    )
 
 
 def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]], bool, int]:
@@ -46,7 +60,7 @@ def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]]
             rel = path.relative_to(root).as_posix()
             low_name = name.lower()
             suffix = path.suffix.lower()
-            is_test = 'test' in low_name or 'test' in rel_parts or 'tests' in rel_parts
+            is_test = is_test_candidate(path, rel_parts)
             is_doc = suffix in DOC_EXTS
             if not is_test and not is_doc:
                 continue
