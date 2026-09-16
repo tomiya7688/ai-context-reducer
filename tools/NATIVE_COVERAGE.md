@@ -20,6 +20,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | remote delta | `remote-delta` | `acr-toolbox remote-delta` |
 | context-size routing estimate | `context-budget` | `acr-toolbox context-budget` |
 | large/deep file routing | `hotspot-report` | `acr-toolbox hotspot-report` |
+| prioritized repository context manifest | `context-manifest` | `acr-toolbox context-manifest` |
+| Context Pack Markdown generation | `context-pack-builder` | `acr-toolbox context-pack-builder` |
 | Goal/Required/Acceptance/Deferred extraction | `acceptance-extractor` | `acr-toolbox acceptance-extractor` |
 | exploration stop heuristic | `exploration-stop-check` | `acr-toolbox exploration-stop-check` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
@@ -39,6 +41,8 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 `context-budget` / `hotspot-report` もPythonとGoで実装コードを共有せず、自己説明的JSON契約とtargeted testで意味を揃えます。内部scanは既定でunlimited、agentへの返却だけをboundedにする方針です。
 
+`context-manifest` はPython/nativeともfull repository scanを許容し、priority manifestだけをboundedに返します。`context-pack-builder` は成果物がMarkdownなのでJSON化せず、Git取得状態の意味とMarkdown contractをtestで揃えます。
+
 `acceptance-extractor` / `exploration-stop-check` も独立実装です。英語termのword-boundary semantics、日本語term、truncation、missing/read errorをtestで合わせます。
 
 ## Python-only / not yet native
@@ -48,7 +52,6 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 ### Common medium
 - `change-router`
 - `validation-plan`
-- `context-pack-builder`
 - `policy-index`
 - `responsibility-candidates`
 - `doc-duplicate-hints`
@@ -56,9 +59,6 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 - `structural-search`
 
 `structural-search` は外部 `ast-grep` が存在すればそのnative parserをbackendとして再利用し、無い場合だけPython stdlib AST fallbackを使います。Goで低品質な独自multi-language parserを重複実装するより、この境界を維持します。
-
-### Common large
-- `context-manifest`
 
 ### Language-specific
 - Python symbols / import / graph
@@ -83,9 +83,8 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 
 次の統合優先順位を推奨します。
 
-1. `context-manifest` / `context-pack-builder`
-2. `change-router` / `validation-plan`
-3. project-specific / language-specific analysis only when maintenance cost is justified
+1. `change-router` / `validation-plan`
+2. project-specific / language-specific analysis only when maintenance cost is justified
 
 Python側へgenericな新規toolを追加した場合、Go側に同等機能を実装できるなら積極的に追加します。ただし共有コード化はせず、入出力契約とtestで対応を保ちます。
 
