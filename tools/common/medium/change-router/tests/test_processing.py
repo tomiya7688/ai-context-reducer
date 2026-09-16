@@ -22,10 +22,25 @@ class ChangeRouterProcessingTests(unittest.TestCase):
 
         self.assertEqual(result['changed_file'], 'src/widget.py')
         self.assertEqual(result['candidate_tests'], ['tests/test_widget.py'])
+        self.assertFalse(result['candidate_tests_truncated'])
         self.assertEqual(result['candidate_docs'], ['docs/widget.md'])
+        self.assertFalse(result['candidate_docs_truncated'])
         self.assertNotIn('changed', result)
         self.assertNotIn('tests', result)
         self.assertNotIn('docs', result)
+
+    def test_per_kind_limit_reports_real_truncation(self):
+        index = [
+            {'path': 'tests/test_widget.py', 'name': 'test_widget.py', 'is_test': True, 'is_doc': False},
+            {'path': 'tests/widget_test.py', 'name': 'widget_test.py', 'is_test': True, 'is_doc': False},
+        ]
+        limited = route_candidates('src/widget.py', index, 1)
+        self.assertEqual(1, len(limited['candidate_tests']))
+        self.assertTrue(limited['candidate_tests_truncated'])
+
+        unlimited = route_candidates('src/widget.py', index, 0)
+        self.assertEqual(2, len(unlimited['candidate_tests']))
+        self.assertFalse(unlimited['candidate_tests_truncated'])
 
 
 if __name__ == '__main__':
