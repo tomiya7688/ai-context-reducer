@@ -2,6 +2,27 @@ package main
 
 var structureIndexCommands = []string{"build", "query", "expand", "affected"}
 
+func emitStructureAdapterFailure(backend, inputKind string, status string, path string, message string) int {
+    outputStatus := "input_read_failed"
+    if status == "backend_unavailable" || status == "backend_incompatible" {
+        outputStatus = "external_backend_unavailable"
+    } else if status == "invalid_arguments" {
+        outputStatus = "invalid_arguments"
+    }
+    payload := map[string]any{
+        "tool":       "source-structure-index",
+        "status":     outputStatus,
+        "input_kind": inputKind,
+        "backend":    backend,
+        "error":      message,
+    }
+    if path != "" {
+        payload["path"] = path
+    }
+    emitStructureJSON(payload)
+    return 2
+}
+
 // Keep affected-scope and external-index adaptation out of the larger
 // build/query/expand implementation so each change reason has a smaller working set.
 func cmdStructureIndexEntry(args []string) int {
@@ -13,26 +34,15 @@ func cmdStructureIndexEntry(args []string) int {
     case "affected":
         return cmdStructureIndexAffected(args[1:])
     case "build":
-        prepared, cleanup, failure := prepareStructureSCIPBuildArgs(args[1:])
+        ctagsPrepared, ctagsCleanup, ctagsFailure := prepareStructureCtagsBuildArgs(args[1:])
+        if ctagsFailure != nil {
+            return emitStructureAdapterFailure("ctags", "ctags_source_or_json", ctagsFailure.Status, ctagsFailure.Path, ctagsFailure.Error)
+        }
+        defer ctagsCleanup()
+
+        prepared, cleanup, failure := prepareStructureSCIPBuildArgs(ctagsPrepared)
         if failure != nil {
-            status := "input_read_failed"
-            if failure.Status == "backend_unavailable" {
-                status = "external_backend_unavailable"
-            } else if failure.Status == "invalid_arguments" {
-                status = "invalid_arguments"
-            }
-            payload := map[string]any{
-                "tool":       "source-structure-index",
-                "status":     status,
-                "input_kind": "scip_index",
-                "backend":    "scip",
-                "error":      failure.Error,
-            }
-            if failure.Path != "" {
-                payload["path"] = failure.Path
-            }
-            emitStructureJSON(payload)
-            return 2
+            return emitStructureAdapterFailure("scip", "scip_index", failure.Status, failure.Path, failure.Error)
         }
         defer cleanup()
         return cmdStructureIndexBuild(prepared)
