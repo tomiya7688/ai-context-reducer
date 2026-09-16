@@ -143,6 +143,25 @@ entrypoint
 - missing runtime / SDK / packageを勝手にinstallしない
 - 精度のためにtool内部で広く読むことと、agentへ大量情報を渡すことを混同しない
 
+## Agent / tool communication contract
+
+Genericなagent-facing toolは、**使い方を毎回READMEで確認しなくてもstdoutだけで結果の意味を判断できること**を目標にする。
+
+- 既定出力はself-describing JSONを優先する
+- `tool` / `status` / input scopeまたはquery / results / truncation / uncertainty / operational warningを、必要な範囲で明示する
+- external backendを利用した場合は `backend` で事実だけを明示し、caller側へbackend固有schemaを漏らさない
+- backendが変わっても同じCLI意味・同じresult schemaを維持する。速度のために検索意味を変えない
+- 同じ事実を `summary` とstructured fieldの両方へ重複して入れない
+- human-readable textとJSONを同じ実行のstdoutへ重複出力しない
+- field名は公開APIとして扱い、理由なく変更しない
+- 成功した0件と取得失敗を同じ値で表現しない
+- limitはagent-visible outputへ適用し、未返却結果がある場合だけtruncationをtrueにする
+- diagnosticsはboundedにし、巨大stderr / external tool outputをそのままagent contextへ流さない
+
+人間が直接使う可能性があるtoolも `--help` と読みやすいindent済みJSONを持ち、特別なwrapperや後処理なしで最低限利用できる状態にする。
+
+成果物そのものがMarkdown / source file / manifest file等であるgeneratorはJSON化を目的化しない。成果物をstdoutへ返す場合は、その成果物だけを返して重複説明を混ぜない。
+
 ## Scan classes
 
 - `targeted`: explicit pathだけを見る。
