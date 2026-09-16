@@ -16,7 +16,9 @@ Common tools の portable Go implementation です。
 | Git diff / remote delta | `git_commands.go` |
 | context-size estimation | `context_budget_command.go` |
 | large/deep file routing | `hotspot_command.go` |
-| context analysis validation | `context_analysis_commands_test.go` |
+| prioritized file manifest | `context_manifest_command.go` |
+| Context Pack Markdown generation | `context_pack_command.go` |
+| context analysis / generation validation | `context_analysis_commands_test.go` / `context_generation_commands_test.go` |
 | acceptance section extraction | `acceptance_command.go` |
 | exploration-stop heuristic | `exploration_stop_command.go` |
 | shared task-context term matching | `task_context_terms.go` |
@@ -59,6 +61,18 @@ acr-toolbox hotspot-report --limit 30 .
 `context-budget` のtoken数は常にrouting estimateです。`accurate` はfile内容を読むmodeですがtokenizer exactではなく、JSONの `token_estimate.approximate=true` と算定式で明示します。
 
 両commandとも既定では内部file-count scan limitを持ちません。明示した `--max-files` はperformance/safety capで、実際に未走査候補が残った時だけ `scan_truncated=true` になります。
+
+## context-manifest / context-pack-builder
+
+```text
+acr-toolbox context-manifest --limit 400 .
+acr-toolbox context-pack-builder --goal "..." --acceptance "..." .
+acr-toolbox context-pack-builder --output CONTEXT_PACK.md .
+```
+
+`context-manifest` はrepository全体をscanしてpriority順のbounded JSONだけ返します。scan errorは `stat_error_count / walk_error_count` と `ok_with_warnings` で明示し、missing rootを空manifestとして扱いません。
+
+`context-pack-builder` は成果物そのものがMarkdownなのでJSON化しません。Git unavailable / query failure / clean state / truncated stateを本文で区別します。input/outputのoperational errorはstderr + non-zero exitです。
 
 ## acceptance-extractor / exploration-stop-check
 
