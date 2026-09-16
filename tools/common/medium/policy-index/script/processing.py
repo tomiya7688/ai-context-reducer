@@ -2,14 +2,25 @@ from __future__ import annotations
 
 import re
 
-RULE_WORDS = ('must', 'must not', 'should', 'should not', 'required', 'recommended', '禁止', '必須', '推奨', 'してはならない', 'すること')
+ENGLISH_RULE_TERMS = ('must not', 'should not', 'must', 'should', 'required', 'recommended')
+JAPANESE_RULE_TERMS = ('禁止', '必須', '推奨', 'してはならない', 'すること')
+ENGLISH_RULE_PATTERN = re.compile(
+    r'\b(?:' + '|'.join(re.escape(term) for term in ENGLISH_RULE_TERMS) + r')\b',
+    re.IGNORECASE,
+)
+HEADING_PATTERN = re.compile(r'^#{1,6}\s+')
+
+
+def is_policy_line(line: str) -> bool:
+    if ENGLISH_RULE_PATTERN.search(line):
+        return True
+    return any(term in line for term in JAPANESE_RULE_TERMS)
 
 
 def policy_findings(lines: list[str]):
     heading = ''
     for number, line in enumerate(lines, 1):
-        if re.match(r'^#{1,6}\s+', line):
-            heading = line.strip('# ').strip()
-        low = line.lower()
-        if any(word in low for word in RULE_WORDS):
+        if HEADING_PATTERN.match(line):
+            heading = line.lstrip('#').strip()
+        if is_policy_line(line):
             yield number, heading or 'no-heading', line.strip()[:220]
