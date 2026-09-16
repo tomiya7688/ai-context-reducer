@@ -21,7 +21,13 @@ def priority(path: Path) -> str:
     return 'P4'
 
 
-def build_manifest(entries: list[dict[str, object]], limit: int) -> dict[str, object]:
+def build_manifest(
+    entries: list[dict[str, object]],
+    limit: int,
+    stat_error_count: int = 0,
+    walk_error_count: int = 0,
+) -> dict[str, object]:
+    limit = max(0, limit)
     rows = [
         {
             'context_priority': priority(entry['path']),
@@ -31,11 +37,15 @@ def build_manifest(entries: list[dict[str, object]], limit: int) -> dict[str, ob
         for entry in entries
     ]
     rows.sort(key=lambda row: (ORDER[row['context_priority']], row['path']))
+    errors = stat_error_count + walk_error_count
+    returned = rows[:limit] if limit > 0 else []
     return {
         'tool': 'context-manifest',
-        'status': 'ok',
+        'status': 'ok_with_warnings' if errors else 'ok',
         'total_files': len(rows),
-        'returned_files': min(len(rows), limit),
-        'files_truncated': len(rows) > limit,
-        'files': rows[:limit],
+        'returned_files': len(returned),
+        'stat_error_count': stat_error_count,
+        'walk_error_count': walk_error_count,
+        'files_truncated': len(rows) > len(returned),
+        'files': returned,
     }
