@@ -11,19 +11,31 @@ IGNORE_DIRS = {
 DOC_EXTS = {'.md', '.rst', '.txt'}
 
 
-def changed_files(root: Path, base: str | None) -> tuple[bool, list[str]]:
+def changed_files(root: Path, base: str | None) -> dict[str, object]:
     cmd = ['git', '-C', str(root), 'diff', '--name-only', base or 'HEAD']
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    except OSError:
+        return {'ok': False, 'lines': [], 'error_kind': 'git_unavailable'}
     if result.returncode != 0:
-        return False, []
-    return True, [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        return {'ok': False, 'lines': [], 'error_kind': 'git_query_failed'}
+    return {
+        'ok': True,
+        'lines': [line.strip() for line in result.stdout.splitlines() if line.strip()],
+        'error_kind': None,
+    }
 
 
-def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]], bool]:
+def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]], bool, int]:
     rows: list[dict[str, object]] = []
     truncated = False
+    walk_error_count = 0
 
-    for current, dirs, files in os.walk(root):
+    def on_walk_error(_error: OSError) -> None:
+        nonlocal walk_error_count
+        walk_error_count += 1
+
+    for current, dirs, files in os.walk(root, onerror=on_walk_error):
         dirs[:] = [d for d in dirs if d.lower() not in IGNORE_DIRS]
         current_path = Path(current)
         rel_dir = current_path.relative_to(root)
@@ -39,14 +51,14 @@ def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]]
             if not is_test and not is_doc:
                 continue
 
+            if max_files > 0 and len(rows) >= max_files:
+                truncated = True
+                return rows, truncated, walk_error_count
             rows.append({
                 'path': rel,
                 'name': low_name,
                 'is_test': is_test,
                 'is_doc': is_doc,
             })
-            if max_files > 0 and len(rows) >= max_files:
-                truncated = True
-                return rows, truncated
 
-    return rows, truncated
+    return rows, truncated, walk_error_count
