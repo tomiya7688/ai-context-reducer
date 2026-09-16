@@ -13,6 +13,8 @@ import (
     pathpkg "path"
     "path/filepath"
     "regexp"
+    "sort"
+    "strconv"
     "strings"
 )
 
@@ -67,6 +69,13 @@ func emitSearchJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
+}
+
+func searchNonNegative(value int) int {
+    if value < 0 {
+        return 0
+    }
+    return value
 }
 
 func boundedSearchError(text string) string {
@@ -256,14 +265,14 @@ func ripgrepSearch(
         args = append(args, "--fixed-strings")
     }
     if maxFileBytes > 0 {
-        args = append(args, "--max-filesize", int64String(maxFileBytes))
+        args = append(args, "--max-filesize", strconv.FormatInt(maxFileBytes, 10))
     }
     ignoreNames := make([]string, 0, len(ignoreDirs)+1)
     for name := range ignoreDirs {
         ignoreNames = append(ignoreNames, name)
     }
     ignoreNames = append(ignoreNames, "generated")
-    sortStrings(ignoreNames)
+    sort.Strings(ignoreNames)
     for _, name := range ignoreNames {
         args = append(args, "--glob", "!**/"+name+"/**")
     }
@@ -333,10 +342,6 @@ func ripgrepSearch(
     return matches, false, ""
 }
 
-func int64String(value int64) string {
-    return strconv.FormatInt(value, 10)
-}
-
 func cmdSearch(args []string) int {
     flags := flag.NewFlagSet("search", flag.ContinueOnError)
     flags.SetOutput(io.Discard)
@@ -378,13 +383,14 @@ func cmdSearch(args []string) int {
         emitSearchJSON(map[string]any{"tool": "text-search", "status": "input_unavailable", "root_path": root, "error": boundedSearchError(err.Error())})
         return 2
     }
+    context := searchNonNegative(*contextLines)
     query := map[string]any{
         "pattern": pattern,
         "mode": map[bool]string{true: "fixed_string", false: "regex"}[fixedString],
         "ignore_case": ignoreCase,
         "globs": []string(globs),
         "excludes": []string(excludes),
-        "context_lines": maxInt(0, *contextLines),
+        "context_lines": context,
     }
     info, statErr := os.Stat(absoluteRoot)
     if statErr != nil {
@@ -410,12 +416,11 @@ func cmdSearch(args []string) int {
         }
     }
 
-    resultsLimit := maxInt(0, *maxResults)
+    resultsLimit := searchNonNegative(*maxResults)
     fileBytes := *maxFileBytes
     if fileBytes < 0 {
         fileBytes = 0
     }
-    context := maxInt(0, *contextLines)
     rgPath, rgErr := exec.LookPath("rg")
     canUseRG := context == 0
     if *backend == "ripgrep" && rgErr != nil {
@@ -462,10 +467,18 @@ func cmdSearch(args []string) int {
         "query": query, "backend": "portable", "matches": matches, "matches_truncated": truncated,
         "walk_error_count": stats.WalkErrorCount, "stat_error_count": stats.StatErrorCount, "read_error_count": stats.ReadErrorCount,
     }
-    if len(stats.WalkErrorPaths) > 0 { payload["walk_error_paths"] = stats.WalkErrorPaths }
-    if len(stats.StatErrorPaths) > 0 { payload["stat_error_paths"] = stats.StatErrorPaths }
-    if len(stats.ReadErrorPaths) > 0 { payload["read_error_paths"] = stats.ReadErrorPaths }
-    if fallback != nil { payload["backend_fallback"] = fallback }
+    if len(stats.WalkErrorPaths) > 0 {
+        payload["walk_error_paths"] = stats.WalkErrorPaths
+    }
+    if len(stats.StatErrorPaths) > 0 {
+        payload["stat_error_paths"] = stats.StatErrorPaths
+    }
+    if len(stats.ReadErrorPaths) > 0 {
+        payload["read_error_paths"] = stats.ReadErrorPaths
+    }
+    if fallback != nil {
+        payload["backend_fallback"] = fallback
+    }
     emitSearchJSON(payload)
     return 0
 }
