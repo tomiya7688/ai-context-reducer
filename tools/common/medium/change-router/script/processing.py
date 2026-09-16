@@ -23,15 +23,18 @@ def route_candidates(rel: str, index: list[dict[str, object]], limit: int) -> di
             if stem not in name:
                 continue
             path = str(row['path'])
-            if bool(row['is_test']) and len(tests) < limit:
+            if bool(row['is_test']):
                 tests.append(path)
-            elif bool(row['is_doc']) and len(docs) < limit:
+            elif bool(row['is_doc']):
                 docs.append(path)
-            if len(tests) >= limit and len(docs) >= limit:
-                break
 
+    limit = max(0, limit)
+    returned_tests = tests[:limit] if limit > 0 else tests
+    returned_docs = docs[:limit] if limit > 0 else docs
     return {
         'changed_file': rel,
-        'candidate_tests': tests,
-        'candidate_docs': docs,
+        'candidate_tests': returned_tests,
+        'candidate_tests_truncated': len(tests) > len(returned_tests),
+        'candidate_docs': returned_docs,
+        'candidate_docs_truncated': len(docs) > len(returned_docs),
     }
