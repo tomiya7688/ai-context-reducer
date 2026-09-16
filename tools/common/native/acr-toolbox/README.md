@@ -20,8 +20,10 @@ Common tools の portable Go implementation です。
 | Context Pack Markdown generation | `context_pack_command.go` |
 | change -> test/doc routing | `change_router_command.go` |
 | file -> validation-kind routing | `validation_plan_command.go` |
+| Responsibility Map starter Markdown | `responsibility_candidates_command.go` |
 | context analysis / generation validation | `context_analysis_commands_test.go` / `context_generation_commands_test.go` |
 | change/validation routing validation | `change_validation_commands_test.go` |
+| responsibility candidate validation | `responsibility_candidates_command_test.go` |
 | acceptance section extraction | `acceptance_command.go` |
 | exploration-stop heuristic | `exploration_stop_command.go` |
 | shared task-context term matching | `task_context_terms.go` |
@@ -88,6 +90,17 @@ acr-toolbox validation-plan src/core.py config/schema.json
 `change-router` はinternal test/doc indexを既定で全scanし、agent-visible candidateだけをboundedにします。`--max-index-files` は明示的なsafety capです。Git failure、index walk warning、changed/index/per-route truncationをJSONで区別します。
 
 `validation-plan` はpathをtokenizeしてvalidation種類を選び、`build` 内の `ui` や `latest` 内の `test` のようなsubstring false positiveを避けます。どちらもrepository固有build/test metadataがある場合は、そのSource of Truthを置き換えるものではありません。
+
+## responsibility-candidates
+
+```text
+acr-toolbox responsibility-candidates --max 120 .
+acr-toolbox responsibility-candidates --max 120 --max-scan-files 50000 .
+```
+
+Responsibility Map starterそのものが成果物なのでMarkdown-onlyです。内部code-file scanは既定unlimited、`--max` は返却table rowsだけをboundedにします。`--max-scan-files` は明示的なperformance/safety capです。
+
+size metadata / filesystem walk failureはMarkdown commentで明示し、read errorをsize=0へ偽装しません。responsibility本文そのものは推測せずTODOのまま残します。
 
 ## acceptance-extractor / exploration-stop-check
 
