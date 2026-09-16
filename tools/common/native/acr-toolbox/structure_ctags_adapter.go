@@ -57,10 +57,10 @@ func ctagsQualified(path, scope, name string) string {
     return path + "::" + name
 }
 
-func normalizeCtagsRows(raw any) (map[string]any, map[string]any, error) {
+func normalizeCtagsRows(raw any) (map[string]any, map[string]any, map[string]any, error) {
     rows, ok := raw.([]any)
     if !ok {
-        return nil, nil, fmt.Errorf("ctags JSON input must be JSON Lines tag rows")
+        return nil, nil, nil, fmt.Errorf("ctags JSON input must be JSON Lines tag rows")
     }
 
     files := map[string][]any{}
