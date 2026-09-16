@@ -11,7 +11,12 @@ Common tools の portable Go implementation です。
 | CLI subcommand dispatch | `main.go` |
 | repository walk / ignore / language metadata | `repo_commands.go` |
 | repository analysis / recommendation | `analyze_command.go` |
-| search / find / tree / stats / docs index | `browse_commands.go` |
+| text search / optional ripgrep boundary | `search_command.go` |
+| path search / optional fd boundary | `find_command.go` |
+| repository statistics / optional scc boundary | `stats_command.go` |
+| tree / docs index | `browse_commands.go` |
+| search / find contract validation | `search_find_commands_test.go` |
+| repository statistics validation | `stats_command_test.go` |
 | bounded excerpt / compact log | `text_commands.go` |
 | Git diff / remote delta | `git_commands.go` |
 | context-size estimation | `context_budget_command.go` |
@@ -63,6 +68,28 @@ Common tools の portable Go implementation です。
 ## Go flag ordering
 
 Go標準 `flag` parserを使うcommandでは、optionをpositional pathより前に置きます。READMEの例もこの順序をSource of Truthにします。
+
+## search / find / stats
+
+```text
+acr-toolbox search --max-results 100 Service src
+acr-toolbox find --type file '*.go' .
+acr-toolbox stats .
+```
+
+3 commandともstdoutはself-describing JSONだけです。PATH上に既存external toolがある場合は自動利用し、無い場合はnative Go fallbackでそのまま動作します。
+
+```text
+search -> ripgrep (`rg`) or portable Go
+find   -> fd or portable Go
+stats  -> scc or portable Go
+```
+
+external toolは自動installしません。単に未導入ならnormal portable backendです。PATH上で見つかったexternal backendが実行失敗した場合だけ `backend_fallback` を返します。
+
+backendが変わってもcallerへ別schemaを要求しません。`backend` は実際に使った解析境界を示す事実だけです。
+
+`find` の内部scanは既定unlimitedで、`--max-visited` は明示的なportable safety capです。`stats` の `--max-file-bytes` も既定0=unlimitedです。agent-visible outputや明示capだけをboundedにし、既定性能制限でrouting/statistics精度を落としません。
 
 ## context-budget / hotspot-report
 
