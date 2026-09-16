@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|acceptance-extractor|exploration-stop-check|materialize|language-env|env> ...")
+    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-env|env> ...")
 }
 
 func main() {
@@ -57,6 +57,8 @@ func main() {
         code = cmdPolicyIndex(os.Args[2:])
     case "doc-duplicate-hints":
         code = cmdDocDuplicateHints(os.Args[2:])
+    case "ignore-candidates":
+        code = cmdIgnoreCandidates(os.Args[2:])
     case "acceptance-extractor":
         code = cmdAcceptanceExtractor(os.Args[2:])
     case "exploration-stop-check":
