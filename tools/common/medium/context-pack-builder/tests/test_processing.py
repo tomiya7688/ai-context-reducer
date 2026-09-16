@@ -5,6 +5,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parents[1] / 'script'
 sys.path.insert(0, str(SCRIPT_DIR))
 
+from commander import build_context_pack
 from processing import render_context_pack
 
 
@@ -81,6 +82,21 @@ class RenderContextPackTests(unittest.TestCase):
             },
         )
 
+        self.assertGreaterEqual(text.count('truncated'), 2)
+
+    def test_negative_limit_is_normalized_to_zero(self):
+        class FakeResult(dict):
+            pass
+
+        import commander
+        original = commander.git_lines
+        try:
+            commander.git_lines = lambda root, args: FakeResult(ok=True, lines=['a.py'], error_kind=None)
+            text = build_context_pack(Path('.'), {'goal': 'g', 'required': '', 'acceptance': '', 'deferred': ''}, -1)
+        finally:
+            commander.git_lines = original
+
+        self.assertNotIn('  - a.py\n', text)
         self.assertGreaterEqual(text.count('truncated'), 2)
 
 
