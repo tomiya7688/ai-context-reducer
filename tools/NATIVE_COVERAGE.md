@@ -22,6 +22,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | large/deep file routing | `hotspot-report` | `acr-toolbox hotspot-report` |
 | prioritized repository context manifest | `context-manifest` | `acr-toolbox context-manifest` |
 | Context Pack Markdown generation | `context-pack-builder` | `acr-toolbox context-pack-builder` |
+| changed file -> test/doc routing | `change-router` | `acr-toolbox change-router` |
+| changed file -> validation-kind routing | `validation-plan` | `acr-toolbox validation-plan` |
 | Goal/Required/Acceptance/Deferred extraction | `acceptance-extractor` | `acr-toolbox acceptance-extractor` |
 | exploration stop heuristic | `exploration-stop-check` | `acr-toolbox exploration-stop-check` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
@@ -43,6 +45,8 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 `context-manifest` はPython/nativeともfull repository scanを許容し、priority manifestだけをboundedに返します。`context-pack-builder` は成果物がMarkdownなのでJSON化せず、Git取得状態の意味とMarkdown contractをtestで揃えます。
 
+`change-router` は内部test/doc indexを既定unlimitedにし、agent-visible routesだけをboundedにします。`validation-plan` はtoken-based path classificationでshort substring false positiveを避けます。両方ともPython/Goを共有コードなしで実装します。
+
 `acceptance-extractor` / `exploration-stop-check` も独立実装です。英語termのword-boundary semantics、日本語term、truncation、missing/read errorをtestで合わせます。
 
 ## Python-only / not yet native
@@ -50,8 +54,6 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 現時点で次は Python implementation が中心です。
 
 ### Common medium
-- `change-router`
-- `validation-plan`
 - `policy-index`
 - `responsibility-candidates`
 - `doc-duplicate-hints`
@@ -81,10 +83,13 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 
 ## Native priority
 
-次の統合優先順位を推奨します。
+次の候補は、native化そのものより利用頻度とmaintenance costを見て判断します。
 
-1. `change-router` / `validation-plan`
-2. project-specific / language-specific analysis only when maintenance cost is justified
+1. `policy-index` / `responsibility-candidates`
+2. `doc-duplicate-hints` / `ignore-candidates`
+3. project-specific / language-specific analysis only when maintenance cost is justified
+
+`structural-search` はexternal `ast-grep` reuseを優先するため、native coverageのためだけに別parserを作りません。
 
 Python側へgenericな新規toolを追加した場合、Go側に同等機能を実装できるなら積極的に追加します。ただし共有コード化はせず、入出力契約とtestで対応を保ちます。
 
