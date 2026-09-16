@@ -36,8 +36,10 @@ type fileInfo struct {
 }
 
 type walkResult struct {
-    Files      []fileInfo
-    ErrorCount int
+    Files          []fileInfo
+    ErrorCount     int
+    StatErrorCount int
+    WalkErrorCount int
 }
 
 func walkWithOptions(root string, includeIgnored bool) (walkResult, error) {
@@ -48,6 +50,7 @@ func walkWithOptions(root string, includeIgnored bool) (walkResult, error) {
                 return err
             }
             out.ErrorCount++
+            out.WalkErrorCount++
             return nil
         }
         if d.IsDir() {
@@ -59,6 +62,7 @@ func walkWithOptions(root string, includeIgnored bool) (walkResult, error) {
         info, infoErr := d.Info()
         if infoErr != nil {
             out.ErrorCount++
+            out.StatErrorCount++
             return nil
         }
         out.Files = append(out.Files, fileInfo{Path: path, Size: info.Size()})
