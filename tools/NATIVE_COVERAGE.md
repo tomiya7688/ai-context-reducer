@@ -27,6 +27,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | Responsibility Map starter Markdown | `responsibility-candidates` | `acr-toolbox responsibility-candidates` |
 | policy/rule routing index | `policy-index` | `acr-toolbox policy-index` |
 | repeated documentation hints | `doc-duplicate-hints` | `acr-toolbox doc-duplicate-hints` |
+| low-value context path hints | `ignore-candidates` | `acr-toolbox ignore-candidates` |
 | Goal/Required/Acceptance/Deferred extraction | `acceptance-extractor` | `acr-toolbox acceptance-extractor` |
 | exploration stop heuristic | `exploration-stop-check` | `acr-toolbox exploration-stop-check` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
@@ -54,14 +55,15 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 `policy-index` はdependency/generated docsを除外し、英語rule語をword boundaryで判定します。`doc-duplicate-hints` はfull document scan後にgroup/occurrenceだけをboundedにし、同じ本文をoccurrenceごとに重複出力しません。いずれもPython/nativeを独立実装し、JSON contractとtestで揃えます。
 
+`ignore-candidates` は候補directory自体を1件返した時点でsubtreeをpruneし、同じ低価値tree配下の大量fileを重複候補として列挙しません。JSONに `matched_rule` を含め、候補理由を出力だけで判断できます。
+
 `acceptance-extractor` / `exploration-stop-check` も独立実装です。英語termのword-boundary semantics、日本語term、truncation、missing/read errorをtestで合わせます。
 
 ## Python-only / not yet native
 
-現時点で次は Python implementation が中心です。
+現時点でCommon generic toolのうち、意図的にPython fallbackを残している主なものは次です。
 
 ### Common medium
-- `ignore-candidates`
 - `structural-search`
 
 `structural-search` は外部 `ast-grep` が存在すればそのnative parserをbackendとして再利用し、無い場合だけPython stdlib AST fallbackを使います。Goで低品質な独自multi-language parserを重複実装するより、この境界を維持します。
@@ -87,10 +89,7 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 
 ## Native priority
 
-次の候補は、native化そのものより利用頻度とmaintenance costを見て判断します。
-
-1. `ignore-candidates`
-2. project-specific / language-specific analysis only when maintenance cost is justified
+Common generic toolsは、低品質なparser重複を避ける `structural-search` を除き、主要なportable候補をかなりnative化できました。次はcoverage率ではなく、project-specific / language-specific analysisのmaintenance costと利用頻度を見て判断します。
 
 `structural-search` はexternal `ast-grep` reuseを優先するため、native coverageのためだけに別parserを作りません。
 
