@@ -8,22 +8,29 @@
 
 | Tool | 主用途 | 向いている場面 | ai-context-reducer での位置づけ |
 |---|---|---|---|
-| `ripgrep (rg)` | 高速テキスト検索 | ほぼ全repo | Search-first / Read-second の第一候補 |
-| `fd` | 高速ファイル探索 | ファイル数が多いrepo | 対象ファイル候補の絞り込み |
+| `ripgrep (rg)` | 高速テキスト検索 | ほぼ全repo | `text-search` のoptional backendとして再利用 |
+| `fd` | 高速ファイル探索 | ファイル数が多いrepo | `path-find` のoptional backendとして再利用 |
 | `ast-grep` | AST構造検索・outline | 中〜大規模、多言語 | `structural-search` backend / Source Structure Index inputとして再利用 |
 | `Universal Ctags` | multi-language symbol index | 中〜大規模、多言語 | `source-structure-index` の既存symbol backendとして再利用 |
 | `SCIP` | semantic code intelligence index | semantic indexを既に生成できるrepo | `source-structure-index` のsymbol/dependency backendとして再利用 |
 | `Tree-sitter` | 構文木生成 | 精密解析ツールを作る場合 | 言語固有parserの共通基盤候補。低品質な再実装はしない |
-| `scc` | LOC・言語・複雑度概要 | 導入前のrepo分析 | repo-profile の高機能代替/補助 |
+| `scc` | LOC・言語・複雑度概要 | 導入前のrepo分析 | `repo-profile` / `repo-stats` のoptional aggregate backendとして再利用 |
 | `git-sizer` | Git履歴・repoサイズ健全性 | 巨大/長寿命repo | 大容量履歴・巨大blob検出 |
 
 ## 選び方
 
 ### ほぼ全プロジェクト
 
-`rg` を最優先候補とします。全文を順番に読む代わりに、キーワード・symbol・エラー文・見出しを先に検索します。
+Search-first / Read-secondでは `text-search` と `path-find` を入口にします。
 
-`fd` がある場合は、ファイル探索を `find` や全tree列挙より短くできます。
+```text
+text-search -> rg があれば再利用 -> 無ければportable fallback
+path-find   -> fd があれば再利用 -> 無ければportable fallback
+```
+
+callerはexternal backendごとの出力形式を覚える必要がありません。両toolとも同じself-describing JSON contractへ正規化し、`backend` で実際に利用した境界だけを明示します。
+
+external toolが単に未導入なだけならportable backendで正常終了します。PATH上で見つかったbackendが実行失敗した場合だけfallback情報を返します。
 
 ### 中〜大規模コードベース
 
@@ -43,9 +50,17 @@ SCIP indexがある場合は `--scip` / `--scip-json` で同じ共通IRへ取り
 
 ただし、小規模repoの導入時にparser runtimeやgrammarを大量追加する必要はありません。既存parser/indexerが利用可能なら再利用し、Context Reducer内に別のmulti-language parserを複製しないことを優先します。
 
+### Repository規模・言語統計
+
+`repo-profile` はrepository全file数・size class・top-level directoryをportable scanで把握し、sccが利用可能ならlanguage別LOC/complexityを補助情報として取り込みます。
+
+`repo-stats` / `acr-toolbox stats` はlanguage/line statistics専用です。sccのJSON aggregateが使える場合は再利用し、per-file detailはagent contextへ流しません。sccが無ければPython/Goのportable実装へ戻ります。
+
+これによりagentがscc固有JSONの使い方を覚えたり、巨大なraw outputを直接読む必要をなくします。
+
 ### 巨大repo
 
-`git-sizer` でGit履歴・巨大objectの問題を確認し、`scc` で言語構成・コード量・複雑度を短く把握できます。
+現在のsource量・language構成は `repo-profile` / `repo-stats` でcompactに確認します。Git履歴・巨大objectの問題は別軸なので、既に `git-sizer` がある環境ではその解析を利用できます。
 
 巨大repoでは「現在のソース量」と「Git履歴の重さ」を別に扱います。
 
@@ -69,6 +84,7 @@ python tools/common/small/external-tool-probe/script/external_tool_probe.py
 
 - 外部ツールの導入自体が大きな負担なら使わない。
 - 既存のrepo標準ツールがある場合はそれを優先する。
+- external backendのraw outputをcallerへ直接漏らさず、安定したcompact contractへ正規化する。
 - 外部ツール出力も bounded / compact に扱う。
 - 解析結果は原典への索引であり、Source of Truth にはしない。
 - 高品質な外部index/parserを再利用できる場合、同じ解析器を別実装しない。
