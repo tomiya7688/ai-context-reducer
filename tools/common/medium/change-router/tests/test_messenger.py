@@ -1,0 +1,40 @@
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parents[1] / 'script'
+sys.path.insert(0, str(SCRIPT_DIR))
+
+from messenger import candidate_index
+
+
+class ChangeRouterMessengerTests(unittest.TestCase):
+    def test_exact_index_cap_is_not_truncated(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'tests').mkdir()
+            (root / 'tests' / 'test_a.py').write_text('', encoding='utf-8')
+            (root / 'docs').mkdir()
+            (root / 'docs' / 'a.md').write_text('', encoding='utf-8')
+
+            rows, truncated, errors = candidate_index(root, 2)
+            self.assertEqual(2, len(rows))
+            self.assertFalse(truncated)
+            self.assertEqual(0, errors)
+
+    def test_additional_candidate_marks_truncation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'tests').mkdir()
+            (root / 'tests' / 'test_a.py').write_text('', encoding='utf-8')
+            (root / 'tests' / 'test_b.py').write_text('', encoding='utf-8')
+
+            rows, truncated, errors = candidate_index(root, 1)
+            self.assertEqual(1, len(rows))
+            self.assertTrue(truncated)
+            self.assertEqual(0, errors)
+
+
+if __name__ == '__main__':
+    unittest.main()
