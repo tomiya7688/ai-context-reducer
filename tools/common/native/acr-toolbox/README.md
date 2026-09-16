@@ -18,7 +18,10 @@ Common tools の portable Go implementation です。
 | large/deep file routing | `hotspot_command.go` |
 | prioritized file manifest | `context_manifest_command.go` |
 | Context Pack Markdown generation | `context_pack_command.go` |
+| change -> test/doc routing | `change_router_command.go` |
+| file -> validation-kind routing | `validation_plan_command.go` |
 | context analysis / generation validation | `context_analysis_commands_test.go` / `context_generation_commands_test.go` |
+| change/validation routing validation | `change_validation_commands_test.go` |
 | acceptance section extraction | `acceptance_command.go` |
 | exploration-stop heuristic | `exploration_stop_command.go` |
 | shared task-context term matching | `task_context_terms.go` |
@@ -73,6 +76,18 @@ acr-toolbox context-pack-builder --output CONTEXT_PACK.md .
 `context-manifest` はrepository全体をscanしてpriority順のbounded JSONだけ返します。scan errorは `stat_error_count / walk_error_count` と `ok_with_warnings` で明示し、missing rootを空manifestとして扱いません。
 
 `context-pack-builder` は成果物そのものがMarkdownなのでJSON化しません。Git unavailable / query failure / clean state / truncated stateを本文で区別します。input/outputのoperational errorはstderr + non-zero exitです。
+
+## change-router / validation-plan
+
+```text
+acr-toolbox change-router --base origin/main .
+acr-toolbox change-router --changed src/core.py --changed src/schema.py .
+acr-toolbox validation-plan src/core.py config/schema.json
+```
+
+`change-router` はinternal test/doc indexを既定で全scanし、agent-visible candidateだけをboundedにします。`--max-index-files` は明示的なsafety capです。Git failure、index walk warning、changed/index/per-route truncationをJSONで区別します。
+
+`validation-plan` はpathをtokenizeしてvalidation種類を選び、`build` 内の `ui` や `latest` 内の `test` のようなsubstring false positiveを避けます。どちらもrepository固有build/test metadataがある場合は、そのSource of Truthを置き換えるものではありません。
 
 ## acceptance-extractor / exploration-stop-check
 
