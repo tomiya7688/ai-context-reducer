@@ -24,6 +24,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | Context Pack Markdown generation | `context-pack-builder` | `acr-toolbox context-pack-builder` |
 | changed file -> test/doc routing | `change-router` | `acr-toolbox change-router` |
 | changed file -> validation-kind routing | `validation-plan` | `acr-toolbox validation-plan` |
+| Responsibility Map starter Markdown | `responsibility-candidates` | `acr-toolbox responsibility-candidates` |
 | Goal/Required/Acceptance/Deferred extraction | `acceptance-extractor` | `acr-toolbox acceptance-extractor` |
 | exploration stop heuristic | `exploration-stop-check` | `acr-toolbox exploration-stop-check` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
@@ -47,6 +48,8 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 `change-router` は内部test/doc indexを既定unlimitedにし、agent-visible routesだけをboundedにします。`validation-plan` はtoken-based path classificationでshort substring false positiveを避けます。両方ともPython/Goを共有コードなしで実装します。
 
+`responsibility-candidates` もMarkdown artifactを維持した独立実装です。内部code scanは既定unlimited、table rowsだけをboundedにし、stat/walk/truncationはMarkdown commentで伝えます。
+
 `acceptance-extractor` / `exploration-stop-check` も独立実装です。英語termのword-boundary semantics、日本語term、truncation、missing/read errorをtestで合わせます。
 
 ## Python-only / not yet native
@@ -55,7 +58,6 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 ### Common medium
 - `policy-index`
-- `responsibility-candidates`
 - `doc-duplicate-hints`
 - `ignore-candidates`
 - `structural-search`
@@ -85,7 +87,7 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 
 次の候補は、native化そのものより利用頻度とmaintenance costを見て判断します。
 
-1. `policy-index` / `responsibility-candidates`
+1. `policy-index`
 2. `doc-duplicate-hints` / `ignore-candidates`
 3. project-specific / language-specific analysis only when maintenance cost is justified
 
