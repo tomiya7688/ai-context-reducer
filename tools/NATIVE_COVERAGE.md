@@ -25,6 +25,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | changed file -> test/doc routing | `change-router` | `acr-toolbox change-router` |
 | changed file -> validation-kind routing | `validation-plan` | `acr-toolbox validation-plan` |
 | Responsibility Map starter Markdown | `responsibility-candidates` | `acr-toolbox responsibility-candidates` |
+| policy/rule routing index | `policy-index` | `acr-toolbox policy-index` |
+| repeated documentation hints | `doc-duplicate-hints` | `acr-toolbox doc-duplicate-hints` |
 | Goal/Required/Acceptance/Deferred extraction | `acceptance-extractor` | `acr-toolbox acceptance-extractor` |
 | exploration stop heuristic | `exploration-stop-check` | `acr-toolbox exploration-stop-check` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
@@ -50,6 +52,8 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 
 `responsibility-candidates` もMarkdown artifactを維持した独立実装です。内部code scanは既定unlimited、table rowsだけをboundedにし、stat/walk/truncationはMarkdown commentで伝えます。
 
+`policy-index` はdependency/generated docsを除外し、英語rule語をword boundaryで判定します。`doc-duplicate-hints` はfull document scan後にgroup/occurrenceだけをboundedにし、同じ本文をoccurrenceごとに重複出力しません。いずれもPython/nativeを独立実装し、JSON contractとtestで揃えます。
+
 `acceptance-extractor` / `exploration-stop-check` も独立実装です。英語termのword-boundary semantics、日本語term、truncation、missing/read errorをtestで合わせます。
 
 ## Python-only / not yet native
@@ -57,8 +61,6 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 現時点で次は Python implementation が中心です。
 
 ### Common medium
-- `policy-index`
-- `doc-duplicate-hints`
 - `ignore-candidates`
 - `structural-search`
 
@@ -87,9 +89,8 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 
 次の候補は、native化そのものより利用頻度とmaintenance costを見て判断します。
 
-1. `policy-index`
-2. `doc-duplicate-hints` / `ignore-candidates`
-3. project-specific / language-specific analysis only when maintenance cost is justified
+1. `ignore-candidates`
+2. project-specific / language-specific analysis only when maintenance cost is justified
 
 `structural-search` はexternal `ast-grep` reuseを優先するため、native coverageのためだけに別parserを作りません。
 
