@@ -131,6 +131,25 @@ class SourceStructureProcessingTests(unittest.TestCase):
         )
 
 
+
+    def test_build_propagates_graph_analyzer_warning_counts(self):
+        graphs = [
+            ('graph.json', {
+                'tool': 'python-module-graph',
+                'status': 'ok_with_warnings',
+                'edges': [],
+                'parse_error_count': 1,
+                'read_error_count': 2,
+                'scan_truncated': False,
+            })
+        ]
+        index = module.build_index([], graphs)
+        self.assertEqual(
+            ['graph.json: analyzer warnings parse_error_count=1 read_error_count=2'],
+            index['input_errors'],
+        )
+
+
     def test_query_prefers_exact_name(self):
         index = {
             'nodes': [
