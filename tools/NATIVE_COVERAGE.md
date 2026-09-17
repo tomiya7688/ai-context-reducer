@@ -8,7 +8,8 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 
 | Method / use | Python tool | Native implementation |
 |---|---|---|
-| repository analysis | `analyze-and-recommend` | `acr-toolbox analyze` |
+| repository/runtime fact analysis | `analyze-and-recommend` | `acr-toolbox analyze` |
+| ordered tool routing / exploration stop | `tool-selector` | `acr-toolbox select` |
 | Search-first text search | `text-search` | `acr-toolbox search` |
 | path search | `path-find` | `acr-toolbox find` |
 | bounded tree | `tree-view` | `acr-toolbox tree` |
@@ -44,6 +45,10 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 Windows / Linux / macOS では prebuilt/native binaryを優先し、利用できない場合は対応するPython implementationまたは別fallbackへ切り替えます。
 
 Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildできる形を基本とします。
+
+`analyze-and-recommend` / `acr-toolbox analyze` はrepository/runtime factsの収集だけを担当します。tool推薦を二重保持せず、出力の `routing_handoff` から `tool-selector` / `acr-toolbox select` へ進みます。
+
+`tool-selector` / `acr-toolbox select` はordered routingのSource of Truthです。候補を `orient -> search -> scope -> inspect -> validate -> stop` の順で返し、各entryに `phase / activation / availability / reason` を持たせます。external backendが本体となるtoolはbackendが利用可能な時だけ通常routingへ入れ、portable fallbackを持つtoolはfallback readinessを明示します。
 
 `materialize-tools` はbootstrap用途でも使えるよう、Python版とは独立して `acr-toolbox materialize` を持ちます。native版は実行中のtoolbox自身とOS向けwrapperを `bin/` + root wrapper layoutへ配置し、preview / conflict protection / hash manifestを同じ契約で提供します。
 
