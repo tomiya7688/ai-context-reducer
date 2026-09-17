@@ -45,4 +45,4 @@ repoで使われている言語
 
 ## 配布方針
 
-Common機能は prebuilt `acr-toolbox` を Windows / Linux / macOS 向けに配布します。言語固有解析は、既存runtime/compilerを利用できる範囲を優先し、別SDKやparserの必須依存を増やさないことを基本とします。
+Common機能は prebuilt `acr-toolbox` を Windows / Linux / macOS 向けに配布します。Goで独立実装している `affected-tests` / `go-symbols` / `go-import-map` / `go-package-graph` も同じplatform bundleへ含めます。その他の言語固有解析は、既存runtime/compilerを利用できる範囲を優先し、別SDKやparserの必須依存を増やさないことを基本とします。
