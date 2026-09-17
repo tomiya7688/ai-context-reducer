@@ -16,10 +16,48 @@ func TestSelectReturnsOrderedRoutingAndNoLatestFalsePositive(t *testing.T) {
     if output["test_file_count"] != float64(0) { t.Fatalf("latest.py must not be counted as test: %#v", output) }
     routing, ok := output["routing_order"].([]any)
     if !ok || len(routing) != 6 || routing[0] != "orient" || routing[5] != "stop" { t.Fatalf("unexpected routing order: %#v", output["routing_order"]) }
+    taskContext := output["task_context"].(map[string]any)
+    if taskContext["applied"] != false { t.Fatalf("task context should be inactive: %#v", taskContext) }
     recommended, ok := output["recommended_tools"].([]any)
     if !ok || len(recommended) == 0 { t.Fatalf("missing recommended tools: %#v", output) }
     first := recommended[0].(map[string]any)
     if first["phase"] != "orient" { t.Fatalf("routing is not phase ordered: %#v", recommended) }
+}
+
+func TestSelectTaskContextNarrowsRecommendedTools(t *testing.T) {
+    root := t.TempDir()
+    if err := os.Mkdir(filepath.Join(root, ".git"), 0o755); err != nil { t.Fatal(err) }
+    if err := os.Mkdir(filepath.Join(root, "src"), 0o755); err != nil { t.Fatal(err) }
+    if err := os.Mkdir(filepath.Join(root, "tests"), 0o755); err != nil { t.Fatal(err) }
+    if err := os.WriteFile(filepath.Join(root, "src", "service.go"), []byte("package service\n"), 0o644); err != nil { t.Fatal(err) }
+    if err := os.WriteFile(filepath.Join(root, "tests", "service_test.go"), []byte("package tests\n"), 0o644); err != nil { t.Fatal(err) }
+    if err := os.WriteFile(filepath.Join(root, "TASK.md"), []byte("# Goal\nChange service behavior\n"), 0o644); err != nil { t.Fatal(err) }
+
+    code, output := captureJSONCommand(t, func() int {
+        return cmdSelect([]string{
+            "--goal", "Change service behavior",
+            "--task-file", "TASK.md",
+            "--changed", "src/service.go",
+            "--validation-intent", "targeted",
+            root,
+        })
+    })
+    if code != 0 { t.Fatalf("unexpected exit code=%d output=%#v", code, output) }
+    taskContext := output["task_context"].(map[string]any)
+    if taskContext["applied"] != true { t.Fatalf("task context should be active: %#v", taskContext) }
+    conditional := output["conditional_tools"].([]any)
+    if len(conditional) != 0 { t.Fatalf("task-aware routing should defer unrelated conditional tools: %#v", conditional) }
+    recommended := output["recommended_tools"].([]any)
+    selected := map[string]bool{}
+    for _, raw := range recommended {
+        row := raw.(map[string]any)
+        selected[row["tool_path"].(string)] = true
+        if row["task_relevance"] != "direct" { t.Fatalf("missing task relevance: %#v", row) }
+    }
+    for _, path := range []string{"common/small/text-search", "common/medium/acceptance-extractor", "common/medium/compact-diff", "common/medium/change-router", "common/medium/validation-plan"} {
+        if !selected[path] { t.Fatalf("expected task-aware tool %s in %#v", path, selected) }
+    }
+    if selected["common/large/context-budget"] { t.Fatalf("unrelated large routing tool should be deferred: %#v", selected) }
 }
 
 func TestAnalyzeHandsRoutingToSelector(t *testing.T) {
