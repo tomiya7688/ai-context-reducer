@@ -11,6 +11,17 @@ Linux/macOS: tools/setup.sh <project-root>
 
 不足runtime / SDKは自動installしません。利用可能なnative / Python / external toolだけを候補化します。
 
+通常のrouting入口は次です。
+
+```text
+analyze-and-recommend / acr-toolbox analyze
+  -> repository / runtime facts
+  -> tool-selector / acr-toolbox select
+  -> orient -> search -> scope -> inspect -> validate -> stop
+```
+
+`analyze` はtool推薦を重複保持しません。ordered tool routingとexploration-stop条件のSource of Truthは `tool-selector` / `acr-toolbox select` です。
+
 ## Development routing
 
 `tools/` 自体にもContext Reducerを適用します。
@@ -43,6 +54,7 @@ context-budget
 policy-index
 doc-duplicate-hints
 source-structure-index
+tool-selector
 ```
 
 複数の変更理由を持つ場合、必要に応じて次の責務へ分離します。
@@ -105,8 +117,9 @@ portable binary buildも `go test ./...` 成功後だけartifact buildへ進み�
 主なsubcommand:
 
 ```text
-analyze search find tree stats doc-index slice
-compact-log compact-diff remote-delta structure-index language-env env
+analyze select search find tree stats doc-index slice
+compact-log compact-diff remote-delta git-history-health syntax-health
+structure-index context-budget hotspot-report language-env env
 ```
 
 ## Categories
@@ -124,19 +137,24 @@ profiles       optional project-type / routing input
 ## Main routing tools
 
 ```text
-Search-first             -> search / find / structural-search / tree / doc-index / slice
-Exploration stop         -> acceptance-extractor / exploration-stop-check
-Remote delta             -> remote-delta / compact-diff
-Responsibility           -> responsibility-candidates
-Change routing           -> change-router
-Architecture hints       -> architecture-boundary-router + project-provided profile
-Affected tests           -> affected-tests
-Policy routing           -> policy-index
-Validation               -> validation-plan / compact-log
-Context pack             -> context-pack-builder
-Source structure         -> language-specific symbols / dependency / graph tools -> source-structure-index
-Context priority         -> context-manifest / context-budget / hotspot-report
+Repository facts          -> analyze-and-recommend / acr-toolbox analyze
+Ordered tool routing      -> tool-selector / acr-toolbox select
+Search-first              -> search / find / structural-search / tree / doc-index / slice
+Exploration stop          -> acceptance-extractor / exploration-stop-check
+Remote delta              -> remote-delta / compact-diff
+Responsibility            -> responsibility-candidates
+Change routing            -> change-router
+Architecture hints        -> architecture-boundary-router + project-provided profile
+Affected tests            -> affected-tests
+Policy routing            -> policy-index
+Validation                -> validation-plan / syntax-health / compact-log
+Context pack              -> context-pack-builder
+Source structure          -> language-specific symbols / dependency / graph tools -> source-structure-index
+Context priority          -> context-manifest / context-budget / hotspot-report
+Git history health        -> git-history-health
 ```
+
+`tool-selector` は候補を `orient -> search -> scope -> inspect -> validate -> stop` の順で返します。各entryは `phase / activation / availability / reason` を持ち、external backendが必要なtoolは利用可能性もrouting時点で反映します。
 
 `structural-search` はplain text searchでは候補が広すぎる場合に構文形状で絞ります。既に `ast-grep` があればbackendとして再利用し、無ければPython sourceだけstdlib AST fallbackを使います。外部toolは自動installしません。
 
