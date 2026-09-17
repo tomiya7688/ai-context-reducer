@@ -59,6 +59,37 @@ JSON intended for both agents and humans should be pretty-printed and use stable
 
 Tools whose actual artifact is Markdown/text (for example a Context Pack generator) may emit that artifact instead of JSON.
 
+
+## Language analyzer minimum contract
+
+Language-specific symbol analyzers should keep file-level failures distinguishable from a valid file with zero symbols.
+
+```json
+{
+  "tool": "python-symbols",
+  "status": "ok_with_warnings",
+  "language": "python",
+  "files": [
+    {
+      "file": "src/example.py",
+      "status": "parse_failed",
+      "symbols": [],
+      "error": "..."
+    }
+  ],
+  "file_count": 1,
+  "symbol_count": 0,
+  "parse_error_count": 1,
+  "read_error_count": 0,
+  "unsupported_input_count": 0,
+  "unsupported_inputs": []
+}
+```
+
+A file row with `status=ok` and `symbols=[]` means analysis succeeded and no symbols were found. Parse/read failure must use a different file status. Unsupported or missing explicit inputs must not disappear silently.
+
+Downstream indexes may accept older list-only analyzer output for compatibility, but new analyzer output should use the self-describing object form.
+
 ## Compatibility
 
 Treat field removal, renaming, type changes, or status semantic changes as output-contract changes. Validate them with targeted contract tests. Python and Go implementations that advertise the same CLI contract should produce semantically equivalent fields, even when their internals are independent.
