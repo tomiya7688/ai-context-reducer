@@ -60,6 +60,31 @@ func TestBuildStructureIndexBridgesGoPackageToFile(t *testing.T) {
     if !found { t.Fatal("missing Go package to file bridge") }
 }
 
+
+func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
+    dir := t.TempDir()
+    symbols := filepath.Join(dir, "symbols.json")
+    if err := os.WriteFile(symbols, []byte(`{
+      "tool":"go-symbols",
+      "status":"ok_with_warnings",
+      "files":[{"file":"broken.go","status":"parse_failed","symbols":[]}],
+      "parse_error_count":1,
+      "read_error_count":0,
+      "unsupported_input_count":2
+    }`), 0o644); err != nil { t.Fatal(err) }
+
+    index, err := buildStructureIndex([]string{symbols}, nil, "")
+    if err != nil { t.Fatal(err) }
+    if len(index.InputErrors) != 1 {
+        t.Fatalf("expected one analyzer warning, got %#v", index.InputErrors)
+    }
+    want := symbols + ": analyzer warnings parse_error_count=1 unsupported_input_count=2"
+    if index.InputErrors[0] != want {
+        t.Fatalf("unexpected analyzer warning: %q want %q", index.InputErrors[0], want)
+    }
+}
+
+
 func TestStructureQueryAndExpansion(t *testing.T) {
     index := structureIndex{
         Format: structureIndexFormat,
