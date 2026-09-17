@@ -1,32 +1,33 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import platform
 import shutil
 import subprocess
 from collections import Counter
 from pathlib import Path
 
-IGNORE = {'.git','.venv','venv','node_modules','bin','obj','build','dist','__pycache__','.godot','.cache'}
-LANG = {'.py':'python','.cs':'csharp','.go':'go','.c':'c','.h':'c','.cpp':'cpp','.cc':'cpp','.cxx':'cpp','.hpp':'cpp','.hh':'cpp','.gd':'gdscript'}
+IGNORE = {'.git','.venv','venv','node_modules','bin','obj','build','dist','__pycache__','.godot','.cache','vendor'}
+LANG = {'.py':'python','.cs':'csharp','.go':'go','.c':'c','.h':'c','.cpp':'cpp','.cc':'cpp','.cxx':'cpp','.hpp':'cpp','.hh':'cpp','.gd':'gdscript','.rs':'rust','.js':'javascript','.ts':'typescript','.java':'java'}
 TYPE_SIGNALS = {
     'game': {'project.godot','assets','scenes','game'},
     'gui': {'ui','views','widgets','forms','window'},
     'compiler': {'lexer','parser','token','ast','compiler','grammar'},
-    'data-tool': {'dataset','etl','converter','export','importer','migration'},
-    'packaged-app': {'installer','package','publish','release','dist'},
+    'data_tool': {'dataset','etl','converter','export','importer','migration'},
+    'packaged_app': {'installer','package','publish','release','dist'},
     'simulation': {'simulation','simulator','agent','physics','seed','random'},
-    'rule-heavy': {'rules','specification','protocol','validator','policy'},
+    'rule_heavy': {'rules','specification','protocol','validator','policy'},
 }
-EXTERNAL = ['rg','fd','ast-grep','sg','ctags','tree-sitter','scc','git-sizer','semgrep']
+EXTERNAL = ['rg','fd','ast-grep','sg','ctags','scip','tree-sitter','scc','git-sizer']
 
 
 def walk(root):
-    for p in root.rglob('*'):
-        if any(part.lower() in IGNORE for part in p.parts):
-            continue
-        if p.is_file():
-            yield p
+    for current, dirs, names in os.walk(root):
+        dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
+        current_path = Path(current)
+        for name in sorted(names):
+            yield current_path / name
 
 
 def git_result(root, *args):
@@ -48,10 +49,20 @@ def implementation_plan(repo_root):
     native = next((str(p) for p in candidates if p.exists()), None)
     python_available = shutil.which('python3') or shutil.which('python')
     preferred = 'native' if native else 'python' if python_available else 'prebuilt-native-required'
-    unused = []
-    if preferred == 'native': unused.append('python runtime is optional for deployed common tools')
-    if preferred == 'python': unused.append('native binary is optional but recommended for Python-free hosts')
-    return {'os': system, 'arch': arch, 'preferred_implementation': preferred, 'native_binary_path': native, 'python_executable_path': python_available, 'unused_variants': unused}
+    return {
+        'os': system,
+        'arch': arch,
+        'preferred_implementation': preferred,
+        'native_binary_path': native,
+        'python_executable_path': python_available,
+    }
+
+
+def is_test_path(path: Path, root: Path) -> bool:
+    relative = path.relative_to(root)
+    name = path.name.lower()
+    parts = {part.lower() for part in relative.parts}
+    return name.startswith('test_') or name.endswith('_test.py') or name.endswith('_test.go') or bool({'test', 'tests'} & parts)
 
 
 def analyze(root: Path) -> dict[str, object]:
@@ -60,12 +71,24 @@ def analyze(root: Path) -> dict[str, object]:
     non_language_files = 0
     stat_error_count = 0
     large_files = 0
+    detected_types = set()
+    docs = 0
+    tests = 0
+
     for p in paths:
         lang = LANG.get(p.suffix.lower())
         if lang is None:
             non_language_files += 1
         else:
             langs[lang] += 1
+        if p.suffix.lower() in {'.md','.rst','.txt'}:
+            docs += 1
+        if is_test_path(p, root):
+            tests += 1
+        relative = p.relative_to(root).as_posix().lower()
+        for project_type, words in TYPE_SIGNALS.items():
+            if any(word in relative for word in words):
+                detected_types.add(project_type)
         try:
             if p.stat().st_size >= 100_000:
                 large_files += 1
@@ -73,10 +96,6 @@ def analyze(root: Path) -> dict[str, object]:
             stat_error_count += 1
 
     size = 'small' if len(paths) < 200 else 'medium' if len(paths) < 2000 else 'large'
-    hay = ' '.join(str(p.relative_to(root)).lower() for p in paths)
-    types = [k for k, words in TYPE_SIGNALS.items() if any(w in hay for w in words)]
-    docs = [p for p in paths if p.suffix.lower() in {'.md','.rst','.txt'}]
-    tests = [p for p in paths if 'test' in p.name.lower() or any(x.lower() in {'test','tests'} for x in p.parts)]
     git_repository_present = (root / '.git').exists()
     git_executable_available = bool(shutil.which('git'))
     git_status = 'not_repository'
@@ -87,52 +106,24 @@ def analyze(root: Path) -> dict[str, object]:
         dirty = bool(text) if ok else None
     elif git_repository_present:
         git_status = 'git_unavailable'
-    external = [x for x in EXTERNAL if shutil.which(x)]
-    runtime_plan = implementation_plan(root)
 
-    techniques = ['AI_CONTEXT minimum core','Search-first / Read-second','Exploration stop condition','Source of Truth','Targeted validation']
-    tools = ['common/small/doc-index','common/small/file-role-map','common/small/environment-plan']
-    if git_repository_present:
-        techniques += ['Diff-first workflow','Remote Delta First']
-        tools += ['common/medium/compact-diff','common/medium/remote-delta','common/medium/change-router']
-    if docs:
-        techniques.append('Document routing / heading-first reading')
-    if len(paths) >= 200:
-        techniques += ['Responsibility Map','Change Routing Map','Structural search before broad source reads']
-        tools += ['common/medium/structural-search','common/medium/responsibility-candidates','common/medium/context-pack-builder']
-    if len(paths) >= 2000 or large_files:
-        techniques += ['Source Structure Index','Bounded excerpts','Context manifest']
-        tools += ['common/large/context-manifest','common/large/hotspot-report','common/large/target-slice','common/large/context-budget','common/large/source-structure-index']
-    if tests:
-        techniques.append('Validation Routing')
-        tools.append('common/medium/validation-plan')
-    if 'rule-heavy' in types:
-        techniques += ['Policy Routing','Compact checker output']
-        tools.append('common/medium/policy-index')
-    if {'game','gui'} & set(types): techniques.append('Headless-first + visual confirmation when required')
-    if 'simulation' in types: techniques.append('Deterministic seam / structured observation')
-    if 'packaged-app' in types: techniques.append('Artifact-boundary validation')
-    for lang, _ in langs.most_common(3):
-        if lang in {'python','csharp','go','c','cpp','gdscript'}:
-            tools.append(f'{lang}/small')
-            if size in {'medium','large'}: tools.append(f'{lang}/medium')
-            if size == 'large': tools.append(f'{lang}/large')
-
+    external = [name for name in EXTERNAL if shutil.which(name)]
+    status = 'ok_with_warnings' if stat_error_count else 'ok'
     return {
         'tool': 'analyze-and-recommend',
-        'status': 'ok',
+        'status': status,
         'project_root': str(root),
         'project_size_class': size,
         'files_scanned': len(paths),
         'scan_truncated': False,
         'recognized_source_files_scanned': sum(langs.values()),
         'non_language_files_scanned': non_language_files,
-        'documentation_file_count': len(docs),
-        'test_file_count': len(tests),
+        'documentation_file_count': docs,
+        'test_file_count': tests,
         'large_files_100kb_plus_count': large_files,
         'file_stat_error_count': stat_error_count,
         'language_file_counts': dict(langs.most_common()),
-        'detected_project_types': types,
+        'detected_project_types': sorted(detected_types),
         'git': {
             'repository_present': git_repository_present,
             'executable_available': git_executable_available,
@@ -140,14 +131,17 @@ def analyze(root: Path) -> dict[str, object]:
             'dirty': dirty,
         },
         'external_tools_available': external,
-        'runtime_plan': runtime_plan,
-        'recommended_techniques': list(dict.fromkeys(techniques)),
-        'recommended_tool_paths': list(dict.fromkeys(tools)),
+        'runtime_plan': implementation_plan(root),
+        'routing_handoff': {
+            'tool_path': 'common/small/tool-selector',
+            'native_command': 'acr-toolbox select',
+            'reason': 'tool-selector is the Source of Truth for ordered tool routing and exploration-stop conditions',
+        },
     }
 
 
 def main():
-    ap = argparse.ArgumentParser(description='Analyze a repository and recommend Context Reducer techniques/tools as self-describing JSON.')
+    ap = argparse.ArgumentParser(description='Analyze repository/runtime facts, then hand off ordered tool routing to tool-selector.')
     ap.add_argument('root', nargs='?', default='.')
     args = ap.parse_args()
     root = Path(args.root).resolve()
