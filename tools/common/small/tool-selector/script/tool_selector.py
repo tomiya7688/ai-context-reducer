@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import shutil
 from collections import Counter
 from pathlib import Path
 
@@ -22,6 +23,9 @@ TYPE_SIGNALS = {
     'rule_heavy': {'rules', 'specification', 'protocol', 'validator', 'legal', 'policy'},
 }
 
+EXTERNAL_CANDIDATES = ('rg', 'fd', 'ast-grep', 'sg', 'ctags', 'scip', 'tree-sitter', 'scc', 'git-sizer')
+PHASE_ORDER = {'orient': 0, 'search': 1, 'scope': 2, 'inspect': 3, 'validate': 4, 'stop': 5}
+
 
 def iter_files(root: Path):
     for current, dirs, names in os.walk(root):
@@ -40,69 +44,95 @@ def detect_types_from_relative_path(relative_path: str, detected: set[str]) -> N
             detected.add(project_type)
 
 
-def item(path: str, reason: str) -> dict[str, str]:
-    return {'tool_path': path, 'reason': reason}
+def available_external_tools() -> set[str]:
+    return {name for name in EXTERNAL_CANDIDATES if shutil.which(name)}
 
 
-def recommend(size, languages, project_types, docs, tests, has_git):
+def item(path: str, reason: str, phase: str = 'orient', activation: str = 'always', availability: str = 'ready') -> dict[str, str]:
+    return {
+        'tool_path': path,
+        'phase': phase,
+        'activation': activation,
+        'availability': availability,
+        'reason': reason,
+    }
+
+
+def _availability(path: str, external: set[str]) -> str:
+    if path == 'common/small/text-search':
+        return 'external_backend_ready' if 'rg' in external else 'portable_fallback_ready'
+    if path == 'common/small/path-find':
+        return 'external_backend_ready' if 'fd' in external else 'portable_fallback_ready'
+    if path in {'common/small/repo-profile', 'common/small/repo-stats'}:
+        return 'external_backend_ready' if 'scc' in external else 'portable_fallback_ready'
+    if path == 'common/medium/structural-search':
+        return 'external_backend_ready' if {'ast-grep', 'sg'} & external else 'python_ast_fallback_limited'
+    return 'ready'
+
+
+def recommend(size, languages, project_types, docs, tests, has_git, external_tools=None):
+    external = set(external_tools or ())
     recommended = [
-        item('common/small/analyze-and-recommend', 'cheap first-pass repository guidance'),
-        item('common/small/repo-profile', 'identify repository size and language mix'),
-        item('common/small/source-of-truth-candidates', 'find likely authoritative documentation entry points'),
+        item('common/small/repo-profile', 'identify repository size and language mix before deeper reads', 'orient', availability=_availability('common/small/repo-profile', external)),
+        item('common/small/source-of-truth-candidates', 'find likely authoritative documentation entry points before broad reading', 'orient'),
+        item('common/small/text-search', 'search for target terms before opening whole files', 'search', availability=_availability('common/small/text-search', external)),
+        item('common/small/path-find', 'narrow candidate paths before tree-wide reading', 'search', availability=_availability('common/small/path-find', external)),
     ]
     conditional = []
 
     if docs:
-        conditional.append(item('common/small/doc-index', 'documentation files are present; index headings before reading full documents'))
+        conditional.append(item('common/small/doc-index', 'documentation exists; inspect headings before full documents', 'search', 'when documentation is relevant'))
     if has_git:
-        recommended.append(item('common/medium/compact-diff', 'Git repository detected; inspect bounded change evidence before full diff'))
+        recommended.append(item('common/medium/compact-diff', 'Git repository detected; inspect bounded change evidence before full diff', 'scope', 'when the task concerns current changes'))
         conditional.extend([
-            item('common/medium/remote-delta', 'use when local/remote divergence matters'),
-            item('common/medium/change-router', 'use when changed files need likely tests/docs routing'),
-            item('common/medium/context-pack-builder', 'use when preparing a bounded task context pack'),
+            item('common/medium/remote-delta', 'compare local and remote state before broad repository exploration', 'scope', 'when remote divergence matters'),
+            item('common/medium/change-router', 'route changed files to likely tests and documentation', 'scope', 'when changed files are known'),
+            item('common/medium/context-pack-builder', 'materialize a bounded task context when context must be handed off', 'inspect', 'when a reusable Context Pack is needed'),
         ])
-        if size == 'large':
-            conditional.append(item('common/small/git-history-health', 'large Git repository may need compact history/object health analysis via existing git-sizer'))
+        if size == 'large' and 'git-sizer' in external:
+            conditional.append(item('common/small/git-history-health', 'reuse existing git-sizer for compact history/object health findings', 'orient', 'when repository history/object size may affect work', 'external_backend_ready'))
     if tests:
         conditional.extend([
-            item('common/medium/validation-plan', 'test files detected; derive targeted validation from changed paths'),
-            item('common/medium/compact-log', 'use when validation output is too large for agent context'),
+            item('common/medium/validation-plan', 'derive targeted validation from changed paths instead of running everything first', 'validate', 'when implementation changes are ready to validate'),
+            item('common/medium/compact-log', 'compress large validation output to actionable findings', 'validate', 'when validation output is verbose'),
         ])
     if docs:
         conditional.extend([
-            item('common/medium/acceptance-extractor', 'use when task documents contain goal/acceptance sections'),
-            item('common/medium/exploration-stop-check', 'use to decide whether broad exploration can stop'),
+            item('common/medium/acceptance-extractor', 'extract Goal/Required/Acceptance before implementation when task docs contain them', 'orient', 'when a task/specification document exists'),
+            item('common/medium/exploration-stop-check', 'check whether enough task context exists to stop broad exploration', 'stop', 'after Goal/Required/Acceptance/source/tests are identified'),
         ])
     if size in {'medium', 'large'}:
-        recommended.append(item('common/medium/change-router', f'{size} repository benefits from change-to-test/doc routing'))
+        recommended.append(item('common/medium/change-router', f'{size} repository benefits from change-to-test/doc routing', 'scope', 'when changed files are known'))
         conditional.extend([
-            item('common/medium/structural-search', 'use syntax-shaped search when plain text search returns too many unrelated matches'),
-            item('common/medium/responsibility-candidates', 'use to locate likely responsibility boundaries'),
-            item('common/medium/doc-duplicate-hints', 'use when duplicated documentation may inflate context'),
-            item('common/large/hotspot-report', 'use to find large/deep repository hotspots'),
+            item('common/medium/structural-search', 'use syntax-shaped search when text search is noisy', 'search', 'when text search returns unrelated matches', _availability('common/medium/structural-search', external)),
+            item('common/medium/responsibility-candidates', 'locate likely responsibility boundaries before reading neighboring modules', 'scope', 'when ownership boundaries are unclear'),
+            item('common/medium/doc-duplicate-hints', 'find duplicated documentation that may inflate context', 'orient', 'when documentation is repetitive'),
+            item('common/large/hotspot-report', 'find large/deep hotspots before broad source reads', 'orient', 'when repository shape is unclear'),
         ])
     if size == 'large':
         recommended.extend([
-            item('common/large/context-manifest', 'large repository benefits from prioritized context routing'),
-            item('common/large/target-slice', 'read bounded excerpts instead of full files'),
-            item('common/large/context-budget', 'estimate likely agent context cost before broad reads'),
-            item('common/large/source-structure-index', 'reuse language-specific symbol/dependency analysis and expand only the target neighborhood'),
+            item('common/large/context-manifest', 'prioritize likely context entry points in a large repository', 'orient'),
+            item('common/large/source-structure-index', 'query and expand only the target symbol/dependency neighborhood', 'scope'),
+            item('common/large/target-slice', 'read bounded excerpts instead of full source files', 'inspect'),
+            item('common/large/context-budget', 'estimate likely agent context cost before broad reads', 'orient'),
         ])
+    if 'tree-sitter' in external and languages:
+        conditional.append(item('common/small/syntax-health', 'reuse configured Tree-sitter parsers to surface only files with syntax issues', 'validate', 'when syntax-level validation is useful', 'external_backend_ready'))
     if 'rule_heavy' in project_types:
-        conditional.append(item('common/medium/policy-index', 'rule-heavy project detected; extract likely policy lines before reading full documents'))
+        conditional.append(item('common/medium/policy-index', 'extract likely policy lines before reading full rule documents', 'orient', 'when policy/rule constraints govern the task'))
 
     groups = []
     conditional_groups = []
     for lang, _ in languages[:3]:
-        groups.append({'tool_group_path': f'{lang}/small', 'reason': f'{lang} source files detected'})
+        groups.append({'tool_group_path': f'{lang}/small', 'phase': 'search', 'reason': f'{lang} source files detected'})
         if size in {'medium', 'large'}:
-            conditional_groups.append({'tool_group_path': f'{lang}/medium', 'reason': f'{size} {lang} project may need dependency/change analysis'})
+            conditional_groups.append({'tool_group_path': f'{lang}/medium', 'phase': 'scope', 'reason': f'{size} {lang} project may need dependency/change analysis'})
         if size == 'large':
-            conditional_groups.append({'tool_group_path': f'{lang}/large', 'reason': f'large {lang} project may benefit from whole-scope analysis'})
+            conditional_groups.append({'tool_group_path': f'{lang}/large', 'phase': 'scope', 'reason': f'large {lang} project may benefit from whole-scope analysis'})
     if project_types:
-        conditional_groups.append({'tool_group_path': 'profiles/project-type-profile', 'reason': 'project-type signals were detected'})
+        conditional_groups.append({'tool_group_path': 'profiles/project-type-profile', 'phase': 'orient', 'reason': 'project-type signals were detected'})
 
-    def dedupe(rows, key):
+    def dedupe_and_sort(rows, key):
         out = []
         seen = set()
         for row in rows:
@@ -111,9 +141,14 @@ def recommend(size, languages, project_types, docs, tests, has_git):
                 continue
             seen.add(value)
             out.append(row)
-        return out
+        return sorted(out, key=lambda row: PHASE_ORDER.get(row.get('phase', 'orient'), 99))
 
-    return dedupe(recommended, 'tool_path'), dedupe(conditional, 'tool_path'), dedupe(groups, 'tool_group_path'), dedupe(conditional_groups, 'tool_group_path')
+    return (
+        dedupe_and_sort(recommended, 'tool_path'),
+        dedupe_and_sort(conditional, 'tool_path'),
+        dedupe_and_sort(groups, 'tool_group_path'),
+        dedupe_and_sort(conditional_groups, 'tool_group_path'),
+    )
 
 
 def build_selection(root: Path) -> dict[str, object]:
@@ -134,13 +169,16 @@ def build_selection(root: Path) -> dict[str, object]:
         if path.suffix.lower() in {'.md', '.rst', '.txt'}:
             documentation_file_count += 1
         relative = path.relative_to(root)
-        if 'test' in path.name.lower() or 'tests' in {part.lower() for part in relative.parts}:
+        name = path.name.lower()
+        parts = {part.lower() for part in relative.parts}
+        if name.startswith('test_') or name.endswith('_test.py') or name.endswith('_test.go') or {'test', 'tests'} & parts:
             test_file_count += 1
         detect_types_from_relative_path(relative.as_posix(), detected_types)
 
     size = 'small' if file_count < 200 else 'medium' if file_count < 2000 else 'large'
     project_types = sorted(detected_types)
     has_git = (root / '.git').exists()
+    external = available_external_tools()
     recommended, conditional, groups, conditional_groups = recommend(
         size,
         languages.most_common(),
@@ -148,6 +186,7 @@ def build_selection(root: Path) -> dict[str, object]:
         documentation_file_count,
         test_file_count,
         has_git,
+        external,
     )
     return {
         'tool': 'tool-selector',
@@ -163,6 +202,14 @@ def build_selection(root: Path) -> dict[str, object]:
         'documentation_file_count': documentation_file_count,
         'test_file_count': test_file_count,
         'git_repository_detected': has_git,
+        'external_tools_available': sorted(external),
+        'routing_order': ['orient', 'search', 'scope', 'inspect', 'validate', 'stop'],
+        'exploration_stop_conditions': [
+            'Goal, Required, and Acceptance are known',
+            'authoritative source or implementation target is identified',
+            'targeted validation path is identified',
+            'additional broad exploration is unlikely to change the working set',
+        ],
         'recommended_tools': recommended,
         'conditional_tools': conditional,
         'recommended_tool_groups': groups,
@@ -171,7 +218,7 @@ def build_selection(root: Path) -> dict[str, object]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Select likely useful Context Reducer tools as self-describing JSON.')
+    parser = argparse.ArgumentParser(description='Select an ordered Context Reducer routing plan as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
     args = parser.parse_args()
     root = Path(args.root).resolve()
