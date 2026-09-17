@@ -46,6 +46,9 @@ Windows / Linux / macOS では prebuilt/native binaryを優先し、利用でき
 
 Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildできる形を基本とします。
 
+
+CIの `Build portable tools` は `acr-toolbox` と standalone Go tools 4本を同じplatform bundleへcross-buildします。Windows / Linux / macOS × amd64 / arm64をartifact化し、build前にUbuntu / Windowsで各Go moduleのtestを実行します。
+
 `analyze-and-recommend` / `acr-toolbox analyze` はrepository/runtime factsの収集だけを担当します。tool推薦を二重保持せず、出力の `routing_handoff` から `tool-selector` / `acr-toolbox select` へ進みます。
 
 `tool-selector` / `acr-toolbox select` はordered routingのSource of Truthです。候補を `orient -> search -> scope -> inspect -> validate -> stop` の順で返し、各entryに `phase / activation / availability / reason` を持たせます。external backendが本体となるtoolはbackendが利用可能な時だけ通常routingへ入れ、portable fallbackを持つtoolはfallback readinessを明示します。
