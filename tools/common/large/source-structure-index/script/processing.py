@@ -67,8 +67,17 @@ def build_index(symbol_payloads: list[dict], graph_payloads: list[dict], root: P
             input_errors.append(f'{source_name}: unsupported symbol payload')
             continue
         rows = payload.get('files', []) if isinstance(payload, dict) else payload
-        if isinstance(payload, dict) and any(value is True for key, value in payload.items() if key.endswith('truncated')):
-            input_truncated = True
+        if isinstance(payload, dict):
+            if any(value is True for key, value in payload.items() if key.endswith('truncated')):
+                input_truncated = True
+            warning_counts = {
+                key: int(payload.get(key, 0) or 0)
+                for key in ('parse_error_count', 'read_error_count', 'unsupported_input_count')
+            }
+            nonzero = {key: value for key, value in warning_counts.items() if value > 0}
+            if nonzero:
+                details = ' '.join(f'{key}={value}' for key, value in nonzero.items())
+                input_errors.append(f'{source_name}: analyzer warnings {details}')
         for row in rows:
             if not isinstance(row, dict) or not row.get('file'):
                 continue
