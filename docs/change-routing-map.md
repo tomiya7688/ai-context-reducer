@@ -2,7 +2,7 @@
 
 変更内容から、最初に読む実装・最初に走らせる検証・必要な詳細資料を直接引ける対応表を持つことを推奨します。
 
-この考え方は `kadocacio` の AI 向けコード地図と、`upd-commander-base-design` の責務境界・正式通信経路を参考にしています。
+重要なのは、既存の責務境界・依存方向・source/test対応をrouting sourceとして再利用し、毎回repository全体から関係箇所を探し直さないことです。
 
 ## 目的
 
@@ -38,28 +38,24 @@ Task type / changed area
 
 アーキテクチャ自体が責務と正式な依存経路を定義している場合、その境界を Change Routing Map の入力として利用できます。
 
-`upd-commander-base-design` では、UI / Process / Data と Commander / Messenger / Processing の責務、Application boundary、層間通信経路が明示されています。
-
-そのため例えば、
+例えば、UI / Process / Data、Application / Domain / Infrastructure、frontend / backend / storageなど、既存architectureが所有者と通信境界を明示しているなら、変更種別から関係する責務だけを先に選べます。
 
 ```text
 UI表示変更
-  -> UI Processing / UI Commander
-  -> Process/Data は contract 変更がある場合だけ追加確認
+  -> UI responsibility
+  -> backend/data は contract 変更がある場合だけ追加確認
 
 Data保存変更
-  -> Data Processing / Data Commander
+  -> storage/data responsibility
   -> UI は通常対象外
 
 層間message変更
-  -> sender Messenger
+  -> sender boundary
   -> message contract
-  -> receiver Messenger
+  -> receiver boundary
 ```
 
-のように、変更種別から読むべき責務と隣接境界を直接絞れます。
-
-この方式は特定の3層設計を標準化するものではありません。重要なのは、既存architectureに責務・依存方向・境界が明示されているなら、それを探索削減へ再利用することです。
+この方式は特定の層構造を標準化するものではありません。重要なのは、既存architectureに責務・依存方向・境界が明示されているなら、それを探索削減へ再利用することです。
 
 ## 大きな文書は見出し検索から入る
 
