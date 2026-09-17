@@ -119,7 +119,10 @@ portable binary buildも `go test ./...` 成功後だけartifact buildへ進み�
 ```text
 analyze select search find tree stats doc-index slice
 compact-log compact-diff remote-delta git-history-health syntax-health
-structure-index context-budget hotspot-report language-env env
+structure-index context-budget hotspot-report context-manifest context-pack-builder
+change-router validation-plan responsibility-candidates policy-index
+doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
+materialize language-env env
 ```
 
 ## Categories
