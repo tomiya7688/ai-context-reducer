@@ -159,8 +159,8 @@ func selectorRecommendations(size string, languages [][2]any, projectTypes []str
 }
 
 func cmdSelect(args []string) int {
-    root := "."
-    if len(args) > 0 { root = args[0] }
+    options := parseSelectorTaskArgs(args)
+    root := options.Root
     absRoot, _ := filepath.Abs(root)
     info, err := os.Stat(absRoot)
     if err != nil {
@@ -213,6 +213,7 @@ func cmdSelect(args []string) int {
     hasGit := false
     if stat, err := os.Stat(filepath.Join(absRoot, ".git")); err == nil && stat.IsDir() { hasGit = true }
     recommended, conditional, groups, conditionalGroups := selectorRecommendations(size, languages, typeList, docs, tests, hasGit, externalMap)
+    recommended, conditional, taskContext := selectorApplyTaskContext(recommended, conditional, options)
     out := map[string]any{
         "tool": "tool-selector", "status": "ok", "project_root": absRoot, "project_size_class": size,
         "files_scanned": len(walked.Files), "scan_truncated": false,
@@ -221,6 +222,7 @@ func cmdSelect(args []string) int {
         "documentation_file_count": docs, "test_file_count": tests, "git_repository_detected": hasGit,
         "external_tools_available": externalList,
         "routing_order": []string{"orient", "search", "scope", "inspect", "validate", "stop"},
+        "task_context": taskContext,
         "exploration_stop_conditions": []string{
             "Goal, Required, and Acceptance are known",
             "authoritative source or implementation target is identified",
