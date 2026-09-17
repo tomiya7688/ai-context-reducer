@@ -1,6 +1,7 @@
 package main
 
 import (
+    "encoding/json"
     "os"
     "os/exec"
     "path/filepath"
@@ -8,6 +9,33 @@ import (
     "sort"
     "strings"
 )
+
+var analyzeLanguages = map[string]string{
+    ".py": "python", ".cs": "csharp", ".go": "go", ".c": "c", ".h": "c",
+    ".cpp": "cpp", ".cc": "cpp", ".cxx": "cpp", ".hpp": "cpp", ".hh": "cpp",
+    ".gd": "gdscript", ".rs": "rust", ".js": "javascript", ".ts": "typescript", ".java": "java",
+}
+
+var analyzeTypeSignals = map[string][]string{
+    "game": {"project.godot", "assets", "scenes", "game"},
+    "gui": {"ui", "views", "widgets", "forms", "window"},
+    "compiler": {"lexer", "parser", "token", "ast", "compiler", "grammar"},
+    "data_tool": {"dataset", "etl", "converter", "export", "importer", "migration"},
+    "packaged_app": {"installer", "package", "publish", "release", "dist"},
+    "simulation": {"simulation", "simulator", "agent", "physics", "seed", "random"},
+    "rule_heavy": {"rules", "specification", "protocol", "validator", "policy"},
+}
+
+func analyzeWriteJSON(value any) {
+    enc := json.NewEncoder(os.Stdout)
+    enc.SetIndent("", "  ")
+    _ = enc.Encode(value)
+}
+
+func analyzeBoundedText(text string, limit int) string {
+    if limit <= 0 || len(text) <= limit { return text }
+    return text[:limit]
+}
 
 func nativeExternalTools() []string {
     candidates := []string{"rg", "fd", "ast-grep", "sg", "ctags", "scip", "tree-sitter", "scc", "git-sizer"}
@@ -24,16 +52,16 @@ func cmdAnalyze(args []string) int {
     absRoot, _ := filepath.Abs(root)
     info, err := os.Stat(absRoot)
     if err != nil {
-        writeJSON(map[string]any{"tool": "analyze-and-recommend", "status": "input_missing", "project_root": absRoot})
+        analyzeWriteJSON(map[string]any{"tool": "analyze-and-recommend", "status": "input_missing", "project_root": absRoot})
         return 2
     }
     if !info.IsDir() {
-        writeJSON(map[string]any{"tool": "analyze-and-recommend", "status": "input_not_directory", "project_root": absRoot})
+        analyzeWriteJSON(map[string]any{"tool": "analyze-and-recommend", "status": "input_not_directory", "project_root": absRoot})
         return 2
     }
     walked, err := walkWithOptions(absRoot, false)
     if err != nil {
-        writeJSON(map[string]any{"tool": "analyze-and-recommend", "status": "scan_failed", "project_root": absRoot, "error": boundedText(err.Error(), 800)})
+        analyzeWriteJSON(map[string]any{"tool": "analyze-and-recommend", "status": "scan_failed", "project_root": absRoot, "error": analyzeBoundedText(err.Error(), 800)})
         return 1
     }
     langs := map[string]int{}
@@ -41,7 +69,7 @@ func cmdAnalyze(args []string) int {
     detected := map[string]bool{}
     for _, f := range walked.Files {
         ext := strings.ToLower(filepath.Ext(f.Path))
-        if lang := selectorLanguages[ext]; lang != "" { langs[lang]++ } else { nonLang++ }
+        if lang := analyzeLanguages[ext]; lang != "" { langs[lang]++ } else { nonLang++ }
         if ext == ".md" || ext == ".rst" || ext == ".txt" { docs++ }
         rel, _ := filepath.Rel(absRoot, f.Path)
         relSlash := strings.ToLower(filepath.ToSlash(rel))
@@ -51,10 +79,9 @@ func cmdAnalyze(args []string) int {
         for _, p := range parts { if p == "test" || p == "tests" { isTest = true } }
         if isTest { tests++ }
         if f.Size >= 100000 { large++ }
-        for projectType, words := range typeSignals {
-            normalized := strings.ReplaceAll(projectType, "-", "_")
-            if detected[normalized] { continue }
-            for _, word := range words { if strings.Contains(relSlash, word) { detected[normalized] = true; break } }
+        for projectType, words := range analyzeTypeSignals {
+            if detected[projectType] { continue }
+            for _, word := range words { if strings.Contains(relSlash, word) { detected[projectType] = true; break } }
         }
     }
     size := "small"
@@ -93,6 +120,6 @@ func cmdAnalyze(args []string) int {
         },
     }
     if walked.WalkErrorCount > 0 { out["walk_error_count"] = walked.WalkErrorCount }
-    writeJSON(out)
+    analyzeWriteJSON(out)
     return 0
 }
