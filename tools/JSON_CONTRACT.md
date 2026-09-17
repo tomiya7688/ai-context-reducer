@@ -90,6 +90,9 @@ A file row with `status=ok` and `symbols=[]` means analysis succeeded and no sym
 
 Downstream indexes may accept older list-only analyzer output for compatibility, but new analyzer output should use the self-describing object form.
 
+
+Dependency/import/graph analyzers should expose completeness separately from an empty dependency set. Use explicit counts such as `parse_error_count` / `read_error_count` and a real `scan_truncated` flag. A downstream affected-scope tool must not treat a truncated or partially failed graph as complete evidence.
+
 ## Compatibility
 
 Treat field removal, renaming, type changes, or status semantic changes as output-contract changes. Validate them with targeted contract tests. Python and Go implementations that advertise the same CLI contract should produce semantically equivalent fields, even when their internals are independent.
