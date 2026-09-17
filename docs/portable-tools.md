@@ -30,6 +30,19 @@ tool/
 
 バイナリはソース管理へ大量に直接コミットせず、GitHub Actions / Release artifact で生成することを推奨します。
 
+
+現在の `Build portable tools` workflow は、各platform bundleへ次をまとめて生成します。
+
+```text
+acr-toolbox
+affected-tests
+go-symbols
+go-import-map
+go-package-graph
+```
+
+対象は Windows / Linux / macOS × amd64 / arm64 です。artifact生成前に、これら5つのGo moduleをUbuntu / Windowsの両方で `go test ./...` します。
+
 ## Native implementation
 
 第一候補は Go とします。
