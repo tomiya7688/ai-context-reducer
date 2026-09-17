@@ -41,6 +41,7 @@ class ToolSelectorTests(unittest.TestCase):
             self.assertEqual(result['non_language_files_scanned'], 1)
             self.assertFalse(result['scan_truncated'])
             self.assertEqual(result['routing_order'], ['orient', 'search', 'scope', 'inspect', 'validate', 'stop'])
+            self.assertFalse(result['task_context']['applied'])
             self.assertTrue(result['exploration_stop_conditions'])
 
     def test_project_type_detection_uses_relative_path_content(self):
@@ -64,6 +65,34 @@ class ToolSelectorTests(unittest.TestCase):
         self.assertIn('python/large', paths(conditional_groups, 'tool_group_path'))
         phases = [module.PHASE_ORDER[row['phase']] for row in recommended]
         self.assertEqual(phases, sorted(phases))
+
+    def test_task_context_narrows_routing_to_directly_relevant_tools(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            (root / '.git').mkdir()
+            (root / 'src').mkdir()
+            (root / 'src' / 'service.py').write_text('def run():\n    pass\n', encoding='utf-8')
+            (root / 'tests').mkdir()
+            (root / 'tests' / 'test_service.py').write_text('def test_run():\n    pass\n', encoding='utf-8')
+            (root / 'TASK.md').write_text('# Goal\nChange service behavior\n', encoding='utf-8')
+            result = module.build_selection(
+                root,
+                goal='Change service behavior',
+                task_file='TASK.md',
+                changed_files=['src/service.py'],
+                validation_intent='targeted',
+            )
+            selected = paths(result['recommended_tools'], 'tool_path')
+            self.assertTrue(result['task_context']['applied'])
+            self.assertEqual(result['conditional_tools'], [])
+            self.assertIn('common/small/text-search', selected)
+            self.assertIn('common/medium/acceptance-extractor', selected)
+            self.assertIn('common/medium/compact-diff', selected)
+            self.assertIn('common/medium/change-router', selected)
+            self.assertIn('common/medium/validation-plan', selected)
+            self.assertNotIn('common/large/context-budget', selected)
+            self.assertTrue(all(row['task_relevance'] == 'direct' for row in result['recommended_tools']))
+            self.assertGreater(result['task_context']['deferred_tool_count'], 0)
 
     def test_latest_file_is_not_counted_as_test(self):
         with tempfile.TemporaryDirectory() as raw:
