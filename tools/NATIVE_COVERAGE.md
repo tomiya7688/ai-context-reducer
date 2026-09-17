@@ -18,6 +18,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | compact validation logs | `compact-log` | `acr-toolbox compact-log` |
 | compact Git diff | `compact-diff` | `acr-toolbox compact-diff` |
 | remote delta | `remote-delta` | `acr-toolbox remote-delta` |
+| Git history / repository object health | `git-history-health` | `acr-toolbox git-history-health` |
 | context-size routing estimate | `context-budget` | `acr-toolbox context-budget` |
 | large/deep file routing | `hotspot-report` | `acr-toolbox hotspot-report` |
 | prioritized repository context manifest | `context-manifest` | `acr-toolbox context-manifest` |
@@ -46,6 +47,8 @@ Standalone Go toolsは各directoryの `build.bat` / `build.sh` で一発buildで
 `materialize-tools` はbootstrap用途でも使えるよう、Python版とは独立して `acr-toolbox materialize` を持ちます。native版は実行中のtoolbox自身とOS向けwrapperを `bin/` + root wrapper layoutへ配置し、preview / conflict protection / hash manifestを同じ契約で提供します。
 
 `text-search` / `path-find` / `repo-stats` はPython/nativeともself-describing JSONをSource of Truthにし、PATH上に既存 `rg` / `fd` / `scc` があればoptional backendとして再利用します。未導入ならnormal portable fallback、見つかったbackendが失敗した場合だけfallback情報を返します。external backendのraw schemaはcallerへ漏らしません。
+
+`git-history-health` もPython/nativeを独立実装し、既存 `git-sizer --json --json-version=2` の出力から concern threshold以上のmetricだけをbounded JSONへ圧縮します。Git object graph analyzerは再実装せず、git-sizer未導入時は `external_backend_unavailable` を返します。保存済みJSONは `--json-input` で同じcontractへ変換できます。
 
 `path-find` の内部scan capと `repo-stats` のper-file size capは既定0=unlimitedです。明示的なperformance/safety capだけが解析完全性を制限し、その事実はJSONで区別します。
 
