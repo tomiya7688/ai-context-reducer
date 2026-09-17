@@ -88,11 +88,14 @@ portable-tools/
 ├─ analyze.sh or analyze.bat
 └─ common/small/
    ├─ analyze-and-recommend/script/analyze_and_recommend.py
+   ├─ tool-selector/script/tool_selector.py
    ├─ text-search/script/text_search.py
    ├─ path-find/script/path_find.py
    ├─ tree-view/script/tree_view.py
    └─ repo-stats/script/repo_stats.py
 ```
+
+`analyze-and-recommend` の `routing_handoff` が配布先でも成立するよう、Python modeでは `tool-selector` も必ず同時にmaterializeします。native modeでは `acr-toolbox` 自身が `analyze` と `select` の両subcommandを持ちます。
 
 以前のflat copyではwrapperの相対pathと一致せず、materialize後にwrapperが動きませんでした。現在はwrapper契約をSource of Truthとしてlayoutを維持します。
 
