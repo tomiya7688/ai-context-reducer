@@ -5,13 +5,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[2]
+TOOLS = Path(__file__).resolve().parents[1]
 TOOLS = [
-    ('python-symbols', 'python', REPO / 'python/small/python-symbols/script/python_symbols.py', '.py', 'def run():\n    pass\n'),
-    ('c-symbols', 'c', REPO / 'c/small/c-symbols/script/c_symbols.py', '.c', 'int run(void) {\n  return 0;\n}\n'),
-    ('cpp-symbols', 'cpp', REPO / 'cpp/small/cpp-symbols/script/cpp_symbols.py', '.cpp', 'int run() {\n  return 0;\n}\n'),
-    ('csharp-symbols', 'csharp', REPO / 'csharp/small/csharp-symbols/script/csharp_symbols.py', '.cs', 'public class Demo {\n  public void Run() {}\n}\n'),
-    ('gdscript-symbols', 'gdscript', REPO / 'gdscript/small/gdscript-symbols/script/gdscript_symbols.py', '.gd', 'func run():\n    pass\n'),
+    ('python-symbols', 'python', TOOLS / 'python/small/python-symbols/script/python_symbols.py', '.py', 'def run():\n    pass\n'),
+    ('c-symbols', 'c', TOOLS / 'c/small/c-symbols/script/c_symbols.py', '.c', 'int run(void) {\n  return 0;\n}\n'),
+    ('cpp-symbols', 'cpp', TOOLS / 'cpp/small/cpp-symbols/script/cpp_symbols.py', '.cpp', 'int run() {\n  return 0;\n}\n'),
+    ('csharp-symbols', 'csharp', TOOLS / 'csharp/small/csharp-symbols/script/csharp_symbols.py', '.cs', 'public class Demo {\n  public void Run() {}\n}\n'),
+    ('gdscript-symbols', 'gdscript', TOOLS / 'gdscript/small/gdscript-symbols/script/gdscript_symbols.py', '.gd', 'func run():\n    pass\n'),
 ]
 
 
