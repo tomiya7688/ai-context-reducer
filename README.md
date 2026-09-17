@@ -125,7 +125,7 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 
 ## 外部プロジェクトとの関係
 
-Kadoka系を含む外部リポジトリは **実装例 / 参考実装** です。
+外部リポジトリや既存プロジェクトの実装から有効な考え方を学ぶことはありますが、AI Context Reducer の標準は特定の参考プロジェクトへ依存しません。
 
 - 有効な手法だけ一般化して取り込む
 - 外部repoを必須依存にしない
@@ -133,22 +133,6 @@ Kadoka系を含む外部リポジトリは **実装例 / 参考実装** です�
 - 同じ原則を別実装でも満たせるようにする
 
 外部ツールへ具体的にリンクする場合は、原則として **無料 / 商用利用可能 / 通常利用時のクレジット明示不要 / ポータブルまたは導入容易** の4条件をすべて満たすものだけに限定します。詳細は [`docs/external-tool-reference-policy.md`](docs/external-tool-reference-policy.md) を参照してください。
-
-主な参考元:
-
-- `AI_game_player`: Current State、情報源の責務分離、巨大repo運用
-- `comfyUI_support_tools`: Search-first、探索停止、Acceptance-first、split packet
-- `kadoka_code_atlas`: Source Structure Index、bounded graph traversal
-- `kadocacio`: source / tests / docs の直接ルーティング
-- `Bitlang`: Responsibility Map、compact policy checks
-- `obake-no-sumika`: Validation Routing、structured runtime evidence
-- `upd-commander-base-design`: UI / Process / Data と Commander / Messenger / Processing の責務分離、正式な通信経路、Application境界、Policy Routing、rule strength、exception record。責務と依存経路が限定されることで、AIが読むべき実装・規定・影響範囲を絞る参考例
-- `kadoka_tetris_ai`: evidence validity、artifact smoke
-- `dot_editor`: headless-first、disposable validation workspace
-- `joke_programs`: RNG / clock 等の deterministic seam
-- `Obake_Lisense`: canonical template + variables の定型文生成
-
-これらがなくても標準は成立します。
 
 ## 導入しすぎない
 
