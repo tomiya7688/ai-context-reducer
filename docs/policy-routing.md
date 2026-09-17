@@ -2,7 +2,7 @@
 
 この文書は、規約全文を毎回 AI に読ませず、現在タスクに必要な規約だけを強さ・適用範囲・判定方法で選別するための方針です。
 
-この考え方は `upd-commander-base-design` の仕様分離、規定の強さ、例外記録、静的 checker の運用を参考にしています。外部プロジェクトは実装例であり、標準仕様そのものは依存しません。
+重要なのは、説明・必須規定・推奨事項・例外記録・機械判定可能な規則を分離し、現在タスクに必要なものだけを先に取得できるようにすることです。
 
 ## 1. 説明文書と規定文書を分ける
 
@@ -84,11 +84,7 @@ Detailed policy text only if needed
 
 成功した checker の長い出力や、現在タスクに無関係な規約全文は通常コンテキストへ入れません。
 
-## 7. 実装例
-
-`upd-commander-base-design` では、説明用 `docs/` と規定用 `specification/` を分離し、必須規定・推奨規定・品質適合条件を区別しています。
-
-また Python checker では、機械的に確定できる違反と、静的解析だけでは断定できない項目を warning として分離しています。
+## 7. 既存ツールの利用
 
 外部ツールでは [ast-grep](https://github.com/ast-grep/ast-grep) が具体例です。ASTベースのstructural search / lint / rewriteをCLIで行え、custom ruleを使って禁止パターンやproject固有の静的規則を機械判定へ移せます。npm / pip / cargo / Homebrew / Scoop 等から導入できます。
 
