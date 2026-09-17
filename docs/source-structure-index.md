@@ -2,7 +2,7 @@
 
 この文書は、ソースコード全文を読む前に、構造化された解析結果を使って必要箇所へ到達するための標準方針を定義します。
 
-この考え方は `kadoka_code_atlas` など外部プロジェクトの設計・実装を参考にしています。AI Context Reducer の標準自体は特定ツールへ依存しません。
+重要なのは、特定実装ではなく、symbol / ownership / dependency 等の構造情報を索引として再利用し、agentが読む原典を必要範囲へ絞ることです。
 
 ## 1. Source Structure Index
 
@@ -105,9 +105,7 @@ Common IR / Structure Index
 
 AST、シンボル、呼び出し関係、依存関係など機械的に取得できる情報は、可能なら決定論的な解析を優先します。LLM 補助解析を使う場合は、決定論的解析結果と区別します。
 
-## 9. 実装例・参考実装
-
-`kadoka_code_atlas` は、Source Structure Index、共通 IR、call graph、bounded traversal などを実装する参考例の一つです。
+## 9. 既存ツールとRepository-owned implementation
 
 外部ツールでは次を具体例として扱えます。
 
