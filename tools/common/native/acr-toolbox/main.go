@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-    fmt.Println("acr-toolbox <analyze|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|git-history-health|syntax-health|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-env|env> ...")
+    fmt.Println("acr-toolbox <analyze|select|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|git-history-health|syntax-health|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-env|env> ...")
 }
 
 func main() {
@@ -19,6 +19,8 @@ func main() {
     switch os.Args[1] {
     case "analyze":
         code = cmdAnalyze(os.Args[2:])
+    case "select":
+        code = cmdSelect(os.Args[2:])
     case "search":
         code = cmdSearch(os.Args[2:])
     case "find":
