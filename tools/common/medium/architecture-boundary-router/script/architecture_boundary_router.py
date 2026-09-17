@@ -4,24 +4,45 @@ import json
 
 from commander import route_paths
 
+TOOL = 'architecture-boundary-router'
+
 
 def main():
     parser = argparse.ArgumentParser(description='Classify changed paths using an architecture routing profile.')
     parser.add_argument('--profile', required=True)
     parser.add_argument('paths', nargs='+')
-    parser.add_argument('--json', action='store_true')
+    parser.add_argument('--json', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
 
-    result = route_paths(args.profile, args.paths)
-    if args.json:
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-        return
+    try:
+        result = route_paths(args.profile, args.paths)
+    except FileNotFoundError as exc:
+        print(json.dumps({
+            'tool': TOOL,
+            'status': 'profile_missing',
+            'profile_path': args.profile,
+            'error': str(exc),
+        }, ensure_ascii=False, indent=2))
+        return 2
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(json.dumps({
+            'tool': TOOL,
+            'status': 'profile_read_failed',
+            'profile_path': args.profile,
+            'error': str(exc),
+        }, ensure_ascii=False, indent=2))
+        return 2
 
-    for row in result['routes']:
-        print(row['path'])
-        print(f"  layer={row['layer'] or '-'} role={row['role'] or '-'} boundary={'yes' if row['boundary'] else 'no'}")
-        print('  route=' + row['route_hint'])
+    routes = result.get('routes', [])
+    print(json.dumps({
+        'tool': TOOL,
+        'status': 'ok',
+        'profile': result.get('profile'),
+        'route_count': len(routes),
+        'routes': routes,
+    }, ensure_ascii=False, indent=2))
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
