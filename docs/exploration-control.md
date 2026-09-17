@@ -2,7 +2,7 @@
 
 この文書は、AI が「念のため」でリポジトリ全体へ探索を広げ続けることを防ぐための標準方針を定義します。
 
-この考え方は複数の実運用プロジェクトを参考にしています。外部プロジェクトは実装例であり、標準仕様そのものは依存しません。
+重要なのは、探索開始条件だけでなく、必要情報が揃った時点で止める条件も明示することです。
 
 ## 1. Search first, read second
 
@@ -188,14 +188,7 @@ Evidence Budgetを使う場合も、Unverifiedを無理にゼロにするため�
 
 これは変更量、レビュー量、必要コンテキストを抑え、最適化によって未確定仕様まで探索対象になることを防ぎます。
 
-## 12. 実装例
-
-- `comfyUI_support_tools`: Search-first / Read-second、Acceptance 抽出、bounded packet、探索停止条件
-- `Kadoka-shougi-ai`: narrow task、明示的 deferred behavior、対象 subsystem / tests の固定、correctness tests 前の先行最適化を避ける運用
-
-これらは参考例であり、同じ標準を別の Issue tracker、別言語、別ツールで実装して構いません。
-
-## 13. 標準推奨
+## 12. 標準推奨
 
 - Search first, read second
 - Goal / Required / Acceptance を探索停止条件として使う
