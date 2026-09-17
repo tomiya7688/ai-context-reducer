@@ -301,7 +301,7 @@ func analyze(changed []string, cfg config, deps depMap, dependencyMapUsed ...boo
         reasons = append(reasons, "no mapping or naming candidate")
     }
 
-    used := false
+    used := len(deps.Files) > 0 || deps.ScanTruncated || deps.Truncated || deps.ParseErrorCount > 0 || deps.ReadErrorCount > 0 || deps.WalkErrorCount > 0
     if len(dependencyMapUsed) > 0 {
         used = dependencyMapUsed[0]
     }
