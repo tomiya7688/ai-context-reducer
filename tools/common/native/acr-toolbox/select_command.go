@@ -15,8 +15,29 @@ var selectorLanguages = map[string]string{
     ".gd": "gdscript", ".rs": "rust", ".js": "javascript", ".ts": "typescript", ".java": "java",
 }
 
+var selectorTypeSignals = map[string][]string{
+    "game": {"project.godot", "unityproject", "game", "assets", "scenes"},
+    "gui": {"ui", "views", "widgets", "forms", "mainwindow", "window"},
+    "compiler": {"lexer", "parser", "token", "ast", "compiler", "interpreter", "grammar"},
+    "data_tool": {"dataset", "etl", "converter", "export", "importer", "migration"},
+    "packaged_app": {"installer", "package", "publish", "release", "dist"},
+    "simulation": {"simulation", "simulator", "agent", "physics", "seed", "random"},
+    "rule_heavy": {"rules", "specification", "protocol", "validator", "legal", "policy"},
+}
+
 var selectorExternal = []string{"rg", "fd", "ast-grep", "sg", "ctags", "scip", "tree-sitter", "scc", "git-sizer"}
 var selectorPhaseOrder = map[string]int{"orient": 0, "search": 1, "scope": 2, "inspect": 3, "validate": 4, "stop": 5}
+
+func selectorWriteJSON(value any) {
+    enc := json.NewEncoder(os.Stdout)
+    enc.SetIndent("", "  ")
+    _ = enc.Encode(value)
+}
+
+func selectorBoundedText(text string, limit int) string {
+    if limit <= 0 || len(text) <= limit { return text }
+    return text[:limit]
+}
 
 func selectorItem(path, reason, phase, activation, availability string) map[string]any {
     if activation == "" { activation = "always" }
@@ -143,16 +164,16 @@ func cmdSelect(args []string) int {
     absRoot, _ := filepath.Abs(root)
     info, err := os.Stat(absRoot)
     if err != nil {
-        writeJSON(map[string]any{"tool": "tool-selector", "status": "input_missing", "project_root": absRoot})
+        selectorWriteJSON(map[string]any{"tool": "tool-selector", "status": "input_missing", "project_root": absRoot})
         return 2
     }
     if !info.IsDir() {
-        writeJSON(map[string]any{"tool": "tool-selector", "status": "input_not_directory", "project_root": absRoot})
+        selectorWriteJSON(map[string]any{"tool": "tool-selector", "status": "input_not_directory", "project_root": absRoot})
         return 2
     }
     walked, err := walkWithOptions(absRoot, false)
     if err != nil {
-        writeJSON(map[string]any{"tool": "tool-selector", "status": "scan_failed", "project_root": absRoot, "error": boundedText(err.Error(), 800)})
+        selectorWriteJSON(map[string]any{"tool": "tool-selector", "status": "scan_failed", "project_root": absRoot, "error": selectorBoundedText(err.Error(), 800)})
         return 1
     }
     langCounts := map[string]int{}
@@ -170,10 +191,9 @@ func cmdSelect(args []string) int {
         for _, p := range parts { if p == "test" || p == "tests" { isTest = true } }
         if isTest { tests++ }
         low := strings.ToLower(relSlash)
-        for projectType, words := range typeSignals {
-            normalized := strings.ReplaceAll(projectType, "-", "_")
-            if detected[normalized] { continue }
-            for _, word := range words { if strings.Contains(low, word) { detected[normalized] = true; break } }
+        for projectType, words := range selectorTypeSignals {
+            if detected[projectType] { continue }
+            for _, word := range words { if strings.Contains(low, word) { detected[projectType] = true; break } }
         }
     }
     size := "small"
@@ -211,6 +231,6 @@ func cmdSelect(args []string) int {
         "recommended_tool_groups": groups, "conditional_tool_groups": conditionalGroups,
     }
     if walked.ErrorCount > 0 { out["status"] = "ok_with_warnings"; out["scan_error_count"] = walked.ErrorCount }
-    writeJSON(out)
+    selectorWriteJSON(out)
     return 0
 }
