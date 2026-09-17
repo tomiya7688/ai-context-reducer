@@ -223,6 +223,15 @@ func buildStructureIndex(symbolPaths, graphPaths []string, root string) (structu
             continue
         }
         if payloadTruncated(payload) { truncated = true }
+        warningParts := []string{}
+        for _, key := range []string{"parse_error_count", "read_error_count", "walk_error_count"} {
+            if count := structureInt(payload[key]); count > 0 {
+                warningParts = append(warningParts, fmt.Sprintf("%s=%d", key, count))
+            }
+        }
+        if len(warningParts) > 0 {
+            inputErrors = append(inputErrors, source+": analyzer warnings "+strings.Join(warningParts, " "))
+        }
 
         explicitNodes, hasExplicitNodes := payload["nodes"].([]any)
         for _, rawNode := range explicitNodes {
