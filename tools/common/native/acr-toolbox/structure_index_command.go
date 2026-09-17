@@ -166,6 +166,15 @@ func buildStructureIndex(symbolPaths, graphPaths []string, root string) (structu
             rows = payload
         case map[string]any:
             if payloadTruncated(payload) { truncated = true }
+            warningParts := []string{}
+            for _, key := range []string{"parse_error_count", "read_error_count", "unsupported_input_count"} {
+                if count := structureInt(payload[key]); count > 0 {
+                    warningParts = append(warningParts, fmt.Sprintf("%s=%d", key, count))
+                }
+            }
+            if len(warningParts) > 0 {
+                inputErrors = append(inputErrors, source+": analyzer warnings "+strings.Join(warningParts, " "))
+            }
             if files, ok := payload["files"].([]any); ok { rows = files } else { inputErrors = append(inputErrors, source+": unsupported symbol payload") }
         default:
             inputErrors = append(inputErrors, source+": unsupported symbol payload")
