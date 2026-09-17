@@ -15,7 +15,7 @@
 | `SCIP` | semantic code intelligence index | semantic indexを既に生成できるrepo | `source-structure-index` のsymbol/dependency backendとして再利用 |
 | `Tree-sitter` | 構文木生成 | 精密解析ツールを作る場合 | 言語固有parserの共通基盤候補。低品質な再実装はしない |
 | `scc` | LOC・言語・複雑度概要 | 導入前のrepo分析 | `repo-profile` / `repo-stats` のoptional aggregate backendとして再利用 |
-| `git-sizer` | Git履歴・repoサイズ健全性 | 巨大/長寿命repo | 大容量履歴・巨大blob検出 |
+| `git-sizer` | Git履歴・repoサイズ健全性 | 巨大/長寿命repo | `git-history-health` でmachine outputをcompact findingsへ圧縮 |
 
 ## 選び方
 
@@ -58,9 +58,17 @@ SCIP indexがある場合は `--scip` / `--scip-json` で同じ共通IRへ取り
 
 これによりagentがscc固有JSONの使い方を覚えたり、巨大なraw outputを直接読む必要をなくします。
 
-### 巨大repo
+### 巨大repo / 長いGit履歴
 
-現在のsource量・language構成は `repo-profile` / `repo-stats` でcompactに確認します。Git履歴・巨大objectの問題は別軸なので、既に `git-sizer` がある環境ではその解析を利用できます。
+現在のsource量・language構成は `repo-profile` / `repo-stats` でcompactに確認します。Git履歴・巨大objectは別軸として `git-history-health` を使います。
+
+```text
+git-history-health -> git-sizer --json -> concern >= threshold のfindingだけ返却
+```
+
+`git-history-health` はgit-sizerのraw JSONをagentへ流さず、`metric / value / level_of_concern` と必要な説明・object pathだけへ圧縮します。保存済みgit-sizer JSONも `--json-input` から同じcontractへ変換できます。
+
+`git-sizer` が無い場合、Git object graph analyzerを低品質に再実装しません。自動installもせず `external_backend_unavailable` を明示します。
 
 巨大repoでは「現在のソース量」と「Git履歴の重さ」を別に扱います。
 
