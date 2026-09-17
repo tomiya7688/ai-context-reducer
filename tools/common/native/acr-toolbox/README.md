@@ -10,7 +10,9 @@ Common tools の portable Go implementation です。
 |---|---|
 | CLI subcommand dispatch | `main.go` |
 | repository walk / ignore / language metadata | `repo_commands.go` |
-| repository analysis / recommendation | `analyze_command.go` |
+| repository/runtime fact analysis | `analyze_command.go` |
+| ordered tool routing / external backend readiness | `select_command.go` |
+| analysis / selector contract validation | `select_analyze_command_test.go` |
 | text search / optional ripgrep boundary | `search_command.go` |
 | path search / optional fd boundary | `find_command.go` |
 | repository statistics / optional scc boundary | `stats_command.go` |
@@ -68,6 +70,25 @@ Common tools の portable Go implementation です。
 ## Go flag ordering
 
 Go標準 `flag` parserを使うcommandでは、optionをpositional pathより前に置きます。READMEの例もこの順序をSource of Truthにします。
+
+## analyze / select
+
+```text
+acr-toolbox analyze .
+acr-toolbox select .
+```
+
+`analyze` はrepository/runtime factsだけを返します。tool recommendationは重複保持せず、`routing_handoff.native_command = "acr-toolbox select"` を返します。
+
+`select` がordered routingのSource of Truthです。候補を次のphase順で返します。
+
+```text
+orient -> search -> scope -> inspect -> validate -> stop
+```
+
+各tool entryは `phase / activation / availability / reason` を持ちます。`rg` / `fd` / `scc` のようにportable fallbackを持つtoolはfallback readinessを示し、`git-sizer` / Tree-sitterのようにexternal backendが本体となるtoolはbackendが利用可能な場合だけ通常候補へ入れます。
+
+`exploration_stop_conditions` が満たされたら追加のbroad explorationを続ける前に停止判断します。
 
 ## search / find / stats
 
