@@ -1,4 +1,7 @@
 import importlib.util
+import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -44,7 +47,15 @@ class AffectedTestsContractTests(unittest.TestCase):
     def test_missing_dependency_map_file_is_explicit_cli_failure(self):
         with tempfile.TemporaryDirectory() as raw:
             missing = Path(raw) / 'missing.json'
-            self.assertFalse(missing.exists())
+            completed = subprocess.run(
+                [sys.executable, str(SCRIPT), '--changed', 'src/a.py', '--dependency-map', str(missing)],
+                text=True,
+                capture_output=True,
+            )
+            self.assertNotEqual(0, completed.returncode)
+            result = json.loads(completed.stdout)
+            self.assertEqual('affected-tests', result['tool'])
+            self.assertEqual('dependency_map_read_failed', result['status'])
 
 
 if __name__ == '__main__':
