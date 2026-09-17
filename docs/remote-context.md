@@ -86,7 +86,3 @@ remote delta
 - remote context の Context Pack への自動挿入
 
 Git、GitHub、特定OS、特定AIへの依存は標準必須にはしません。
-
-## 出典となった実運用
-
-この方式は `kadoka_quest` の remote-context 運用から一般化したものです。
