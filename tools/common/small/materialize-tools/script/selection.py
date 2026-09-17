@@ -6,6 +6,7 @@ from pathlib import Path
 
 PYTHON_TOOL_PATHS = [
     Path('common/small/analyze-and-recommend/script/analyze_and_recommend.py'),
+    Path('common/small/tool-selector/script/tool_selector.py'),
     Path('common/small/text-search/script/text_search.py'),
     Path('common/small/path-find/script/path_find.py'),
     Path('common/small/tree-view/script/tree_view.py'),
