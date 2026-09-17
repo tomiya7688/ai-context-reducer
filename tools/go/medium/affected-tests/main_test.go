@@ -45,3 +45,25 @@ func TestDependencyConsumersAddCandidates(t *testing.T) {
     }
     if !foundReason { t.Fatalf("dependency-map reason missing: %#v", got.Reasons) }
 }
+
+
+func TestIncompleteDependencyMapForcesBroaderFallback(t *testing.T) {
+    cfg := config{Mappings: []mapping{{Source: "src/parser/*", Tests: []string{"tests/test_parser.py"}}}}
+    deps := depMap{ScanTruncated: true, ParseErrorCount: 2}
+    got := analyze([]string{"src/parser/lexer.py"}, cfg, deps, true)
+    if got.Status != "ok_with_warnings" {
+        t.Fatalf("status=%s", got.Status)
+    }
+    if !got.ImpactUncertain {
+        t.Fatal("expected impact uncertainty")
+    }
+    if got.Confidence != "medium" {
+        t.Fatalf("confidence=%s", got.Confidence)
+    }
+    if got.Fallback != "broader-or-full" {
+        t.Fatalf("fallback=%s", got.Fallback)
+    }
+    if !got.DependencyMap.Used || got.DependencyMap.Complete {
+        t.Fatalf("unexpected dependency state: %#v", got.DependencyMap)
+    }
+}
