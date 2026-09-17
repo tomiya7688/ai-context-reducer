@@ -2,7 +2,7 @@
 
 この文書は、ソース全体を読む前に「各ファイルが何を担当するか」を短い責務表から判断し、機械判定できる規約は compact checker output へ移すための標準方針です。
 
-この考え方は `Bitlang` の `FILE_RESPONSIBILITIES.md` と `go-rule-checker` を参考にしています。外部プロジェクトは実装例であり、標準仕様そのものは依存しません。
+重要なのは、責務の索引と機械判定可能な規約を分け、現在タスクに関係する実装候補へ短い経路で到達できるようにすることです。
 
 ## 1. Responsibility Map
 
@@ -112,13 +112,11 @@ Task / changed area
 
 ファイル数が小さいプロジェクトでは専用表を作らず、`AI_CONTEXT.md` や既存 architecture doc の短い表で代用して構いません。
 
-## 8. Implementation example
+## 8. Implementation options
 
-`Bitlang` では `FILE_RESPONSIBILITIES.md` が現在・予定ファイルの責務を短く保持し、責務記述が長くなりすぎること自体を分割候補の signal として使っています。
+Responsibility Map の表現形式は固定しません。Markdown table、JSON、生成索引、既存architecture metadataなど、現在タスクから責務へ短く到達できれば構いません。
 
-また `tools/go-rule-checker` は、Go 固有ルールのうち機械判定できる部分だけをチェックし、`OK` または短い findings を返します。責務分離など機械判定しにくいルールは architectural review に残しています。
-
-これらは参考実装であり、Markdown 表・JSON・生成索引・言語固有 checker など別の実装でも同じ標準を満たせます。
+機械判定可能な規則についても、既存lint/static analysisで十分なら専用checkerを増やしません。専用checkerを作る場合は、確定できるfindingだけをcompactに返し、semantic ownershipのような推測を必要とする判断はtargeted reviewへ残します。
 
 ## 9. 標準推奨
 
