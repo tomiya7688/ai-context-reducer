@@ -85,6 +85,32 @@ func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
 }
 
 
+
+func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
+    dir := t.TempDir()
+    graph := filepath.Join(dir, "graph.json")
+    if err := os.WriteFile(graph, []byte(`{
+      "tool":"go-package-graph",
+      "status":"ok_with_warnings",
+      "module":"example.com/demo",
+      "edges":[],
+      "parse_error_count":1,
+      "read_error_count":2,
+      "scan_truncated":false
+    }`), 0o644); err != nil { t.Fatal(err) }
+
+    index, err := buildStructureIndex(nil, []string{graph}, "")
+    if err != nil { t.Fatal(err) }
+    if len(index.InputErrors) != 1 {
+        t.Fatalf("expected one graph warning, got %#v", index.InputErrors)
+    }
+    want := graph + ": analyzer warnings parse_error_count=1 read_error_count=2"
+    if index.InputErrors[0] != want {
+        t.Fatalf("unexpected graph warning: %q want %q", index.InputErrors[0], want)
+    }
+}
+
+
 func TestStructureQueryAndExpansion(t *testing.T) {
     index := structureIndex{
         Format: structureIndexFormat,
