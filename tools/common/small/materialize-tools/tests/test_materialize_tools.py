@@ -36,6 +36,7 @@ class MaterializeToolsTests(unittest.TestCase):
             self.assertEqual(mode, 'python')
             self.assertIn('analyze.sh', destinations)
             self.assertIn('common/small/analyze-and-recommend/script/analyze_and_recommend.py', destinations)
+            self.assertIn('common/small/tool-selector/script/tool_selector.py', destinations)
             self.assertNotIn('analyze_and_recommend.py', destinations)
 
     def test_native_selection_places_binary_under_bin_for_wrapper(self):
@@ -67,13 +68,16 @@ class MaterializeToolsTests(unittest.TestCase):
             self.assertTrue(applied['applied'])
             self.assertTrue((out / 'analyze.sh').exists())
             analyzer = out / 'common/small/analyze-and-recommend/script/analyze_and_recommend.py'
+            selector = out / 'common/small/tool-selector/script/tool_selector.py'
             self.assertTrue(analyzer.exists())
+            self.assertTrue(selector.exists())
 
             manifest = json.loads((out / materialize.MANIFEST_NAME).read_text(encoding='utf-8'))
             self.assertEqual(manifest['format'], materialize.MANIFEST_FORMAT)
             manifest_paths = {row['path'] for row in manifest['files']}
             self.assertIn('analyze.sh', manifest_paths)
             self.assertIn('common/small/analyze-and-recommend/script/analyze_and_recommend.py', manifest_paths)
+            self.assertIn('common/small/tool-selector/script/tool_selector.py', manifest_paths)
 
             analyzer.write_text('# locally changed\n', encoding='utf-8')
             conflict = materialize.execute(source, out, apply=True, overwrite=False)
