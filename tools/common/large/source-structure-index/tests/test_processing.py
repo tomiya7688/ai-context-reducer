@@ -110,6 +110,27 @@ class SourceStructureProcessingTests(unittest.TestCase):
             edge_keys,
         )
 
+
+    def test_build_propagates_symbol_analyzer_warning_counts(self):
+        symbols = [
+            ('symbols.json', {
+                'tool': 'python-symbols',
+                'status': 'ok_with_warnings',
+                'files': [
+                    {'file': 'pkg/broken.py', 'status': 'parse_failed', 'symbols': []},
+                ],
+                'parse_error_count': 1,
+                'read_error_count': 0,
+                'unsupported_input_count': 2,
+            })
+        ]
+        index = module.build_index(symbols, [])
+        self.assertEqual(
+            ['symbols.json: analyzer warnings parse_error_count=1 unsupported_input_count=2'],
+            index['input_errors'],
+        )
+
+
     def test_query_prefers_exact_name(self):
         index = {
             'nodes': [
