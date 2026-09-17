@@ -3,7 +3,6 @@ package main
 import (
     "encoding/json"
     "flag"
-    "fmt"
     "go/parser"
     "go/token"
     "os"
