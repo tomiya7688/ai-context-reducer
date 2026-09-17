@@ -4,10 +4,13 @@ on:
   push:
     paths:
       - 'tools/common/native/acr-toolbox/**'
+      - 'tools/go/**'
       - '.github/workflows/build-portable-tools.yml'
   pull_request:
     paths:
       - 'tools/common/native/acr-toolbox/**'
+      - 'tools/go/**'
+      - '.github/workflows/build-portable-tools.yml'
   workflow_dispatch:
 
 jobs:
@@ -17,6 +20,12 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+        module:
+          - tools/common/native/acr-toolbox
+          - tools/go/small/go-symbols
+          - tools/go/medium/go-import-map
+          - tools/go/large/go-package-graph
+          - tools/go/medium/affected-tests
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +33,7 @@ jobs:
         with:
           go-version: '1.22.x'
       - name: Test
-        working-directory: tools/common/native/acr-toolbox
+        working-directory: ${{ matrix.module }}
         run: go test ./...
 
   build:
@@ -62,16 +71,33 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22.x'
-      - name: Build
-        working-directory: tools/common/native/acr-toolbox
+      - name: Build portable bundle
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: '0'
+          EXT: ${{ matrix.ext }}
+          OUT: artifacts/${{ matrix.name }}
+        shell: bash
         run: |
-          mkdir -p ../../../../artifacts/${{ matrix.name }}
-          go build -trimpath -ldflags='-s -w' -o ../../../../artifacts/${{ matrix.name }}/acr-toolbox${{ matrix.ext }} .
+          set -euo pipefail
+          mkdir -p "$OUT"
+
+          build_tool() {
+            dir="$1"
+            name="$2"
+            (
+              cd "$dir"
+              go build -trimpath -ldflags='-s -w' -o "../../../../$OUT/$name$EXT" .
+            )
+          }
+
+          build_tool tools/common/native/acr-toolbox acr-toolbox
+          build_tool tools/go/small/go-symbols go-symbols
+          build_tool tools/go/medium/go-import-map go-import-map
+          build_tool tools/go/large/go-package-graph go-package-graph
+          build_tool tools/go/medium/affected-tests affected-tests
       - uses: actions/upload-artifact@v4
         with:
-          name: acr-toolbox-${{ matrix.name }}
-          path: artifacts/${{ matrix.name }}/acr-toolbox${{ matrix.ext }}
+          name: portable-tools-${{ matrix.name }}
+          path: artifacts/${{ matrix.name }}/
