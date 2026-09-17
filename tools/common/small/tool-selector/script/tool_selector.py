@@ -61,6 +61,8 @@ def recommend(size, languages, project_types, docs, tests, has_git):
             item('common/medium/change-router', 'use when changed files need likely tests/docs routing'),
             item('common/medium/context-pack-builder', 'use when preparing a bounded task context pack'),
         ])
+        if size == 'large':
+            conditional.append(item('common/small/git-history-health', 'large Git repository may need compact history/object health analysis via existing git-sizer'))
     if tests:
         conditional.extend([
             item('common/medium/validation-plan', 'test files detected; derive targeted validation from changed paths'),
