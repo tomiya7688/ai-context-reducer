@@ -54,6 +54,7 @@ Common tools の portable Go implementation です。
 | materialize replace / restore fallback | `safe_replace.go` |
 | runtime / language environment detection | `env_commands.go` |
 | repository language + runtime -> enabled language tools | `language_setup_command.go` |
+| Small language analyzer launcher / compact result routing | `language_run_command.go` |
 | build | `build.bat` / `build.sh` |
 
 別concernのfileは、interface変更や共有helper変更が必要な場合だけ追加で読みます。
@@ -261,3 +262,13 @@ acr-toolbox language-setup --run-small .
 ```
 
 Repositoryで検出した言語と既存runtime/compilerを突き合わせ、Small / Medium / Largeのlanguage-specific tool候補を返します。missing SDK/runtimeは自動installせず、理由付きでskipします。`--run-small` は低コストSmall解析の次実行候補を返すrouting flagであり、launcher要件が未確認のtoolを無条件実行しません。
+
+
+## language-run
+
+```text
+acr-toolbox language-run --acr-root /path/to/ai-context-reducer .
+acr-toolbox language-run --acr-root /path/to/ai-context-reducer --out .acr/language .
+```
+
+Repositoryで検出したSmall language analyzerだけを実行します。full analyzer JSONはoutput directoryへ保存し、stdoutにはtool / status / backend / output path / skip理由だけを返します。Goはbundled `go-symbols` binaryを優先し、無ければ既存Go runtimeの `go run` へfallbackします。Python / C# / C / C++ / GDScriptの現在のSmall analyzerはbundled Python scriptを使い、Pythonが無ければskipします。
