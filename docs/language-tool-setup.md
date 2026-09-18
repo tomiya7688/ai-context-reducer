@@ -9,7 +9,7 @@ Windows: tools/setup.bat <project-root>
 Linux/macOS: tools/setup.sh <project-root>
 ```
 
-入口は native `acr-toolbox` を優先し、無ければ Python 版へ fallback します。
+入口は native `acr-toolbox` を優先し、無ければ Python 版へ fallback します。`setup.bat/.sh` は `language-setup` も実行し、repositoryの実言語・規模・利用可能runtime/compilerから有効化候補を絞ります。
 
 ## 自動検出
 
@@ -46,3 +46,13 @@ repoで使われている言語
 ## 配布方針
 
 Common機能は prebuilt `acr-toolbox` を Windows / Linux / macOS 向けに配布します。Goで独立実装している `affected-tests` / `go-symbols` / `go-import-map` / `go-package-graph` も同じplatform bundleへ含めます。その他の言語固有解析は、既存runtime/compilerを利用できる範囲を優先し、別SDKやparserの必須依存を増やさないことを基本とします。
+
+
+## language-setup
+
+```text
+acr-toolbox language-setup <project-root>
+python tools/common/small/language-setup/script/language_setup.py <project-root>
+```
+
+出力は `enabled_tools` / `skipped_languages` / `runtime_commands` を持ちます。Small / Medium / Large の段階をrepository規模から選びますが、Medium/Large解析をセットアップ時に無条件実行しません。`--run-small` は低コストなSmall解析を次の実行候補として明示するrouting flagです。
