@@ -122,7 +122,7 @@ compact-log compact-diff remote-delta git-history-health syntax-health
 structure-index context-budget hotspot-report context-manifest context-pack-builder
 change-router validation-plan responsibility-candidates policy-index
 doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
-materialize language-setup language-run language-medium-run language-env env
+materialize language-setup language-run language-medium-run language-large-plan language-large-run language-env env
 ```
 
 ## Categories
@@ -144,6 +144,7 @@ Repository facts          -> analyze-and-recommend / acr-toolbox analyze
 Language tool selection   -> language-setup / acr-toolbox language-setup
 Shallow language analysis -> language-run / acr-toolbox language-run
 Medium dependency routing -> acr-toolbox language-medium-run
+Large backend planning    -> acr-toolbox language-large-plan
 Ordered tool routing      -> tool-selector / acr-toolbox select
 Search-first              -> search / find / structural-search / tree / doc-index / slice
 Exploration stop          -> acceptance-extractor / exploration-stop-check
@@ -191,3 +192,6 @@ Large  -> existing SDK/compiler/parser when justified
 ```
 
 Small/Medium routingはPythonや各言語SDKが無くても成立します。Largeや高精度解析だけ既存runtime/compiler/parserを利用し、自動installはしません。
+
+
+Large解析は `language-large-plan` でbackend候補を確認してから、必要な場合だけ `language-large-run --allow-heavy` を明示実行します。SCIP / Universal Ctags が利用可能なら source-structure-index へ統合し、無ければMedium evidenceで止めます。
