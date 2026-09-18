@@ -56,6 +56,7 @@ Common tools の portable Go implementation です。
 | repository language + runtime -> enabled language tools | `language_setup_command.go` |
 | Small language analyzer launcher / compact result routing | `language_run_command.go` |
 | portable Medium dependency/project maps | `language_medium_command.go` |
+| Large backend planning / explicit heavy execution | `language_large_command.go` |
 | embedded Python/C#/Go/C/C++/GDScript shallow symbols | `language_symbols_native.go` |
 | build | `build.bat` / `build.sh` |
 
@@ -284,3 +285,13 @@ acr-toolbox language-medium-run --out .acr/language-medium .
 ```
 
 Python import、C# ProjectReference、Go import、C/C++ include、GDScript dependencyをportable native fallbackで抽出します。SDK/runtimeは必須ではありません。結果全文はoutput directoryへ保存し、stdoutにはcompactな実行情報だけを返します。高精度なproject evaluationや型/compile条件が必要な場合だけ既存SDK/compiler/parserへ進みます。
+
+
+## language-large-plan / language-large-run
+
+```text
+acr-toolbox language-large-plan .
+acr-toolbox language-large-run --allow-heavy .
+```
+
+Largeは自動実行しません。planは既存SCIP index、Universal Ctags、dotnet、Go、C/C++ compiler、Godot等を確認して推奨backendとcommandを返します。runは `--allow-heavy` 必須で、現在は既存SCIP indexまたはUniversal Ctagsを `structure-index build` へ接続します。backendが無ければ追加installせずMedium結果を維持します。
