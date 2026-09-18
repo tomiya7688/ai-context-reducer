@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-    fmt.Println("acr-toolbox <analyze|select|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|git-history-health|syntax-health|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-setup|language-run|language-medium-run|language-env|env> ...")
+    fmt.Println("acr-toolbox <analyze|select|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|git-history-health|syntax-health|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-setup|language-run|language-medium-run|language-large-plan|language-large-run|language-env|env> ...")
 }
 
 func main() {
@@ -77,6 +77,10 @@ func main() {
         code = cmdLanguageRun(os.Args[2:])
     case "language-medium-run":
         code = cmdLanguageMediumRun(os.Args[2:])
+    case "language-large-plan":
+        code = cmdLanguageLargePlan(os.Args[2:])
+    case "language-large-run":
+        code = cmdLanguageLargeRun(os.Args[2:])
     case "language-env":
         code = cmdLanguageEnv()
     case "env":
