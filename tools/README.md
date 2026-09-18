@@ -122,7 +122,7 @@ compact-log compact-diff remote-delta git-history-health syntax-health
 structure-index context-budget hotspot-report context-manifest context-pack-builder
 change-router validation-plan responsibility-candidates policy-index
 doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
-materialize language-setup language-run language-env env
+materialize language-setup language-run language-medium-run language-env env
 ```
 
 ## Categories
@@ -143,6 +143,7 @@ profiles       optional project-type / routing input
 Repository facts          -> analyze-and-recommend / acr-toolbox analyze
 Language tool selection   -> language-setup / acr-toolbox language-setup
 Shallow language analysis -> language-run / acr-toolbox language-run
+Medium dependency routing -> acr-toolbox language-medium-run
 Ordered tool routing      -> tool-selector / acr-toolbox select
 Search-first              -> search / find / structural-search / tree / doc-index / slice
 Exploration stop          -> acceptance-extractor / exploration-stop-check
@@ -179,3 +180,14 @@ UPD Commanderを含む外部設計手法は、tools内部の責務分離や実�
 - toolの維持コストがagent-context削減効果を上回るなら追加しない
 
 詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/portable-tools.md` を参照してください。
+
+
+## Language portability
+
+```text
+Small  -> acr-toolbox native shallow symbols
+Medium -> acr-toolbox native dependency/project-map fallback
+Large  -> existing SDK/compiler/parser when justified
+```
+
+Small/Medium routingはPythonや各言語SDKが無くても成立します。Largeや高精度解析だけ既存runtime/compiler/parserを利用し、自動installはしません。
