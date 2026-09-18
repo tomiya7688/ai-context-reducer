@@ -82,3 +82,15 @@ acr-toolbox language-medium-run <project-root>
 Python import、C# ProjectReference、Go import、C/C++ include、GDScript load/preload/extends をportable native fallbackで抽出します。結果全文は `<project-root>/.acr/language-medium/` に保存し、stdoutはcompact summaryです。
 
 Medium結果はrouting用の近似情報です。型解決・compile条件・MSBuild評価・Godot runtime semanticsなどが必要な場合だけ、既存SDK/compiler/parserへ進みます。
+
+
+## Large high-precision routing
+
+```text
+acr-toolbox language-large-plan <project-root>
+acr-toolbox language-large-run --allow-heavy <project-root>
+```
+
+`language-large-plan` は実行せず、既存SCIP index、Universal Ctags、dotnet、Go、C/C++ compiler、Godot等のavailabilityと推奨経路だけを返します。重い解析は自動では走りません。
+
+`language-large-run` は `--allow-heavy` を必須にし、現時点では既存SCIP indexまたはUniversal Ctagsをsource-structure-indexへ取り込みます。利用可能な高精度backendが無ければMedium fallbackで止めます。
