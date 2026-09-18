@@ -76,11 +76,11 @@ func cmdLanguageSetup(args []string) int {
         cmd := runtimeCmd[lang]
         enabled = append(enabled, languageSetupTool{ToolPath:names[0],Level:"small",Enabled:true,Reason:"source detected; bundled acr-toolbox native shallow analyzer is available"})
         if size == "medium" || size == "large" {
+            reason := "repository size may justify dependency/project mapping; bundled portable Medium fallback is available"
             if cmd != "" {
-                enabled = append(enabled, languageSetupTool{ToolPath:names[1],Level:"medium",Enabled:true,Reason:"repository size and matching runtime/compiler justify dependency/project mapping"})
-            } else {
-                skipped = append(skipped, map[string]any{"language":lang,"level":"medium","tool_path":names[1],"reason":"matching runtime/compiler unavailable; dependencies are not auto-installed"})
+                reason += "; matching runtime/compiler is also available for higher-precision follow-up"
             }
+            enabled = append(enabled, languageSetupTool{ToolPath:names[1],Level:"medium",Enabled:true,Reason:reason})
         }
         if size == "large" {
             if cmd != "" {
@@ -109,7 +109,7 @@ func cmdLanguageSetup(args []string) int {
         "skipped_languages":skipped,
         "run_small_requested":*runSmall,
         "small_tools_to_run":run,
-        "policy":"Small shallow analyzers use bundled native fallback; Medium/Large analyzers require suitable existing runtimes/compilers when needed; never auto-install dependencies",
+        "policy":"Small and Medium routing analyzers have bundled native fallbacks; Large or higher-precision analysis may use suitable existing runtimes/compilers; never auto-install dependencies",
     }
     if walked.ErrorCount > 0 {
         out["status"]="ok_with_warnings"
