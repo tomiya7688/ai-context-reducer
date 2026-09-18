@@ -37,6 +37,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | safe portable tool materialization | `materialize-tools` | `acr-toolbox materialize` |
 | language/runtime-aware tool selection | `language-setup` | `acr-toolbox language-setup` |
 | shallow language analyzer launcher | `language-run` | `acr-toolbox language-run` |
+| portable Medium dependency/project routing | language-specific Medium tools | `acr-toolbox language-medium-run` |
 | language runtime detection | `language-environment-plan` | `acr-toolbox language-env` |
 | runtime/environment check | `environment-plan` の一部 | `acr-toolbox env` |
 | affected test selection | Python `affected-tests` | standalone Go `affected-tests` |
@@ -94,7 +95,7 @@ CIの `Build portable tools` は `acr-toolbox` と standalone Go tools 4本を�
 - C / C++ include / graph
 - GDScript dependency / Godot scene graph
 
-Python / C# / Go / C / C++ / GDScript のSmall symbol抽出は `acr-toolbox language-run` のnative fallback対応済みです。Go import map / package graph はstandalone Go実装もあります。
+Python / C# / Go / C / C++ / GDScript のSmall symbol抽出は `acr-toolbox language-run` のnative fallback対応済みです。Mediumの import / project reference / include / GDScript dependency map も `language-medium-run` のportable fallback対応済みです。Go import map / package graph はstandalone Go実装もあります。
 
 言語固有解析は native 化を急がず、まず対象言語の標準環境が存在するかを `language-env` で判定します。
 
