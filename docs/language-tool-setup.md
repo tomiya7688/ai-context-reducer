@@ -22,15 +22,16 @@ Linux/macOS: tools/setup.sh <project-root>
 | C++ | `g++` / `clang++` / `c++` | include / project解析を利用可能 |
 | GDScript | `godot4` / `godot` | Godot scene/resource関連を利用可能 |
 
-環境が無ければ、その言語固有toolはスキップします。セットアップ処理が package manager を呼び出したり、ランタイム・SDKを自動インストールしたりしません。
+Smallのshallow symbol解析は `acr-toolbox` 内蔵fallbackで実行できるため、runtime/compilerが無くても利用できます。Medium/Largeのdependency/project/graph解析は既存runtime/compilerがある場合だけ候補化します。セットアップ処理が package manager を呼び出したり、ランタイム・SDKを自動インストールしたりしません。
 
 ## 選択原則
 
 ```text
 repoで使われている言語
-  -> 対応runtime/compilerが既にあるか
-  -> yes: language-specific toolsを候補化
-  -> no: Common toolsだけで運用
+  -> Small symbol analyzer: acr-toolbox native fallback
+  -> Medium/Largeが必要か
+  -> yes: 対応runtime/compilerが既にあれば候補化
+  -> no: Small + Common toolsで運用
 ```
 
 外部toolも同様で、`rg` / `fd` / `ctags` / `ast-grep` 等が既にあれば利用し、無ければ同梱fallbackへ戻ります。
@@ -63,10 +64,10 @@ python tools/common/small/language-setup/script/language_setup.py <project-root>
 `setup.bat/.sh` は選択後にSmall analyzerだけを自動実行します。
 
 ```text
-acr-toolbox language-run --acr-root /path/to/ai-context-reducer <project-root>
+acr-toolbox language-run <project-root>
 python tools/common/small/language-run/script/language_run.py --acr-root /path/to/ai-context-reducer <project-root>
 ```
 
 解析結果全文は既定で `<project-root>/.acr/language/` に保存し、stdoutにはstatus / backend / output path / skip理由だけを返します。Medium/Large toolは自動実行しません。
 
-現在のbackendは、Pythonはstdlib AST、Goはstandalone `go-symbols` または既存Go runtime、C#/C/C++/GDScriptはbundled Python analyzerです。launcher/runtimeが足りない場合はinstallせずskipします。
+`acr-toolbox` native版は Python / C# / Go / C / C++ / GDScript のSmall symbol抽出をすべて内蔵fallbackで実行します。これはrouting用の近似解析であり、完全なparser代替ではありません。Medium/Large精度が必要な場合だけ既存SDK/compiler/parserを利用します。
