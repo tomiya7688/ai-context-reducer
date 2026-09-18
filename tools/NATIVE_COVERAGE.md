@@ -89,12 +89,12 @@ CIの `Build portable tools` は `acr-toolbox` と standalone Go tools 4本を�
 `structural-search` は外部 `ast-grep` が存在すればそのnative parserをbackendとして再利用し、無い場合だけPython stdlib AST fallbackを使います。Goで低品質な独自multi-language parserを重複実装するより、この境界を維持します。
 
 ### Language-specific
-- Python symbols / import / graph
-- C# symbols / project / graph
-- C / C++ symbols / include / graph
-- GDScript symbols / dependency / Godot scene graph
+- Python import / graph
+- C# project / graph
+- C / C++ include / graph
+- GDScript dependency / Godot scene graph
 
-Go symbols / import map / package graph はGoネイティブ化済みです。
+Python / C# / Go / C / C++ / GDScript のSmall symbol抽出は `acr-toolbox language-run` のnative fallback対応済みです。Go import map / package graph はstandalone Go実装もあります。
 
 言語固有解析は native 化を急がず、まず対象言語の標準環境が存在するかを `language-env` で判定します。
 
@@ -105,7 +105,7 @@ Go symbols / import map / package graph はGoネイティブ化済みです。
 - C++: `g++` / `clang++` / `c++`
 - GDScript: `godot4` / `godot`
 
-対応環境が無い場合は、依存を自動インストールせずその言語固有toolをスキップします。`language-run` はSmall analyzerだけを自動実行し、full resultを `.acr/language/` に保存してstdoutをcompactに保ちます。高品質な external parser / compiler / `ctags` / `ast-grep` 等が既に利用可能なら、それらも優先候補にできます。
+`language-run` のSmall symbol解析はSDK無しでもnative fallbackで動作します。Medium/Large解析に必要な対応環境が無い場合は、依存を自動インストールせずその深い解析だけをスキップします。full resultは `.acr/language/` に保存してstdoutをcompactに保ちます。高品質な external parser / compiler / `ctags` / `ast-grep` 等が既に利用可能なら、それらも優先候補にできます。
 
 ## Native priority
 
