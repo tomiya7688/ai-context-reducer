@@ -87,7 +87,7 @@ jobs:
         run: |
           set -euo pipefail
           BIN="${{ matrix.binary }}"
-          "$BIN" search --max-results 5 context README.md
+          "$BIN" search --max-results 5 --glob README.md context .
           "$BIN" find --type file --max-results 5 '*.md' .
           "$BIN" slice context README.md
           printf 'ok\nwarning: sample\nerror: sample\n' | "$BIN" compact-log
