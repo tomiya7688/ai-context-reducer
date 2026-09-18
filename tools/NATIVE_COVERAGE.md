@@ -38,6 +38,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | language/runtime-aware tool selection | `language-setup` | `acr-toolbox language-setup` |
 | shallow language analyzer launcher | `language-run` | `acr-toolbox language-run` |
 | portable Medium dependency/project routing | language-specific Medium tools | `acr-toolbox language-medium-run` |
+| Large high-precision backend planning/execution | external SCIP/ctags/SDKs | `acr-toolbox language-large-plan` / `language-large-run` |
 | language runtime detection | `language-environment-plan` | `acr-toolbox language-env` |
 | runtime/environment check | `environment-plan` の一部 | `acr-toolbox env` |
 | affected test selection | Python `affected-tests` | standalone Go `affected-tests` |
@@ -117,3 +118,6 @@ Common generic toolsは、低品質なparser重複を避ける `structural-searc
 Python側へgenericな新規toolを追加した場合、Go側に同等機能を実装できるなら積極的に追加します。ただし共有コード化はせず、入出力契約とtestで対応を保ちます。
 
 原則は native coverage 100% を目的化せず、**インストール不要にする効果が高い機能を優先して native 化する**ことです。
+
+
+Largeはcoverage目的の再実装をしません。`language-large-plan` が既存 SCIP / Universal Ctags / language SDK/compiler availabilityを確認し、重い実行は `language-large-run --allow-heavy` の明示時だけ行います。SCIP/ctagsが使えない場合はportable Medium evidenceを維持し、追加依存を自動installしません。
