@@ -19,7 +19,7 @@ if [ -x "$NATIVE" ]; then
   echo "[ai-context-reducer] language tool plan"
   "$NATIVE" language-setup "$ROOT"
   echo "[ai-context-reducer] shallow language analysis"
-  "$NATIVE" language-run --acr-root "$ACR_ROOT" "$ROOT"
+  "$NATIVE" language-run "$ROOT"
 elif command -v python3 >/dev/null 2>&1; then
   python3 "$PY_LANG"
   python3 "$PY_ANALYZE" "$ROOT"
