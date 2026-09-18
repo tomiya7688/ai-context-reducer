@@ -71,3 +71,14 @@ python tools/common/small/language-run/script/language_run.py --acr-root /path/t
 解析結果全文は既定で `<project-root>/.acr/language/` に保存し、stdoutにはstatus / backend / output path / skip理由だけを返します。Medium/Large toolは自動実行しません。
 
 `acr-toolbox` native版は Python / C# / Go / C / C++ / GDScript のSmall symbol抽出をすべて内蔵fallbackで実行します。これはrouting用の近似解析であり、完全なparser代替ではありません。Medium/Large精度が必要な場合だけ既存SDK/compiler/parserを利用します。
+
+
+## Medium portable fallback
+
+```text
+acr-toolbox language-medium-run <project-root>
+```
+
+Python import、C# ProjectReference、Go import、C/C++ include、GDScript load/preload/extends をportable native fallbackで抽出します。結果全文は `<project-root>/.acr/language-medium/` に保存し、stdoutはcompact summaryです。
+
+Medium結果はrouting用の近似情報です。型解決・compile条件・MSBuild評価・Godot runtime semanticsなどが必要な場合だけ、既存SDK/compiler/parserへ進みます。
