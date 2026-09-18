@@ -55,6 +55,7 @@ Common tools の portable Go implementation です。
 | runtime / language environment detection | `env_commands.go` |
 | repository language + runtime -> enabled language tools | `language_setup_command.go` |
 | Small language analyzer launcher / compact result routing | `language_run_command.go` |
+| embedded Python/C#/Go/C/C++/GDScript shallow symbols | `language_symbols_native.go` |
 | build | `build.bat` / `build.sh` |
 
 別concernのfileは、interface変更や共有helper変更が必要な場合だけ追加で読みます。
@@ -267,8 +268,8 @@ Repositoryで検出した言語と既存runtime/compilerを突き合わせ、Sma
 ## language-run
 
 ```text
-acr-toolbox language-run --acr-root /path/to/ai-context-reducer .
-acr-toolbox language-run --acr-root /path/to/ai-context-reducer --out .acr/language .
+acr-toolbox language-run .
+acr-toolbox language-run --out .acr/language .
 ```
 
-Repositoryで検出したSmall language analyzerだけを実行します。full analyzer JSONはoutput directoryへ保存し、stdoutにはtool / status / backend / output path / skip理由だけを返します。Goはbundled `go-symbols` binaryを優先し、無ければ既存Go runtimeの `go run` へfallbackします。Python / C# / C / C++ / GDScriptの現在のSmall analyzerはbundled Python scriptを使い、Pythonが無ければskipします。
+Repositoryで検出したSmall language analyzerだけを実行します。full analyzer JSONはoutput directoryへ保存し、stdoutにはtool / status / backend / output path / skip理由だけを返します。Python / C# / Go / C / C++ / GDScript のshallow symbol抽出はすべてtoolbox内蔵fallbackで動作し、SDK/runtimeを必須にしません。これはrouting用の近似解析であり、精密なdependency/type/compile解析はMedium/Large toolと既存SDK/compiler/parserへ委譲します。
