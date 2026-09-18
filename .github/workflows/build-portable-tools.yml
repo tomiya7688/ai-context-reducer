@@ -80,6 +80,7 @@ jobs:
           "$BIN" language-env\n          "$BIN" language-setup .
           "$BIN" language-run --out "$RUNNER_TEMP/acr-language" .
           "$BIN" language-medium-run --out "$RUNNER_TEMP/acr-language-medium" .
+          "$BIN" language-large-plan .
       - name: Smoke text pipeline
         shell: bash
         run: |
