@@ -53,6 +53,7 @@ Common tools の portable Go implementation です。
 | materialize temporary writes | `materialize_write.go` |
 | materialize replace / restore fallback | `safe_replace.go` |
 | runtime / language environment detection | `env_commands.go` |
+| repository language + runtime -> enabled language tools | `language_setup_command.go` |
 | build | `build.bat` / `build.sh` |
 
 別concernのfileは、interface変更や共有helper変更が必要な場合だけ追加で読みます。
@@ -250,3 +251,13 @@ Linux/macOS: ./build.sh
 build scriptは `go test ./...` 成功後にbinaryを生成します。
 
 GitHub Actionsではnative testsをLinuxとWindowsの両方で実行し、その後Windows / Linux / macOS向け amd64 / arm64 binaryをcross buildします。
+
+
+## language-setup
+
+```text
+acr-toolbox language-setup .
+acr-toolbox language-setup --run-small .
+```
+
+Repositoryで検出した言語と既存runtime/compilerを突き合わせ、Small / Medium / Largeのlanguage-specific tool候補を返します。missing SDK/runtimeは自動installせず、理由付きでskipします。`--run-small` は低コストSmall解析の次実行候補を返すrouting flagであり、launcher要件が未確認のtoolを無条件実行しません。
