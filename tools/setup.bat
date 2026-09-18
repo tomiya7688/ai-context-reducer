@@ -3,10 +3,12 @@ setlocal
 set ROOT=%~1
 if "%ROOT%"=="" set ROOT=.
 set SELF=%~dp0
+for %%I in ("%SELF%..") do set ACR_ROOT=%%~fI
 set NATIVE=%SELF%common\native\acr-toolbox\dist\acr-toolbox.exe
 set PY_ANALYZE=%SELF%common\small\analyze-and-recommend\script\analyze_and_recommend.py
 set PY_LANG=%SELF%common\small\language-environment-plan\script\language_environment_plan.py
 set PY_LANG_SETUP=%SELF%common\small\language-setup\script\language_setup.py
+set PY_LANG_RUN=%SELF%common\small\language-run\script\language_run.py
 
 echo [ai-context-reducer] environment
 if exist "%NATIVE%" (
@@ -17,6 +19,8 @@ if exist "%NATIVE%" (
   "%NATIVE%" analyze "%ROOT%"
   echo [ai-context-reducer] language tool plan
   "%NATIVE%" language-setup "%ROOT%"
+  echo [ai-context-reducer] shallow language analysis
+  "%NATIVE%" language-run --acr-root "%ACR_ROOT%" "%ROOT%"
   goto done
 )
 
@@ -25,6 +29,7 @@ if %errorlevel%==0 (
   py "%PY_LANG%"
   py "%PY_ANALYZE%" "%ROOT%"
   py "%PY_LANG_SETUP%" "%ROOT%"
+  py "%PY_LANG_RUN%" --acr-root "%ACR_ROOT%" "%ROOT%"
   goto done
 )
 
@@ -33,6 +38,7 @@ if %errorlevel%==0 (
   python "%PY_LANG%"
   python "%PY_ANALYZE%" "%ROOT%"
   python "%PY_LANG_SETUP%" "%ROOT%"
+  python "%PY_LANG_RUN%" --acr-root "%ACR_ROOT%" "%ROOT%"
   goto done
 )
 
@@ -41,5 +47,5 @@ echo Use a prebuilt acr-toolbox.exe for this architecture. 1>&2
 exit /b 2
 
 :done
-echo [ai-context-reducer] setup policy: enable only compatible language-specific tools; do not install missing runtimes automatically.
+echo [ai-context-reducer] setup policy: run only shallow compatible language analysis automatically; do not install missing runtimes or run Medium/Large analyzers automatically.
 endlocal
