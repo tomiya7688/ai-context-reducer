@@ -55,6 +55,7 @@ Common tools の portable Go implementation です。
 | runtime / language environment detection | `env_commands.go` |
 | repository language + runtime -> enabled language tools | `language_setup_command.go` |
 | Small language analyzer launcher / compact result routing | `language_run_command.go` |
+| portable Medium dependency/project maps | `language_medium_command.go` |
 | embedded Python/C#/Go/C/C++/GDScript shallow symbols | `language_symbols_native.go` |
 | build | `build.bat` / `build.sh` |
 
@@ -273,3 +274,13 @@ acr-toolbox language-run --out .acr/language .
 ```
 
 Repositoryで検出したSmall language analyzerだけを実行します。full analyzer JSONはoutput directoryへ保存し、stdoutにはtool / status / backend / output path / skip理由だけを返します。Python / C# / Go / C / C++ / GDScript のshallow symbol抽出はすべてtoolbox内蔵fallbackで動作し、SDK/runtimeを必須にしません。これはrouting用の近似解析であり、精密なdependency/type/compile解析はMedium/Large toolと既存SDK/compiler/parserへ委譲します。
+
+
+## language-medium-run
+
+```text
+acr-toolbox language-medium-run .
+acr-toolbox language-medium-run --out .acr/language-medium .
+```
+
+Python import、C# ProjectReference、Go import、C/C++ include、GDScript dependencyをportable native fallbackで抽出します。SDK/runtimeは必須ではありません。結果全文はoutput directoryへ保存し、stdoutにはcompactな実行情報だけを返します。高精度なproject evaluationや型/compile条件が必要な場合だけ既存SDK/compiler/parserへ進みます。
