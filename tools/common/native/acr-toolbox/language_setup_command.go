@@ -74,16 +74,20 @@ func cmdLanguageSetup(args []string) int {
             continue
         }
         cmd := runtimeCmd[lang]
-        if cmd == "" {
-            skipped = append(skipped, map[string]any{"language":lang,"file_count":counts[lang],"reason":"matching runtime/compiler unavailable; dependencies are not auto-installed"})
-            continue
-        }
-        enabled = append(enabled, languageSetupTool{ToolPath:names[0],Level:"small",Enabled:true,Reason:"source detected and matching runtime/compiler available"})
+        enabled = append(enabled, languageSetupTool{ToolPath:names[0],Level:"small",Enabled:true,Reason:"source detected; bundled acr-toolbox native shallow analyzer is available"})
         if size == "medium" || size == "large" {
-            enabled = append(enabled, languageSetupTool{ToolPath:names[1],Level:"medium",Enabled:true,Reason:"repository size may justify dependency/project mapping"})
+            if cmd != "" {
+                enabled = append(enabled, languageSetupTool{ToolPath:names[1],Level:"medium",Enabled:true,Reason:"repository size and matching runtime/compiler justify dependency/project mapping"})
+            } else {
+                skipped = append(skipped, map[string]any{"language":lang,"level":"medium","tool_path":names[1],"reason":"matching runtime/compiler unavailable; dependencies are not auto-installed"})
+            }
         }
         if size == "large" {
-            enabled = append(enabled, languageSetupTool{ToolPath:names[2],Level:"large",Enabled:true,Reason:"large repository may justify bounded graph analysis"})
+            if cmd != "" {
+                enabled = append(enabled, languageSetupTool{ToolPath:names[2],Level:"large",Enabled:true,Reason:"large repository and matching runtime/compiler justify bounded graph analysis"})
+            } else {
+                skipped = append(skipped, map[string]any{"language":lang,"level":"large","tool_path":names[2],"reason":"matching runtime/compiler unavailable; dependencies are not auto-installed"})
+            }
         }
     }
 
@@ -105,7 +109,7 @@ func cmdLanguageSetup(args []string) int {
         "skipped_languages":skipped,
         "run_small_requested":*runSmall,
         "small_tools_to_run":run,
-        "policy":"do not install missing runtimes; enable only language tools supported by the existing environment",
+        "policy":"Small shallow analyzers use bundled native fallback; Medium/Large analyzers require suitable existing runtimes/compilers when needed; never auto-install dependencies",
     }
     if walked.ErrorCount > 0 {
         out["status"]="ok_with_warnings"
