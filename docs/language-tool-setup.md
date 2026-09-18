@@ -56,3 +56,17 @@ python tools/common/small/language-setup/script/language_setup.py <project-root>
 ```
 
 出力は `enabled_tools` / `skipped_languages` / `runtime_commands` を持ちます。Small / Medium / Large の段階をrepository規模から選びますが、Medium/Large解析をセットアップ時に無条件実行しません。`--run-small` は低コストなSmall解析を次の実行候補として明示するrouting flagです。
+
+
+## language-run
+
+`setup.bat/.sh` は選択後にSmall analyzerだけを自動実行します。
+
+```text
+acr-toolbox language-run --acr-root /path/to/ai-context-reducer <project-root>
+python tools/common/small/language-run/script/language_run.py --acr-root /path/to/ai-context-reducer <project-root>
+```
+
+解析結果全文は既定で `<project-root>/.acr/language/` に保存し、stdoutにはstatus / backend / output path / skip理由だけを返します。Medium/Large toolは自動実行しません。
+
+現在のbackendは、Pythonはstdlib AST、Goはstandalone `go-symbols` または既存Go runtime、C#/C/C++/GDScriptはbundled Python analyzerです。launcher/runtimeが足りない場合はinstallせずskipします。
