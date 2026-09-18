@@ -79,6 +79,7 @@ jobs:
           "$BIN" compact-diff --base HEAD --head HEAD
           "$BIN" language-env\n          "$BIN" language-setup .
           "$BIN" language-run --out "$RUNNER_TEMP/acr-language" .
+          "$BIN" language-medium-run --out "$RUNNER_TEMP/acr-language-medium" .
       - name: Smoke text pipeline
         shell: bash
         run: |
