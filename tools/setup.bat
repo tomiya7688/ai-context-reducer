@@ -20,7 +20,7 @@ if exist "%NATIVE%" (
   echo [ai-context-reducer] language tool plan
   "%NATIVE%" language-setup "%ROOT%"
   echo [ai-context-reducer] shallow language analysis
-  "%NATIVE%" language-run --acr-root "%ACR_ROOT%" "%ROOT%"
+  "%NATIVE%" language-run "%ROOT%"
   goto done
 )
 
