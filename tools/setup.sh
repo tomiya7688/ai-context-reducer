@@ -5,6 +5,7 @@ SELF_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 NATIVE="$SELF_DIR/common/native/acr-toolbox/dist/acr-toolbox"
 PY_ANALYZE="$SELF_DIR/common/small/analyze-and-recommend/script/analyze_and_recommend.py"
 PY_LANG="$SELF_DIR/common/small/language-environment-plan/script/language_environment_plan.py"
+PY_LANG_SETUP="$SELF_DIR/common/small/language-setup/script/language_setup.py"
 
 echo "[ai-context-reducer] environment"
 if [ -x "$NATIVE" ]; then
@@ -13,12 +14,16 @@ if [ -x "$NATIVE" ]; then
   "$NATIVE" language-env
   echo "[ai-context-reducer] project analysis"
   "$NATIVE" analyze "$ROOT"
+  echo "[ai-context-reducer] language tool plan"
+  "$NATIVE" language-setup "$ROOT"
 elif command -v python3 >/dev/null 2>&1; then
   python3 "$PY_LANG"
   python3 "$PY_ANALYZE" "$ROOT"
+  python3 "$PY_LANG_SETUP" "$ROOT"
 elif command -v python >/dev/null 2>&1; then
   python "$PY_LANG"
   python "$PY_ANALYZE" "$ROOT"
+  python "$PY_LANG_SETUP" "$ROOT"
 else
   echo "No native acr-toolbox or Python runtime found." >&2
   echo "Use a prebuilt acr-toolbox binary for this OS/architecture." >&2
