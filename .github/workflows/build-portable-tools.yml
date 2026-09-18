@@ -77,7 +77,8 @@ jobs:
           "$BIN" context-budget --mode fast --top 5 .
           "$BIN" hotspot-report --limit 5 .
           "$BIN" compact-diff --base HEAD --head HEAD
-          "$BIN" language-env\n          "$BIN" language-setup .
+          "$BIN" language-env
+          "$BIN" language-setup .
           "$BIN" language-run --out "$RUNNER_TEMP/acr-language" .
           "$BIN" language-medium-run --out "$RUNNER_TEMP/acr-language-medium" .
           "$BIN" language-large-plan .
