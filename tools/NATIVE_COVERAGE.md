@@ -35,6 +35,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 | exploration stop heuristic | `exploration-stop-check` | `acr-toolbox exploration-stop-check` |
 | reusable source structure index / bounded graph expansion / affected scope | `source-structure-index` | `acr-toolbox structure-index` |
 | safe portable tool materialization | `materialize-tools` | `acr-toolbox materialize` |
+| language/runtime-aware tool selection | `language-setup` | `acr-toolbox language-setup` |
 | language runtime detection | `language-environment-plan` | `acr-toolbox language-env` |
 | runtime/environment check | `environment-plan` の一部 | `acr-toolbox env` |
 | affected test selection | Python `affected-tests` | standalone Go `affected-tests` |
