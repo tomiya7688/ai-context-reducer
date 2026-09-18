@@ -77,7 +77,7 @@ jobs:
           "$BIN" context-budget --mode fast --top 5 .
           "$BIN" hotspot-report --limit 5 .
           "$BIN" compact-diff --base HEAD --head HEAD
-          "$BIN" language-env
+          "$BIN" language-env\n          "$BIN" language-setup .
       - name: Smoke text pipeline
         shell: bash
         run: |
