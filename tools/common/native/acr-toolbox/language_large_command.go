@@ -1,7 +1,6 @@
 package main
 
 import (
-    "encoding/json"
     "flag"
     "os"
     "path/filepath"
@@ -14,7 +13,25 @@ type largeBackendPlan struct {
     Available bool `json:"available"`
     Backend string `json:"backend,omitempty"`
     Command []string `json:"command,omitempty"`
+    RunSupported bool `json:"run_supported"`
+    Execution string `json:"execution"`
     Reason string `json:"reason"`
+}
+
+func largeBackendRunSupported(backend string) bool {
+    return backend == "existing-scip-index" || backend == "universal-ctags"
+}
+
+func finalizeLargePlan(plan largeBackendPlan) largeBackendPlan {
+    plan.RunSupported = largeBackendRunSupported(plan.Backend)
+    if plan.RunSupported {
+        plan.Execution = "language-large-run"
+    } else if plan.Available {
+        plan.Execution = "planning_only"
+    } else {
+        plan.Execution = "unavailable"
+    }
+    return plan
 }
 
 func cmdLanguageLargePlan(args []string) int {
@@ -98,7 +115,7 @@ func cmdLanguageLargePlan(args []string) int {
                 }
             }
         }
-        plans=append(plans,plan)
+        plans=append(plans,finalizeLargePlan(plan))
     }
 
     status:="ok"
@@ -106,7 +123,8 @@ func cmdLanguageLargePlan(args []string) int {
     selectorWriteJSON(map[string]any{
         "tool":"language-large-plan","status":status,"project_root":absRoot,
         "plans":plans,"automatic_execution":false,
-        "policy":"Large analysis is never auto-installed or auto-run; prefer existing SCIP/ctags indexes, then existing language SDK/compiler backends; otherwise keep portable Medium evidence",
+        "run_supported_backends":[]string{"existing-scip-index","universal-ctags"},
+        "policy":"Large analysis is never auto-installed or auto-run; run_supported=true means language-large-run can execute it, while available=true with execution=planning_only is advisory only; otherwise keep portable Medium evidence",
     })
     return 0
 }
