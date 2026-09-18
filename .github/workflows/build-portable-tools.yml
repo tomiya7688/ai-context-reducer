@@ -37,8 +37,61 @@ jobs:
         working-directory: ${{ matrix.module }}
         run: go test ./...
 
-  build:
+  smoke:
     needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary: ./artifacts/acr-toolbox
+          - os: windows-latest
+            binary: .\\artifacts\\acr-toolbox.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      - name: Build host toolbox
+        working-directory: tools/common/native/acr-toolbox
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ../../../../artifacts
+          ext=""
+          case "${{ runner.os }}" in
+            Windows) ext=".exe" ;;
+          esac
+          go build -trimpath -o "../../../../artifacts/acr-toolbox${ext}" .
+      - name: Smoke common commands
+        shell: bash
+        run: |
+          set -euo pipefail
+          BIN="${{ matrix.binary }}"
+          "$BIN" env
+          "$BIN" analyze .
+          "$BIN" select .
+          "$BIN" stats .
+          "$BIN" doc-index .
+          "$BIN" context-budget --mode fast --top 5 .
+          "$BIN" hotspot-report --limit 5 .
+          "$BIN" compact-diff --base HEAD --head HEAD
+          "$BIN" language-env
+      - name: Smoke text pipeline
+        shell: bash
+        run: |
+          set -euo pipefail
+          BIN="${{ matrix.binary }}"
+          "$BIN" search --max-results 5 context README.md
+          "$BIN" find --type file --max-results 5 '*.md' .
+          "$BIN" slice context README.md
+          printf 'ok\nwarning: sample\nerror: sample\n' | "$BIN" compact-log
+
+  build:
+    needs:
+      - test
+      - smoke
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
