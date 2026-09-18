@@ -122,7 +122,7 @@ compact-log compact-diff remote-delta git-history-health syntax-health
 structure-index context-budget hotspot-report context-manifest context-pack-builder
 change-router validation-plan responsibility-candidates policy-index
 doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
-materialize language-env env
+materialize language-setup language-env env
 ```
 
 ## Categories
@@ -141,6 +141,7 @@ profiles       optional project-type / routing input
 
 ```text
 Repository facts          -> analyze-and-recommend / acr-toolbox analyze
+Language tool selection   -> language-setup / acr-toolbox language-setup
 Ordered tool routing      -> tool-selector / acr-toolbox select
 Search-first              -> search / find / structural-search / tree / doc-index / slice
 Exploration stop          -> acceptance-extractor / exploration-stop-check
