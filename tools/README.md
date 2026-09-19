@@ -122,7 +122,7 @@ compact-log compact-diff remote-delta git-history-health syntax-health
 structure-index context-budget hotspot-report context-manifest context-pack-builder
 change-router validation-plan responsibility-candidates policy-index
 doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
-materialize scoped-guides language-setup language-run language-medium-run language-large-plan language-large-run language-env env
+materialize scoped-guides policy-check language-setup language-run language-medium-run language-large-plan language-large-run language-env env
 ```
 
 ## Categories
@@ -154,7 +154,7 @@ Responsibility            -> responsibility-candidates
 Change routing            -> change-router
 Architecture hints        -> architecture-boundary-router + project-provided profile
 Affected tests            -> affected-tests
-Policy routing            -> policy-index
+Policy routing            -> policy-index / policy-check / acr-toolbox policy-check
 Validation                -> validation-plan / syntax-health / compact-log
 Context pack              -> context-pack-builder
 Source structure          -> language-specific symbols / dependency / graph tools -> source-structure-index
