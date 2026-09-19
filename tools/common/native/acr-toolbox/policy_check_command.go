@@ -174,9 +174,9 @@ func cmdPolicyCheck(args []string) int {
   }
   sort.Slice(findings,func(i,j int)bool{if findings[i].Path==findings[j].Path{return findings[i].Line<findings[j].Line};return findings[i].Path<findings[j].Path})
   total:=len(findings);truncated:=false
-  if *maxFindings>0&&len(findings)>*maxFindings{findings=findings[:*maxFindings];truncated=true}
   errors:=0;warnings:=0
   for _,f:=range findings{if f.Severity=="error"{errors++}else{warnings++}}
+  if *maxFindings>0&&len(findings)>*maxFindings{findings=findings[:*maxFindings];truncated=true}
   status:="ok"
   if len(ruleErrors)>0||len(readErrors)>0{status="partial"}
   if errors>0{status="violations"}
