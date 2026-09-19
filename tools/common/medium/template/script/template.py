@@ -41,8 +41,7 @@ def main():
     missing=sorted(k for k in a.required if not vars.get(k,'').strip())
     if bad or missing:
         print(json.dumps({'tool':'template','status':'validation_failed','missing_required_variables':missing,'unsupported_variable_types':sorted(bad)},indent=2));return 2
-    canonical=json.dumps(raw,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()
-    vh=hashlib.sha256(canonical).hexdigest()
+    vh=hashlib.sha256(Path(a.vars).read_bytes()).hexdigest()
     if not src.exists():
         print(json.dumps({'tool':'template','status':'template_unavailable','template_path':str(src)},indent=2));return 2
     pairs=[]
