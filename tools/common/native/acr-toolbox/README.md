@@ -315,3 +315,13 @@ acr-toolbox policy-check --rules policy-rules.json .
 ```
 
 path scoped literal/regex ruleの `forbid` / `require` を検査します。error findingはexit 1、warningのみはexit 0です。理由付き `acr-ignore RULE_ID: reason` をsuppressionとして記録し、semantic ruleは確定判定せずunsupportedとして返します。
+
+
+## template
+
+```text
+acr-toolbox template --template template.txt --vars vars.json --out generated.txt --template-id example --template-version 1
+acr-toolbox template --template templates/ --vars vars.json --out generated/ --check
+```
+
+`{{name}}` の単純置換だけを扱うdeterministic generatorです。required variable、unresolved placeholder、dry-run/check-only、compact change hint、template metadataを持ちます。高度なlifecycleはCopier/Cookiecutter等へ委譲します。
