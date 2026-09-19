@@ -7,6 +7,7 @@ import (
     "testing"
 )
 
+// TestNativeMaterializeSelectionPreservesWrapperLayout は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestNativeMaterializeSelectionPreservesWrapperLayout(t *testing.T) {
     source := t.TempDir()
     wrapper := filepath.Join(source, "tools", "analyze.sh")
@@ -31,6 +32,7 @@ func TestNativeMaterializeSelectionPreservesWrapperLayout(t *testing.T) {
     }
 }
 
+// TestPlanNativeMaterializationProtectsDifferentDestination は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestPlanNativeMaterializationProtectsDifferentDestination(t *testing.T) {
     source := t.TempDir()
     out := t.TempDir()
@@ -72,6 +74,7 @@ func TestPlanNativeMaterializationProtectsDifferentDestination(t *testing.T) {
     }
 }
 
+// TestNativeMaterializeManifestMatchesPythonFormat は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestNativeMaterializeManifestMatchesPythonFormat(t *testing.T) {
     revision := "abc123"
     actions := []materializeAction{{
@@ -94,6 +97,7 @@ func TestNativeMaterializeManifestMatchesPythonFormat(t *testing.T) {
     }
 }
 
+// TestReplaceMaterializedFileReplacesExistingDestination は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestReplaceMaterializedFileReplacesExistingDestination(t *testing.T) {
     root := t.TempDir()
     destination := filepath.Join(root, "tool.bin")
@@ -120,6 +124,7 @@ func TestReplaceMaterializedFileReplacesExistingDestination(t *testing.T) {
     }
 }
 
+// TestAtomicNativeJSONReplacesExistingManifest は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestAtomicNativeJSONReplacesExistingManifest(t *testing.T) {
     path := filepath.Join(t.TempDir(), materializeManifestName)
     if err := os.WriteFile(path, []byte("old"), 0o644); err != nil {

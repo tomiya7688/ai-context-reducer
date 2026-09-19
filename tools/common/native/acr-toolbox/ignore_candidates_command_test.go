@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestNativeIgnoreCandidatesPrunesCandidateDirectory は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestNativeIgnoreCandidatesPrunesCandidateDirectory(t *testing.T) {
     root := t.TempDir()
     nested := filepath.Join(root, "node_modules", "pkg")
@@ -38,6 +39,7 @@ func TestNativeIgnoreCandidatesPrunesCandidateDirectory(t *testing.T) {
     }
 }
 
+// TestNativeIgnoreCandidatesZeroLimitIsUnlimited は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestNativeIgnoreCandidatesZeroLimitIsUnlimited(t *testing.T) {
     root := t.TempDir()
     if err := os.Mkdir(filepath.Join(root, "build"), 0o755); err != nil {
@@ -61,6 +63,7 @@ func TestNativeIgnoreCandidatesZeroLimitIsUnlimited(t *testing.T) {
     }
 }
 
+// TestNativeIgnoreCandidatesMissingRootIsError は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestNativeIgnoreCandidatesMissingRootIsError(t *testing.T) {
     root := filepath.Join(t.TempDir(), "missing")
     code, payload := captureJSONCommand(t, func() int {

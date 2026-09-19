@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestLanguageLargePlanDoesNotAutoRun は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestLanguageLargePlanDoesNotAutoRun(t *testing.T) {
     dir:=t.TempDir()
     if err:=os.WriteFile(filepath.Join(dir,"a.go"),[]byte("package demo\n"),0644);err!=nil{t.Fatal(err)}
@@ -14,12 +15,14 @@ func TestLanguageLargePlanDoesNotAutoRun(t *testing.T) {
     if code:=cmdLanguageLargePlan([]string{dir});code!=0{t.Fatalf("plan code=%d",code)}
 }
 
+// TestLanguageLargeRunRequiresExplicitFlag は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestLanguageLargeRunRequiresExplicitFlag(t *testing.T) {
     dir:=t.TempDir()
     if code:=cmdLanguageLargeRun([]string{dir});code!=2{t.Fatalf("expected confirmation code 2, got %d",code)}
 }
 
 
+// TestLargeBackendExecutionContract は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestLargeBackendExecutionContract(t *testing.T) {
     cases := []struct{
         backend string
