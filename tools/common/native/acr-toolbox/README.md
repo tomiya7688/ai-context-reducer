@@ -306,3 +306,12 @@ acr-toolbox scoped-guides --name LOCAL_GUIDE.md path/to/target .
 ```
 
 repository rootからtargetまでのancestor path上にあるguide候補だけを返します。agent固有precedenceを推測せず、本文全文も既定出力しません。
+
+
+## policy-check
+
+```text
+acr-toolbox policy-check --rules policy-rules.json .
+```
+
+path scoped literal/regex ruleの `forbid` / `require` を検査します。error findingはexit 1、warningのみはexit 0です。理由付き `acr-ignore RULE_ID: reason` をsuppressionとして記録し、semantic ruleは確定判定せずunsupportedとして返します。
