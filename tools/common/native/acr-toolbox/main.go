@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-    fmt.Println("acr-toolbox <analyze|select|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|git-history-health|syntax-health|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-setup|language-run|language-medium-run|language-large-plan|language-large-run|scoped-guides|language-env|env> ...")
+    fmt.Println("acr-toolbox <analyze|select|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|git-history-health|syntax-health|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-setup|language-run|language-medium-run|language-large-plan|language-large-run|scoped-guides|policy-check|template|version|language-env|env> ...")
 }
 
 func main() {
