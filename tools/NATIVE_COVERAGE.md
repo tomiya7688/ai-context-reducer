@@ -10,6 +10,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 |---|---|---|
 | scoped AI guide resolution | `scoped-guides` | `acr-toolbox scoped-guides` |
 | lightweight policy checker | `policy-check` | `acr-toolbox policy-check` |
+| canonical template generator | `template` | `acr-toolbox template` |
 | repository/runtime fact analysis | `analyze-and-recommend` | `acr-toolbox analyze` |
 | ordered tool routing / exploration stop | `tool-selector` | `acr-toolbox select` |
 | Search-first text search | `text-search` | `acr-toolbox search` |
