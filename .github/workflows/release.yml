@@ -100,7 +100,8 @@ jobs:
           EXT: ${{ matrix.ext }}
           NAME: ${{ matrix.name }}
           TAG: ${{ steps.version.outputs.tag }}
-          COMMIT: ${{ github.sha }}
+          COMMIT: ''
+
         shell: bash
         run: |
           set -euo pipefail
@@ -117,6 +118,7 @@ jobs:
             )
           }
 
+          COMMIT="$(git rev-parse HEAD)"
           version_flags="-s -w -X main.buildVersion=${TAG#v} -X main.buildCommit=${COMMIT}"
           build_tool tools/common/native/acr-toolbox acr-toolbox "$version_flags"
           build_tool tools/go/small/go-symbols go-symbols "-s -w"
