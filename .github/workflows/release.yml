@@ -1,6 +1,18 @@
 name: Release v1 distribution
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'tools/**'
+      - 'release/**'
+      - 'README.md'
+      - 'LICENSE'
+      - '.github/scripts/release-acceptance.sh'
+      - '.github/workflows/release.yml'
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
@@ -13,10 +25,6 @@ on:
         required: true
         default: false
         type: boolean
-  push:
-    tags:
-      - 'v*'
-
 permissions:
   contents: write
 
