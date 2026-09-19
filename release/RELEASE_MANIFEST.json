@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "release_version": "1.0.0",
+  "bundle_contents": [
+    "acr-toolbox",
+    "go-symbols",
+    "go-import-map",
+    "go-package-graph",
+    "affected-tests",
+    "README.md",
+    "TOOLS_README.md",
+    "LICENSE",
+    "RELEASE_MANIFEST.json"
+  ],
+  "platforms": [
+    "windows-x64",
+    "windows-arm64",
+    "linux-x64",
+    "linux-arm64",
+    "macos-x64",
+    "macos-arm64"
+  ],
+  "notes": [
+    "Executable suffix .exe is used on Windows.",
+    "SHA256SUMS is published beside archives in the GitHub Release.",
+    "No runtime or SDK is auto-installed by the distributed tools."
+  ]
+}
