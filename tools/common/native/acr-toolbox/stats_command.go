@@ -58,12 +58,14 @@ var statsLanguageByExt = map[string]string{
     ".toml": "TOML", ".xml": "XML", ".html": "HTML", ".css": "CSS",
 }
 
+// emitStatsJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitStatsJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// boundedStatsError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedStatsError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= 1200 {
@@ -72,6 +74,7 @@ func boundedStatsError(text string) string {
     return text[:1200]
 }
 
+// statsIgnoredDir はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func statsIgnoredDir(name string) bool {
     if strings.EqualFold(name, "generated") {
         return true
@@ -79,6 +82,7 @@ func statsIgnoredDir(name string) bool {
     return ignoreDirs[strings.ToLower(name)]
 }
 
+// lineCount はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func lineCount(data []byte) int {
     if len(data) == 0 {
         return 0
@@ -90,6 +94,7 @@ func lineCount(data []byte) int {
     return count
 }
 
+// buildPortableStats は解析結果を後段で再利用できる構造へ組み立てます。
 func buildPortableStats(root string, maxFileBytes int64) (portableStatsResult, error) {
     result := portableStatsResult{
         Languages:      map[string]statsLanguageMetrics{},
@@ -161,6 +166,7 @@ func buildPortableStats(root string, maxFileBytes int64) (portableStatsResult, e
     return result, err
 }
 
+// parseSCCStats は外部入力を内部表現へ変換し、不正入力を後段へ流さない境界を担当します。
 func parseSCCStats(data []byte) (map[string]statsLanguageMetrics, int, int, error) {
     rows := []sccLanguageSummary{}
     if err := json.Unmarshal(data, &rows); err != nil {
@@ -191,6 +197,7 @@ func parseSCCStats(data []byte) (map[string]statsLanguageMetrics, int, int, erro
     return languages, totalFiles, totalLines, nil
 }
 
+// runSCCStats は対象処理を実行し、外部境界の失敗を呼び出し元へ明示します。
 func runSCCStats(root string) (map[string]statsLanguageMetrics, int, int, string, string) {
     executable, err := exec.LookPath("scc")
     if err != nil {
@@ -227,6 +234,7 @@ func runSCCStats(root string) (map[string]statsLanguageMetrics, int, int, string
     return languages, files, lines, "ok", ""
 }
 
+// emitPortableStats は内部結果を安定した利用者向け出力へ変換します。
 func emitPortableStats(root string, limit int64, portable portableStatsResult, status string, fallback map[string]any) {
     payload := map[string]any{
         "tool": "repo-stats", "status": status, "project_root": root, "backend": "portable",
@@ -252,6 +260,7 @@ func emitPortableStats(root string, limit int64, portable portableStatsResult, s
     emitStatsJSON(payload)
 }
 
+// cmdStats は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdStats(args []string) int {
     flags := flag.NewFlagSet("stats", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

@@ -15,7 +15,9 @@ const structureIndexFormat = "acr-source-structure-index-v1"
 
 type structureStringList []string
 
+// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *structureStringList) String() string { return strings.Join(*s, ",") }
+// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *structureStringList) Set(value string) error {
     *s = append(*s, value)
     return nil
@@ -49,17 +51,20 @@ type structureIndex struct {
     InputErrors    []string        `json:"input_errors"`
 }
 
+// emitStructureJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitStructureJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// structureMap はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func structureMap(raw any) (map[string]any, bool) {
     value, ok := raw.(map[string]any)
     return value, ok
 }
 
+// structureString はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func structureString(value any) string {
     if text, ok := value.(string); ok {
         return text
@@ -67,6 +72,7 @@ func structureString(value any) string {
     return ""
 }
 
+// structureInt はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func structureInt(value any) int {
     switch n := value.(type) {
     case float64:
@@ -78,6 +84,7 @@ func structureInt(value any) int {
     }
 }
 
+// normalizeStructurePath は表記揺れを正規化し、後段の比較条件を単純化します。
 func normalizeStructurePath(raw, root string) string {
     path := raw
     if root != "" && filepath.IsAbs(path) {
@@ -88,6 +95,7 @@ func normalizeStructurePath(raw, root string) string {
     return filepath.ToSlash(path)
 }
 
+// pythonModuleFromPath はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func pythonModuleFromPath(path string) string {
     if !strings.HasSuffix(strings.ToLower(path), ".py") {
         return ""
@@ -99,6 +107,7 @@ func pythonModuleFromPath(path string) string {
     return strings.ReplaceAll(strings.Trim(value, "/"), "/", ".")
 }
 
+// goPackageFromPath はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func goPackageFromPath(module, path string) string {
     if module == "" || !strings.HasSuffix(strings.ToLower(path), ".go") {
         return ""
@@ -110,10 +119,12 @@ func goPackageFromPath(module, path string) string {
     return strings.TrimSuffix(module, "/") + "/" + strings.Trim(parent, "/")
 }
 
+// structureEdgeKey はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func structureEdgeKey(edge structureEdge) string {
     return edge.From + "\x00" + edge.To + "\x00" + edge.Kind
 }
 
+// addStructureNode はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func addStructureNode(nodes map[string]structureNode, node structureNode) {
     if node.ID == "" || node.Kind == "" {
         return
@@ -132,6 +143,7 @@ func addStructureNode(nodes map[string]structureNode, node structureNode) {
     nodes[node.ID] = current
 }
 
+// payloadTruncated はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func payloadTruncated(payload map[string]any) bool {
     for key, value := range payload {
         if strings.HasSuffix(key, "truncated") {
@@ -143,6 +155,7 @@ func payloadTruncated(payload map[string]any) bool {
     return false
 }
 
+// loadStructureRaw は入力元から必要情報だけを読み込み、後段が扱える形へ整えます。
 func loadStructureRaw(path string) (any, error) {
     data, err := os.ReadFile(path)
     if err != nil { return nil, err }
@@ -151,6 +164,7 @@ func loadStructureRaw(path string) (any, error) {
     return value, nil
 }
 
+// buildStructureIndex は解析結果を後段で再利用できる構造へ組み立てます。
 func buildStructureIndex(symbolPaths, graphPaths []string, root string) (structureIndex, error) {
     nodes := map[string]structureNode{}
     edges := map[string]structureEdge{}
@@ -293,6 +307,7 @@ func buildStructureIndex(symbolPaths, graphPaths []string, root string) (structu
     return structureIndex{Format: structureIndexFormat, Nodes: nodeRows, Edges: edgeRows, InputTruncated: truncated, InputErrors: inputErrors}, nil
 }
 
+// writeStructureIndex は内部結果を安定した利用者向け出力へ変換します。
 func writeStructureIndex(path string, index structureIndex) error {
     if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil { return err }
     data, err := json.MarshalIndent(index, "", "  ")
@@ -301,6 +316,7 @@ func writeStructureIndex(path string, index structureIndex) error {
     return os.WriteFile(path, data, 0o644)
 }
 
+// readStructureIndex は入力元から必要情報だけを読み込み、後段が扱える形へ整えます。
 func readStructureIndex(path string) (structureIndex, error) {
     data, err := os.ReadFile(path)
     if err != nil { return structureIndex{}, err }
@@ -316,6 +332,7 @@ type structureRanked struct {
     Node structureNode
 }
 
+// queryStructureNodes は広い探索結果から条件に合う対象だけを絞り込みます。
 func queryStructureNodes(index structureIndex, pattern string, limit int) ([]structureNode, bool) {
     needle := strings.ToLower(pattern)
     ranked := []structureRanked{}
@@ -344,6 +361,7 @@ func queryStructureNodes(index structureIndex, pattern string, limit int) ([]str
     return rows, false
 }
 
+// resolveStructureTarget はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func resolveStructureTarget(index structureIndex, target string) (string, []structureNode) {
     matches, _ := queryStructureNodes(index, target, 0)
     needle := strings.ToLower(target)
@@ -363,6 +381,7 @@ func resolveStructureTarget(index structureIndex, target string) (string, []stru
     return "target_not_found", nil
 }
 
+// structureCycleGroups はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func structureCycleGroups(nodeIDs map[string]bool, edges []structureEdge) [][]string {
     graph := map[string][]string{}
     for _, edge := range edges {
@@ -420,6 +439,7 @@ func structureCycleGroups(nodeIDs map[string]bool, edges []structureEdge) [][]st
     return groups
 }
 
+// expandStructure はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func expandStructure(index structureIndex, start string, depth, maxNodes int, direction string) map[string]any {
     nodes := map[string]structureNode{}
     outgoing := map[string][]structureEdge{}
@@ -486,6 +506,7 @@ func expandStructure(index structureIndex, start string, depth, maxNodes int, di
     }
 }
 
+// cmdStructureIndexBuild は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdStructureIndexBuild(args []string) int {
     fs := flag.NewFlagSet("structure-index build", flag.ContinueOnError)
     fs.SetOutput(io.Discard)
@@ -535,6 +556,7 @@ func cmdStructureIndexBuild(args []string) int {
     return 0
 }
 
+// cmdStructureIndexQuery は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdStructureIndexQuery(args []string) int {
     fs := flag.NewFlagSet("structure-index query", flag.ContinueOnError)
     fs.SetOutput(io.Discard)
@@ -562,6 +584,7 @@ func cmdStructureIndexQuery(args []string) int {
     return 0
 }
 
+// cmdStructureIndexExpand は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdStructureIndexExpand(args []string) int {
     fs := flag.NewFlagSet("structure-index expand", flag.ContinueOnError)
     fs.SetOutput(io.Discard)
@@ -612,6 +635,7 @@ func cmdStructureIndexExpand(args []string) int {
     return 0
 }
 
+// cmdStructureIndex は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdStructureIndex(args []string) int {
     if len(args) == 0 {
         emitStructureJSON(map[string]any{"tool": "source-structure-index", "status": "missing_command", "commands": []string{"build", "query", "expand"}})

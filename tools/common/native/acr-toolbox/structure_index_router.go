@@ -2,6 +2,7 @@ package main
 
 var structureIndexCommands = []string{"build", "query", "expand", "affected"}
 
+// emitStructureAdapterFailure は内部結果を安定した利用者向け出力へ変換します。
 func emitStructureAdapterFailure(backend, inputKind string, status string, path string, message string) int {
     outputStatus := "input_read_failed"
     if status == "backend_unavailable" || status == "backend_incompatible" {
@@ -25,6 +26,7 @@ func emitStructureAdapterFailure(backend, inputKind string, status string, path 
 
 // Keep affected-scope and external-index adaptation out of the larger
 // build/query/expand implementation so each change reason has a smaller working set.
+// cmdStructureIndexEntry は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdStructureIndexEntry(args []string) int {
     if len(args) == 0 {
         emitStructureJSON(map[string]any{"tool": "source-structure-index", "status": "missing_command", "commands": structureIndexCommands})

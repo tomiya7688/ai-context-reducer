@@ -7,6 +7,7 @@ import (
     "strings"
 )
 
+// structureAffectedPathKey はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func structureAffectedPathKey(raw string) string {
     value := strings.ReplaceAll(raw, "\\", "/")
     for strings.HasPrefix(value, "./") {
@@ -15,6 +16,7 @@ func structureAffectedPathKey(raw string) string {
     return value
 }
 
+// affectedStructure はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func affectedStructure(index structureIndex, changedFiles []string, maxResults int) map[string]any {
     nodes := map[string]structureNode{}
     fileIDsByPath := map[string]string{}
@@ -146,6 +148,7 @@ func affectedStructure(index structureIndex, changedFiles []string, maxResults i
     }
 }
 
+// cmdStructureIndexAffected は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdStructureIndexAffected(args []string) int {
     fs := flag.NewFlagSet("structure-index affected", flag.ContinueOnError)
     fs.SetOutput(io.Discard)

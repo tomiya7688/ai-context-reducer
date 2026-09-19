@@ -19,6 +19,7 @@ type structureCtagsFailure struct {
     Error  string
 }
 
+// boundedCtagsError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedCtagsError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= structureCtagsErrorLimit {
@@ -27,6 +28,7 @@ func boundedCtagsError(text string) string {
     return text[:structureCtagsErrorLimit] + "... truncated"
 }
 
+// parseCtagsJSONLines は外部入力を内部表現へ変換し、不正入力を後段へ流さない境界を担当します。
 func parseCtagsJSONLines(data []byte) ([]any, error) {
     scanner := bufio.NewScanner(bytes.NewReader(data))
     scanner.Buffer(make([]byte, 64*1024), 8*1024*1024)
@@ -50,6 +52,7 @@ func parseCtagsJSONLines(data []byte) ([]any, error) {
     return rows, nil
 }
 
+// ctagsQualified はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func ctagsQualified(path, scope, name string) string {
     if scope != "" {
         return path + "::" + scope + "::" + name
@@ -57,6 +60,7 @@ func ctagsQualified(path, scope, name string) string {
     return path + "::" + name
 }
 
+// normalizeCtagsRows は表記揺れを正規化し、後段の比較条件を単純化します。
 func normalizeCtagsRows(raw any) (map[string]any, map[string]any, map[string]any, error) {
     rows, ok := raw.([]any)
     if !ok {
@@ -170,6 +174,7 @@ func normalizeCtagsRows(raw any) (map[string]any, map[string]any, map[string]any
     return symbols, graph, metadata, nil
 }
 
+// sortStrings はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func sortStrings(values []string) {
     for i := 1; i < len(values); i++ {
         value := values[i]
@@ -182,6 +187,7 @@ func sortStrings(values []string) {
     }
 }
 
+// loadCtagsRows は入力元から必要情報だけを読み込み、後段が扱える形へ整えます。
 func loadCtagsRows(path string, invokeCLI bool) ([]any, *structureCtagsFailure) {
     if !invokeCLI {
         data, err := os.ReadFile(path)
@@ -230,6 +236,7 @@ func loadCtagsRows(path string, invokeCLI bool) ([]any, *structureCtagsFailure) 
     return rows, nil
 }
 
+// writeCtagsAdapterJSON は内部結果を安定した利用者向け出力へ変換します。
 func writeCtagsAdapterJSON(path string, payload any) error {
     data, err := json.Marshal(payload)
     if err != nil {
@@ -238,6 +245,7 @@ func writeCtagsAdapterJSON(path string, payload any) error {
     return os.WriteFile(path, data, 0o644)
 }
 
+// prepareStructureCtagsBuildArgs はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func prepareStructureCtagsBuildArgs(args []string) ([]string, func(), *structureCtagsFailure) {
     remaining := []string{}
     sources := []string{}
