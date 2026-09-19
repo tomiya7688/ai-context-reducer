@@ -185,3 +185,15 @@ coding agentの階層instruction機能は有力な実装例ですが、料金体
 - 上位規約のコピーが増えていない
 - local guideのSource of Truthが明確
 - 特定agentやファイル名へ標準全体が依存していない
+
+
+## Portable scoped guide resolver
+
+特定agentが階層instructionを自動解決できない場合は、repository-local fallbackを利用できます。
+
+```text
+acr-toolbox scoped-guides path/to/target .
+python tools/common/small/scoped-guides/script/scoped_guides.py path/to/target .
+```
+
+resolverはrepository rootからtargetまでのancestor path上にあるguide候補だけを返します。本文全文やagent固有precedenceは返さず、path / scope / reasonのみをcompact JSONで返します。候補filenameは `--name` で変更できます。
