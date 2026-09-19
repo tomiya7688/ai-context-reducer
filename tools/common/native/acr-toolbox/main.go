@@ -83,6 +83,8 @@ func main() {
         code = cmdLanguageLargeRun(os.Args[2:])
     case "scoped-guides":
         code = cmdScopedGuides(os.Args[2:])
+    case "policy-check":
+        code = cmdPolicyCheck(os.Args[2:])
     case "language-env":
         code = cmdLanguageEnv()
     case "env":
