@@ -122,7 +122,7 @@ compact-log compact-diff remote-delta git-history-health syntax-health
 structure-index context-budget hotspot-report context-manifest context-pack-builder
 change-router validation-plan responsibility-candidates policy-index
 doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
-materialize language-setup language-run language-medium-run language-large-plan language-large-run language-env env
+materialize scoped-guides language-setup language-run language-medium-run language-large-plan language-large-run language-env env
 ```
 
 ## Categories
@@ -145,6 +145,7 @@ Language tool selection   -> language-setup / acr-toolbox language-setup
 Shallow language analysis -> language-run / acr-toolbox language-run
 Medium dependency routing -> acr-toolbox language-medium-run
 Large backend planning    -> acr-toolbox language-large-plan
+Scoped instructions       -> scoped-guides / acr-toolbox scoped-guides
 Ordered tool routing      -> tool-selector / acr-toolbox select
 Search-first              -> search / find / structural-search / tree / doc-index / slice
 Exploration stop          -> acceptance-extractor / exploration-stop-check
