@@ -69,6 +69,7 @@ jobs:
         run: |
           set -euo pipefail
           BIN="${{ matrix.binary }}"
+          "$BIN" version
           "$BIN" env
           "$BIN" analyze .
           "$BIN" select .
