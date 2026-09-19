@@ -38,6 +38,7 @@ var gdLoad = regexp.MustCompile(`(?:load|preload)\(\s*["']([^"']+)["']\s*\)`)
 var gdExtends = regexp.MustCompile(`^\s*extends\s+["']([^"']+)["']`)
 var csProjectRef = regexp.MustCompile(`<ProjectReference\s+Include=["']([^"']+)["']`)
 
+// mediumExtensions はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func mediumExtensions(language string) map[string]bool {
     switch language {
     case "python": return map[string]bool{".py":true}
@@ -49,6 +50,7 @@ func mediumExtensions(language string) map[string]bool {
     return map[string]bool{}
 }
 
+// collectDependencyFiles は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func collectDependencyFiles(root, language string) ([]string,error) {
     files:=[]string{}
     if language=="csharp" {
@@ -70,6 +72,7 @@ func collectDependencyFiles(root, language string) ([]string,error) {
     sort.Strings(files); return files,err
 }
 
+// uniqueSorted はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func uniqueSorted(values []string) []string {
     seen:=map[string]bool{}
     out:=[]string{}
@@ -77,6 +80,7 @@ func uniqueSorted(values []string) []string {
     sort.Strings(out); return out
 }
 
+// scanDependencyFile は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func scanDependencyFile(path, language string) dependencyFile {
     if language=="csharp" {
         data,err:=os.ReadFile(path)
@@ -114,6 +118,7 @@ func scanDependencyFile(path, language string) dependencyFile {
     return dependencyFile{File:filepath.ToSlash(path),Status:"ok",Dependencies:uniqueSorted(deps)}
 }
 
+// buildDependencyResult は解析結果を後段で再利用できる構造へ組み立てます。
 func buildDependencyResult(root,language,tool string)(dependencyResult,error){
     files,err:=collectDependencyFiles(root,language)
     if err!=nil{return dependencyResult{},err}
@@ -129,6 +134,7 @@ func buildDependencyResult(root,language,tool string)(dependencyResult,error){
     return out,nil
 }
 
+// cmdLanguageMediumRun は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdLanguageMediumRun(args []string) int {
     fs:=flag.NewFlagSet("language-medium-run",flag.ContinueOnError)
     outDirArg:=fs.String("out",".acr/language-medium","directory for dependency/project maps")

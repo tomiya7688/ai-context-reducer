@@ -29,12 +29,14 @@ type ignoreCandidate struct {
     MatchedRule string `json:"matched_rule"`
 }
 
+// emitIgnoreCandidatesJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitIgnoreCandidatesJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// scanNativeIgnoreCandidates は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func scanNativeIgnoreCandidates(root string) ([]ignoreCandidate, int) {
     candidates := []ignoreCandidate{}
     walkErrors := 0
@@ -77,6 +79,7 @@ func scanNativeIgnoreCandidates(root string) ([]ignoreCandidate, int) {
     return candidates, walkErrors
 }
 
+// cmdIgnoreCandidates は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdIgnoreCandidates(args []string) int {
     flags := flag.NewFlagSet("ignore-candidates", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

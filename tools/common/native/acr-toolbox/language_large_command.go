@@ -18,10 +18,12 @@ type largeBackendPlan struct {
     Reason string `json:"reason"`
 }
 
+// largeBackendRunSupported はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func largeBackendRunSupported(backend string) bool {
     return backend == "existing-scip-index" || backend == "universal-ctags"
 }
 
+// finalizeLargePlan はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func finalizeLargePlan(plan largeBackendPlan) largeBackendPlan {
     plan.RunSupported = largeBackendRunSupported(plan.Backend)
     if plan.RunSupported {
@@ -34,6 +36,7 @@ func finalizeLargePlan(plan largeBackendPlan) largeBackendPlan {
     return plan
 }
 
+// cmdLanguageLargePlan は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdLanguageLargePlan(args []string) int {
     fs:=flag.NewFlagSet("language-large-plan",flag.ContinueOnError)
     if err:=fs.Parse(args);err!=nil{return 2}
@@ -129,11 +132,13 @@ func cmdLanguageLargePlan(args []string) int {
     return 0
 }
 
+// fileExists はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func fileExists(path string) bool {
     info,err:=os.Stat(path)
     return err==nil && !info.IsDir()
 }
 
+// cmdLanguageLargeRun は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdLanguageLargeRun(args []string) int {
     fs:=flag.NewFlagSet("language-large-run",flag.ContinueOnError)
     allowHeavy:=fs.Bool("allow-heavy",false,"explicitly permit selected heavy backend execution")

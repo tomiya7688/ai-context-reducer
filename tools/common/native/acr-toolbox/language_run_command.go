@@ -17,17 +17,20 @@ type languageRunResult struct {
     Error string `json:"error,omitempty"`
 }
 
+// boundedErr はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedErr(data []byte) string {
     s := strings.TrimSpace(string(data))
     if len(s) > 1200 { return s[:1200] }
     return s
 }
 
+// writeCommandOutput は内部結果を安定した利用者向け出力へ変換します。
 func writeCommandOutput(path string, stdout []byte) error {
     if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil { return err }
     return os.WriteFile(path, stdout, 0644)
 }
 
+// runLanguageTool は対象処理を実行し、外部境界の失敗を呼び出し元へ明示します。
 func runLanguageTool(toolPath, root, outDir string) languageRunResult {
     languages := map[string]string{
         "python/small/python-symbols":"python",
@@ -42,6 +45,7 @@ func runLanguageTool(toolPath, root, outDir string) languageRunResult {
     return writeNativeSymbols(root,language,toolPath,outDir)
 }
 
+// cmdLanguageRun は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdLanguageRun(args []string) int {
     fs:=flag.NewFlagSet("language-run",flag.ContinueOnError)
     out:=fs.String("out",".acr/language","directory for analyzer results")

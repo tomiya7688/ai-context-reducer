@@ -16,6 +16,7 @@ type languageSetupTool struct {
     Reason string `json:"reason"`
 }
 
+// cmdLanguageSetup は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdLanguageSetup(args []string) int {
     fs := flag.NewFlagSet("language-setup", flag.ContinueOnError)
     runSmall := fs.Bool("run-small", false, "mark shallow language analyzers for immediate execution")
