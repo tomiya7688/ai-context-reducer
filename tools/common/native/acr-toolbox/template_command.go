@@ -120,8 +120,7 @@ func cmdTemplate(args []string) int {
   if len(badVars)>0||len(missing)>0{
     selectorWriteJSON(map[string]any{"tool":"template","status":"validation_failed","missing_required_variables":missing,"unsupported_variable_types":badVars});return 2
   }
-  varsRaw,_:=os.ReadFile(*varsPath);var canonical any;_ = json.Unmarshal(varsRaw,&canonical)
-  canon,_:=json.Marshal(canonical);sum:=sha256.Sum256(canon);varsHash:=hex.EncodeToString(sum[:])
+  varsRaw,_:=os.ReadFile(*varsPath);sum:=sha256.Sum256(varsRaw);varsHash:=hex.EncodeToString(sum[:])
 
   type pair struct{src,dst,rel string}
   pairs:=[]pair{}
