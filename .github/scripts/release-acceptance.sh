@@ -56,6 +56,11 @@ class Demo:
 def run():
     return Path(".")
 EOF
+cat > "$P/go.mod" <<'EOF'
+module example.com/fixture
+
+go 1.22
+EOF
 cat > "$P/src/util.go" <<'EOF'
 package fixture
 
@@ -114,7 +119,7 @@ mkdir -p "$OUT"
 "$BIN" context-manifest "$P" > "$OUT/context-manifest.json"
 "$BIN" search --max-results 5 --glob '*.py' Demo "$P" > "$OUT/search.json"
 "$BIN" find --type file --max-results 10 '*.py' "$P" > "$OUT/find.json"
-"$BIN" tree --max-depth 2 "$P" > "$OUT/tree.json"
+"$BIN" tree "$P" > "$OUT/tree.txt"
 "$BIN" slice Demo "$P/src/main.py" > "$OUT/slice.json"
 printf 'ok\nwarning: sample\nerror: sample\n' | "$BIN" compact-log > "$OUT/compact-log.json"
 "$BIN" compact-diff "$P" HEAD HEAD > "$OUT/compact-diff.txt"
@@ -181,8 +186,11 @@ expect_contains "$OUT/policy-index.json" "MUST keep generated output"
 "$BUNDLE/go-symbols$EXT" "$P" > "$OUT/go-symbols.json"
 "$BUNDLE/go-import-map$EXT" "$P" > "$OUT/go-import-map.json"
 "$BUNDLE/go-package-graph$EXT" "$P" > "$OUT/go-package-graph.json"
+"$BUNDLE/affected-tests$EXT" --root "$P" --changed src/main.py > "$OUT/affected-tests.json"
 
 expect_contains "$OUT/go-symbols.json" "Widget"
 expect_contains "$OUT/go-import-map.json" "fmt"
+expect_contains "$OUT/go-package-graph.json" "example.com/fixture"
+expect_contains "$OUT/affected-tests.json" "tests/test_main.py"
 
 echo "release acceptance passed for $VERSION on $RUNNER_OS/$RUNNER_ARCH"
