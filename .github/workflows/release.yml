@@ -183,7 +183,11 @@ jobs:
         shell: pwsh
         run: |
           $archive = Join-Path $env:RUNNER_TEMP "ai-context-reducer-v$env:RELEASE_VERSION-${{ matrix.name }}.zip"
-          Compress-Archive -Path "$env:BUNDLE\*" -DestinationPath $archive -Force
+          $parent = Split-Path -Parent $env:BUNDLE
+          $leaf = Split-Path -Leaf $env:BUNDLE
+          Push-Location $parent
+          Compress-Archive -Path $leaf -DestinationPath $archive -Force
+          Pop-Location
           "ARCHIVE=$archive" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Verify packaged archive by extracting it again
         shell: bash
@@ -193,7 +197,7 @@ jobs:
           rm -rf "$verify"
           mkdir -p "$verify"
           case "$ARCHIVE" in
-            *.zip) unzip -q "$ARCHIVE" -d "$verify"; extracted="$verify" ;;
+            *.zip) unzip -q "$ARCHIVE" -d "$verify"; extracted="$verify/$(basename "$BUNDLE")" ;;
             *.tar.gz) tar -xzf "$ARCHIVE" -C "$verify"; extracted="$verify/$(basename "$BUNDLE")" ;;
             *) echo "unknown archive: $ARCHIVE" >&2; exit 1 ;;
           esac
@@ -268,6 +272,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
           name: v1-release-candidate
@@ -283,6 +289,12 @@ jobs:
           fi
           git rev-parse "$tag" >/dev/null 2>&1 || {
             echo "release tag does not exist in checkout: $tag" >&2
+            exit 1
+          }
+          tag_commit="$(git rev-list -n 1 "$tag")"
+          validated_commit="$(git rev-parse HEAD)"
+          [ "$tag_commit" = "$validated_commit" ] || {
+            echo "tag $tag points to $tag_commit but validated commit is $validated_commit" >&2
             exit 1
           }
           echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
