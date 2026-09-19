@@ -83,6 +83,7 @@ var nativePatterns = map[string][]symbolPattern{
     },
 }
 
+// collectNativeLanguageFiles は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func collectNativeLanguageFiles(root, language string) ([]string, error) {
     exts := nativeSymbolExtensions[language]
     files := []string{}
@@ -99,6 +100,7 @@ func collectNativeLanguageFiles(root, language string) ([]string, error) {
     return files, err
 }
 
+// scanNativeSymbols は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func scanNativeSymbols(path, language string) nativeSymbolFile {
     h, err := os.Open(path)
     if err != nil { return nativeSymbolFile{File:filepath.ToSlash(path),Status:"read_failed",Symbols:[]nativeSymbol{},Error:err.Error()} }
@@ -122,6 +124,7 @@ func scanNativeSymbols(path, language string) nativeSymbolFile {
     return nativeSymbolFile{File:filepath.ToSlash(path),Status:"ok",Symbols:rows}
 }
 
+// buildNativeSymbolResult は解析結果を後段で再利用できる構造へ組み立てます。
 func buildNativeSymbolResult(root, language, tool string) (nativeSymbolResult,error) {
     files,err:=collectNativeLanguageFiles(root,language)
     if err!=nil { return nativeSymbolResult{},err }
@@ -140,6 +143,7 @@ func buildNativeSymbolResult(root, language, tool string) (nativeSymbolResult,er
     return out,nil
 }
 
+// writeNativeSymbols は内部結果を安定した利用者向け出力へ変換します。
 func writeNativeSymbols(root, language, tool, outDir string) languageRunResult {
     r:=languageRunResult{ToolPath:tool,Backend:"acr-toolbox-native-symbols"}
     payload,err:=buildNativeSymbolResult(root,language,filepath.Base(tool))

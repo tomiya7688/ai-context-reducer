@@ -5,10 +5,12 @@ import (
     "os"
 )
 
+// usage はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func usage() {
     fmt.Println("acr-toolbox <analyze|select|search|find|tree|stats|doc-index|slice|compact-log|compact-diff|remote-delta|git-history-health|syntax-health|structure-index|context-budget|hotspot-report|context-manifest|context-pack-builder|change-router|validation-plan|responsibility-candidates|policy-index|doc-duplicate-hints|ignore-candidates|acceptance-extractor|exploration-stop-check|materialize|language-setup|language-run|language-medium-run|language-large-plan|language-large-run|scoped-guides|policy-check|template|version|language-env|env> ...")
 }
 
+// main はサブコマンドへの入口を提供し、CLI全体の終了コードを確定します。
 func main() {
     if len(os.Args) < 2 {
         usage()

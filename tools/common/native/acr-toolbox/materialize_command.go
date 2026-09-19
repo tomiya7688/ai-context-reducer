@@ -9,6 +9,7 @@ import (
     "runtime"
 )
 
+// cmdMaterialize は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdMaterialize(args []string) int {
     fs := flag.NewFlagSet("materialize", flag.ContinueOnError)
     fs.SetOutput(io.Discard)

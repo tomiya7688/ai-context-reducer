@@ -42,6 +42,7 @@ type materializeManifest struct {
     Files              []materializeManifestFile `json:"files"`
 }
 
+// materializeSHA256 はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func materializeSHA256(path string) (string, error) {
     data, err := os.ReadFile(path)
     if err != nil {
@@ -51,6 +52,7 @@ func materializeSHA256(path string) (string, error) {
     return hex.EncodeToString(sum[:]), nil
 }
 
+// materializeSourceRevision はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func materializeSourceRevision(source string) *string {
     command := exec.Command("git", "-C", source, "rev-parse", "HEAD")
     output, err := command.Output()
@@ -67,6 +69,7 @@ func materializeSourceRevision(source string) *string {
     return &value
 }
 
+// nativeMaterializeSelection はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func nativeMaterializeSelection(source, executable, goos string) []materializeSelection {
     nativeName := "acr-toolbox"
     wrapperName := "analyze.sh"
@@ -94,6 +97,7 @@ func nativeMaterializeSelection(source, executable, goos string) []materializeSe
     return selected
 }
 
+// planNativeMaterialization はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func planNativeMaterialization(out string, selected []materializeSelection, overwrite bool) ([]materializeAction, []string, error) {
     actions := make([]materializeAction, 0, len(selected))
     missing := []string{}
@@ -150,6 +154,7 @@ func planNativeMaterialization(out string, selected []materializeSelection, over
     return actions, missing, nil
 }
 
+// nativeMaterializeManifest はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func nativeMaterializeManifest(revision *string, actions []materializeAction) materializeManifest {
     files := make([]materializeManifestFile, 0, len(actions))
     for _, row := range actions {
