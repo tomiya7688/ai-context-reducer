@@ -87,6 +87,11 @@ jobs:
           {"rules":[{"id":"SMOKE001","paths":["README.md"],"severity":"error","forbid":"__acr_policy_smoke_forbidden__"}]}
           EOF
           "$BIN" policy-check --rules "$RUNNER_TEMP/policy-rules.json" .
+          mkdir -p "$RUNNER_TEMP/acr-template-smoke"
+          printf 'Hello {{name}}\n' > "$RUNNER_TEMP/acr-template-smoke/template.txt"
+          printf '{"name":"World"}\n' > "$RUNNER_TEMP/acr-template-smoke/vars.json"
+          "$BIN" template --template "$RUNNER_TEMP/acr-template-smoke/template.txt" --vars "$RUNNER_TEMP/acr-template-smoke/vars.json" --out "$RUNNER_TEMP/acr-template-smoke/out.txt" --required name --template-id smoke --template-version 1
+          "$BIN" template --template "$RUNNER_TEMP/acr-template-smoke/template.txt" --vars "$RUNNER_TEMP/acr-template-smoke/vars.json" --out "$RUNNER_TEMP/acr-template-smoke/out.txt" --required name --check
       - name: Smoke text pipeline
         shell: bash
         run: |
