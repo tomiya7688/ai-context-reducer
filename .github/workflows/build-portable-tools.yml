@@ -82,6 +82,7 @@ jobs:
           "$BIN" language-run --out "$RUNNER_TEMP/acr-language" .
           "$BIN" language-medium-run --out "$RUNNER_TEMP/acr-language-medium" .
           "$BIN" language-large-plan .
+          "$BIN" scoped-guides tools/common/native/acr-toolbox/main.go .
       - name: Smoke text pipeline
         shell: bash
         run: |
