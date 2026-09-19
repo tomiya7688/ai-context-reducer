@@ -8,6 +8,7 @@ import (
     "testing"
 )
 
+// captureJSONCommand はCLI境界をtest内で再現し、終了状態と出力を検証可能な形で取得します。
 func captureJSONCommand(t *testing.T, run func() int) (int, map[string]any) {
     t.Helper()
     previous := os.Stdout
@@ -35,6 +36,7 @@ func captureJSONCommand(t *testing.T, run func() int) (int, map[string]any) {
     return code, payload
 }
 
+// TestContextEstimateAccurateReadsTextButRemainsApproximate は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestContextEstimateAccurateReadsTextButRemainsApproximate(t *testing.T) {
     root := t.TempDir()
     path := filepath.Join(root, "sample.py")
@@ -60,6 +62,7 @@ func TestContextEstimateAccurateReadsTextButRemainsApproximate(t *testing.T) {
     }
 }
 
+// TestContextBudgetCLIReportsApproximationAndExactTruncation は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestContextBudgetCLIReportsApproximationAndExactTruncation(t *testing.T) {
     root := t.TempDir()
     for _, name := range []string{"a.py", "b.py"} {
@@ -90,6 +93,7 @@ func TestContextBudgetCLIReportsApproximationAndExactTruncation(t *testing.T) {
     }
 }
 
+// TestHotspotScanLimitOnlyMarksRealTruncation は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestHotspotScanLimitOnlyMarksRealTruncation(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "a.txt"), []byte("a"), 0o644); err != nil {

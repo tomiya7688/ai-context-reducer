@@ -8,6 +8,7 @@ import (
     "testing"
 )
 
+// captureTextCommand はCLI境界をtest内で再現し、終了状態と出力を検証可能な形で取得します。
 func captureTextCommand(t *testing.T, run func() int) (int, string) {
     t.Helper()
     previous := os.Stdout
@@ -31,6 +32,7 @@ func captureTextCommand(t *testing.T, run func() int) (int, string) {
     return code, string(data)
 }
 
+// TestContextManifestPriorityMatchesPythonContract は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestContextManifestPriorityMatchesPythonContract(t *testing.T) {
     cases := map[string]string{
         "README.md":         "P0",
@@ -46,6 +48,7 @@ func TestContextManifestPriorityMatchesPythonContract(t *testing.T) {
     }
 }
 
+// TestContextManifestCLIIsBoundedAndSelfDescribing は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestContextManifestCLIIsBoundedAndSelfDescribing(t *testing.T) {
     root := t.TempDir()
     files := map[string]string{
@@ -82,6 +85,7 @@ func TestContextManifestCLIIsBoundedAndSelfDescribing(t *testing.T) {
     }
 }
 
+// TestContextPackRenderingDistinguishesCleanAndGitFailure は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestContextPackRenderingDistinguishesCleanAndGitFailure(t *testing.T) {
     task := contextPackTask{Goal: "g"}
     clean := renderNativeContextPack(task, contextPackState{ChangedQueryOK: true, StatusQueryOK: true})
@@ -103,6 +107,7 @@ func TestContextPackRenderingDistinguishesCleanAndGitFailure(t *testing.T) {
     }
 }
 
+// TestContextPackBoundedLinesNormalizeNegativeLimit は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestContextPackBoundedLinesNormalizeNegativeLimit(t *testing.T) {
     rows, truncated := boundedContextPackLines([]string{"a", "b"}, -1)
     if len(rows) != 0 || !truncated {
@@ -114,6 +119,7 @@ func TestContextPackBoundedLinesNormalizeNegativeLimit(t *testing.T) {
     }
 }
 
+// TestContextPackGitUnavailableIsExplicit は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestContextPackGitUnavailableIsExplicit(t *testing.T) {
     t.Setenv("PATH", "")
     result := contextPackGitLines(t.TempDir(), "status", "--short")

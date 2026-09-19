@@ -7,6 +7,7 @@ import (
     "testing"
 )
 
+// TestSummarizeGitSizerFiltersSortsAndTruncates は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestSummarizeGitSizerFiltersSortsAndTruncates(t *testing.T) {
     payload := map[string]any{
         "uniqueBlobSize": map[string]any{"value": float64(100), "levelOfConcern": float64(0.2)},
@@ -31,6 +32,7 @@ func TestSummarizeGitSizerFiltersSortsAndTruncates(t *testing.T) {
     }
 }
 
+// TestGitHistoryHealthCLIReadsSavedJSON は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestGitHistoryHealthCLIReadsSavedJSON(t *testing.T) {
     root := t.TempDir()
     input := filepath.Join(root, "git-sizer.json")

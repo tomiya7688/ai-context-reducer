@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestValidationPlanAvoidsUISubstringFalsePositive は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestValidationPlanAvoidsUISubstringFalsePositive(t *testing.T) {
     result := classifyValidationPath("build/core.py")
     for _, value := range result {
@@ -24,6 +25,7 @@ func TestValidationPlanAvoidsUISubstringFalsePositive(t *testing.T) {
     }
 }
 
+// TestValidationPlanCompoundParserTerm は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestValidationPlanCompoundParserTerm(t *testing.T) {
     result := classifyValidationPath("tools/parser_rules.py")
     found := false
@@ -37,6 +39,7 @@ func TestValidationPlanCompoundParserTerm(t *testing.T) {
     }
 }
 
+// TestChangeRouterTestCandidateAvoidsSubstringFalsePositive は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestChangeRouterTestCandidateAvoidsSubstringFalsePositive(t *testing.T) {
     if changeRouterIsTestCandidate("latest.py", nil) || changeRouterIsTestCandidate("contest.py", nil) {
         t.Fatal("substring test false positive")
@@ -49,6 +52,7 @@ func TestChangeRouterTestCandidateAvoidsSubstringFalsePositive(t *testing.T) {
     }
 }
 
+// TestChangeRouterIndexTruncationRequiresAdditionalCandidate は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestChangeRouterIndexTruncationRequiresAdditionalCandidate(t *testing.T) {
     root := t.TempDir()
     testsDir := filepath.Join(root, "tests")
@@ -77,6 +81,7 @@ func TestChangeRouterIndexTruncationRequiresAdditionalCandidate(t *testing.T) {
     }
 }
 
+// TestChangeRouterCLIExplicitChangedIsSelfDescribing は対象機能の期待contractが将来の変更で崩れないことを検証します。
 func TestChangeRouterCLIExplicitChangedIsSelfDescribing(t *testing.T) {
     root := t.TempDir()
     if err := os.MkdirAll(filepath.Join(root, "tests"), 0o755); err != nil {
