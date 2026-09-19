@@ -8,6 +8,7 @@ import (
     "regexp"
 )
 
+// readLines は入力元から必要情報だけを読み込み、後段が扱える形へ整えます。
 func readLines(path string) ([]string, error) {
     h, err := os.Open(path)
     if err != nil {
@@ -24,6 +25,7 @@ func readLines(path string) ([]string, error) {
     return out, s.Err()
 }
 
+// cmdSlice は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdSlice(args []string) int {
     if len(args) < 2 {
         fmt.Fprintln(os.Stderr, "usage: acr-toolbox slice PATTERN FILE [FILE...]")
@@ -68,6 +70,7 @@ func cmdSlice(args []string) int {
 
 var logSignal = regexp.MustCompile(`(?i)(error|failed|failure|fatal|exception|warning|warn|assert|traceback|ng\b)`)
 
+// cmdCompactLog は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdCompactLog(args []string) int {
     var r io.Reader = os.Stdin
     if len(args) > 0 {

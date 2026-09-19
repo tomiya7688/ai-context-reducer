@@ -17,6 +17,7 @@ type structureSCIPFailure struct {
     Error  string
 }
 
+// boundedSCIPError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedSCIPError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= structureSCIPErrorLimit {
@@ -25,6 +26,7 @@ func boundedSCIPError(text string) string {
     return text[:structureSCIPErrorLimit] + "... truncated"
 }
 
+// scipMapField はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func scipMapField(row map[string]any, camel, snake string) any {
     if value, ok := row[camel]; ok {
         return value
@@ -32,10 +34,12 @@ func scipMapField(row map[string]any, camel, snake string) any {
     return row[snake]
 }
 
+// scipRoles はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func scipRoles(row map[string]any) int {
     return structureInt(scipMapField(row, "symbolRoles", "symbol_roles"))
 }
 
+// scipRangeLines はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func scipRangeLines(raw any) (int, int) {
     values, ok := raw.([]any)
     if !ok || (len(values) != 3 && len(values) != 4) {
@@ -49,6 +53,7 @@ func scipRangeLines(raw any) (int, int) {
     return start, end
 }
 
+// normalizeSCIPPrint は表記揺れを正規化し、後段の比較条件を単純化します。
 func normalizeSCIPPrint(raw any) ([]any, map[string]any, error) {
     payload, ok := raw.(map[string]any)
     if !ok {
@@ -235,6 +240,7 @@ func normalizeSCIPPrint(raw any) ([]any, map[string]any, error) {
     return symbolRows, graph, nil
 }
 
+// loadSCIPPrintJSON は入力元から必要情報だけを読み込み、後段が扱える形へ整えます。
 func loadSCIPPrintJSON(path string, invokeCLI bool) (any, *structureSCIPFailure) {
     if !invokeCLI {
         raw, err := loadStructureRaw(path)
@@ -261,6 +267,7 @@ func loadSCIPPrintJSON(path string, invokeCLI bool) (any, *structureSCIPFailure)
     return raw, nil
 }
 
+// writeSCIPAdapterJSON は内部結果を安定した利用者向け出力へ変換します。
 func writeSCIPAdapterJSON(path string, payload any) error {
     data, err := json.Marshal(payload)
     if err != nil {
@@ -269,6 +276,7 @@ func writeSCIPAdapterJSON(path string, payload any) error {
     return os.WriteFile(path, data, 0o644)
 }
 
+// prepareStructureSCIPBuildArgs はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func prepareStructureSCIPBuildArgs(args []string) ([]string, func(), *structureSCIPFailure) {
     remaining := []string{}
     scipIndexes := []string{}

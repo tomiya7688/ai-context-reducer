@@ -15,7 +15,9 @@ import (
 )
 
 type templateStringList []string
+// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *templateStringList) String() string { return strings.Join(*s,",") }
+// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *templateStringList) Set(v string) error { *s=append(*s,v); return nil }
 
 type templateFilePlan struct {
@@ -30,6 +32,7 @@ type templateFilePlan struct {
 
 var templatePlaceholderRX=regexp.MustCompile(`\{\{\s*([A-Za-z_][A-Za-z0-9_.-]*)\s*\}\}`)
 
+// templateScalar はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func templateScalar(v any)(string,bool){
   switch x:=v.(type){
   case string:return x,true
@@ -40,6 +43,7 @@ func templateScalar(v any)(string,bool){
   }
 }
 
+// templateVariables はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func templateVariables(path string)(map[string]string,[]string,error){
   data,err:=os.ReadFile(path);if err!=nil{return nil,nil,err}
   var raw map[string]any
@@ -52,6 +56,7 @@ func templateVariables(path string)(map[string]string,[]string,error){
   return out,bad,nil
 }
 
+// renderTemplateBytes は内部結果を安定した利用者向け出力へ変換します。
 func renderTemplateBytes(data []byte,vars map[string]string)([]byte,[]string){
   rendered:=templatePlaceholderRX.ReplaceAllFunc(data,func(m []byte)[]byte{
     sub:=templatePlaceholderRX.FindSubmatch(m)
@@ -67,11 +72,13 @@ func renderTemplateBytes(data []byte,vars map[string]string)([]byte,[]string){
   return rendered,names
 }
 
+// templateBinary はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func templateBinary(data []byte) bool {
   sample:=data;if len(sample)>4096{sample=sample[:4096]}
   return bytes.IndexByte(sample,0)>=0
 }
 
+// templateDiffHint はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func templateDiffHint(oldData,newData []byte)map[string]any{
   if bytes.Equal(oldData,newData){return nil}
   oldLines:=strings.Split(strings.ReplaceAll(string(oldData),"\r\n","\n"),"\n")
@@ -90,11 +97,13 @@ func templateDiffHint(oldData,newData []byte)map[string]any{
   return map[string]any{"old_line_count":len(oldLines),"new_line_count":len(newLines)}
 }
 
+// templateMetadataPath はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func templateMetadataPath(out string,isDir bool)string{
   if isDir{return filepath.Join(out,".acr-template.json")}
   return out+".acr-template.json"
 }
 
+// cmdTemplate は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdTemplate(args []string) int {
   fs:=flag.NewFlagSet("template",flag.ContinueOnError)
   templatePath:=fs.String("template","","template file or directory")
@@ -178,6 +187,7 @@ func cmdTemplate(args []string) int {
   return exit
 }
 
+// sortedKeys はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func sortedKeys(m map[string]string)[]string{
   keys:=make([]string,0,len(m));for k:=range m{keys=append(keys,k)};sort.Strings(keys);return keys
 }

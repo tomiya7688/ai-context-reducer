@@ -18,6 +18,7 @@ type syntaxHealthRow struct {
     MissingCount int    `json:"missing_count"`
 }
 
+// syntaxInt はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func syntaxInt(value any) int {
     switch v := value.(type) {
     case float64:
@@ -32,6 +33,7 @@ func syntaxInt(value any) int {
     return 0
 }
 
+// syntaxString はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func syntaxString(row map[string]any, names ...string) string {
     for _, name := range names {
         if value, ok := row[name].(string); ok {
@@ -41,6 +43,7 @@ func syntaxString(row map[string]any, names ...string) string {
     return ""
 }
 
+// normalizeSyntaxHealth は表記揺れを正規化し、後段の比較条件を単純化します。
 func normalizeSyntaxHealth(payload any) []syntaxHealthRow {
     rawRows := []any{payload}
     if rows, ok := payload.([]any); ok {
@@ -84,6 +87,7 @@ func normalizeSyntaxHealth(payload any) []syntaxHealthRow {
     return result
 }
 
+// emitSyntaxHealth は内部結果を安定した利用者向け出力へ変換します。
 func emitSyntaxHealth(rows []syntaxHealthRow, maxFiles int) {
     failing := []syntaxHealthRow{}
     for _, row := range rows {
@@ -111,6 +115,7 @@ func emitSyntaxHealth(rows []syntaxHealthRow, maxFiles int) {
     })
 }
 
+// cmdSyntaxHealth は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdSyntaxHealth(args []string) int {
     flags := flag.NewFlagSet("syntax-health", flag.ContinueOnError)
     flags.SetOutput(io.Discard)
