@@ -23,12 +23,14 @@ for name in README.md TOOLS_README.md LICENSE RELEASE_MANIFEST.json; do
   expect_file "$BUNDLE/$name"
 done
 expect_contains "$BUNDLE/RELEASE_MANIFEST.json" "\"release_version\": \"$VERSION\""
+expect_contains "$BUNDLE/LICENSE" "MIT License"
 
 mkdir -p "$ROOT"
 VERSION_JSON="$ROOT/version.json"
 "$BIN" version > "$VERSION_JSON"
 expect_contains "$VERSION_JSON" "\"version\": \"$VERSION\""
 expect_contains "$VERSION_JSON" "\"status\": \"ok\""
+grep -E '"commit": "[0-9a-f]{40}"' "$VERSION_JSON" >/dev/null || fail "version commit is not a full SHA"
 
 rm -rf "$ROOT/project"
 mkdir -p "$ROOT/project/src" "$ROOT/project/tests" "$ROOT/project/docs" "$ROOT/project/app/nested" "$ROOT/project/build"
@@ -110,6 +112,7 @@ OUT="$ROOT/out"
 mkdir -p "$OUT"
 
 "$BIN" env > "$OUT/env.json"
+"$BIN" language-env > "$OUT/language-env.json"
 "$BIN" analyze "$P" > "$OUT/analyze.json"
 "$BIN" select "$P" > "$OUT/select.json"
 "$BIN" stats "$P" > "$OUT/stats.json"
@@ -117,6 +120,9 @@ mkdir -p "$OUT"
 "$BIN" context-budget --mode fast --top 5 "$P" > "$OUT/context-budget.json"
 "$BIN" hotspot-report --limit 5 "$P" > "$OUT/hotspot.json"
 "$BIN" context-manifest "$P" > "$OUT/context-manifest.json"
+"$BIN" context-pack-builder --goal "Fixture release validation" --required "Compact output" --acceptance "All checks pass" --deferred "None" --output "$OUT/context-pack.md" "$P"
+expect_file "$OUT/context-pack.md"
+expect_contains "$OUT/context-pack.md" "Fixture release validation"
 "$BIN" search --max-results 5 --glob '*.py' Demo "$P" > "$OUT/search.json"
 "$BIN" find --type file --max-results 10 '*.py' "$P" > "$OUT/find.json"
 "$BIN" tree "$P" > "$OUT/tree.txt"
@@ -124,6 +130,19 @@ mkdir -p "$OUT"
 printf 'ok\nwarning: sample\nerror: sample\n' | "$BIN" compact-log > "$OUT/compact-log.json"
 "$BIN" compact-diff "$P" HEAD HEAD > "$OUT/compact-diff.txt"
 "$BIN" remote-delta "$P" > "$OUT/remote-delta.txt"
+
+cat > "$ROOT/git-sizer.json" <<'EOF'
+{"blobSize":{"value":100,"levelOfConcern":1,"unit":"B","description":"fixture"}}
+EOF
+"$BIN" git-history-health --json-input "$ROOT/git-sizer.json" "$P" > "$OUT/git-history-health.json"
+expect_contains "$OUT/git-history-health.json" "\"status\": \"ok\""
+
+cat > "$ROOT/tree-sitter-summary.json" <<'EOF'
+[{"path":"src/main.py","successful":true,"error_count":0,"missing_count":0}]
+EOF
+"$BIN" syntax-health --json-input "$ROOT/tree-sitter-summary.json" > "$OUT/syntax-health.json"
+expect_contains "$OUT/syntax-health.json" "\"status\": \"ok\""
+
 "$BIN" change-router "$P" > "$OUT/change-router.json"
 "$BIN" validation-plan "$P/src/main.py" > "$OUT/validation-plan.json"
 "$BIN" responsibility-candidates "$P" > "$OUT/responsibility.md"
@@ -134,10 +153,21 @@ printf 'ok\nwarning: sample\nerror: sample\n' | "$BIN" compact-log > "$OUT/compa
 "$BIN" exploration-stop-check "$P/context.md" > "$OUT/exploration-stop.json"
 "$BIN" scoped-guides "$P/app/nested" "$P" > "$OUT/scoped-guides.json"
 
+"$BIN" materialize --out "$OUT/materialized" --apply "$BUNDLE" > "$OUT/materialize.json"
+expect_contains "$OUT/materialize.json" "\"status\": \"ok\""
+expect_file "$OUT/materialized/.acr-materialized-tools.json"
+expect_file "$OUT/materialized/bin/acr-toolbox$EXT"
+
 "$BIN" language-setup "$P" > "$OUT/language-setup.json"
 "$BIN" language-run --out "$OUT/language-small" "$P" > "$OUT/language-run.json"
 "$BIN" language-medium-run --out "$OUT/language-medium" "$P" > "$OUT/language-medium-run.json"
 "$BIN" language-large-plan "$P" > "$OUT/language-large-plan.json"
+set +e
+"$BIN" language-large-run "$P" > "$OUT/language-large-run.json"
+LARGE_RUN_CODE=$?
+set -e
+[ "$LARGE_RUN_CODE" -eq 2 ] || fail "language-large-run safety exit code=$LARGE_RUN_CODE, expected 2"
+expect_contains "$OUT/language-large-run.json" "\"status\": \"confirmation_required\""
 
 expect_dir "$OUT/language-small"
 expect_dir "$OUT/language-medium"
@@ -187,6 +217,13 @@ expect_contains "$OUT/policy-index.json" "MUST keep generated output"
 "$BUNDLE/go-import-map$EXT" "$P" > "$OUT/go-import-map.json"
 "$BUNDLE/go-package-graph$EXT" "$P" > "$OUT/go-package-graph.json"
 "$BUNDLE/affected-tests$EXT" --root "$P" --changed src/main.py > "$OUT/affected-tests.json"
+
+"$BIN" structure-index build --symbols "$OUT/go-symbols.json" --graph "$OUT/go-package-graph.json" --root "$P" --output "$OUT/structure-index.json" > "$OUT/structure-index-build.json"
+expect_file "$OUT/structure-index.json"
+"$BIN" structure-index query "$OUT/structure-index.json" Widget > "$OUT/structure-index-query.json"
+expect_contains "$OUT/structure-index-query.json" "Widget"
+"$BIN" structure-index expand "$OUT/structure-index.json" Widget --depth 1 > "$OUT/structure-index-expand.json"
+expect_contains "$OUT/structure-index-expand.json" "\"status\": \"ok\""
 
 expect_contains "$OUT/go-symbols.json" "Widget"
 expect_contains "$OUT/go-import-map.json" "fmt"
