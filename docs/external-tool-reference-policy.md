@@ -42,3 +42,39 @@ MIT / BSD / Apache-2.0 等で、ツール本体を再配布する場合にライ
 外部ツールを追加する前に、公式情報を優先して無料利用、商用利用、表示義務、導入方法を確認します。条件変更が判明した場合は掲載を削除または置換します。
 
 標準の原則自体は外部ツールに依存させません。
+
+
+## External / fallback / unsupported matrix
+
+外部toolは必須依存ではありません。AI Context Reducer側で軽量に代替できるsubsetだけをportable fallbackとして持ち、高度機能は外部toolへ委譲します。
+
+| Capability | External example | Repository-local fallback | Intentionally unsupported / delegated |
+|---|---|---|---|
+| fast text search | ripgrep | `acr-toolbox search` | ripgrep完全互換CLI / 全最適化 |
+| file discovery | fd | `acr-toolbox find` | fd完全互換filter / UX |
+| syntax / structural search | ast-grep | `structural-search`（Python AST fallback） | multi-language AST rule engine / rewrite engine |
+| affected test routing | Nx / Pants | `affected-tests`, `structure-index affected` | build graph / coverage engine完全再実装 |
+| scoped AI instructions | agent-native scoped instructions | `scoped-guides` | agent固有precedenceの再現 |
+| policy checking | ast-grep / Semgrep等 | `policy-check` | AST / dataflow / taint / semantic rule engine |
+| canonical templates | Copier / Cookiecutter | `template` | Jinja2互換、Copier update algorithm |
+| source / semantic index | SCIP / Universal Ctags | `structure-index` adapters + portable language analyzers | SCIP compiler/indexer完全再実装 |
+| syntax health | Tree-sitter | existing Tree-sitter integration where available | grammar/runtimeの自動install |
+| Git repository health | git-sizer | `git-history-health` adapter/fallback routing | Git object analyzer完全再実装 |
+
+### 判断ルール
+
+```text
+external backend already available and higher quality
+  -> reuse it
+
+not installed / portable environment
+  -> use repository-local fallback
+
+task requires unsupported semantic/deep feature
+  -> explicitly escalate to external backend
+
+backend unavailable
+  -> do not auto-install; keep the result unavailable / approximate / unverified
+```
+
+この表は「外部toolを置き換える一覧」ではなく、どこまでをこのrepositoryが責任範囲とするかを示すboundaryです。既存fallbackと重複する新規toolは追加せず、完全互換を目指さないことを標準とします。
