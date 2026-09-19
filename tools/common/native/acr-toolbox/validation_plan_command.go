@@ -22,12 +22,14 @@ type validationPlanRow struct {
     RecommendedValidation []string `json:"recommended_validation"`
 }
 
+// emitValidationPlanJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitValidationPlanJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// validationPathTerms はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func validationPathTerms(path string) map[string]bool {
     lower := strings.ToLower(path)
     parts := strings.FieldsFunc(lower, func(r rune) bool {
@@ -42,6 +44,7 @@ func validationPathTerms(path string) map[string]bool {
     return out
 }
 
+// validationHasAny はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func validationHasAny(terms map[string]bool, wanted map[string]bool) bool {
     for term := range wanted {
         if terms[term] {
@@ -51,6 +54,7 @@ func validationHasAny(terms map[string]bool, wanted map[string]bool) bool {
     return false
 }
 
+// validationAppendUnique はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func validationAppendUnique(out []string, seen map[string]bool, values ...string) []string {
     for _, value := range values {
         if !seen[value] {
@@ -61,6 +65,7 @@ func validationAppendUnique(out []string, seen map[string]bool, values ...string
     return out
 }
 
+// classifyValidationPath はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func classifyValidationPath(path string) []string {
     lower := strings.ToLower(path)
     terms := validationPathTerms(lower)
@@ -92,6 +97,7 @@ func classifyValidationPath(path string) []string {
     return out
 }
 
+// cmdValidationPlan は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdValidationPlan(args []string) int {
     flags := flag.NewFlagSet("validation-plan", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

@@ -5,6 +5,7 @@ import "runtime"
 var buildVersion = "dev"
 var buildCommit = ""
 
+// cmdVersion は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdVersion() int {
     selectorWriteJSON(map[string]any{
         "tool": "version",
