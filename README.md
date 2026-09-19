@@ -2,7 +2,7 @@
 
 AI / Codex / Claude Code を利用した開発で、必要以上にコンテキストを消費せず、必要な設計・実装情報へ正確に到達するための共通方針です。
 
-このリポジトリ自体は **文書・設計中心** です。補助ツールは、繰り返し処理をAIのコンテキスト外へ移す価値がある場合だけ追加します。
+このリポジトリは文書・設計を中核にしつつ、繰り返し処理をAIのコンテキスト外へ移すportable toolも提供します。主要なCommon機能は `acr-toolbox` 単体バイナリで利用できます。
 
 ## 目標
 
@@ -22,6 +22,38 @@ AI / Codex / Claude Code を利用した開発で、必要以上にコンテキ�
 ```
 
 要約は原典の代替ではなく索引として扱い、必要なら source / tests / docs / diff へ戻れる状態を維持します。
+
+## v1.0.0 Portable Distribution
+
+v1.0.0では次の6環境向けarchiveを配布します。
+
+- Windows x64 / arm64
+- Linux x64 / arm64
+- macOS x64 / arm64
+
+各archiveには次を含みます。
+
+- `acr-toolbox`
+- `go-symbols`
+- `go-import-map`
+- `go-package-graph`
+- `affected-tests`
+- `README.md`
+- `TOOLS_README.md`
+- `LICENSE`
+- `RELEASE_MANIFEST.json`
+
+Releaseには6archive共通の `SHA256SUMS` も添付します。
+
+配布前にGitHub Actions上で、6環境すべてについて **実際に配布するbinaryをnative buildし、そのbinaryでE2Eを実行してからarchive化し、さらにarchiveを再展開して内容を検査** します。source上のunit testだけではRelease gateを通しません。
+
+```text
+acr-toolbox version
+acr-toolbox analyze <project-root>
+acr-toolbox select <project-root>
+```
+
+`acr-toolbox version` はrelease version / commit / OS / architectureをJSONで返します。
 
 ## Codex / Claude Code へ導入させる
 
@@ -120,6 +152,7 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 - Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
 - Boilerplate Generation: [`docs/boilerplate-generation.md`](docs/boilerplate-generation.md)
 - 外部ツール掲載基準: [`docs/external-tool-reference-policy.md`](docs/external-tool-reference-policy.md)
+- Release / completion gate: [`docs/releasing.md`](docs/releasing.md)
 - AI入口テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Task用テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
