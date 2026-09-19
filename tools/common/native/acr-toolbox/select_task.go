@@ -13,6 +13,7 @@ type selectorTaskOptions struct {
     ValidationIntent string
 }
 
+// parseSelectorTaskArgs は外部入力を内部表現へ変換し、不正入力を後段へ流さない境界を担当します。
 func parseSelectorTaskArgs(args []string) selectorTaskOptions {
     out := selectorTaskOptions{Root: ".", ValidationIntent: "unknown"}
     for i := 0; i < len(args); i++ {
@@ -32,6 +33,7 @@ func parseSelectorTaskArgs(args []string) selectorTaskOptions {
     return out
 }
 
+// selectorApplyTaskContext はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func selectorApplyTaskContext(recommended, conditional []map[string]any, options selectorTaskOptions) ([]map[string]any, []map[string]any, map[string]any) {
     applied := strings.TrimSpace(options.Goal) != "" || options.TaskFile != "" || len(options.ChangedFiles) > 0 || options.ValidationIntent != "unknown"
     if !applied {

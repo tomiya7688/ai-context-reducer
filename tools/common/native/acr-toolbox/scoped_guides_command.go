@@ -8,9 +8,12 @@ import (
 )
 
 type scopedGuideNameList []string
+// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *scopedGuideNameList) String() string { return strings.Join(*s,",") }
+// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *scopedGuideNameList) Set(v string) error { *s=append(*s,v); return nil }
 
+// cmdScopedGuides は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdScopedGuides(args []string) int {
   fs:=flag.NewFlagSet("scoped-guides",flag.ContinueOnError)
   names:=scopedGuideNameList{"AI_CONTEXT.md","AI_CONTEXT.local.md","AGENTS.md","CLAUDE.md"}

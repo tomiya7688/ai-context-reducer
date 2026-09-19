@@ -28,23 +28,27 @@ var selectorTypeSignals = map[string][]string{
 var selectorExternal = []string{"rg", "fd", "ast-grep", "sg", "ctags", "scip", "tree-sitter", "scc", "git-sizer"}
 var selectorPhaseOrder = map[string]int{"orient": 0, "search": 1, "scope": 2, "inspect": 3, "validate": 4, "stop": 5}
 
+// selectorWriteJSON はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func selectorWriteJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// selectorBoundedText はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func selectorBoundedText(text string, limit int) string {
     if limit <= 0 || len(text) <= limit { return text }
     return text[:limit]
 }
 
+// selectorItem はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func selectorItem(path, reason, phase, activation, availability string) map[string]any {
     if activation == "" { activation = "always" }
     if availability == "" { availability = "ready" }
     return map[string]any{"tool_path": path, "phase": phase, "activation": activation, "availability": availability, "reason": reason}
 }
 
+// selectorAvailability はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func selectorAvailability(path string, external map[string]bool) string {
     switch path {
     case "common/small/text-search":
@@ -63,6 +67,7 @@ func selectorAvailability(path string, external map[string]bool) string {
     return "ready"
 }
 
+// selectorDedupeSort はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func selectorDedupeSort(rows []map[string]any, key string) []map[string]any {
     seen := map[string]bool{}
     out := []map[string]any{}
@@ -80,6 +85,7 @@ func selectorDedupeSort(rows []map[string]any, key string) []map[string]any {
     return out
 }
 
+// selectorRecommendations はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func selectorRecommendations(size string, languages [][2]any, projectTypes []string, docs, tests int, hasGit bool, external map[string]bool) ([]map[string]any, []map[string]any, []map[string]any, []map[string]any) {
     recommended := []map[string]any{
         selectorItem("common/small/repo-profile", "identify repository size and language mix before deeper reads", "orient", "always", selectorAvailability("common/small/repo-profile", external)),
@@ -158,6 +164,7 @@ func selectorRecommendations(size string, languages [][2]any, projectTypes []str
     return selectorDedupeSort(recommended, "tool_path"), selectorDedupeSort(conditional, "tool_path"), selectorDedupeSort(groups, "tool_group_path"), selectorDedupeSort(conditionalGroups, "tool_group_path")
 }
 
+// cmdSelect は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdSelect(args []string) int {
     options := parseSelectorTaskArgs(args)
     root := options.Root

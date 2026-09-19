@@ -24,7 +24,9 @@ var errSearchEnough = errors.New("search result limit reached")
 
 type searchStringList []string
 
+// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *searchStringList) String() string { return strings.Join(*s, ",") }
+// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *searchStringList) Set(value string) error {
     *s = append(*s, value)
     return nil
@@ -65,12 +67,14 @@ type rgJSONMessage struct {
     } `json:"data"`
 }
 
+// emitSearchJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitSearchJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// searchNonNegative は広い探索結果から条件に合う対象だけを絞り込みます。
 func searchNonNegative(value int) int {
     if value < 0 {
         return 0
@@ -78,6 +82,7 @@ func searchNonNegative(value int) int {
     return value
 }
 
+// boundedSearchError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedSearchError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= 1200 {
@@ -86,6 +91,7 @@ func boundedSearchError(text string) string {
     return text[:1200]
 }
 
+// searchGlobMatch は広い探索結果から条件に合う対象だけを絞り込みます。
 func searchGlobMatch(rel, name, pattern string) bool {
     if ok, err := pathpkg.Match(pattern, name); err == nil && ok {
         return true
@@ -94,6 +100,7 @@ func searchGlobMatch(rel, name, pattern string) bool {
     return err == nil && ok
 }
 
+// searchAllowedPath は広い探索結果から条件に合う対象だけを絞り込みます。
 func searchAllowedPath(rel, name string, globs, excludes []string) bool {
     for _, pattern := range excludes {
         if searchGlobMatch(rel, name, pattern) {
@@ -111,6 +118,7 @@ func searchAllowedPath(rel, name string, globs, excludes []string) bool {
     return false
 }
 
+// portableSearch はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func portableSearch(
     root, pattern string,
     ignoreCase, fixedString bool,
@@ -250,6 +258,7 @@ func portableSearch(
     return matches, truncated, stats, nil
 }
 
+// ripgrepSearch はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func ripgrepSearch(
     executable, root, pattern string,
     ignoreCase, fixedString bool,
@@ -342,6 +351,7 @@ func ripgrepSearch(
     return matches, false, ""
 }
 
+// cmdSearch は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdSearch(args []string) int {
     flags := flag.NewFlagSet("search", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

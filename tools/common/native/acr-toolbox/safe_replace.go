@@ -10,6 +10,7 @@ import (
 // On platforms where replacing an existing destination is not supported by
 // os.Rename, it preserves the old file in a temporary backup and restores it
 // if installing the new file fails.
+// replaceMaterializedFile はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func replaceMaterializedFile(temporaryName, destination string) error {
     if err := os.Rename(temporaryName, destination); err == nil {
         return nil
