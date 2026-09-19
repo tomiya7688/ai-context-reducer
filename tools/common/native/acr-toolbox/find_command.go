@@ -34,12 +34,14 @@ type findStats struct {
     WalkErrorPaths []string
 }
 
+// emitFindJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitFindJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// boundedFindError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedFindError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= 1200 {
@@ -48,6 +50,7 @@ func boundedFindError(text string) string {
     return text[:1200]
 }
 
+// findNonNegative は広い探索結果から条件に合う対象だけを絞り込みます。
 func findNonNegative(value int) int {
     if value < 0 {
         return 0
@@ -55,6 +58,7 @@ func findNonNegative(value int) int {
     return value
 }
 
+// findPatternMatch は広い探索結果から条件に合う対象だけを絞り込みます。
 func findPatternMatch(name, rel, pattern string) bool {
     if ok, err := pathpkg.Match(pattern, name); err == nil && ok {
         return true
@@ -63,6 +67,7 @@ func findPatternMatch(name, rel, pattern string) bool {
     return err == nil && ok
 }
 
+// pathDepth はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func pathDepth(rel string) int {
     if rel == "" || rel == "." {
         return 0
@@ -70,6 +75,7 @@ func pathDepth(rel string) int {
     return len(strings.Split(filepath.ToSlash(rel), "/"))
 }
 
+// portableFind はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func portableFind(root, pattern, entryType string, maxResults, maxDepth, maxVisited int) ([]findResult, bool, bool, findStats, error) {
     results := []findResult{}
     stats := findStats{WalkErrorPaths: []string{}}
@@ -153,6 +159,7 @@ func portableFind(root, pattern, entryType string, maxResults, maxDepth, maxVisi
     return results, resultsTruncated, scanTruncated, stats, nil
 }
 
+// fdFind はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func fdFind(executable, root, pattern, entryType string, maxResults, maxDepth int) ([]findResult, bool, string) {
     args := []string{"--glob", "--case-sensitive", "--hidden", "--no-ignore", "--color", "never"}
     if entryType == "file" {
@@ -233,6 +240,7 @@ func fdFind(executable, root, pattern, entryType string, maxResults, maxDepth in
     return results, false, ""
 }
 
+// cmdFind は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdFind(args []string) int {
     flags := flag.NewFlagSet("find", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

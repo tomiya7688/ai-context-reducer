@@ -21,6 +21,7 @@ type gitHealthFinding struct {
     ObjectDescription string  `json:"object_description,omitempty"`
 }
 
+// boundedGitHealthError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedGitHealthError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= 1200 {
@@ -29,12 +30,14 @@ func boundedGitHealthError(text string) string {
     return text[:1200]
 }
 
+// emitGitHealthJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitGitHealthJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// numberValue はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func numberValue(value any) (float64, bool) {
     switch typed := value.(type) {
     case float64:
@@ -51,6 +54,7 @@ func numberValue(value any) (float64, bool) {
     }
 }
 
+// collectGitSizerMetrics は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func collectGitSizerMetrics(node any, prefix string, out *[]gitHealthFinding) {
     switch typed := node.(type) {
     case map[string]any:
@@ -102,6 +106,7 @@ func collectGitSizerMetrics(node any, prefix string, out *[]gitHealthFinding) {
     }
 }
 
+// summarizeGitSizer はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func summarizeGitSizer(payload any, minConcern float64, maxFindings int) map[string]any {
     metrics := []gitHealthFinding{}
     collectGitSizerMetrics(payload, "", &metrics)
@@ -135,6 +140,7 @@ func summarizeGitSizer(payload any, minConcern float64, maxFindings int) map[str
     }
 }
 
+// loadGitSizerJSON は入力元から必要情報だけを読み込み、後段が扱える形へ整えます。
 func loadGitSizerJSON(root, jsonInput string) (any, string, string) {
     var data []byte
     if jsonInput != "" {
@@ -178,6 +184,7 @@ func loadGitSizerJSON(root, jsonInput string) (any, string, string) {
     return payload, "ok", ""
 }
 
+// intString はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func intString(value int) string {
     const digits = "0123456789"
     if value == 0 {
@@ -194,6 +201,7 @@ func intString(value int) string {
     return string(buf)
 }
 
+// cmdGitHistoryHealth は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdGitHistoryHealth(args []string) int {
     flags := flag.NewFlagSet("git-history-health", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

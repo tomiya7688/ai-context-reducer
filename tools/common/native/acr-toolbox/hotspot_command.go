@@ -19,6 +19,7 @@ type hotspotRow struct {
 
 var errStopHotspotScan = errors.New("hotspot scan limit reached")
 
+// scanHotspots は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func scanHotspots(root string, maxFiles int) ([]hotspotRow, int, int, bool, error) {
     rows := []hotspotRow{}
     statErrors := 0
@@ -64,6 +65,7 @@ func scanHotspots(root string, maxFiles int) ([]hotspotRow, int, int, bool, erro
     return rows, statErrors, walkErrors, truncated, nil
 }
 
+// cmdHotspotReport は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdHotspotReport(args []string) int {
     flags := flag.NewFlagSet("hotspot-report", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

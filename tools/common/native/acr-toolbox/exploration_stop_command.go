@@ -18,6 +18,7 @@ var explorationChecks = map[string][]string{
 
 var explorationRequired = []string{"goal", "required", "acceptance", "source", "tests"}
 
+// evaluateExplorationStop はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func evaluateExplorationStop(text string) map[string]any {
     lowered := strings.ToLower(text)
     checks := map[string]bool{}
@@ -45,6 +46,7 @@ func evaluateExplorationStop(text string) map[string]any {
     }
 }
 
+// cmdExplorationStopCheck は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdExplorationStopCheck(args []string) int {
     fs := flag.NewFlagSet("exploration-stop-check", flag.ContinueOnError)
     fs.SetOutput(io.Discard)

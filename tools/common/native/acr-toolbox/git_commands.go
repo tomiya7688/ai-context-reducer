@@ -6,6 +6,7 @@ import (
     "strings"
 )
 
+// gitOutput はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func gitOutput(root string, args ...string) string {
     all := append([]string{"-C", root}, args...)
     out, err := exec.Command("git", all...).CombinedOutput()
@@ -15,6 +16,7 @@ func gitOutput(root string, args ...string) string {
     return strings.TrimSpace(string(out))
 }
 
+// cmdCompactDiff は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdCompactDiff(args []string) int {
     root, base, head := ".", "HEAD~1", "HEAD"
     if len(args) > 0 {
@@ -66,6 +68,7 @@ func cmdCompactDiff(args []string) int {
     return 0
 }
 
+// cmdRemoteDelta は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdRemoteDelta(args []string) int {
     root, base, remote := ".", "HEAD", "origin/HEAD"
     if len(args) > 0 {
