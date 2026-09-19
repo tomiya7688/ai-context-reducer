@@ -57,6 +57,7 @@ Common tools の portable Go implementation です。
 | Small language analyzer launcher / compact result routing | `language_run_command.go` |
 | portable Medium dependency/project maps | `language_medium_command.go` |
 | Large backend planning / explicit heavy execution | `language_large_command.go` |
+| scoped AI guide resolution | `scoped_guides_command.go` |
 | embedded Python/C#/Go/C/C++/GDScript shallow symbols | `language_symbols_native.go` |
 | build | `build.bat` / `build.sh` |
 
@@ -295,3 +296,13 @@ acr-toolbox language-large-run --allow-heavy .
 ```
 
 Largeは自動実行しません。planは既存SCIP index、Universal Ctags、dotnet、Go、C/C++ compiler、Godot等を確認して推奨backendとcommandを返します。runは `--allow-heavy` 必須で、現在は既存SCIP indexまたはUniversal Ctagsを `structure-index build` へ接続します。backendが無ければ追加installせずMedium結果を維持します。
+
+
+## scoped-guides
+
+```text
+acr-toolbox scoped-guides path/to/target .
+acr-toolbox scoped-guides --name LOCAL_GUIDE.md path/to/target .
+```
+
+repository rootからtargetまでのancestor path上にあるguide候補だけを返します。agent固有precedenceを推測せず、本文全文も既定出力しません。
