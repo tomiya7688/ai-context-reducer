@@ -26,17 +26,20 @@ var analyzeTypeSignals = map[string][]string{
     "rule_heavy": {"rules", "specification", "protocol", "validator", "policy"},
 }
 
+// analyzeWriteJSON はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func analyzeWriteJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// analyzeBoundedText はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func analyzeBoundedText(text string, limit int) string {
     if limit <= 0 || len(text) <= limit { return text }
     return text[:limit]
 }
 
+// nativeExternalTools はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func nativeExternalTools() []string {
     candidates := []string{"rg", "fd", "ast-grep", "sg", "ctags", "scip", "tree-sitter", "scc", "git-sizer"}
     out := []string{}
@@ -46,6 +49,7 @@ func nativeExternalTools() []string {
     return out
 }
 
+// cmdAnalyze は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdAnalyze(args []string) int {
     root := "."
     if len(args) > 0 { root = args[0] }

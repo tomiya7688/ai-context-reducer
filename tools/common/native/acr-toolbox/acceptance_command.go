@@ -14,6 +14,7 @@ var acceptanceHeadings = map[string][]string{
     "deferred":   {"deferred", "out of scope", "非対象", "対象外", "今後", "future"},
 }
 
+// markdownHeadingTitle はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func markdownHeadingTitle(line string) (string, bool) {
     trimmed := strings.TrimSpace(line)
     count := 0
@@ -26,6 +27,7 @@ func markdownHeadingTitle(line string) (string, bool) {
     return strings.TrimSpace(trimmed[count+1:]), true
 }
 
+// acceptanceSection はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func acceptanceSection(lines []string, start, limit int) ([]string, bool) {
     if limit < 0 {
         limit = 0
@@ -45,6 +47,7 @@ func acceptanceSection(lines []string, start, limit int) ([]string, bool) {
     return all, false
 }
 
+// extractAcceptanceSections はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func extractAcceptanceSections(lines []string, limit int) (map[string][]string, map[string]bool) {
     sections := map[string][]string{}
     truncated := map[string]bool{}
@@ -77,6 +80,7 @@ func extractAcceptanceSections(lines []string, limit int) (map[string][]string, 
     return sections, truncated
 }
 
+// cmdAcceptanceExtractor は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdAcceptanceExtractor(args []string) int {
     fs := flag.NewFlagSet("acceptance-extractor", flag.ContinueOnError)
     fs.SetOutput(io.Discard)

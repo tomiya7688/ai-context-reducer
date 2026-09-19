@@ -23,6 +23,7 @@ type contextBudgetRow struct {
     Bytes           int64  `json:"bytes"`
 }
 
+// contextEstimate はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func contextEstimate(file fileInfo, mode string) (contextBudgetRow, bool) {
     size := file.Size
     estimateBasis := size
@@ -42,6 +43,7 @@ func contextEstimate(file fileInfo, mode string) (contextBudgetRow, bool) {
     return contextBudgetRow{EstimatedTokens: tokens, Bytes: size}, true
 }
 
+// cmdContextBudget は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdContextBudget(args []string) int {
     fs := flag.NewFlagSet("context-budget", flag.ContinueOnError)
     fs.SetOutput(io.Discard)

@@ -8,6 +8,7 @@ import (
     "strings"
 )
 
+// cmdTree は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdTree(args []string) int {
     root := "."
     const maxDepth = 3
@@ -36,6 +37,7 @@ func cmdTree(args []string) int {
     return 0
 }
 
+// cmdDocIndex は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdDocIndex(args []string) int {
     root := "."
     if len(args) > 0 {

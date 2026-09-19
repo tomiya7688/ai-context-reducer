@@ -18,7 +18,9 @@ var errStopChangeRouterIndex = errors.New("change-router index limit exceeded")
 
 type changeRouterStringList []string
 
+// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *changeRouterStringList) String() string { return strings.Join(*s, ",") }
+// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func (s *changeRouterStringList) Set(value string) error {
     *s = append(*s, value)
     return nil
@@ -39,12 +41,14 @@ type changeRouterRoute struct {
     CandidateDocsTruncated  bool     `json:"candidate_docs_truncated"`
 }
 
+// emitChangeRouterJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitChangeRouterJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// changeRouterDedupe はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func changeRouterDedupe(values []string) []string {
     out := []string{}
     seen := map[string]bool{}
@@ -59,6 +63,7 @@ func changeRouterDedupe(values []string) []string {
     return out
 }
 
+// changeRouterGitChanged はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func changeRouterGitChanged(root, base string) (bool, []string, string) {
     executable, err := exec.LookPath("git")
     if err != nil {
@@ -74,6 +79,7 @@ func changeRouterGitChanged(root, base string) (bool, []string, string) {
     return true, changeRouterDedupe(strings.Split(string(output), "\n")), ""
 }
 
+// changeRouterIsTestCandidate はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func changeRouterIsTestCandidate(path string, directoryParts []string) bool {
     for _, part := range directoryParts {
         if changeRouterTestDirs[strings.ToLower(part)] {
@@ -89,6 +95,7 @@ func changeRouterIsTestCandidate(path string, directoryParts []string) bool {
         strings.Contains(name, ".test.") || strings.Contains(name, ".spec.")
 }
 
+// scanChangeRouterCandidates は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func scanChangeRouterCandidates(root string, maxFiles int) ([]changeRouterCandidate, bool, int, error) {
     rows := []changeRouterCandidate{}
     truncated := false
@@ -141,6 +148,7 @@ func scanChangeRouterCandidates(root string, maxFiles int) ([]changeRouterCandid
     return rows, truncated, walkErrors, nil
 }
 
+// changeRouterNormalizedStem はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func changeRouterNormalizedStem(path string) string {
     name := strings.ToLower(filepath.Base(path))
     stem := strings.TrimSuffix(name, filepath.Ext(name))
@@ -149,6 +157,7 @@ func changeRouterNormalizedStem(path string) string {
     return stem
 }
 
+// routeChangeCandidates はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func routeChangeCandidates(path string, index []changeRouterCandidate, limit int) changeRouterRoute {
     stem := changeRouterNormalizedStem(path)
     tests := []string{}
@@ -185,6 +194,7 @@ func routeChangeCandidates(path string, index []changeRouterCandidate, limit int
     }
 }
 
+// cmdChangeRouter は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdChangeRouter(args []string) int {
     flags := flag.NewFlagSet("change-router", flag.ContinueOnError)
     flags.SetOutput(io.Discard)
