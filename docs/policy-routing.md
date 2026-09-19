@@ -101,3 +101,17 @@ Detailed policy text only if needed
 - 例外は reason / scope / mitigation / removal condition を短く残す
 - 共通規約と language-specific checker を分離する
 - 既存rule engineで十分な規則は、自前checkerより既存ツール再利用を優先する
+
+
+## Repository-local lightweight checker
+
+literal / regexで確実に判定できる規則にはportable fallbackを利用できます。
+
+```text
+acr-toolbox policy-check --rules policy-rules.json .
+python tools/common/medium/policy-check/script/policy_check.py --rules policy-rules.json .
+```
+
+対応範囲はpath include/exclude、`forbid` / `require`、literal / regex、`error` / `warning`、理由付きsuppressionです。suppressionは `acr-ignore RULE_ID: reason` をlineまたは直前lineに記録します。
+
+AST / dataflow / architecture semanticsが必要な規則はportable checkerで確定判定せず、`semantic: true` として `unsupported_rules` に残し、ast-grep / Semgrep / project固有checker等へ委譲します。
