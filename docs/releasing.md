@@ -59,12 +59,30 @@ SHA256SUMS
 
 mainへのrelease関連変更でも同じcompletion workflowを実行します。この場合はReleaseを公開せず、`v1-release-candidate` artifactだけを生成します。
 
+main上のcandidate CIがgreenでも、tagやGitHub Releaseを自動作成しません。
+
 ## Publishing
 
-`v1.0.0` tag push時は同じcompletion gateをもう一度通し、全job成功後だけGitHub Releaseを作成します。
+公開は必ず明示操作を起点にします。
+
+```text
+main candidate CI green
+  -> 配布内容とbug checkを最終確認
+  -> 人がrelease tagを作成してpush
+  -> tag commit上でcompletion workflowを再実行
+  -> 全job success
+  -> GitHub Releaseを作成
+```
+
+`v1.0.0` 以降、main pushやREADY markerからtag/Releaseを自動promotionする経路は持ちません。
 
 workflow_dispatchからpublishする場合も、matching tagがrepositoryに存在することを必須とします。
 
 ## Post-release
 
 v1.0.0後の新言語対応、外部backend追加、heuristic改善は新しいIssueとして管理します。v1.0.0の完了条件へ後付けしません。
+
+
+## v1.0.0 validation record
+
+公開済みv1.0.0の最終検証記録は [`release-validation-v1.0.0.md`](release-validation-v1.0.0.md) を参照してください。
