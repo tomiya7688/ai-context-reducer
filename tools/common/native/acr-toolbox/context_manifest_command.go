@@ -34,12 +34,14 @@ type contextManifestRow struct {
     Bytes           int64  `json:"bytes"`
 }
 
+// emitContextManifestJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitContextManifestJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// contextManifestPriority はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func contextManifestPriority(path string) string {
     clean := filepath.ToSlash(path)
     name := filepath.Base(clean)
@@ -59,6 +61,7 @@ func contextManifestPriority(path string) string {
     return "P4"
 }
 
+// buildContextManifestRows は解析結果を後段で再利用できる構造へ組み立てます。
 func buildContextManifestRows(root string, files []fileInfo) ([]contextManifestRow, int) {
     rows := make([]contextManifestRow, 0, len(files))
     pathErrors := 0
@@ -86,6 +89,7 @@ func buildContextManifestRows(root string, files []fileInfo) ([]contextManifestR
     return rows, pathErrors
 }
 
+// cmdContextManifest は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdContextManifest(args []string) int {
     flags := flag.NewFlagSet("context-manifest", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

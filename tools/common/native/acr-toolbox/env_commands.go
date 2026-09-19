@@ -7,6 +7,7 @@ import (
     "runtime"
 )
 
+// firstAvailable はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func firstAvailable(names ...string) string {
     for _, name := range names {
         if p, err := exec.LookPath(name); err == nil {
@@ -16,6 +17,7 @@ func firstAvailable(names ...string) string {
     return ""
 }
 
+// cmdLanguageEnv は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdLanguageEnv() int {
     env := map[string]any{
         "python": map[string]any{"available": firstAvailable("python3", "python") != "", "command": firstAvailable("python3", "python")},
@@ -37,6 +39,7 @@ func cmdLanguageEnv() int {
     return 0
 }
 
+// cmdEnv は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdEnv() int {
     out := map[string]any{
         "os": runtime.GOOS,

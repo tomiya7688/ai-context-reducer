@@ -18,12 +18,14 @@ type nativeDocumentDiscovery struct {
     WalkErrorCount int
 }
 
+// emitDocDuplicateJSON は内部結果を安定した利用者向け出力へ変換します。
 func emitDocDuplicateJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// discoverNativeDocuments はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func discoverNativeDocuments(root string) nativeDocumentDiscovery {
     result := nativeDocumentDiscovery{Paths: []string{}}
     _ = filepath.WalkDir(root, func(path string, entry fs.DirEntry, visitErr error) error {
@@ -46,6 +48,7 @@ func discoverNativeDocuments(root string) nativeDocumentDiscovery {
     return result
 }
 
+// readDocumentLines は入力元から必要情報だけを読み込み、後段が扱える形へ整えます。
 func readDocumentLines(path string) ([]string, error) {
     data, err := os.ReadFile(path)
     if err != nil {
@@ -56,6 +59,7 @@ func readDocumentLines(path string) ([]string, error) {
     return strings.Split(text, "\n"), nil
 }
 
+// cmdDocDuplicateHints は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdDocDuplicateHints(args []string) int {
     flags := flag.NewFlagSet("doc-duplicate-hints", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

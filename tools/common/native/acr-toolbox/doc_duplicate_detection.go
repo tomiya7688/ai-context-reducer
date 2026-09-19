@@ -20,12 +20,14 @@ type docDuplicateDocument struct {
     Lines []string
 }
 
+// normalizeDuplicateLine は表記揺れを正規化し、後段の比較条件を単純化します。
 func normalizeDuplicateLine(line string) string {
     text := strings.ToLower(strings.Join(strings.Fields(strings.TrimSpace(line)), " "))
     replacer := strings.NewReplacer("`", "", "*", "", "_", "", ">", "", "#", "", "-", "")
     return strings.TrimSpace(replacer.Replace(text))
 }
 
+// truncateRunes はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func truncateRunes(text string, limit int) string {
     runes := []rune(text)
     if len(runes) <= limit {
@@ -34,6 +36,7 @@ func truncateRunes(text string, limit int) string {
     return string(runes[:limit])
 }
 
+// collectNativeDocumentDuplicates は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func collectNativeDocumentDuplicates(documents []docDuplicateDocument, minChars int) []docDuplicateGroup {
     if minChars < 0 {
         minChars = 0

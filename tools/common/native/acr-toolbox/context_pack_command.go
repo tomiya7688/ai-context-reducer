@@ -34,6 +34,7 @@ type contextPackState struct {
     StatusTruncated  bool
 }
 
+// contextPackGitLines はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func contextPackGitLines(root string, args ...string) contextPackGitResult {
     executable, err := exec.LookPath("git")
     if err != nil {
@@ -55,6 +56,7 @@ func contextPackGitLines(root string, args ...string) contextPackGitResult {
     return contextPackGitResult{OK: true, Lines: lines}
 }
 
+// boundedContextPackLines はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func boundedContextPackLines(lines []string, limit int) ([]string, bool) {
     if limit < 0 {
         limit = 0
@@ -68,6 +70,7 @@ func boundedContextPackLines(lines []string, limit int) ([]string, bool) {
     return lines[:limit], true
 }
 
+// buildContextPackState は解析結果を後段で再利用できる構造へ組み立てます。
 func buildContextPackState(root string, limit int) contextPackState {
     changed := contextPackGitLines(root, "diff", "--name-only", "HEAD")
     status := contextPackGitLines(root, "status", "--short")
@@ -85,6 +88,7 @@ func buildContextPackState(root string, limit int) contextPackState {
     }
 }
 
+// contextPackFailureLine はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func contextPackFailureLine(errorKind, queryName string) string {
     if errorKind == "git_unavailable" {
         return "- Git unavailable\n"
@@ -92,6 +96,7 @@ func contextPackFailureLine(errorKind, queryName string) string {
     return "- unavailable: " + queryName + " query failed\n"
 }
 
+// renderNativeContextPack は内部結果を安定した利用者向け出力へ変換します。
 func renderNativeContextPack(task contextPackTask, state contextPackState) string {
     var out strings.Builder
     out.WriteString("# Context Pack\n\n## Task\n")
@@ -140,6 +145,7 @@ func renderNativeContextPack(task contextPackTask, state contextPackState) strin
     return out.String()
 }
 
+// cmdContextPackBuilder は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdContextPackBuilder(args []string) int {
     flags := flag.NewFlagSet("context-pack-builder", flag.ContinueOnError)
     flags.SetOutput(io.Discard)
