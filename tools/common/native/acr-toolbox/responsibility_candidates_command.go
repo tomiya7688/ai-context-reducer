@@ -26,11 +26,13 @@ type responsibilityCandidateRow struct {
     SizeAvailable bool
 }
 
+// responsibilityIgnoredDir はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func responsibilityIgnoredDir(name string) bool {
     lower := strings.ToLower(name)
     return ignoreDirs[lower] || lower == "generated"
 }
 
+// scanResponsibilityCandidates は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func scanResponsibilityCandidates(root string, maxScanFiles int) ([]responsibilityCandidateRow, int, bool, int, int, error) {
     rows := []responsibilityCandidateRow{}
     scanned := 0
@@ -82,6 +84,7 @@ func scanResponsibilityCandidates(root string, maxScanFiles int) ([]responsibili
     return rows, scanned, truncated, statErrors, walkErrors, nil
 }
 
+// sortResponsibilityCandidates はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func sortResponsibilityCandidates(rows []responsibilityCandidateRow) {
     sort.Slice(rows, func(i, j int) bool {
         if rows[i].SizeAvailable != rows[j].SizeAvailable {
@@ -94,6 +97,7 @@ func sortResponsibilityCandidates(rows []responsibilityCandidateRow) {
     })
 }
 
+// renderResponsibilityCandidates は内部結果を安定した利用者向け出力へ変換します。
 func renderResponsibilityCandidates(rows []responsibilityCandidateRow, maxRows, scanned int, scanTruncated bool, statErrors, walkErrors int) string {
     if maxRows < 0 {
         maxRows = 0
@@ -133,6 +137,7 @@ func renderResponsibilityCandidates(rows []responsibilityCandidateRow, maxRows, 
     return out.String()
 }
 
+// cmdResponsibilityCandidates は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdResponsibilityCandidates(args []string) int {
     flags := flag.NewFlagSet("responsibility-candidates", flag.ContinueOnError)
     flags.SetOutput(io.Discard)

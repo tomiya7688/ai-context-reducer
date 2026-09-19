@@ -42,6 +42,7 @@ type walkResult struct {
     WalkErrorCount int
 }
 
+// walkWithOptions は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func walkWithOptions(root string, includeIgnored bool) (walkResult, error) {
     out := walkResult{Files: []fileInfo{}}
     err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
@@ -71,6 +72,7 @@ func walkWithOptions(root string, includeIgnored bool) (walkResult, error) {
     return out, err
 }
 
+// walk は対象scopeを走査し、agentへ渡す候補情報を収集します。
 func walk(root string) ([]fileInfo, error) {
     result, err := walkWithOptions(root, false)
     return result.Files, err

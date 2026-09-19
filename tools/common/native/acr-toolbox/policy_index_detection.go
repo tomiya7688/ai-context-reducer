@@ -16,6 +16,7 @@ type policyFinding struct {
     RuleText string `json:"rule_text"`
 }
 
+// isNativePolicyLine はroutingや安全側fallbackに使う条件を判定します。
 func isNativePolicyLine(line string) bool {
     if policyEnglishRulePattern.MatchString(line) {
         return true
@@ -28,6 +29,7 @@ func isNativePolicyLine(line string) bool {
     return false
 }
 
+// nativePolicyFindings はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func nativePolicyFindings(path string, lines []string) []policyFinding {
     heading := ""
     findings := []policyFinding{}

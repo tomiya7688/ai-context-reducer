@@ -40,6 +40,7 @@ type policySuppression struct {
   Reason string `json:"reason"`
 }
 
+// policyGlobRegex はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func policyGlobRegex(pattern string) (*regexp.Regexp,error) {
   p:=filepath.ToSlash(pattern)
   var b strings.Builder
@@ -61,6 +62,7 @@ func policyGlobRegex(pattern string) (*regexp.Regexp,error) {
   return regexp.Compile(b.String())
 }
 
+// policyPathMatches はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func policyPathMatches(path string, patterns []string) bool {
   if len(patterns)==0{return true}
   path=filepath.ToSlash(path)
@@ -70,6 +72,7 @@ func policyPathMatches(path string, patterns []string) bool {
   return false
 }
 
+// policySuppressionReason はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func policySuppressionReason(line, ruleID string)(string,bool,bool){
   marker:="acr-ignore "+ruleID
   i:=strings.Index(line,marker)
@@ -82,6 +85,7 @@ func policySuppressionReason(line, ruleID string)(string,bool,bool){
   return "",true,false
 }
 
+// policyRuleMatcher はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
 func policyRuleMatcher(rule policyRule)(func(string)bool,error){
   mode:=rule.Mode;if mode==""{mode="literal"}
   pattern:=rule.Forbid;if pattern==""{pattern=rule.Require}
@@ -96,6 +100,7 @@ func policyRuleMatcher(rule policyRule)(func(string)bool,error){
   }
 }
 
+// cmdPolicyCheck は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdPolicyCheck(args []string) int {
   fs:=flag.NewFlagSet("policy-check",flag.ContinueOnError)
   rulesPath:=fs.String("rules","","JSON rule file")
