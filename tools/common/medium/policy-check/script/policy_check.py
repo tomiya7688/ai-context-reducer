@@ -69,8 +69,8 @@ def main():
                 findings.append({'rule_id':rid,'severity':sev,'path':rel,'kind':'required_pattern_missing','message':rule.get('message') or 'required pattern missing'})
     findings.sort(key=lambda x:(x['path'],x.get('line',0)))
     total=len(findings);limit=max(0,a.max_findings);truncated=bool(limit and total>limit)
-    if truncated:findings=findings[:limit]
     errors=sum(x['severity']=='error' for x in findings);warnings=sum(x['severity']=='warning' for x in findings)
+    if truncated:findings=findings[:limit]
     status='violations' if errors else 'partial' if rule_errors or read_errors else 'ok'
     print(json.dumps({'tool':'policy-check','status':status,'root_path':str(root),'rules_path':a.rules,'rules_total':len(cfg.get('rules',[])),'rules_checked':checked,'files_scanned':files_scanned,'finding_count_total':total,'error_count':errors,'warning_count':warnings,'findings':findings,'findings_truncated':truncated,'suppressions':supp,'invalid_suppressions':bad_supp,'unsupported_rules':unsupported,'rule_errors':rule_errors,'read_error_paths':sorted(set(read_errors))},ensure_ascii=False,indent=2))
     return 1 if errors else 2 if rule_errors else 0
