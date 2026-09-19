@@ -24,7 +24,7 @@ type policyRule struct {
   Semantic bool `json:"semantic,omitempty"`
 }
 type policyRuleConfig struct { Rules []policyRule `json:"rules"` }
-type policyFinding struct {
+type policyCheckFinding struct {
   RuleID string `json:"rule_id"`
   Severity string `json:"severity"`
   Path string `json:"path"`
@@ -112,7 +112,7 @@ func cmdPolicyCheck(args []string) int {
   var cfg policyRuleConfig
   if err:=json.Unmarshal(data,&cfg);err!=nil{selectorWriteJSON(map[string]any{"tool":"policy-check","status":"rules_invalid","rules_path":*rulesPath,"error":boundedErr([]byte(err.Error()))});return 2}
 
-  findings:=[]policyFinding{}; suppressions:=[]policySuppression{}; invalidSuppressions:=[]map[string]any{}; unsupported:=[]map[string]any{}
+  findings:=[]policyCheckFinding{}; suppressions:=[]policySuppression{}; invalidSuppressions:=[]map[string]any{}; unsupported:=[]map[string]any{}
   filesScanned:=0; readErrors:=[]string{}; ruleErrors:=[]map[string]any{}
   rulesChecked:=0
   for _,rule:=range cfg.Rules{
@@ -159,14 +159,14 @@ func cmdPolicyCheck(args []string) int {
             invalidSuppressions=append(invalidSuppressions,map[string]any{"rule_id":rule.ID,"path":rel,"line":i+1,"reason":"suppression requires non-empty reason"})
           }
           msg:=rule.Message;if msg==""{msg="forbidden pattern matched"}
-          findings=append(findings,policyFinding{RuleID:rule.ID,Severity:sev,Path:rel,Line:i+1,Kind:"forbidden_pattern",Message:msg,Match:strings.TrimSpace(line)})
+          findings=append(findings,policyCheckFinding{RuleID:rule.ID,Severity:sev,Path:rel,Line:i+1,Kind:"forbidden_pattern",Message:msg,Match:strings.TrimSpace(line)})
         }
       }else{
         found:=false
         for _,line:=range lines{if matcher(line){found=true;break}}
         if !found{
           msg:=rule.Message;if msg==""{msg="required pattern missing"}
-          findings=append(findings,policyFinding{RuleID:rule.ID,Severity:sev,Path:rel,Kind:"required_pattern_missing",Message:msg})
+          findings=append(findings,policyCheckFinding{RuleID:rule.ID,Severity:sev,Path:rel,Kind:"required_pattern_missing",Message:msg})
         }
       }
       return nil
