@@ -112,7 +112,7 @@ portable binary buildも `go test ./...` 成功後だけartifact buildへ進み�
 
 ## Native toolbox
 
-`tools/common/native/acr-toolbox` はCommon機能のportable Go binaryです。
+`tools/common/native/acr-toolbox` はCommon機能のportable Go binaryです。Release buildでは `acr-toolbox version` でversion / commit / OS / architectureを確認できます。
 
 主なsubcommand:
 
@@ -122,7 +122,7 @@ compact-log compact-diff remote-delta git-history-health syntax-health
 structure-index context-budget hotspot-report context-manifest context-pack-builder
 change-router validation-plan responsibility-candidates policy-index
 doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
-materialize scoped-guides policy-check template language-setup language-run language-medium-run language-large-plan language-large-run language-env env
+materialize scoped-guides policy-check template version language-setup language-run language-medium-run language-large-plan language-large-run language-env env
 ```
 
 ## Categories
