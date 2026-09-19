@@ -131,3 +131,17 @@ tools/boilerplate-generator/script/
 - 法的内容の妥当性そのものを generator の責務にしない
 - 成熟したtemplate generatorで十分なら自前generatorより再利用を優先する
 - 共通 generator を作る場合も特定ライセンスや外部リポジトリへの必須依存を避ける
+
+
+## Repository-local portable generator
+
+単純な置換で十分な場合はportable fallbackを利用できます。
+
+```text
+acr-toolbox template --template templates/foo --vars vars.json --out generated/foo --template-id foo --template-version 1
+python tools/common/medium/template/script/template.py --template templates/foo --vars vars.json --out generated/foo
+```
+
+placeholderは `{{name}}` のみを扱い、file / directory template、required variable、unresolved placeholder、dry-run、check-only、compact diff hint、template id/version、variables SHA-256を提供します。生成時はmetadataもsidecarまたはoutput directoryへ残します。
+
+Copier / Cookiecutterが既に利用可能ならavailabilityを出力しますが、自動installや完全互換engineの再実装はしません。
