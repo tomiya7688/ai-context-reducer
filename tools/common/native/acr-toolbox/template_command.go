@@ -162,8 +162,9 @@ func cmdTemplate(args []string) int {
     }
     meta:=map[string]any{"template_id":*templateID,"template_version":*templateVersion,"template_path":filepath.ToSlash(*templatePath),"variables_sha256":varsHash,"variable_keys":sortedKeys(vars),"output_path":filepath.ToSlash(*outPath)}
     md,_:=json.MarshalIndent(meta,"","  ");md=append(md,'\n')
-    if e:=os.MkdirAll(filepath.Dir(metadataPath),0755);e==nil{e=os.WriteFile(metadataPath,md,0644)}
-    if e!=nil{selectorWriteJSON(map[string]any{"tool":"template","status":"metadata_write_failed","metadata_path":metadataPath,"error":e.Error()});return 2}
+    metaErr:=os.MkdirAll(filepath.Dir(metadataPath),0755)
+    if metaErr==nil{metaErr=os.WriteFile(metadataPath,md,0644)}
+    if metaErr!=nil{selectorWriteJSON(map[string]any{"tool":"template","status":"metadata_write_failed","metadata_path":metadataPath,"error":metaErr.Error()});return 2}
     wrote=true
   }
   selectorWriteJSON(map[string]any{
