@@ -87,6 +87,8 @@ func main() {
         code = cmdPolicyCheck(os.Args[2:])
     case "template":
         code = cmdTemplate(os.Args[2:])
+    case "version":
+        code = cmdVersion()
     case "language-env":
         code = cmdLanguageEnv()
     case "env":
