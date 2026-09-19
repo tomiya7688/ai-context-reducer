@@ -74,7 +74,7 @@ jobs:
             echo "==> $file"
             python "$file"
           done
-      - name: Test every Go module
+      - name: Vet and test every Go module
         shell: bash
         run: |
           set -euo pipefail
@@ -83,7 +83,9 @@ jobs:
           for mod in "${modules[@]}"; do
             dir="$(dirname "$mod")"
             echo "==> $dir"
+            (cd "$dir" && go vet ./...)
             (cd "$dir" && go test ./...)
+            (cd "$dir" && go test -race ./...)
           done
 
   distribution-e2e:
