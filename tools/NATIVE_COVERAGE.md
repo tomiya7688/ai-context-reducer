@@ -8,6 +8,7 @@ Go language-specific / portable fallback toolは、`acr-toolbox` へ無理に統
 
 | Method / use | Python tool | Native implementation |
 |---|---|---|
+| scoped AI guide resolution | `scoped-guides` | `acr-toolbox scoped-guides` |
 | repository/runtime fact analysis | `analyze-and-recommend` | `acr-toolbox analyze` |
 | ordered tool routing / exploration stop | `tool-selector` | `acr-toolbox select` |
 | Search-first text search | `text-search` | `acr-toolbox search` |
