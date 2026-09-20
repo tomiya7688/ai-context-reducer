@@ -8,6 +8,7 @@ import (
     "testing"
 )
 
+// scipTestPayload はtest setupや検証を局所化し、各testの意図を読みやすく保ちます。
 func scipTestPayload() map[string]any {
     return map[string]any{
         "documents": []any{
@@ -62,6 +63,7 @@ func scipTestPayload() map[string]any {
     }
 }
 
+// TestNormalizeSCIPPrintBuildsRoutingDependencies は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNormalizeSCIPPrintBuildsRoutingDependencies(t *testing.T) {
     symbols, graph, err := normalizeSCIPPrint(scipTestPayload())
     if err != nil {
@@ -120,6 +122,7 @@ func TestNormalizeSCIPPrintBuildsRoutingDependencies(t *testing.T) {
     }
 }
 
+// TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex は対象機能の契約と回帰条件が維持されることを確認します。
 func TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex(t *testing.T) {
     root := t.TempDir()
     input := filepath.Join(root, "index.json")
@@ -176,6 +179,7 @@ func TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex(t *testing.
     }
 }
 
+// TestMissingSCIPCLIIsExplicit は対象機能の契約と回帰条件が維持されることを確認します。
 func TestMissingSCIPCLIIsExplicit(t *testing.T) {
     t.Setenv("PATH", "")
     _, failure := loadSCIPPrintJSON("index.scip", true)
@@ -184,6 +188,7 @@ func TestMissingSCIPCLIIsExplicit(t *testing.T) {
     }
 }
 
+// TestSCIPErrorIsBounded は対象機能の契約と回帰条件が維持されることを確認します。
 func TestSCIPErrorIsBounded(t *testing.T) {
     value := boundedSCIPError(strings.Repeat("x", structureSCIPErrorLimit+500))
     if len(value) > structureSCIPErrorLimit+32 || !strings.HasSuffix(value, "... truncated") {
