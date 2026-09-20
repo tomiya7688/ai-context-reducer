@@ -8,6 +8,7 @@ mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 
+# test_recommend_for_large_python_repo は対象機能の契約と回帰条件が維持されることを確認する。
 def test_recommend_for_large_python_repo():
     recommended, conditional = mod.recommend(
         'large',
@@ -22,6 +23,7 @@ def test_recommend_for_large_python_repo():
     assert 'common/medium/policy-index' in conditional
 
 
+# test_build_selection は対象機能の契約と回帰条件が維持されることを確認する。
 def test_build_selection(tmp_path):
     (tmp_path / '.git').mkdir()
     (tmp_path / 'tests').mkdir()
