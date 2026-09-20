@@ -8,10 +8,12 @@ from messenger import iter_documents, read_lines
 from processing import collect_duplicates
 
 
+# emit は内部結果を安定した利用者向け表現へ変換する。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Find repeated documentation lines as compact self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
