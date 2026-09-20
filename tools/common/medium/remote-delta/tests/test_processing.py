@@ -9,6 +9,7 @@ from processing import compact_remote_delta
 
 
 class CompactRemoteDeltaTests(unittest.TestCase):
+    # test_compact_result_is_self_describing は対象機能の契約と回帰条件が維持されることを確認する。
     def test_compact_result_is_self_describing(self):
         result = compact_remote_delta({
             'status': 'ok',
@@ -28,6 +29,7 @@ class CompactRemoteDeltaTests(unittest.TestCase):
         self.assertFalse(result['changed_files_truncated'])
         self.assertNotIn('summary', result)
 
+    # test_changed_files_are_bounded_without_losing_truncation_signal は対象機能の契約と回帰条件が維持されることを確認する。
     def test_changed_files_are_bounded_without_losing_truncation_signal(self):
         result = compact_remote_delta({
             'status': 'ok',
@@ -40,6 +42,7 @@ class CompactRemoteDeltaTests(unittest.TestCase):
         self.assertEqual(result['changed_files'], ['a.py', 'b.py'])
         self.assertTrue(result['changed_files_truncated'])
 
+    # test_failure_status_keeps_unknown_values_explicit は対象機能の契約と回帰条件が維持されることを確認する。
     def test_failure_status_keeps_unknown_values_explicit(self):
         result = compact_remote_delta({
             'status': 'git_unavailable_or_not_repository',
