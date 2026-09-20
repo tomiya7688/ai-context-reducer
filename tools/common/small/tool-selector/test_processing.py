@@ -9,6 +9,7 @@ spec.loader.exec_module(module)
 
 
 class ToolSelectorTests(unittest.TestCase):
+    # test_tool_paths_and_group_paths_are_separate は対象機能の契約と回帰条件が維持されることを確認する。
     def test_tool_paths_and_group_paths_are_separate(self):
         tools, conditional_tools, groups, conditional_groups = module.recommend(
             'medium', [('python', 10)], [], docs=1, tests=1, has_git=True
