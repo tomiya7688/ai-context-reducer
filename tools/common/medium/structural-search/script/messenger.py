@@ -6,6 +6,7 @@ import subprocess
 from pathlib import Path
 
 
+# find_ast_grep は広い候補から必要な対象だけを絞り込む。
 def find_ast_grep() -> str | None:
     direct = shutil.which('ast-grep')
     if direct:
@@ -21,6 +22,7 @@ def find_ast_grep() -> str | None:
     return candidate if 'ast-grep' in text else None
 
 
+# run_ast_grep はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def run_ast_grep(executable: str, root: Path, pattern: str, language: str | None) -> tuple[bool, list[dict], str]:
     command = [
         executable,
