@@ -6,6 +6,7 @@ from pathlib import Path
 from commander import build_context_pack
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Generate a small task Context Pack skeleton from git state.')
     parser.add_argument('root', nargs='?', default='.')
