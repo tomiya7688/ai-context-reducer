@@ -7,6 +7,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
+# test_build_profile_separates_language_and_other_files は対象機能の契約と回帰条件が維持されることを確認する。
 def test_build_profile_separates_language_and_other_files(tmp_path):
     (tmp_path / 'main.py').write_text('print(1)\n', encoding='utf-8')
     (tmp_path / 'README.md').write_text('# Demo\n', encoding='utf-8')
@@ -22,6 +23,7 @@ def test_build_profile_separates_language_and_other_files(tmp_path):
     assert result['language_metrics'][0]['lines'] is None
 
 
+# test_build_profile_marks_only_real_truncation_unknown は対象機能の契約と回帰条件が維持されることを確認する。
 def test_build_profile_marks_only_real_truncation_unknown(tmp_path):
     (tmp_path / 'a.py').write_text('', encoding='utf-8')
     exact = module.build_profile(tmp_path, 1)
@@ -34,6 +36,7 @@ def test_build_profile_marks_only_real_truncation_unknown(tmp_path):
     assert truncated['project_size_class'] == 'large_or_unknown_due_to_scan_limit'
 
 
+# test_parse_scc_payload_keeps_compact_language_metrics は対象機能の契約と回帰条件が維持されることを確認する。
 def test_parse_scc_payload_keeps_compact_language_metrics():
     counts, metrics = module.parse_scc_payload([
         {
