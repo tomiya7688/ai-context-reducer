@@ -9,6 +9,7 @@ spec.loader.exec_module(mod)
 
 
 class CompactLogTests(unittest.TestCase):
+    # test_findings_and_tail_are_bounded は対象機能の契約と回帰条件が維持されることを確認する。
     def test_findings_and_tail_are_bounded(self):
         result = mod.compact_log('ok\nwarning one\nerror two\nlast', max_findings=1, tail=2)
         self.assertEqual(4, result['line_count'])
