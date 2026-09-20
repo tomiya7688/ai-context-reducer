@@ -12,10 +12,12 @@ DATA_EXTS = {'.json', '.yaml', '.yml', '.toml', '.csv'}
 SOURCE_EXTS = {'.py', '.cs', '.go', '.c', '.h', '.cpp', '.hpp', '.gd'}
 
 
+# path_terms はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def path_terms(path: str) -> set[str]:
     return {part for part in re.split(r'[^a-z0-9]+', path.lower()) if part}
 
 
+# classify はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def classify(path: str) -> list[str]:
     lowered = path.lower()
     terms = path_terms(lowered)
@@ -36,6 +38,7 @@ def classify(path: str) -> list[str]:
     return list(dict.fromkeys(out)) or ['targeted validation']
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> None:
     parser = argparse.ArgumentParser(description='Suggest the smallest sufficient validation for changed files as self-describing JSON.')
     parser.add_argument('files', nargs='+')
