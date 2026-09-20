@@ -6,6 +6,7 @@ import (
   "testing"
 )
 
+// TestScopedGuidesAncestorOnly は対象機能の契約と回帰条件が維持されることを確認します。
 func TestScopedGuidesAncestorOnly(t *testing.T){
   root:=t.TempDir()
   target:=filepath.Join(root,"apps","editor","src","x.go")
@@ -22,6 +23,7 @@ func TestScopedGuidesAncestorOnly(t *testing.T){
   if code:=cmdScopedGuides([]string{target,root});code!=0{t.Fatalf("code=%d",code)}
 }
 
+// TestScopedGuidesCustomName は対象機能の契約と回帰条件が維持されることを確認します。
 func TestScopedGuidesCustomName(t *testing.T){
   root:=t.TempDir()
   target:=filepath.Join(root,"pkg","src")
