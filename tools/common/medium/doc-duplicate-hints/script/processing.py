@@ -5,11 +5,13 @@ import re
 from collections import defaultdict
 
 
+# normalize は表記揺れを正規化し、後段の比較条件を単純化する。
 def normalize(line: str) -> str:
     line = re.sub(r'\s+', ' ', line.strip().lower())
     return re.sub(r'[`*_>#-]', '', line).strip()
 
 
+# collect_duplicates は対象scopeを調べ、routingに必要な情報だけを集める。
 def collect_duplicates(documents: list[tuple[str, list[str]]], min_chars: int):
     min_chars = max(0, min_chars)
     seen = defaultdict(list)
