@@ -7,6 +7,7 @@ mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
 
+# test_role_classification は対象機能の契約と回帰条件が維持されることを確認する。
 def test_role_classification():
     assert mod.role(Path('src/main.py')) == 'source'
     assert mod.role(Path('tests/test_main.py')) == 'tests'
@@ -14,6 +15,7 @@ def test_role_classification():
     assert mod.role(Path('config/app.toml')) == 'configuration'
 
 
+# test_build_role_map は対象機能の契約と回帰条件が維持されることを確認する。
 def test_build_role_map(tmp_path):
     (tmp_path / 'src').mkdir()
     (tmp_path / 'src' / 'a.py').write_text('x = 1', encoding='utf-8')
