@@ -16,6 +16,7 @@ TOOLS = {
 }
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Probe useful external context-reduction tools on PATH.')
     parser.add_argument('--json', action='store_true', help=argparse.SUPPRESS)
