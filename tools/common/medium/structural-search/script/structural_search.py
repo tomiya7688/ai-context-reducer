@@ -6,6 +6,7 @@ from pathlib import Path
 from commander import search_structure
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Run bounded structural search with ast-grep when available and a stdlib Python AST fallback.')
     parser.add_argument('pattern', help='AST-style pattern, for example: print($ARG)')
