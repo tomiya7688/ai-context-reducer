@@ -12,6 +12,7 @@ spec.loader.exec_module(syntax_health)
 
 
 class SyntaxHealthTests(unittest.TestCase):
+    # test_summarize_returns_only_failing_files は対象機能の契約と回帰条件が維持されることを確認する。
     def test_summarize_returns_only_failing_files(self):
         payload = [
             {'path': 'ok.py', 'successful': True, 'error_count': 0, 'missing_count': 0},
@@ -23,6 +24,7 @@ class SyntaxHealthTests(unittest.TestCase):
         self.assertEqual(result['syntax_issue_files'][0]['path'], 'bad.py')
         self.assertFalse(result['syntax_issue_files_truncated'])
 
+    # test_limit_is_agent_visible_only は対象機能の契約と回帰条件が維持されることを確認する。
     def test_limit_is_agent_visible_only(self):
         payload = [
             {'file': 'b.py', 'errors': 1},
