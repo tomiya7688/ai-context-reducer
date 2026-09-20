@@ -7,6 +7,7 @@ from commander import route_paths
 TOOL = 'architecture-boundary-router'
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Classify changed paths using an architecture routing profile.')
     parser.add_argument('--profile', required=True)
