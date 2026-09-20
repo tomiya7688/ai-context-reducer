@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestSelectReturnsOrderedRoutingAndNoLatestFalsePositive は対象機能の契約と回帰条件が維持されることを確認します。
 func TestSelectReturnsOrderedRoutingAndNoLatestFalsePositive(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "latest.py"), []byte("x = 1\n"), 0o644); err != nil { t.Fatal(err) }
@@ -24,6 +25,7 @@ func TestSelectReturnsOrderedRoutingAndNoLatestFalsePositive(t *testing.T) {
     if first["phase"] != "orient" { t.Fatalf("routing is not phase ordered: %#v", recommended) }
 }
 
+// TestSelectTaskContextNarrowsRecommendedTools は対象機能の契約と回帰条件が維持されることを確認します。
 func TestSelectTaskContextNarrowsRecommendedTools(t *testing.T) {
     root := t.TempDir()
     if err := os.Mkdir(filepath.Join(root, ".git"), 0o755); err != nil { t.Fatal(err) }
@@ -60,6 +62,7 @@ func TestSelectTaskContextNarrowsRecommendedTools(t *testing.T) {
     if selected["common/large/context-budget"] { t.Fatalf("unrelated large routing tool should be deferred: %#v", selected) }
 }
 
+// TestAnalyzeHandsRoutingToSelector は対象機能の契約と回帰条件が維持されることを確認します。
 func TestAnalyzeHandsRoutingToSelector(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "main.go"), []byte("package main\n"), 0o644); err != nil { t.Fatal(err) }
