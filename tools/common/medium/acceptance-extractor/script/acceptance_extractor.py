@@ -12,12 +12,14 @@ HEADINGS = {
 }
 
 
+# term_present はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def term_present(text: str, term: str) -> bool:
     if any(ord(char) > 127 for char in term):
         return term in text
     return re.search(rf'(?<![a-z0-9_]){re.escape(term)}(?![a-z0-9_])', text) is not None
 
 
+# section はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
     limit = max(0, limit)
     out = []
@@ -29,6 +31,7 @@ def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
     return out[:limit], len(out) > limit
 
 
+# extract_sections はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def extract_sections(lines: list[str], limit: int) -> tuple[dict[str, list[str]], dict[str, bool]]:
     sections = {key: [] for key in HEADINGS}
     truncated = {key: False for key in HEADINGS}
@@ -45,6 +48,7 @@ def extract_sections(lines: list[str], limit: int) -> tuple[dict[str, list[str]]
     return sections, truncated
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Extract Goal/Required/Acceptance/Deferred sections from markdown as self-describing JSON.')
     parser.add_argument('file')
