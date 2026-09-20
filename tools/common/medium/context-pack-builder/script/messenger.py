@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 
+# git_lines はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def git_lines(root: Path, args: list[str]) -> dict[str, object]:
     try:
         result = subprocess.run(['git', '-C', str(root), *args], capture_output=True, text=True, check=False)
