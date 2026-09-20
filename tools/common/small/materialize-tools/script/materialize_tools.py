@@ -17,6 +17,7 @@ MANIFEST_FORMAT = 'acr-materialized-tools-v1'
 MANIFEST_NAME = '.acr-materialized-tools.json'
 
 
+# sha256_file はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open('rb') as handle:
@@ -25,6 +26,7 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+# source_revision はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def source_revision(source: Path) -> str | None:
     if not shutil.which('git'):
         return None
@@ -41,6 +43,7 @@ def source_revision(source: Path) -> str | None:
     return value if result.returncode == 0 and value else None
 
 
+# source_relative はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def source_relative(path: Path, source: Path) -> str:
     try:
         return path.resolve().relative_to(source.resolve()).as_posix()
@@ -48,6 +51,7 @@ def source_relative(path: Path, source: Path) -> str:
         return path.as_posix()
 
 
+# plan_materialization はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def plan_materialization(source: Path, out: Path, selected: list[dict[str, object]], overwrite: bool) -> tuple[list[dict], list[str]]:
     actions = []
     missing_sources = []
@@ -84,6 +88,7 @@ def plan_materialization(source: Path, out: Path, selected: list[dict[str, objec
     return actions, sorted(missing_sources)
 
 
+# manifest_payload はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def manifest_payload(mode: str, revision: str | None, actions: list[dict]) -> dict:
     return {
         'format': MANIFEST_FORMAT,
@@ -101,6 +106,7 @@ def manifest_payload(mode: str, revision: str | None, actions: list[dict]) -> di
     }
 
 
+# atomic_copy はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def atomic_copy(source: Path, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary_name = tempfile.mkstemp(prefix='.acr-copy-', dir=destination.parent)
@@ -116,6 +122,7 @@ def atomic_copy(source: Path, destination: Path) -> None:
             pass
 
 
+# atomic_write_json はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def atomic_write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary_name = tempfile.mkstemp(prefix='.acr-manifest-', dir=path.parent)
@@ -131,6 +138,7 @@ def atomic_write_json(path: Path, payload: dict) -> None:
             pass
 
 
+# execute はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def execute(source: Path, out: Path, apply: bool, overwrite: bool) -> dict:
     base = {
         'tool': TOOL,
@@ -210,6 +218,7 @@ def execute(source: Path, out: Path, apply: bool, overwrite: bool) -> dict:
     return result
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Safely materialize usable portable tool variants as self-describing JSON.')
     parser.add_argument('source', nargs='?', default='.')
