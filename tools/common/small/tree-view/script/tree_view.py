@@ -7,6 +7,7 @@ from pathlib import Path
 IGNORE = {'.git', '.hg', '.svn', '.venv', 'venv', 'node_modules', '__pycache__', 'bin', 'obj', 'build', 'dist', '.godot', '.idea', '.vs'}
 
 
+# collect_tree は対象scopeを調べ、routingに必要な情報だけを集める。
 def collect_tree(path: Path, root: Path, depth: int, max_depth: int, max_entries: int, state: dict[str, object]):
     if depth > max_depth or (max_entries > 0 and state['entries_scanned'] >= max_entries):
         return
@@ -31,6 +32,7 @@ def collect_tree(path: Path, root: Path, depth: int, max_depth: int, max_entries
                 return
 
 
+# build_tree は解析結果を後段で再利用できる構造へ組み立てる。
 def build_tree(root: Path, max_depth: int, max_entries: int) -> dict[str, object]:
     state = {
         'entries': [],
@@ -49,6 +51,7 @@ def build_tree(root: Path, max_depth: int, max_entries: int) -> dict[str, object
     }
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     ap = argparse.ArgumentParser(description='Portable bounded repository tree as self-describing JSON.')
     ap.add_argument('root', nargs='?', default='.')
