@@ -6,6 +6,7 @@ from pathlib import Path
 from commander import build_remote_delta
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Show compact local/remote git delta as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
