@@ -8,6 +8,7 @@ from pathlib import Path
 PATTERN = re.compile(r'(error|failed|failure|fatal|exception|warning|warn|assert|traceback|ng\b)', re.I)
 
 
+# compact_log はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def compact_log(text: str, max_findings: int, tail: int) -> dict[str, object]:
     lines = text.splitlines()
     findings = [
@@ -28,6 +29,7 @@ def compact_log(text: str, max_findings: int, tail: int) -> dict[str, object]:
     }
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Reduce long validation logs to high-signal findings and a bounded tail.')
     parser.add_argument('file', nargs='?')
