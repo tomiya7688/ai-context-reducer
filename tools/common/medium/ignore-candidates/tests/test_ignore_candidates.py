@@ -12,6 +12,7 @@ from ignore_candidates import scan_candidates
 
 
 class IgnoreCandidatesTests(unittest.TestCase):
+    # test_candidate_directory_prunes_subtree は対象機能の契約と回帰条件が維持されることを確認する。
     def test_candidate_directory_prunes_subtree(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -28,6 +29,7 @@ class IgnoreCandidatesTests(unittest.TestCase):
                 {'path': 'src/trace.log', 'kind': 'file', 'matched_rule': 'file_extension:.log'},
             ])
 
+    # test_cli_zero_limit_is_unlimited_and_missing_root_is_error は対象機能の契約と回帰条件が維持されることを確認する。
     def test_cli_zero_limit_is_unlimited_and_missing_root_is_error(self):
         script = SCRIPT_DIR / 'ignore_candidates.py'
         with tempfile.TemporaryDirectory() as tmp:
