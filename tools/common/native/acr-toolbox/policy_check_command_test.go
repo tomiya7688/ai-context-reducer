@@ -7,6 +7,7 @@ import (
   "testing"
 )
 
+// writePolicyFixture はtest setupや検証を局所化し、各testの意図を読みやすく保ちます。
 func writePolicyFixture(t *testing.T, root string, cfg policyRuleConfig) string {
   t.Helper()
   data,err:=json.Marshal(cfg);if err!=nil{t.Fatal(err)}
@@ -15,6 +16,7 @@ func writePolicyFixture(t *testing.T, root string, cfg policyRuleConfig) string 
   return p
 }
 
+// TestPolicyCheckPathScopeAndSuppression は対象機能の契約と回帰条件が維持されることを確認します。
 func TestPolicyCheckPathScopeAndSuppression(t *testing.T){
   root:=t.TempDir()
   if err:=os.MkdirAll(filepath.Join(root,"src","ui"),0755);err!=nil{t.Fatal(err)}
@@ -27,6 +29,7 @@ func TestPolicyCheckPathScopeAndSuppression(t *testing.T){
   if code:=cmdPolicyCheck([]string{"--rules",rules,root});code!=0{t.Fatalf("expected suppressed scoped rule to pass, got %d",code)}
 }
 
+// TestPolicyCheckViolationReturnsOne は対象機能の契約と回帰条件が維持されることを確認します。
 func TestPolicyCheckViolationReturnsOne(t *testing.T){
   root:=t.TempDir()
   if err:=os.WriteFile(filepath.Join(root,"a.txt"),[]byte("forbidden\n"),0644);err!=nil{t.Fatal(err)}
@@ -34,6 +37,7 @@ func TestPolicyCheckViolationReturnsOne(t *testing.T){
   if code:=cmdPolicyCheck([]string{"--rules",rules,root});code!=1{t.Fatalf("expected violation code 1, got %d",code)}
 }
 
+// TestPolicyCheckWarningAndSemanticRuleDoNotFail は対象機能の契約と回帰条件が維持されることを確認します。
 func TestPolicyCheckWarningAndSemanticRuleDoNotFail(t *testing.T){
   root:=t.TempDir()
   if err:=os.WriteFile(filepath.Join(root,"a.txt"),[]byte("hello\n"),0644);err!=nil{t.Fatal(err)}
@@ -44,6 +48,7 @@ func TestPolicyCheckWarningAndSemanticRuleDoNotFail(t *testing.T){
   if code:=cmdPolicyCheck([]string{"--rules",rules,root});code!=0{t.Fatalf("expected warning/unsupported semantic rule not to fail, got %d",code)}
 }
 
+// TestPolicyGlobDoubleStar は対象機能の契約と回帰条件が維持されることを確認します。
 func TestPolicyGlobDoubleStar(t *testing.T){
   rx,err:=policyGlobRegex("src/ui/**");if err!=nil{t.Fatal(err)}
   if !rx.MatchString("src/ui/a/b.py"){t.Fatal("expected recursive glob match")}
