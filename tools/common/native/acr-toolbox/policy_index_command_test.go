@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestNativePolicyWordsUseBoundaries は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNativePolicyWordsUseBoundaries(t *testing.T) {
     if !isNativePolicyLine("You must run targeted tests.") || !isNativePolicyLine("This should not be skipped.") {
         t.Fatal("expected policy terms")
@@ -18,6 +19,7 @@ func TestNativePolicyWordsUseBoundaries(t *testing.T) {
     }
 }
 
+// TestNativePolicyDiscoveryDedupesAndIgnoresDependencies は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNativePolicyDiscoveryDedupesAndIgnoresDependencies(t *testing.T) {
     root := t.TempDir()
     docs := filepath.Join(root, "docs")
@@ -45,6 +47,7 @@ func TestNativePolicyDiscoveryDedupesAndIgnoresDependencies(t *testing.T) {
     }
 }
 
+// TestNativePolicyIndexZeroLimitIsUnlimited は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNativePolicyIndexZeroLimitIsUnlimited(t *testing.T) {
     root := t.TempDir()
     policy := filepath.Join(root, "policy.md")
@@ -67,6 +70,7 @@ func TestNativePolicyIndexZeroLimitIsUnlimited(t *testing.T) {
     }
 }
 
+// TestNativePolicyIndexMissingOnlyInputFailsExplicitly は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNativePolicyIndexMissingOnlyInputFailsExplicitly(t *testing.T) {
     missing := filepath.Join(t.TempDir(), "missing.md")
     code, payload := captureJSONCommand(t, func() int {
