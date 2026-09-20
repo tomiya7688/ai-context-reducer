@@ -9,10 +9,12 @@ from processing import normalized_stem, route_candidates
 
 
 class ChangeRouterProcessingTests(unittest.TestCase):
+    # test_test_name_normalization は対象機能の契約と回帰条件が維持されることを確認する。
     def test_test_name_normalization(self):
         self.assertEqual(normalized_stem('tests/test_widget.py'), 'widget')
         self.assertEqual(normalized_stem('widget_test.go'), 'widget')
 
+    # test_route_fields_are_self_describing は対象機能の契約と回帰条件が維持されることを確認する。
     def test_route_fields_are_self_describing(self):
         index = [
             {'path': 'tests/test_widget.py', 'name': 'test_widget.py', 'is_test': True, 'is_doc': False},
@@ -29,6 +31,7 @@ class ChangeRouterProcessingTests(unittest.TestCase):
         self.assertNotIn('tests', result)
         self.assertNotIn('docs', result)
 
+    # test_per_kind_limit_reports_real_truncation は対象機能の契約と回帰条件が維持されることを確認する。
     def test_per_kind_limit_reports_real_truncation(self):
         index = [
             {'path': 'tests/test_widget.py', 'name': 'test_widget.py', 'is_test': True, 'is_doc': False},
