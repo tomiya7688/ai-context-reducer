@@ -9,6 +9,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
+# test_portable_stats_are_self_describing_and_prune_dependencies は対象機能の契約と回帰条件が維持されることを確認する。
 def test_portable_stats_are_self_describing_and_prune_dependencies(tmp_path):
     (tmp_path / 'src').mkdir()
     (tmp_path / 'src' / 'main.py').write_text('a = 1\nprint(a)\n', encoding='utf-8')
@@ -34,6 +35,7 @@ def test_portable_stats_are_self_describing_and_prune_dependencies(tmp_path):
     }
 
 
+# test_explicit_file_size_cap_is_visible は対象機能の契約と回帰条件が維持されることを確認する。
 def test_explicit_file_size_cap_is_visible(tmp_path):
     (tmp_path / 'big.py').write_text('1234567890\n', encoding='utf-8')
     result = module.build_stats(tmp_path, 3, 'portable')
@@ -43,6 +45,7 @@ def test_explicit_file_size_cap_is_visible(tmp_path):
     assert result['max_file_bytes'] == 3
 
 
+# test_parse_scc_stats_compacts_language_summary は対象機能の契約と回帰条件が維持されることを確認する。
 def test_parse_scc_stats_compacts_language_summary():
     parsed = module.parse_scc_stats([
         {
