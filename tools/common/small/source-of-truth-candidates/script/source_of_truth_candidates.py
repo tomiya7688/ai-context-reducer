@@ -16,6 +16,7 @@ DOC_EXTS = {'.md', '.txt', '.rst'}
 SKIP = {'.git', '.venv', 'venv', 'node_modules', 'build', 'dist', 'bin', 'obj', '__pycache__', 'vendor'}
 
 
+# candidate_paths はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str]], dict[str, bool], int]:
     hits = {key: [] for key in NAMES}
     truncated = {key: False for key in NAMES}
@@ -44,6 +45,7 @@ def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str
     return hits, truncated, document_files_scanned
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Find filename-based source-of-truth candidates as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
