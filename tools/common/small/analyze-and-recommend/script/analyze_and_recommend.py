@@ -22,6 +22,7 @@ TYPE_SIGNALS = {
 EXTERNAL = ['rg','fd','ast-grep','sg','ctags','scip','tree-sitter','scc','git-sizer']
 
 
+# walk は対象scopeを調べ、routingに必要な情報だけを集める。
 def walk(root):
     for current, dirs, names in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
@@ -30,6 +31,7 @@ def walk(root):
             yield current_path / name
 
 
+# git_result はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def git_result(root, *args):
     try:
         result = subprocess.run(['git','-C',str(root),*args], text=True, capture_output=True, check=False)
@@ -38,6 +40,7 @@ def git_result(root, *args):
     return result.returncode == 0, result.stdout.strip()
 
 
+# implementation_plan はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def implementation_plan(repo_root):
     system = platform.system().lower()
     arch = platform.machine().lower()
@@ -58,6 +61,7 @@ def implementation_plan(repo_root):
     }
 
 
+# is_test_path はroutingやfallback判断に使う条件を判定する。
 def is_test_path(path: Path, root: Path) -> bool:
     relative = path.relative_to(root)
     name = path.name.lower()
@@ -65,6 +69,7 @@ def is_test_path(path: Path, root: Path) -> bool:
     return name.startswith('test_') or name.endswith('_test.py') or name.endswith('_test.go') or bool({'test', 'tests'} & parts)
 
 
+# analyze はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def analyze(root: Path) -> dict[str, object]:
     paths = list(walk(root))
     langs = Counter()
@@ -140,6 +145,7 @@ def analyze(root: Path) -> dict[str, object]:
     }
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     ap = argparse.ArgumentParser(description='Analyze repository/runtime facts, then hand off ordered tool routing to tool-selector.')
     ap.add_argument('root', nargs='?', default='.')
