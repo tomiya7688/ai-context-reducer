@@ -18,6 +18,7 @@ materialize_spec.loader.exec_module(materialize)
 
 
 class MaterializeToolsTests(unittest.TestCase):
+    # make_python_source はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
     def make_python_source(self, root: Path) -> None:
         for relative in selection.PYTHON_TOOL_PATHS:
             path = root / 'tools' / relative
@@ -27,6 +28,7 @@ class MaterializeToolsTests(unittest.TestCase):
         wrapper.parent.mkdir(parents=True, exist_ok=True)
         wrapper.write_text('#!/usr/bin/env sh\n', encoding='utf-8')
 
+    # test_python_selection_preserves_wrapper_expected_layout は対象機能の契約と回帰条件が維持されることを確認する。
     def test_python_selection_preserves_wrapper_expected_layout(self):
         with tempfile.TemporaryDirectory() as raw:
             source = Path(raw)
@@ -39,6 +41,7 @@ class MaterializeToolsTests(unittest.TestCase):
             self.assertIn('common/small/tool-selector/script/tool_selector.py', destinations)
             self.assertNotIn('analyze_and_recommend.py', destinations)
 
+    # test_native_selection_places_binary_under_bin_for_wrapper は対象機能の契約と回帰条件が維持されることを確認する。
     def test_native_selection_places_binary_under_bin_for_wrapper(self):
         with tempfile.TemporaryDirectory() as raw:
             source = Path(raw)
@@ -52,6 +55,7 @@ class MaterializeToolsTests(unittest.TestCase):
             self.assertEqual(mode, 'native')
             self.assertEqual(destinations, {'bin/acr-toolbox', 'analyze.sh'})
 
+    # test_preview_apply_manifest_and_conflict_protection は対象機能の契約と回帰条件が維持されることを確認する。
     def test_preview_apply_manifest_and_conflict_protection(self):
         with tempfile.TemporaryDirectory() as source_raw, tempfile.TemporaryDirectory() as out_raw:
             source = Path(source_raw)
