@@ -7,6 +7,7 @@ import (
     "testing"
 )
 
+// TestStatsPortableJSONContract は対象機能の契約と回帰条件が維持されることを確認します。
 func TestStatsPortableJSONContract(t *testing.T) {
     root := t.TempDir()
     if err := os.MkdirAll(filepath.Join(root, "src"), 0o755); err != nil {
@@ -44,6 +45,7 @@ func TestStatsPortableJSONContract(t *testing.T) {
     }
 }
 
+// TestStatsExplicitFileLimitIsVisible は対象機能の契約と回帰条件が維持されることを確認します。
 func TestStatsExplicitFileLimitIsVisible(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "big.py"), []byte("1234567890\n"), 0o644); err != nil {
@@ -60,6 +62,7 @@ func TestStatsExplicitFileLimitIsVisible(t *testing.T) {
     }
 }
 
+// TestParseSCCStatsCompactsAggregateOnly は対象機能の契約と回帰条件が維持されることを確認します。
 func TestParseSCCStatsCompactsAggregateOnly(t *testing.T) {
     raw := []byte(`[
         {"Name":"Go","Count":2,"Lines":100,"Bytes":5000,"Code":70,"Comment":20,"Blank":10,"Complexity":9,"Files":[{"Location":"do-not-forward.go"}]},
@@ -85,6 +88,7 @@ func TestParseSCCStatsCompactsAggregateOnly(t *testing.T) {
     }
 }
 
+// containsString はtest setupや検証を局所化し、各testの意図を読みやすく保ちます。
 func containsString(value, needle string) bool {
     for i := 0; i+len(needle) <= len(value); i++ {
         if value[i:i+len(needle)] == needle {
