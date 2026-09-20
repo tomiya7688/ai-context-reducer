@@ -4,11 +4,13 @@ import json
 import subprocess
 
 
+# run_git はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def run_git(*args: str) -> tuple[bool, str]:
     result = subprocess.run(['git', *args], text=True, capture_output=True, check=False)
     return result.returncode == 0, result.stdout.strip()
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Return compact Git diff evidence as self-describing JSON.')
     parser.add_argument('--base', default='HEAD~1')
