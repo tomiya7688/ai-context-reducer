@@ -20,12 +20,14 @@ TOOLS={
     'gdscript':('gdscript/small/gdscript-symbols','gdscript/medium/gdscript-dependency-map','gdscript/large/godot-scene-graph'),
 }
 
+# first はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def first(names):
     for n in names:
         p=shutil.which(n)
         if p: return p
     return ''
 
+# walk は対象scopeを調べ、routingに必要な情報だけを集める。
 def walk(root):
     for p in root.rglob('*'):
         if any(part.lower() in IGNORE for part in p.parts):
@@ -33,6 +35,7 @@ def walk(root):
         if p.is_file():
             yield p
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     ap=argparse.ArgumentParser(description='Select compatible language-specific tools from repository language + environment.')
     ap.add_argument('root',nargs='?',default='.')
