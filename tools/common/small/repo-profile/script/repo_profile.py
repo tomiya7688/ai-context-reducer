@@ -24,16 +24,19 @@ LANG = {
 ERROR_PATH_LIMIT = 20
 
 
+# emit は内部結果を安定した利用者向け表現へ変換する。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# walk は対象scopeを調べ、routingに必要な情報だけを集める。
 def walk(root: Path, max_files: int) -> tuple[list[Path], bool, dict[str, object]]:
     max_files = max(0, max_files)
     files: list[Path] = []
     stats: dict[str, object] = {'walk_error_count': 0, 'walk_error_paths': []}
     wanted = max_files + 1 if max_files > 0 else 0
 
+    # on_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
     def on_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -49,6 +52,7 @@ def walk(root: Path, max_files: int) -> tuple[list[Path], bool, dict[str, object
     return files, False, stats
 
 
+# portable_language_metrics はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def portable_language_metrics(files: list[Path]) -> tuple[dict[str, int], list[dict[str, object]]]:
     languages = Counter()
     for path in files:
@@ -70,6 +74,7 @@ def portable_language_metrics(files: list[Path]) -> tuple[dict[str, int], list[d
     return dict(languages.most_common()), metrics
 
 
+# parse_scc_payload は外部入力を内部表現へ変換し、不正な値を後段へ流さない。
 def parse_scc_payload(payload: object) -> tuple[dict[str, int], list[dict[str, object]]]:
     if not isinstance(payload, list):
         raise ValueError('scc JSON output must be a language summary array')
@@ -97,6 +102,7 @@ def parse_scc_payload(payload: object) -> tuple[dict[str, int], list[dict[str, o
     return counts, metrics
 
 
+# run_scc はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def run_scc(root: Path) -> tuple[dict[str, int] | None, list[dict[str, object]] | None, str | None]:
     executable = shutil.which('scc')
     if not executable:
@@ -116,6 +122,7 @@ def run_scc(root: Path) -> tuple[dict[str, int] | None, list[dict[str, object]] 
     return counts, metrics, None
 
 
+# build_profile は解析結果を後段で再利用できる構造へ組み立てる。
 def build_profile(
     root: Path,
     max_files: int,
@@ -198,6 +205,7 @@ def build_profile(
     return result
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Create a compact self-describing repository profile.')
     parser.add_argument('root', nargs='?', default='.')
