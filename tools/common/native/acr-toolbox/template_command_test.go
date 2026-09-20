@@ -6,6 +6,7 @@ import (
   "testing"
 )
 
+// TestTemplateGenerateAndCheck は対象機能の契約と回帰条件が維持されることを確認します。
 func TestTemplateGenerateAndCheck(t *testing.T){
   root:=t.TempDir()
   tpl:=filepath.Join(root,"tpl.txt");vars:=filepath.Join(root,"vars.json");out:=filepath.Join(root,"out.txt")
@@ -20,6 +21,7 @@ func TestTemplateGenerateAndCheck(t *testing.T){
   if code:=cmdTemplate(append(args,"--check"));code!=1{t.Fatalf("expected drift code 1, got %d",code)}
 }
 
+// TestTemplateValidationAndDirectory は対象機能の契約と回帰条件が維持されることを確認します。
 func TestTemplateValidationAndDirectory(t *testing.T){
   root:=t.TempDir();tplDir:=filepath.Join(root,"tpl");outDir:=filepath.Join(root,"out")
   if err:=os.MkdirAll(tplDir,0755);err!=nil{t.Fatal(err)}
