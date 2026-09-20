@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 
+# _git_failure_line はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def _git_failure_line(error_kind: object, query_name: str) -> str:
     if error_kind == 'git_unavailable':
         return '- Git unavailable\n'
     return f'- unavailable: {query_name} query failed\n'
 
 
+# render_context_pack は内部結果を安定した利用者向け表現へ変換する。
 def render_context_pack(task: dict[str, str], state: dict[str, object]) -> str:
     changed = list(state.get('changed', []))
     status = list(state.get('status', []))
