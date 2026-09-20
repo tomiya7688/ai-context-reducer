@@ -7,6 +7,7 @@ import (
     "testing"
 )
 
+// sampleCtagsJSONLines はtest setupや検証を局所化し、各testの意図を読みやすく保ちます。
 func sampleCtagsJSONLines(t *testing.T, path string) {
     t.Helper()
     rows := []map[string]any{
@@ -30,6 +31,7 @@ func sampleCtagsJSONLines(t *testing.T, path string) {
     }
 }
 
+// TestNormalizeCtagsRowsPreservesNestedOwnership は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNormalizeCtagsRowsPreservesNestedOwnership(t *testing.T) {
     raw := []any{
         map[string]any{"_type": "tag", "name": "Klass", "path": "src/app.py", "line": float64(1), "language": "Python", "kind": "class"},
@@ -59,6 +61,7 @@ func TestNormalizeCtagsRowsPreservesNestedOwnership(t *testing.T) {
     }
 }
 
+// TestCtagsJSONBuildRoundTripPreservesOwnership は対象機能の契約と回帰条件が維持されることを確認します。
 func TestCtagsJSONBuildRoundTripPreservesOwnership(t *testing.T) {
     root := t.TempDir()
     tags := filepath.Join(root, "tags.jsonl")
@@ -93,6 +96,7 @@ func TestCtagsJSONBuildRoundTripPreservesOwnership(t *testing.T) {
     }
 }
 
+// TestCtagsJSONInvalidLineIsExplicit は対象機能の契約と回帰条件が維持されることを確認します。
 func TestCtagsJSONInvalidLineIsExplicit(t *testing.T) {
     root := t.TempDir()
     tags := filepath.Join(root, "bad.jsonl")
