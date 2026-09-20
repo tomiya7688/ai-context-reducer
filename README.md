@@ -4,6 +4,16 @@ AI / Codex / Claude Code を利用した開発で、必要以上にコンテキ�
 
 このリポジトリは文書・設計を中核にしつつ、繰り返し処理をAIのコンテキスト外へ移すportable toolも提供します。主要なCommon機能は `acr-toolbox` 単体バイナリで利用できます。
 
+## まず理解する3原則
+
+コンテキスト削減の基本は次の3つです。
+
+1. 静的解析できるものは静的解析する
+2. よく使う操作をまとめる
+3. 一部だけ読ませる
+
+個別の手法やtoolは、ほとんどがこの3つのどれか、または組み合わせです。詳細は [`docs/context-reduction-basics.md`](docs/context-reduction-basics.md) を参照してください。
+
 ## 目標
 
 > AI に大量の情報を読ませて必要情報を探させるのではなく、必要情報を先に選別・ルーティングしてから AI へ渡す。
@@ -60,8 +70,9 @@ acr-toolbox select <project-root>
 最初に読ませるのは基本的に次の3つだけです。
 
 1. この `README.md`
-2. [`docs/adoption-priority.md`](docs/adoption-priority.md)
-3. [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
+2. [`docs/context-reduction-basics.md`](docs/context-reduction-basics.md)
+3. [`docs/adoption-priority.md`](docs/adoption-priority.md)
+4. [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 
 その上で対象repoを shallow inspection し、**全部ではなく効果が高い手法だけ**導入させます。
 
@@ -135,6 +146,7 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 
 導入時に全部読む必要はありません。
 
+- 基本原則: [`docs/context-reduction-basics.md`](docs/context-reduction-basics.md)
 - 導入判断: [`docs/adoption-priority.md`](docs/adoption-priority.md)
 - 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
 - 基本方針: [`docs/guide.md`](docs/guide.md)
