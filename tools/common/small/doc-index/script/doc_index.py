@@ -7,6 +7,7 @@ from pathlib import Path
 IGNORE = {'.git', '.venv', 'venv', 'node_modules', 'bin', 'obj', 'build', 'dist', '__pycache__'}
 
 
+# build_index は解析結果を後段で再利用できる構造へ組み立てる。
 def build_index(root: Path, max_documents: int, max_headings_per_document: int) -> dict[str, object]:
     documents = []
     documents_scanned = 0
@@ -54,6 +55,7 @@ def build_index(root: Path, max_documents: int, max_headings_per_document: int) 
     }
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     ap = argparse.ArgumentParser(description='Build a compact Markdown heading index as self-describing JSON.')
     ap.add_argument('root', nargs='?', default='.')
