@@ -4,6 +4,7 @@ from pathlib import Path
 
 DEFAULT=["AI_CONTEXT.md","AI_CONTEXT.local.md","AGENTS.md","CLAUDE.md"]
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     ap=argparse.ArgumentParser(description="Resolve scoped AI guide candidates on the target ancestor path.")
     ap.add_argument("target",nargs="?",default=".")
