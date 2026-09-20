@@ -2,6 +2,7 @@ package main
 
 import "testing"
 
+// TestNormalizeSyntaxHealth は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNormalizeSyntaxHealth(t *testing.T) {
     payload := []any{
         map[string]any{"path": "ok.py", "successful": true, "error_count": float64(0), "missing_count": float64(0)},
@@ -19,6 +20,7 @@ func TestNormalizeSyntaxHealth(t *testing.T) {
     }
 }
 
+// TestNormalizeSyntaxHealthAlternateFields は対象機能の契約と回帰条件が維持されることを確認します。
 func TestNormalizeSyntaxHealthAlternateFields(t *testing.T) {
     payload := []any{map[string]any{"file": "broken.ts", "errors": float64(1)}}
     rows := normalizeSyntaxHealth(payload)
