@@ -20,14 +20,17 @@ DEFAULT_IGNORE = {
 ERROR_PATH_LIMIT = 20
 
 
+# emit は内部結果を安定した利用者向け表現へ変換する。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# normalize_limit は表記揺れを正規化し、後段の比較条件を単純化する。
 def normalize_limit(value: int) -> int:
     return max(0, value)
 
 
+# validate_regex はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def validate_regex(pattern: str) -> str | None:
     try:
         re.compile(pattern)
@@ -36,6 +39,7 @@ def validate_regex(pattern: str) -> str | None:
     return None
 
 
+# relative_path はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def relative_path(root: Path, path: Path) -> str:
     try:
         return path.relative_to(root).as_posix()
@@ -43,7 +47,9 @@ def relative_path(root: Path, path: Path) -> str:
         return path.as_posix()
 
 
+# iter_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def iter_files(root: Path, globs: list[str], excludes: list[str], max_bytes: int, stats: dict[str, object]):
+    # walk_error は対象scopeを調べ、routingに必要な情報だけを集める。
     def walk_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -72,6 +78,7 @@ def iter_files(root: Path, globs: list[str], excludes: list[str], max_bytes: int
             yield path
 
 
+# looks_binary はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def looks_binary(path: Path) -> bool:
     try:
         with path.open('rb') as handle:
@@ -80,6 +87,7 @@ def looks_binary(path: Path) -> bool:
         return True
 
 
+# portable_search はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def portable_search(
     root: Path,
     pattern: str,
@@ -145,6 +153,7 @@ def portable_search(
     return matches, False, stats
 
 
+# rg_glob_args はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def rg_glob_args(globs: list[str], excludes: list[str]) -> list[str]:
     args: list[str] = []
     for name in sorted(DEFAULT_IGNORE):
@@ -156,6 +165,7 @@ def rg_glob_args(globs: list[str], excludes: list[str]) -> list[str]:
     return args
 
 
+# ripgrep_search はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def ripgrep_search(
     executable: str,
     root: Path,
@@ -227,6 +237,7 @@ def ripgrep_search(
     return matches, False, None
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(
         description='Search text and return compact self-describing JSON. Uses ripgrep when compatible and available.'
