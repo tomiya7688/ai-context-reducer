@@ -4,12 +4,14 @@ from pathlib import Path
 
 IGNORE={'.git','.hg','.svn','.venv','venv','node_modules','bin','obj','build','dist','__pycache__','.godot','.idea','.vs','vendor'}
 
+# globmatch はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def globmatch(path,pat):
     path=path.replace('\\','/')
     if fnmatch.fnmatchcase(path,pat): return True
     if pat.endswith('/**') and (path==pat[:-3] or path.startswith(pat[:-2])): return True
     return False
 
+# suppression はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def suppression(line,rid):
     marker=f'acr-ignore {rid}'
     i=line.find(marker)
@@ -18,6 +20,7 @@ def suppression(line,rid):
     if tail.startswith(':') and tail[1:].strip(): return tail[1:].strip(),True
     return '',True
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     ap=argparse.ArgumentParser(description='Lightweight path-scoped policy checker.')
     ap.add_argument('root',nargs='?',default='.')
