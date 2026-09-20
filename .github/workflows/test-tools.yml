@@ -43,7 +43,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          unformatted="$(gofmt -l tools --include='*.go' 2>/dev/null || true)"
+          mapfile -t go_files < <(find tools -type f -name '*.go' -print | sort)
+          unformatted="$(gofmt -l "${go_files[@]}")"
           if [ -n "$unformatted" ]; then
             printf 'gofmt required:\n%s\n' "$unformatted"
             exit 1
