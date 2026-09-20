@@ -27,10 +27,12 @@ LANG = {
 ERROR_PATH_LIMIT = 20
 
 
+# emit は内部結果を安定した利用者向け表現へ変換する。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# empty_language_row はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def empty_language_row() -> dict[str, int | None]:
     return {
         'file_count': 0,
@@ -43,6 +45,7 @@ def empty_language_row() -> dict[str, int | None]:
     }
 
 
+# build_portable_stats は解析結果を後段で再利用できる構造へ組み立てる。
 def build_portable_stats(root: Path, max_file_bytes: int) -> dict[str, object]:
     max_file_bytes = max(0, max_file_bytes)
     stats: dict[str, dict[str, int | None]] = defaultdict(empty_language_row)
@@ -54,6 +57,7 @@ def build_portable_stats(root: Path, max_file_bytes: int) -> dict[str, object]:
     binary_like_file_count = 0
     recognized_files_seen = 0
 
+    # walk_error は対象scopeを調べ、routingに必要な情報だけを集める。
     def walk_error(error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1
@@ -114,6 +118,7 @@ def build_portable_stats(root: Path, max_file_bytes: int) -> dict[str, object]:
     return payload
 
 
+# parse_scc_stats は外部入力を内部表現へ変換し、不正な値を後段へ流さない。
 def parse_scc_stats(payload: object) -> dict[str, object]:
     if not isinstance(payload, list):
         raise ValueError('scc JSON output must be a language summary array')
@@ -147,6 +152,7 @@ def parse_scc_stats(payload: object) -> dict[str, object]:
     }
 
 
+# run_scc はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def run_scc(root: Path) -> tuple[dict[str, object] | None, str | None, str]:
     executable = shutil.which('scc')
     if not executable:
@@ -165,6 +171,7 @@ def run_scc(root: Path) -> tuple[dict[str, object] | None, str | None, str]:
     return parsed, None, 'ok'
 
 
+# build_stats は解析結果を後段で再利用できる構造へ組み立てる。
 def build_stats(root: Path, max_file_bytes: int, backend: str = 'portable') -> dict[str, object]:
     max_file_bytes = max(0, max_file_bytes)
     scc_available = shutil.which('scc') is not None
@@ -210,6 +217,7 @@ def build_stats(root: Path, max_file_bytes: int, backend: str = 'portable') -> d
     return build_portable_stats(root, max_file_bytes)
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Compact repository language/line statistics as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
