@@ -12,6 +12,7 @@ DOC_EXTS = {'.md', '.rst', '.txt'}
 TEST_DIRS = {'test', 'tests', 'spec', 'specs'}
 
 
+# changed_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def changed_files(root: Path, base: str | None) -> dict[str, object]:
     cmd = ['git', '-C', str(root), 'diff', '--name-only', base or 'HEAD']
     try:
@@ -27,6 +28,7 @@ def changed_files(root: Path, base: str | None) -> dict[str, object]:
     }
 
 
+# is_test_candidate はroutingやfallback判断に使う条件を判定する。
 def is_test_candidate(path: Path, rel_parts: set[str]) -> bool:
     if rel_parts & TEST_DIRS:
         return True
@@ -40,11 +42,13 @@ def is_test_candidate(path: Path, rel_parts: set[str]) -> bool:
     )
 
 
+# candidate_index はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]], bool, int]:
     rows: list[dict[str, object]] = []
     truncated = False
     walk_error_count = 0
 
+    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
     def on_walk_error(_error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1
