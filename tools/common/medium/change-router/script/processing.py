@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 
+# normalized_stem は表記揺れを正規化し、後段の比較条件を単純化する。
 def normalized_stem(rel: str) -> str:
     stem = Path(rel).stem.lower()
     if stem.startswith('test_'):
@@ -12,6 +13,7 @@ def normalized_stem(rel: str) -> str:
     return stem
 
 
+# route_candidates はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def route_candidates(rel: str, index: list[dict[str, object]], limit: int) -> dict[str, object]:
     stem = normalized_stem(rel)
     tests: list[str] = []
