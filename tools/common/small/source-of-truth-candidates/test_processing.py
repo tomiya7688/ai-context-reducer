@@ -10,6 +10,7 @@ spec.loader.exec_module(module)
 
 
 class SourceOfTruthCandidatesTests(unittest.TestCase):
+    # test_zero_limit_means_unlimited は対象機能の契約と回帰条件が維持されることを確認する。
     def test_zero_limit_means_unlimited(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
