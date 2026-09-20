@@ -11,12 +11,14 @@ ENGLISH_RULE_PATTERN = re.compile(
 HEADING_PATTERN = re.compile(r'^#{1,6}\s+')
 
 
+# is_policy_line はroutingやfallback判断に使う条件を判定する。
 def is_policy_line(line: str) -> bool:
     if ENGLISH_RULE_PATTERN.search(line):
         return True
     return any(term in line for term in JAPANESE_RULE_TERMS)
 
 
+# policy_findings はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def policy_findings(lines: list[str]):
     heading = ''
     for number, line in enumerate(lines, 1):
