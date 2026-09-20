@@ -6,6 +6,7 @@ from messenger import git_lines
 from processing import render_context_pack
 
 
+# build_context_pack は解析結果を後段で再利用できる構造へ組み立てる。
 def build_context_pack(root: Path, task: dict[str, str], limit: int = 60) -> str:
     limit = max(0, limit)
     changed_result = git_lines(root, ['diff', '--name-only', 'HEAD'])
