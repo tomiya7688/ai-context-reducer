@@ -13,6 +13,7 @@ from processing import collect_duplicates
 
 
 class DocDuplicateHintsTests(unittest.TestCase):
+    # test_dependency_documents_are_not_scanned は対象機能の契約と回帰条件が維持されることを確認する。
     def test_dependency_documents_are_not_scanned(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -23,6 +24,7 @@ class DocDuplicateHintsTests(unittest.TestCase):
             paths = [p.relative_to(root).as_posix() for p in iter_documents(root)]
             self.assertEqual(paths, ['docs/a.md'])
 
+    # test_duplicate_groups_are_deterministic は対象機能の契約と回帰条件が維持されることを確認する。
     def test_duplicate_groups_are_deterministic(self):
         text = 'This line is deliberately long enough to be considered duplicate content.'
         groups = collect_duplicates([
@@ -35,6 +37,7 @@ class DocDuplicateHintsTests(unittest.TestCase):
             {'path': 'b.md', 'line': 1},
         ])
 
+    # test_cli_zero_limits_are_unlimited_and_missing_root_is_error は対象機能の契約と回帰条件が維持されることを確認する。
     def test_cli_zero_limits_are_unlimited_and_missing_root_is_error(self):
         script = SCRIPT_DIR / 'doc_duplicate_hints.py'
         with tempfile.TemporaryDirectory() as tmp:
