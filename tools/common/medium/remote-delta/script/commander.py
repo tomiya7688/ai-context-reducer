@@ -6,6 +6,7 @@ from messenger import git_result
 from processing import compact_remote_delta
 
 
+# _int_or_none はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def _int_or_none(text: str) -> int | None:
     try:
         return int(text)
@@ -13,6 +14,7 @@ def _int_or_none(text: str) -> int | None:
         return None
 
 
+# build_remote_delta は解析結果を後段で再利用できる構造へ組み立てる。
 def build_remote_delta(root: Path, base: str, remote: str, max_files: int) -> dict[str, object]:
     status_ok, status_text = git_result(root, 'status', '--short')
     if not status_ok:
