@@ -9,11 +9,13 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
+# paths はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def paths(rows, key):
     return [row[key] for row in rows]
 
 
 class ToolSelectorTests(unittest.TestCase):
+    # test_recommend_includes_git_tools_with_routing_metadata は対象機能の契約と回帰条件が維持されることを確認する。
     def test_recommend_includes_git_tools_with_routing_metadata(self):
         recommended, conditional, recommended_groups, conditional_groups = module.recommend(
             'small', [('python', 3)], [], docs=0, tests=0, has_git=True, external_tools={'rg'}
@@ -26,6 +28,7 @@ class ToolSelectorTests(unittest.TestCase):
         search = next(row for row in recommended if row['tool_path'] == 'common/small/text-search')
         self.assertEqual(search['availability'], 'external_backend_ready')
 
+    # test_build_selection_separates_language_and_other_files は対象機能の契約と回帰条件が維持されることを確認する。
     def test_build_selection_separates_language_and_other_files(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -44,12 +47,14 @@ class ToolSelectorTests(unittest.TestCase):
             self.assertFalse(result['task_context']['applied'])
             self.assertTrue(result['exploration_stop_conditions'])
 
+    # test_project_type_detection_uses_relative_path_content は対象機能の契約と回帰条件が維持されることを確認する。
     def test_project_type_detection_uses_relative_path_content(self):
         detected = set()
         module.detect_types_from_relative_path('src/parser/token_stream.py', detected)
         self.assertIn('compiler', detected)
         self.assertNotIn('simulation', detected)
 
+    # test_large_rule_heavy_repo_gets_structure_and_backend_tools は対象機能の契約と回帰条件が維持されることを確認する。
     def test_large_rule_heavy_repo_gets_structure_and_backend_tools(self):
         recommended, conditional, recommended_groups, conditional_groups = module.recommend(
             'large', [('python', 100)], ['rule_heavy'], docs=5, tests=10, has_git=True,
@@ -66,6 +71,7 @@ class ToolSelectorTests(unittest.TestCase):
         phases = [module.PHASE_ORDER[row['phase']] for row in recommended]
         self.assertEqual(phases, sorted(phases))
 
+    # test_task_context_narrows_routing_to_directly_relevant_tools は対象機能の契約と回帰条件が維持されることを確認する。
     def test_task_context_narrows_routing_to_directly_relevant_tools(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -94,6 +100,7 @@ class ToolSelectorTests(unittest.TestCase):
             self.assertTrue(all(row['task_relevance'] == 'direct' for row in result['recommended_tools']))
             self.assertGreater(result['task_context']['deferred_tool_count'], 0)
 
+    # test_latest_file_is_not_counted_as_test は対象機能の契約と回帰条件が維持されることを確認する。
     def test_latest_file_is_not_counted_as_test(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
