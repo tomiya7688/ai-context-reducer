@@ -7,6 +7,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
+# test_summarize_filters_sorts_and_truncates は対象機能の契約と回帰条件が維持されることを確認する。
 def test_summarize_filters_sorts_and_truncates():
     payload = {
         'uniqueBlobSize': {
@@ -37,6 +38,7 @@ def test_summarize_filters_sorts_and_truncates():
     assert result['findings'][0]['object_description'] == 'assets/big.bin'
 
 
+# test_zero_limit_is_unlimited は対象機能の契約と回帰条件が維持されることを確認する。
 def test_zero_limit_is_unlimited():
     payload = {
         'a': {'value': 1, 'levelOfConcern': 1.0},
