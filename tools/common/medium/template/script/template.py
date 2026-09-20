@@ -5,17 +5,20 @@ import re
 
 RX=re.compile(r'\{\{\s*([A-Za-z_][A-Za-z0-9_.-]*)\s*\}\}')
 
+# scalar はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def scalar(v):
     if v is None:return ''
     if isinstance(v,bool):return 'true' if v else 'false'
     if isinstance(v,(str,int,float)):return str(v)
     raise TypeError
 
+# render は内部結果を安定した利用者向け表現へ変換する。
 def render(data,vars):
     text=data.decode('utf-8')
     text=RX.sub(lambda m:vars.get(m.group(1),m.group(0)),text)
     return text.encode('utf-8'),sorted(set(RX.findall(text)))
 
+# diff_hint はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def diff_hint(old,new):
     if old==new:return None
     a=old.decode('utf-8','replace').replace('\r\n','\n').split('\n')
@@ -25,6 +28,7 @@ def diff_hint(old,new):
         if x!=y:return {'first_changed_line':i+1,'before':x[:160],'after':y[:160],'old_line_count':len(a),'new_line_count':len(b)}
     return {'old_line_count':len(a),'new_line_count':len(b)}
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     ap=argparse.ArgumentParser(description='Deterministic canonical template generator.')
     ap.add_argument('--template',required=True);ap.add_argument('--vars',required=True);ap.add_argument('--out',required=True)
