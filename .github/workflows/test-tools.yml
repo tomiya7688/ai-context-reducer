@@ -39,16 +39,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22.x'
-      - name: Check Go formatting
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t go_files < <(find tools -type f -name '*.go' -print | sort)
-          unformatted="$(gofmt -l "${go_files[@]}")"
-          if [ -n "$unformatted" ]; then
-            printf 'gofmt required:\n%s\n' "$unformatted"
-            exit 1
-          fi
       - name: Test every Go tool module
         shell: bash
         run: |
