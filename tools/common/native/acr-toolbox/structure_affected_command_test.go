@@ -2,6 +2,7 @@ package main
 
 import "testing"
 
+// affectedFixture はtest setupや検証を局所化し、各testの意図を読みやすく保ちます。
 func affectedFixture() structureIndex {
     return structureIndex{
         Format: structureIndexFormat,
@@ -23,6 +24,7 @@ func affectedFixture() structureIndex {
     }
 }
 
+// TestAffectedStructureFindsTransitiveDependents は対象機能の契約と回帰条件が維持されることを確認します。
 func TestAffectedStructureFindsTransitiveDependents(t *testing.T) {
     result := affectedStructure(affectedFixture(), []string{"b.go"}, 80)
     if result["impact_uncertain"].(bool) {
@@ -43,6 +45,7 @@ func TestAffectedStructureFindsTransitiveDependents(t *testing.T) {
     }
 }
 
+// TestAffectedStructureTruncationRequiresBroaderValidation は対象機能の契約と回帰条件が維持されることを確認します。
 func TestAffectedStructureTruncationRequiresBroaderValidation(t *testing.T) {
     result := affectedStructure(affectedFixture(), []string{"b.go"}, 2)
     if !result["affected_modules_truncated"].(bool) {
@@ -56,6 +59,7 @@ func TestAffectedStructureTruncationRequiresBroaderValidation(t *testing.T) {
     }
 }
 
+// TestAffectedStructureUnmatchedFileIsUncertain は対象機能の契約と回帰条件が維持されることを確認します。
 func TestAffectedStructureUnmatchedFileIsUncertain(t *testing.T) {
     result := affectedStructure(affectedFixture(), []string{"missing.go"}, 80)
     if !result["impact_uncertain"].(bool) {
