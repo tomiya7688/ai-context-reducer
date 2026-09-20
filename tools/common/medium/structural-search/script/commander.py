@@ -6,6 +6,7 @@ from messenger import find_ast_grep, run_ast_grep
 from processing import PatternError, normalize_ast_grep_matches, python_ast_search
 
 
+# search_structure は広い候補から必要な対象だけを絞り込む。
 def search_structure(root: Path, pattern: str, language: str | None, max_results: int, backend: str) -> dict:
     base = {
         'tool': 'structural-search',
