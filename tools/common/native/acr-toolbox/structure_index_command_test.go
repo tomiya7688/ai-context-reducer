@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestBuildStructureIndexNormalizesPythonInputs は対象機能の契約と回帰条件が維持されることを確認します。
 func TestBuildStructureIndexNormalizesPythonInputs(t *testing.T) {
     dir := t.TempDir()
     symbols := filepath.Join(dir, "symbols.json")
@@ -36,6 +37,7 @@ func TestBuildStructureIndexNormalizesPythonInputs(t *testing.T) {
     if !edgeFound { t.Fatal("missing dependency edge") }
 }
 
+// TestBuildStructureIndexBridgesGoPackageToFile は対象機能の契約と回帰条件が維持されることを確認します。
 func TestBuildStructureIndexBridgesGoPackageToFile(t *testing.T) {
     dir := t.TempDir()
     symbols := filepath.Join(dir, "symbols.json")
@@ -61,6 +63,7 @@ func TestBuildStructureIndexBridgesGoPackageToFile(t *testing.T) {
 }
 
 
+// TestBuildStructureIndexPropagatesAnalyzerWarnings は対象機能の契約と回帰条件が維持されることを確認します。
 func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
     dir := t.TempDir()
     symbols := filepath.Join(dir, "symbols.json")
@@ -86,6 +89,7 @@ func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
 
 
 
+// TestBuildStructureIndexPropagatesGraphWarnings は対象機能の契約と回帰条件が維持されることを確認します。
 func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
     dir := t.TempDir()
     graph := filepath.Join(dir, "graph.json")
@@ -111,6 +115,7 @@ func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
 }
 
 
+// TestStructureQueryAndExpansion は対象機能の契約と回帰条件が維持されることを確認します。
 func TestStructureQueryAndExpansion(t *testing.T) {
     index := structureIndex{
         Format: structureIndexFormat,
