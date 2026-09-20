@@ -9,10 +9,12 @@ NAMES = {'build', 'dist', 'bin', 'obj', '.cache', 'cache', '.godot', 'node_modul
 EXTS = {'.log', '.tmp', '.bak', '.cache', '.pyc', '.pdb', '.dll', '.so', '.dylib', '.exe', '.class', '.jar', '.zip', '.7z'}
 
 
+# scan_candidates は対象scopeを調べ、routingに必要な情報だけを集める。
 def scan_candidates(root: Path) -> tuple[list[dict[str, str]], int]:
     candidates: list[dict[str, str]] = []
     walk_error_count = 0
 
+    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
     def on_walk_error(_error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1
@@ -46,10 +48,12 @@ def scan_candidates(root: Path) -> tuple[list[dict[str, str]], int]:
     return candidates, walk_error_count
 
 
+# emit は内部結果を安定した利用者向け表現へ変換する。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Suggest likely low-value context paths as self-describing JSON. Review before adding ignore rules.')
     parser.add_argument('root', nargs='?', default='.')
