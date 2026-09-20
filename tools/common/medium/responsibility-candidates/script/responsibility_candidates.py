@@ -11,6 +11,7 @@ IGNORE = {
 CODE = {'.py', '.cs', '.go', '.c', '.h', '.cpp', '.cc', '.cxx', '.hpp', '.hh', '.gd', '.rs', '.java', '.js', '.ts'}
 
 
+# scan_candidates は対象scopeを調べ、routingに必要な情報だけを集める。
 def scan_candidates(root: Path, max_scan_files: int = 0):
     rows: list[tuple[int | None, str]] = []
     scanned = 0
@@ -18,6 +19,7 @@ def scan_candidates(root: Path, max_scan_files: int = 0):
     stat_error_count = 0
     walk_error_count = 0
 
+    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
     def on_walk_error(_error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1
@@ -41,6 +43,7 @@ def scan_candidates(root: Path, max_scan_files: int = 0):
     return rows, scanned, scan_truncated, stat_error_count, walk_error_count
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Generate a bounded Responsibility Map starter table without inventing semantic responsibilities.')
     parser.add_argument('root', nargs='?', default='.')
