@@ -7,6 +7,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
+# test_candidate_paths_group_by_role は対象機能の契約と回帰条件が維持されることを確認する。
 def test_candidate_paths_group_by_role(tmp_path):
     (tmp_path / 'architecture.md').write_text('# A\n', encoding='utf-8')
     (tmp_path / 'specification.md').write_text('# S\n', encoding='utf-8')
@@ -16,6 +17,7 @@ def test_candidate_paths_group_by_role(tmp_path):
     assert truncated['architecture'] is False
 
 
+# test_candidate_paths_report_role_truncation は対象機能の契約と回帰条件が維持されることを確認する。
 def test_candidate_paths_report_role_truncation(tmp_path):
     (tmp_path / 'architecture-a.md').write_text('', encoding='utf-8')
     (tmp_path / 'architecture-b.md').write_text('', encoding='utf-8')
