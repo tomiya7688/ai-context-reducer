@@ -9,6 +9,7 @@ TOOL = 'environment-plan'
 OPTIONAL = ['rg', 'fd', 'git', 'python', 'python3', 'go']
 
 
+# probe は対象scopeを調べ、routingに必要な情報だけを集める。
 def probe(root: Path):
     system = platform.system().lower()
     machine = platform.machine().lower()
@@ -35,6 +36,7 @@ def probe(root: Path):
     }
 
 
+# plan はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def plan(info):
     keep = []
     fallback = []
@@ -59,6 +61,7 @@ def plan(info):
     return {'keep': keep, 'fallback': fallback, 'notes': notes}
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Plan portable ai-context-reducer tool implementations for this environment.')
     parser.add_argument('root', nargs='?', default='.')
