@@ -11,6 +11,7 @@ SKIP = {
 }
 
 
+# role はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def role(path: Path) -> str:
     parts = {part.lower() for part in path.parts}
     low = '/'.join(part.lower() for part in path.parts)
@@ -27,6 +28,7 @@ def role(path: Path) -> str:
     return 'other'
 
 
+# build_role_map は解析結果を後段で再利用できる構造へ組み立てる。
 def build_role_map(root: Path, max_files: int, example_limit: int) -> dict[str, object]:
     groups = defaultdict(lambda: {'file_count': 0, 'example_paths': []})
     scanned = 0
@@ -66,6 +68,7 @@ def build_role_map(root: Path, max_files: int, example_limit: int) -> dict[str, 
     }
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
     parser = argparse.ArgumentParser(description='Classify repository files by likely context role as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
