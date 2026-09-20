@@ -19,19 +19,23 @@ IGNORE = {
 ERROR_PATH_LIMIT = 20
 
 
+# emit は内部結果を安定した利用者向け表現へ変換する。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# normalized は表記揺れを正規化し、後段の比較条件を単純化する。
 def normalized(path: str) -> str:
     value = path.replace('\\', '/').removeprefix('./')
     return value.rstrip('/')
 
 
+# matches_pattern はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def matches_pattern(name: str, rel: str, pattern: str) -> bool:
     return fnmatch.fnmatchcase(name, pattern) or fnmatch.fnmatchcase(rel, pattern)
 
 
+# portable_find はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def portable_find(
     root: Path,
     pattern: str,
@@ -47,6 +51,7 @@ def portable_find(
     stats: dict[str, object] = {'walk_error_count': 0, 'walk_error_paths': []}
     wanted = max_results + 1 if max_results > 0 else 0
 
+    # walk_error は対象scopeを調べ、routingに必要な情報だけを集める。
     def walk_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -85,6 +90,7 @@ def portable_find(
     return results, results_truncated, scan_truncated, stats
 
 
+# fd_find はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def fd_find(
     executable: str,
     root: Path,
@@ -155,6 +161,7 @@ def fd_find(
     return results, False, None
 
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main() -> int:
     parser = argparse.ArgumentParser(
         description='Find paths and return compact self-describing JSON. Uses fd when compatible and available.'
