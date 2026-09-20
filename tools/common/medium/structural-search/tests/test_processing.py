@@ -10,6 +10,7 @@ spec.loader.exec_module(module)
 
 
 class StructuralSearchProcessingTests(unittest.TestCase):
+    # test_python_fallback_matches_single_node_metavariable は対象機能の契約と回帰条件が維持されることを確認する。
     def test_python_fallback_matches_single_node_metavariable(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -22,6 +23,7 @@ class StructuralSearchProcessingTests(unittest.TestCase):
             self.assertEqual(match['start_line_1_based'], 1)
             self.assertEqual(match['captures']['ARG']['text'], 'value')
 
+    # test_repeated_metavariable_requires_same_structure は対象機能の契約と回帰条件が維持されることを確認する。
     def test_repeated_metavariable_requires_same_structure(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -30,6 +32,7 @@ class StructuralSearchProcessingTests(unittest.TestCase):
             self.assertEqual(result['match_count'], 1)
             self.assertEqual(result['matches'][0]['start_line_1_based'], 1)
 
+    # test_fallback_reports_truncation_and_parse_errors は対象機能の契約と回帰条件が維持されることを確認する。
     def test_fallback_reports_truncation_and_parse_errors(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -42,11 +45,13 @@ class StructuralSearchProcessingTests(unittest.TestCase):
             self.assertEqual(result['parse_error_count'], 1)
             self.assertEqual(result['parse_error_paths'], ['broken.py'])
 
+    # test_variadic_pattern_is_explicitly_unsupported_by_fallback は対象機能の契約と回帰条件が維持されることを確認する。
     def test_variadic_pattern_is_explicitly_unsupported_by_fallback(self):
         with tempfile.TemporaryDirectory() as raw:
             with self.assertRaises(module.PatternError):
                 module.python_ast_search(Path(raw), 'call($$$ARGS)', 40)
 
+    # test_ast_grep_normalization_converts_line_to_one_based_and_bounds_text は対象機能の契約と回帰条件が維持されることを確認する。
     def test_ast_grep_normalization_converts_line_to_one_based_and_bounds_text(self):
         rows = [{
             'file': 'src/a.js',
