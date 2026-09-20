@@ -10,6 +10,7 @@ IGNORE_DIRS = {
 }
 
 
+# _path_key はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def _path_key(path: Path) -> str:
     try:
         return str(path.resolve())
@@ -17,6 +18,7 @@ def _path_key(path: Path) -> str:
         return str(path.absolute())
 
 
+# discover_policy_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list[str], int]:
     files: list[Path] = []
     seen: set[str] = set()
@@ -24,6 +26,7 @@ def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list
     unsupported: list[str] = []
     walk_error_count = 0
 
+    # add_file はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
     def add_file(path: Path) -> None:
         if path.suffix.lower() not in DOC_EXTS:
             return
@@ -33,6 +36,7 @@ def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list
         seen.add(key)
         files.append(path)
 
+    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
     def on_walk_error(_error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1
@@ -62,6 +66,7 @@ def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list
     return files, missing, unsupported, walk_error_count
 
 
+# read_lines は必要な入力だけを読み込み、後段が扱いやすい形へ整える。
 def read_lines(path: Path) -> list[str] | None:
     try:
         return path.read_text(encoding='utf-8', errors='ignore').splitlines()
