@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 
+# compact_remote_delta はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
 def compact_remote_delta(data: dict[str, object], max_files: int) -> dict[str, object]:
     names = list(data.get('changed_files', []))
     commits = list(data.get('remote_commits', []))
