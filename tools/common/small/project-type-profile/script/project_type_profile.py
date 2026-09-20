@@ -21,6 +21,7 @@ RECOMMEND={
  'rule-heavy':['Policy Routing','Responsibility Map','targeted policy checks'],
 }
 
+# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
 def main():
  ap=argparse.ArgumentParser(); ap.add_argument('root',nargs='?',default='.'); a=ap.parse_args(); root=Path(a.root).resolve(); names=set()
  for p in root.rglob('*'):
