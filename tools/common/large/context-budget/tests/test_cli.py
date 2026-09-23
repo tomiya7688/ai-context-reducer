@@ -9,6 +9,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / 'script' / 'context_budget.py'
 
 
 class ContextBudgetCliTest(unittest.TestCase):
+    # test_missing_root_is_explicitで想定する境界条件と出力契約が回帰していないことを検証する。
     def test_missing_root_is_explicit(self):
         with tempfile.TemporaryDirectory() as raw:
             missing = Path(raw) / 'missing'
@@ -22,6 +23,7 @@ class ContextBudgetCliTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertEqual('input_missing', payload['status'])
 
+    # test_file_root_is_not_reported_as_empty_repositoryで想定する境界条件と出力契約が回帰していないことを検証する。
     def test_file_root_is_not_reported_as_empty_repository(self):
         with tempfile.TemporaryDirectory() as raw:
             path = Path(raw) / 'file.txt'
