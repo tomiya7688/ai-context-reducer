@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 
+# SCIP object/dictの差を吸収してfieldを安全に取得し、adapter外へ形式差を漏らさない。
 def _field(row: dict, camel: str, snake: str, default=None):
     return row[camel] if camel in row else row.get(snake, default)
 
 
+# SCIP rangeから必要な行範囲だけを取り出し、欠損値は無理に補完しない。
 def _range_lines(raw: object) -> tuple[int | None, int | None]:
     if not isinstance(raw, list) or len(raw) not in (3, 4):
         return None, None
@@ -16,6 +18,7 @@ def _range_lines(raw: object) -> tuple[int | None, int | None]:
     return start, end
 
 
+# SCIP role bitmaskを人が読めるbounded labelへ変換する。
 def _roles(occurrence: dict) -> int:
     raw = _field(occurrence, 'symbolRoles', 'symbol_roles', 0)
     try:
@@ -24,6 +27,7 @@ def _roles(occurrence: dict) -> int:
         return 0
 
 
+# SCIP signatureをbounded文字列へ縮め、詳細情報によるcontext肥大を防ぐ。
 def _signature(symbol: dict) -> str | None:
     payload = _field(symbol, 'signatureDocumentation', 'signature_documentation')
     if not isinstance(payload, dict) or not payload.get('text'):
@@ -31,6 +35,7 @@ def _signature(symbol: dict) -> str | None:
     return str(payload['text'])
 
 
+# SCIP print JSONを共通symbol/dependency schemaへ正規化し、backend依存を隔離する。
 def normalize_scip_print(payload: object) -> tuple[list[dict], dict, dict]:
     if not isinstance(payload, dict):
         raise ValueError('SCIP print JSON must be an object')
