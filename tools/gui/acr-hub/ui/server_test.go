@@ -79,6 +79,24 @@ func TestRunRoutesThroughBackend(t *testing.T) {
 	}
 }
 
+// TestRunReportsRequestedOutputPath は生成系actionの指定出力先をcompact resultへ残します。
+func TestRunReportsRequestedOutputPath(t *testing.T) {
+	fake := &fakeInvoker{result: backend.Result{State: backend.StateSuccess, OutputKind: backend.OutputText, ExitCode: 0, Text: "# Context Pack\n"}}
+	handler, err := (Server{Invoker: fake, SessionToken: "secret"}).Handler()
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+	body := "{\"action_id\":\"context-pack\",\"project_root\":\"/repo\",\"values\":{\"goal\":\"Fix\",\"acceptance\":\"Pass\",\"output\":\"out/CONTEXT_PACK.md\"}}"
+	request := httptest.NewRequest(http.MethodPost, "/api/run", bytes.NewBufferString(body))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-ACR-Session", "secret")
+	handler.ServeHTTP(recorder, request)
+	if recorder.Code != http.StatusOK || !strings.Contains(recorder.Body.String(), "\"requested_output\"") || !strings.Contains(recorder.Body.String(), "out/CONTEXT_PACK.md") {
+		t.Fatalf("unexpected output hint response: %s", recorder.Body.String())
+	}
+}
+
 // TestActionsEndpointReturnsPurposeCatalog はbrowserが6カテゴリとaction fieldsを取得できます。
 func TestActionsEndpointReturnsPurposeCatalog(t *testing.T) {
 	handler, err := (Server{Invoker: &fakeInvoker{}, SessionToken: "secret", InitialProject: "/repo"}).Handler()
