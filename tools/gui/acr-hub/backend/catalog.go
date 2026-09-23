@@ -16,6 +16,9 @@ var binaryNames = map[Program]string{
 
 var textToolboxCommands = map[string]bool{
     "tree":                      true,
+    "doc-index":                 true,
+    "slice":                     true,
+    "compact-log":               true,
     "compact-diff":              true,
     "remote-delta":              true,
     "context-pack-builder":      true,

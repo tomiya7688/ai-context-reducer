@@ -73,6 +73,23 @@ func TestHelperProcess(t *testing.T) {
     }
 }
 
+// TestOutputKindMatchesNativeToolboxContract はnative CLIのJSON/text境界を固定します。
+func TestOutputKindMatchesNativeToolboxContract(t *testing.T) {
+    textCommands := []string{"tree", "doc-index", "slice", "compact-log", "compact-diff", "remote-delta", "context-pack-builder", "responsibility-candidates"}
+    for _, command := range textCommands {
+        request := Request{Program: ProgramACRToolbox, Args: []string{command}}
+        if got := outputKind(request); got != OutputText {
+            t.Fatalf("%s output kind = %s, want text", command, got)
+        }
+    }
+    jsonCommands := []string{"analyze", "select", "search", "stats", "syntax-health", "context-budget", "language-large-run", "policy-check", "version"}
+    for _, command := range jsonCommands {
+        request := Request{Program: ProgramACRToolbox, Args: []string{command}}
+        if got := outputKind(request); got != OutputJSON {
+            t.Fatalf("%s output kind = %s, want json", command, got)
+        }
+    }
+}
 // TestInvokePreservesJSONContract はCLI JSONをbackendが再構築しないことを確認します。
 func TestInvokePreservesJSONContract(t *testing.T) {
     runner := NewRunner(helperResolver{mode: "ok"})
