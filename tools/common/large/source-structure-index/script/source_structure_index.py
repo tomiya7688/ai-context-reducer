@@ -17,10 +17,12 @@ TOOL = 'source-structure-index'
 FORMAT = 'acr-source-structure-index-v1'
 
 
+# command結果を単一JSON契約で返し、textとJSONの二重表現を避ける。
 def emit(payload: dict) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# 保存済みindexを検証して読み込み、壊れた入力を空indexとして扱わない。
 def load_index(path: str) -> dict:
     payload = load_json(path)
     if not isinstance(payload, dict) or payload.get('format') != FORMAT:
@@ -28,6 +30,7 @@ def load_index(path: str) -> dict:
     return payload
 
 
+# SCIP入力を共通build sourceへ追加し、backend由来warningも保持する。
 def _append_scip_input(symbol_payloads, graph_payloads, metadata_rows, source: str, mode: str, payload: object) -> None:
     symbols, graph, metadata = normalize_scip_print(payload)
     symbol_payloads.append((f'{source}#scip-symbols', symbols))
@@ -43,6 +46,7 @@ def _append_scip_input(symbol_payloads, graph_payloads, metadata_rows, source: s
     })
 
 
+# ctags入力を共通build sourceへ追加し、backend失敗を完全なsymbol情報と誤認しない。
 def _append_ctags_input(symbol_payloads, metadata_rows, source: str, mode: str, payload: object) -> None:
     symbols, metadata = normalize_ctags_rows(payload)
     symbol_payloads.append((f'{source}#ctags-symbols', symbols))
@@ -56,6 +60,7 @@ def _append_ctags_input(symbol_payloads, metadata_rows, source: str, mode: str, 
     })
 
 
+# 複数symbol/dependency sourceを統合し、bounded indexと完全性signalを生成する。
 def build_command(args: argparse.Namespace) -> int:
     if not args.symbols and not args.graph and not args.scip and not args.scip_json and not args.ctags_source and not args.ctags_json:
         emit({
@@ -149,6 +154,7 @@ def build_command(args: argparse.Namespace) -> int:
     return 0
 
 
+# symbol queryをbounded候補へ変換し、対象探索の初期working setを狭める。
 def query_command(args: argparse.Namespace) -> int:
     try:
         index = load_index(args.index)
@@ -169,6 +175,7 @@ def query_command(args: argparse.Namespace) -> int:
     return 0
 
 
+# 選択nodeの近傍だけを展開し、fan-out/cycleを含む必要最小限の構造を返す。
 def expand_command(args: argparse.Namespace) -> int:
     try:
         index = load_index(args.index)
@@ -201,6 +208,7 @@ def expand_command(args: argparse.Namespace) -> int:
     return 0
 
 
+# 変更fileから影響候補を辿り、不完全情報では安全側のbroader scopeを示す。
 def affected_command(args: argparse.Namespace) -> int:
     try:
         index = load_index(args.index)
@@ -219,6 +227,7 @@ def affected_command(args: argparse.Namespace) -> int:
     return 0
 
 
+# subcommandごとの入力境界を定義し、CLI contractを一箇所へ集約する。
 def parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         description='Build and query a reusable source-structure index without dumping the full index into agent context.'
@@ -259,6 +268,7 @@ def parser() -> argparse.ArgumentParser:
     return ap
 
 
+# CLIを各routing処理へ接続し、失敗も含めて機械可読な結果として返す。
 def main() -> int:
     args = parser().parse_args()
     args.depth = max(0, getattr(args, 'depth', 0))
