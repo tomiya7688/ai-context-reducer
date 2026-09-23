@@ -6,6 +6,7 @@ from pathlib import Path
 NODE_METADATA_LIMIT = 200
 
 
+# repo基準の安定したrelative pathへ寄せ、machine固有absolute pathをindexへ持ち込まない。
 def _relpath(raw: str, root: Path | None) -> str:
     path = Path(raw)
     if root is not None and path.is_absolute():
@@ -16,6 +17,7 @@ def _relpath(raw: str, root: Path | None) -> str:
     return path.as_posix()
 
 
+# Python file pathからmodule名を導出し、fileとmodule dependencyを橋渡しする。
 def _python_module(path: str) -> str | None:
     if not path.endswith('.py'):
         return None
@@ -25,6 +27,7 @@ def _python_module(path: str) -> str | None:
     return '.'.join(parts) if parts else None
 
 
+# Go file pathからpackage nodeを導出し、package graphとfile nodeを接続する。
 def _go_package(module: str, path: str) -> str | None:
     if not module or not path.endswith('.go'):
         return None
@@ -34,6 +37,7 @@ def _go_package(module: str, path: str) -> str | None:
     return module.rstrip('/') + '/' + parent
 
 
+# backend metadataをboundedに保ち、補助情報が主indexを肥大化させない。
 def _bounded_metadata(value: object) -> str | None:
     if value is None:
         return None
@@ -41,6 +45,7 @@ def _bounded_metadata(value: object) -> str | None:
     return text if len(text) <= NODE_METADATA_LIMIT else text[:NODE_METADATA_LIMIT]
 
 
+# 同一nodeを統合しながら必要metadataだけを保持し、indexの重複を抑える。
 def _add_node(nodes: dict[str, dict], node: dict) -> None:
     node_id = node['id']
     current = nodes.get(node_id)
@@ -52,10 +57,12 @@ def _add_node(nodes: dict[str, dict], node: dict) -> None:
             current[key] = value
 
 
+# dependency edgeの安定keyを作り、重複edgeを除去できるようにする。
 def _edge_key(edge: dict) -> tuple[str, str, str]:
     return edge['from'], edge['to'], edge['kind']
 
 
+# 複数backendのsymbol/dependency情報を共通graphへ統合し、完全性signalも保持する。
 def build_index(symbol_payloads: list[dict], graph_payloads: list[dict], root: Path | None = None) -> dict:
     nodes: dict[str, dict] = {}
     edges: dict[tuple[str, str, str], dict] = {}
@@ -190,6 +197,7 @@ def build_index(symbol_payloads: list[dict], graph_payloads: list[dict], root: P
     }
 
 
+# exact matchを優先しつつ候補数をboundedにして、最初のworking setを狭める。
 def query_nodes(index: dict, pattern: str, max_results: int) -> tuple[list[dict], bool]:
     needle = pattern.casefold()
     ranked: list[tuple[int, str, dict]] = []
@@ -214,6 +222,7 @@ def query_nodes(index: dict, pattern: str, max_results: int) -> tuple[list[dict]
     return rows, False
 
 
+# path/name/idの入力を既存nodeへ解決し、曖昧なら無理に単一nodeへ決め打ちしない。
 def resolve_target(index: dict, target: str) -> tuple[str, list[dict]]:
     matches, _ = query_nodes(index, target, 0)
     exact = []
@@ -238,6 +247,7 @@ def resolve_target(index: dict, target: str) -> tuple[str, list[dict]]:
     return 'target_not_found', []
 
 
+# 依存graphの循環群を抽出し、expand結果で注意すべきcouplingを明示する。
 def _cycle_groups(node_ids: set[str], edges: list[dict]) -> list[list[str]]:
     graph: dict[str, list[str]] = defaultdict(list)
     for edge in edges:
@@ -251,6 +261,7 @@ def _cycle_groups(node_ids: set[str], edges: list[dict]) -> list[list[str]]:
     lowlinks: dict[str, int] = {}
     groups: list[list[str]] = []
 
+    # Tarjan法の1探索stepを担当し、強連結成分を重複なく確定する。
     def strongconnect(node: str) -> None:
         nonlocal index
         indices[node] = index
@@ -283,6 +294,7 @@ def _cycle_groups(node_ids: set[str], edges: list[dict]) -> list[list[str]]:
     return sorted(groups)
 
 
+# 起点周辺の依存・被依存をboundedに展開し、fan-outとcycleを同時に示す。
 def expand(index: dict, start_id: str, depth: int, max_nodes: int, direction: str) -> dict:
     nodes_by_id = {node['id']: node for node in index.get('nodes', []) if node.get('id')}
     outgoing: dict[str, list[dict]] = defaultdict(list)
