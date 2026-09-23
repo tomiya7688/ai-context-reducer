@@ -9,10 +9,12 @@ IGNORE_DIRS = {
 }
 
 
+# Source of Truthを複製せずpointer候補だけを集めるため、対象fileを決定論的に列挙する。
 def collect_files(root: Path) -> tuple[list[dict[str, object]], dict[str, int]]:
     rows: list[dict[str, object]] = []
     stats = {'stat_error_count': 0, 'walk_error_count': 0}
 
+    # 探索失敗をwarningとして残し、不完全なmanifestを完全な一覧と誤認させない。
     def on_walk_error(_error: OSError) -> None:
         stats['walk_error_count'] += 1
 
