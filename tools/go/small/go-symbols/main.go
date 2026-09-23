@@ -44,6 +44,7 @@ type symbolsResult struct {
     UnsupportedInputs     []unsupportedInput `json:"unsupported_inputs"`
 }
 
+// 1つのGo sourceをparseし、symbol一覧とread/parse失敗を別signalとして返す。
 func scan(path string) fileSymbols {
     normalized := filepath.ToSlash(path)
     fset := token.NewFileSet()
@@ -70,6 +71,7 @@ func scan(path string) fileSymbols {
     return fileSymbols{File: normalized, Status: "ok", Symbols: rows}
 }
 
+// file/directoriesを解析対象へ展開し、missingやunsupported inputを別signalとして保持する。
 func collect(paths []string) ([]fileSymbols, []unsupportedInput, error) {
     files := []string{}
     unsupported := []unsupportedInput{}
@@ -125,6 +127,7 @@ func collect(paths []string) ([]fileSymbols, []unsupportedInput, error) {
     return rows, unsupported, nil
 }
 
+// symbol解析結果とwarningを集約し、不完全なscanをclean扱いしない結果を作る。
 func buildResult(paths []string) (symbolsResult, error) {
     rows, unsupported, err := collect(paths)
     if err != nil {
@@ -149,6 +152,7 @@ func buildResult(paths []string) (symbolsResult, error) {
     return result, nil
 }
 
+// CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
 func main() {
     flag.Parse()
     if flag.NArg() == 0 {
