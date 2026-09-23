@@ -15,6 +15,7 @@ PATTERNS = [
 ]
 
 
+# 1ファイルのsymbolだけを解析し、read/parse失敗を空symbol一覧と区別して返す。
 def scan(path: Path):
     try:
         lines = path.read_text(encoding='utf-8', errors='ignore').splitlines()
@@ -30,6 +31,7 @@ def scan(path: Path):
     return {'file': str(path), 'status': 'ok', 'symbols': symbols}
 
 
+# symbol解析結果とwarningを集約し、不完全なscanをclean扱いしない結果を作る。
 def build_result(paths):
     files, unsupported = [], []
     for raw in paths:
@@ -58,6 +60,7 @@ def build_result(paths):
     }
 
 
+# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('paths', nargs='+')
