@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestBuildPackageGraphReportsParseFailureでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestBuildPackageGraphReportsParseFailure(t *testing.T) {
     dir := t.TempDir()
     if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module example.com/demo\n"), 0o644); err != nil {
@@ -29,6 +30,7 @@ func TestBuildPackageGraphReportsParseFailure(t *testing.T) {
     }
 }
 
+// TestBuildPackageGraphTruncationIsRealでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestBuildPackageGraphTruncationIsReal(t *testing.T) {
     dir := t.TempDir()
     if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module example.com/demo\n"), 0o644); err != nil {
