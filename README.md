@@ -146,27 +146,17 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 
 導入時に全部読む必要はありません。
 
+- **手法一覧**: [`docs/手法一覧.md`](docs/手法一覧.md) — 各手法を一言で確認し、必要な詳細文書へ移動する目次
 - 基本原則: [`docs/context-reduction-basics.md`](docs/context-reduction-basics.md)
 - 導入判断: [`docs/adoption-priority.md`](docs/adoption-priority.md)
 - 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
 - 基本方針: [`docs/guide.md`](docs/guide.md)
-- Context Pack: [`docs/context-pack.md`](docs/context-pack.md)
-- Task Routing: [`docs/task-routing.md`](docs/task-routing.md)
-- Exploration Control: [`docs/exploration-control.md`](docs/exploration-control.md)
-- Evidence Budget: [`docs/evidence-budget.md`](docs/evidence-budget.md)
-- Change Routing Map: [`docs/change-routing-map.md`](docs/change-routing-map.md)
-- Hierarchical Context: [`docs/hierarchical-context.md`](docs/hierarchical-context.md)
-- Validation Routing: [`docs/validation-routing.md`](docs/validation-routing.md)
-- Change / Test Impact Routing: [`docs/change-impact-routing.md`](docs/change-impact-routing.md)
-- Responsibility Map: [`docs/responsibility-map.md`](docs/responsibility-map.md)
-- Policy Routing: [`docs/policy-routing.md`](docs/policy-routing.md)
-- Remote Delta First: [`docs/remote-context.md`](docs/remote-context.md)
-- Source Structure Index: [`docs/source-structure-index.md`](docs/source-structure-index.md)
-- Boilerplate Generation: [`docs/boilerplate-generation.md`](docs/boilerplate-generation.md)
 - 外部ツール掲載基準: [`docs/external-tool-reference-policy.md`](docs/external-tool-reference-policy.md)
 - Release / completion gate: [`docs/releasing.md`](docs/releasing.md)
 - AI入口テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Task用テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
+
+個別手法の詳細リンクはREADMEへ列挙せず、[`docs/手法一覧.md`](docs/手法一覧.md) にまとめます。
 
 ## 外部プロジェクトとの関係
 
