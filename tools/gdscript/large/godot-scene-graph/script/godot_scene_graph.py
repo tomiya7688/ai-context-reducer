@@ -11,6 +11,7 @@ NODE = re.compile(r'^\[node\s+name="([^"]+)"(?:\s+type="([^"]+)")?', re.M)
 IGNORE_DIRS = {'.git', '.godot', 'build', 'dist', '.idea', '.vs'}
 
 
+# Godotのscene sourceだけを決定論的に列挙し、生成物や無関係fileをworking setへ入れない。
 def scene_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -23,6 +24,7 @@ def scene_files(root: Path):
     return found
 
 
+# scene間参照をbounded graphへ集約し、探索上限とwarningを明示する。
 def build_result(root: Path, limit: int, max_nodes_per_scene: int):
     all_scenes = scene_files(root)
     limit = max(0, limit)
@@ -70,6 +72,7 @@ def build_result(root: Path, limit: int, max_nodes_per_scene: int):
     }
 
 
+# CLI入力を検証し、通常結果と失敗状態を同じ機械可読JSON契約で返す。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')
