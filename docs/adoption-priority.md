@@ -39,6 +39,7 @@ Aだけで十分な小規模プロジェクトもあります。
 | Current State summary | 実装済み機能・制約・未実装が増え、READMEだけでは現状を把握しにくい |
 | Task Routing | Issue / docs / subsystem が多く、タスクごとに読む資料が変わる |
 | Change Routing Map | 変更カテゴリから source / tests / docs を対応付けられる |
+| [Architecture Boundary Routing](architecture-boundary-routing.md) | project内に信頼できる責務境界・層・component・正式な通信経路がすでにあり、それを使えば最初のworking setを狭められる |
 | Responsibility Map | file / module が増え、名前だけでは責務を判断しづらい |
 | Hierarchical Context | monorepo / multi-appでsubsystem固有ルールがあり、root AI guideが肥大化している |
 | Evidence Budget | Required evidenceが揃っても検索が続く、history / broad docsへ「念のため」で横展開しやすい |
@@ -252,6 +253,7 @@ size: small / medium / large
 concurrent remote edits: yes / no
 many docs or issues: yes / no
 routing ambiguity: low / high
+explicit architecture boundary available: yes / no
 exploration drift risk: low / high
 multiple apps/packages: yes / no
 subsystem-specific instructions: yes / no
@@ -272,6 +274,8 @@ rule-heavy: yes / no
 「将来便利そう」という理由だけで追加しません。
 
 Hierarchical Contextは、複数scopeへ異なる指示を置く明確な理由がある場合だけ選択します。directory数が多いだけでは導入理由にしません。
+
+Architecture Boundary Routingは、対象projectがすでに持つ信頼できる責務・境界情報を再利用できる場合だけ選択します。profileを作るためにarchitectureを推測したり、特定architectureへの適合checkerとして導入したりしません。Small repoやResponsibility Map / Change Routing Mapだけで十分な場合は追加しません。
 
 Evidence Budgetは、通常のGoal / Required / Acceptance停止条件だけで十分なら導入しません。使う場合もtoken hard capではなくRequired / Optional evidenceの不足管理に限定します。
 
