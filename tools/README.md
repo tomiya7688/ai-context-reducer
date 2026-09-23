@@ -152,7 +152,7 @@ Exploration stop          -> acceptance-extractor / exploration-stop-check
 Remote delta              -> remote-delta / compact-diff
 Responsibility            -> responsibility-candidates
 Change routing            -> change-router
-Architecture hints        -> architecture-boundary-router + project-provided profile
+Architecture boundaries   -> Architecture Boundary Routing -> architecture-boundary-router (optional)
 Affected tests            -> affected-tests
 Policy routing            -> policy-index / policy-check / acr-toolbox policy-check
 Canonical templates       -> template / acr-toolbox template
@@ -169,7 +169,7 @@ Git history health        -> git-history-health
 
 `source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
 
-`architecture-boundary-router` は特定architectureへの適合checkerではありません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使います。
+`architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/architecture-boundary-routing.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
 
 UPD Commanderを含む外部設計手法は、tools内部の責務分離や実装構造の参考にできますが、ai-context-reducerの機能要件・適合条件・標準architectureにはしません。
 
