@@ -5,6 +5,7 @@ from collections import defaultdict
 SIGNATURE_LIMIT = 200
 
 
+# 外部tool由来の値をboundedに保ち、index metadataがcontextを占有しないようにする。
 def _bounded(value: object, limit: int = SIGNATURE_LIMIT) -> str | None:
     if value is None:
         return None
@@ -12,12 +13,14 @@ def _bounded(value: object, limit: int = SIGNATURE_LIMIT) -> str | None:
     return text if len(text) <= limit else text[:limit]
 
 
+# scopeとsymbol名を安定したqualified nameへ統合し、ownership routingに使える形にする。
 def _qualified(path: str, scope: str | None, name: str) -> str:
     if scope:
         return f'{path}::{scope}::{name}'
     return f'{path}::{name}'
 
 
+# ctags固有JSONを共通symbol schemaへ正規化し、後段をbackend非依存にする。
 def normalize_ctags_rows(rows: object) -> tuple[dict[str, object], dict[str, object]]:
     if not isinstance(rows, list):
         raise ValueError('ctags JSON input must be a list of JSON tag rows')
