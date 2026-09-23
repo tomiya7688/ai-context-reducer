@@ -70,7 +70,7 @@
 
 # Optional Routing
 
-以下は効果がある場合だけ残す。導入判断は `docs/adoption-priority.md` を参照する。
+以下は効果がある場合だけ残す。導入判断は `docs/jp/導入優先度.md` を参照する。
 
 ## Local Instructions
 monorepo / multi-app等でsubsystem固有ルールがある場合。
@@ -80,7 +80,7 @@ monorepo / multi-app等でsubsystem固有ルールがある場合。
 - local guideにはそのscope固有のbuild / test / architecture / ownership等の差分だけを書く。
 - 特定の `AGENTS.md` / `CLAUDE.md` 等のファイル名へ依存しない。
 
-詳細: `docs/hierarchical-context.md`
+詳細: `docs/jp/場所ごとの指示.md`
 
 ## Current State
 READMEだけでは現在の能力・制約・未実装を把握しにくい場合。

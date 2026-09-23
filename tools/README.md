@@ -172,17 +172,17 @@ Git history health        -> git-history-health
 
 `source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
 
-`context-manifest` は [`Context Manifest`](../docs/context-manifest.md) の補助実装です。手法のSource of Truthはdocs側にあり、repository-wide file listやtool固有priorityを手法そのものにはしません。agentへ渡すmanifestはpointer中心かつboundedにし、現在taskとの関連でworking setを選びます。
+`context-manifest` は [`Context Manifest`](../docs/jp/参照先の目録.md) の補助実装です。手法のSource of Truthはdocs側にあり、repository-wide file listやtool固有priorityを手法そのものにはしません。agentへ渡すmanifestはpointer中心かつboundedにし、現在taskとの関連でworking setを選びます。
 
-`context-budget` / `hotspot-report` は [`Context Priority / Hotspot`](../docs/context-priority.md) の補助signalです。size / cost / depth等はtask relevanceの代わりではなく、高精度routingやsliceが必要な場所を判断する材料として使います。hotspot上位を自動的に読む対象にはしません。
+`context-budget` / `hotspot-report` は [`Context Priority / Hotspot`](../docs/jp/読む候補の優先度を付ける.md) の補助signalです。size / cost / depth等はtask relevanceの代わりではなく、高精度routingやsliceが必要な場所を判断する材料として使います。hotspot上位を自動的に読む対象にはしません。
 
-`doc-duplicate-hints` は [`Documentation Duplication Control`](../docs/documentation-duplication-control.md) のhint実装です。重複候補を絞るだけで、どちらがSource of Truthか、intentional duplicationか、削除可能かは決定しません。自動削除・自動統合には使いません。
+`doc-duplicate-hints` は [`Documentation Duplication Control`](../docs/jp/文書の重複を管理する.md) のhint実装です。重複候補を絞るだけで、どちらがSource of Truthか、intentional duplicationか、削除可能かは決定しません。自動削除・自動統合には使いません。
 
-`ignore-candidates` は [`Context Exclusion`](../docs/context-exclusion.md) の候補提示実装です。generated / logs / vendor / caches等を通常contextから外す候補を示すだけで、Source of Truth判定や `.gitignore` 等への適用は行いません。validationで必要なartifactはtask-specific evidenceとして別扱いします。
+`ignore-candidates` は [`Context Exclusion`](../docs/jp/通常は読まないものを決める.md) の候補提示実装です。generated / logs / vendor / caches等を通常contextから外す候補を示すだけで、Source of Truth判定や `.gitignore` 等への適用は行いません。validationで必要なartifactはtask-specific evidenceとして別扱いします。
 
-`syntax-health` は [`Syntax Health Validation`](../docs/syntax-health-validation.md) の補助実装です。利用可能なparserの結果をcheap evidenceへ圧縮するだけで、syntax successをsemantic correctnessやtask completionとはみなしません。parser / grammarを自動installせず、必要なtargeted tests / compiler / runtime validationへroutingします。
+`syntax-health` は [`Syntax Health Validation`](../docs/jp/構文チェックを軽い検証に使う.md) の補助実装です。利用可能なparserの結果をcheap evidenceへ圧縮するだけで、syntax successをsemantic correctnessやtask completionとはみなしません。parser / grammarを自動installせず、必要なtargeted tests / compiler / runtime validationへroutingします。
 
-`architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/architecture-boundary-routing.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
+`architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/jp/既存の設計境界で読む範囲を絞る.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
 
 UPD Commanderを含む外部設計手法は、tools内部の責務分離や実装構造の参考にできますが、ai-context-reducerの機能要件・適合条件・標準architectureにはしません。
 
@@ -195,7 +195,7 @@ UPD Commanderを含む外部設計手法は、tools内部の責務分離や実�
 - external toolが既にある場合は高品質backendとして使ってよい
 - toolの維持コストがagent-context削減効果を上回るなら追加しない
 
-詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/portable-tools.md` を参照してください。
+詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/jp/追加インストールを減らすツール運用.md` を参照してください。
 
 
 ## Language portability

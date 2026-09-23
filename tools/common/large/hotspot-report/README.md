@@ -1,6 +1,6 @@
 # hotspot-report
 
-Repository内部で大きい / 深いfileを探索し、高精度routingやsliceを検討するためのhotspot候補をbounded JSONへ圧縮します。出力上位をagentが読むべき対象とみなさず、現在taskとの関連を最優先します。手法は [`Context Priority / Hotspot`](../../../../docs/context-priority.md) を参照してください。
+Repository内部で大きい / 深いfileを探索し、高精度routingやsliceを検討するためのhotspot候補をbounded JSONへ圧縮します。出力上位をagentが読むべき対象とみなさず、現在taskとの関連を最優先します。手法は [`Context Priority / Hotspot`](../../../../docs/jp/読む候補の優先度を付ける.md) を参照してください。
 
 ## Usage
 

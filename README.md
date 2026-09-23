@@ -12,7 +12,7 @@ AI / Codex / Claude Code を使った開発で、AIに必要以上の情報を�
 2. よく使う操作をまとめる
 3. 一部だけ読ませる
 
-個別の手法やtoolは、ほとんどがこの3つのどれか、または組み合わせです。詳細は [`docs/context-reduction-basics.md`](docs/context-reduction-basics.md) を参照してください。
+個別の手法やtoolは、ほとんどがこの3つのどれか、または組み合わせです。詳細は [`docs/jp/コンテキスト削減の基本.md`](docs/jp/コンテキスト削減の基本.md) を参照してください。
 
 ## 目標
 
@@ -70,13 +70,13 @@ acr-toolbox select <project-root>
 最初に読ませるのは基本的に次の3つだけです。
 
 1. この `README.md`
-2. [`docs/context-reduction-basics.md`](docs/context-reduction-basics.md)
-3. [`docs/adoption-priority.md`](docs/adoption-priority.md)
+2. [`docs/jp/コンテキスト削減の基本.md`](docs/jp/コンテキスト削減の基本.md)
+3. [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md)
 4. [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 
 その上で対象repoを shallow inspection し、**全部ではなく効果が高い手法だけ**導入させます。
 
-そのまま使える依頼文は [`docs/adoption-prompt.md`](docs/adoption-prompt.md) にあります。
+そのまま使える依頼文は [`docs/jp/導入依頼文.md`](docs/jp/導入依頼文.md) にあります。
 
 ## 最小コア
 
@@ -115,7 +115,7 @@ acr-toolbox select <project-root>
 | coding rules が多い | Policy Routing + compact policy checks |
 | license / NOTICE / header 等が反復する | Boilerplate Generation |
 
-詳細な優先度と「こういうプロジェクト向き」は [`docs/adoption-priority.md`](docs/adoption-priority.md) を参照してください。
+詳細な優先度と「こういうプロジェクト向き」は [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md) を参照してください。
 
 ## 標準フロー
 
@@ -145,19 +145,21 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 
 ## 文書
 
+日本語文書は `docs/jp/` をSource of Truthとします。英語版は `docs/en/` に翻訳として配置し、日英対応は `docs/DOCUMENT_MAP.json` で管理します。英語文書の作成は #29 で進めます。
+
 導入時に全部読む必要はありません。
 
-- **手法一覧**: [`docs/手法一覧.md`](docs/手法一覧.md) — 各手法を一言で確認し、必要な詳細文書へ移動する目次
-- 基本原則: [`docs/context-reduction-basics.md`](docs/context-reduction-basics.md)
-- 導入判断: [`docs/adoption-priority.md`](docs/adoption-priority.md)
-- 導入プロンプト: [`docs/adoption-prompt.md`](docs/adoption-prompt.md)
-- 基本方針: [`docs/guide.md`](docs/guide.md)
-- 外部ツール掲載基準: [`docs/external-tool-reference-policy.md`](docs/external-tool-reference-policy.md)
-- Release / completion gate: [`docs/releasing.md`](docs/releasing.md)
+- **手法一覧**: [`docs/jp/手法一覧.md`](docs/jp/手法一覧.md) — 各手法を一言で確認し、必要な詳細文書へ移動する目次
+- 基本原則: [`docs/jp/コンテキスト削減の基本.md`](docs/jp/コンテキスト削減の基本.md)
+- 導入判断: [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md)
+- 導入プロンプト: [`docs/jp/導入依頼文.md`](docs/jp/導入依頼文.md)
+- 基本方針: [`docs/jp/基本方針.md`](docs/jp/基本方針.md)
+- 外部ツール掲載基準: [`docs/jp/外部ツール掲載基準.md`](docs/jp/外部ツール掲載基準.md)
+- Release / completion gate: [`docs/jp/リリース手順.md`](docs/jp/リリース手順.md)
 - AI入口テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 - Task用テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
-個別手法の詳細リンクはREADMEへ列挙せず、[`docs/手法一覧.md`](docs/手法一覧.md) にまとめます。
+個別手法の詳細リンクはREADMEへ列挙せず、[`docs/jp/手法一覧.md`](docs/jp/手法一覧.md) にまとめます。
 
 ## 外部プロジェクトとの関係
 
@@ -168,7 +170,7 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 - 特定CLI・ファイル形式・ディレクトリ構成を標準化しない
 - 同じ原則を別実装でも満たせるようにする
 
-外部ツールへ具体的にリンクする場合は、原則として **無料 / 商用利用可能 / 通常利用時のクレジット明示不要 / ポータブルまたは導入容易** の4条件をすべて満たすものだけに限定します。詳細は [`docs/external-tool-reference-policy.md`](docs/external-tool-reference-policy.md) を参照してください。
+外部ツールへ具体的にリンクする場合は、原則として **無料 / 商用利用可能 / 通常利用時のクレジット明示不要 / ポータブルまたは導入容易** の4条件をすべて満たすものだけに限定します。詳細は [`docs/jp/外部ツール掲載基準.md`](docs/jp/外部ツール掲載基準.md) を参照してください。
 
 ## 導入しすぎない
 

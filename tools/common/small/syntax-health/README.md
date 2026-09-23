@@ -1,6 +1,6 @@
 # syntax-health
 
-既存 Tree-sitter parser / grammar が利用できる環境で、parse tree全文ではなく syntax health だけを自己説明的JSONへ圧縮します。これは [`Syntax Health Validation`](../../../../docs/syntax-health-validation.md) の補助実装であり、syntax successだけでsemantic correctnessやtask completionを判定しません。
+既存 Tree-sitter parser / grammar が利用できる環境で、parse tree全文ではなく syntax health だけを自己説明的JSONへ圧縮します。これは [`Syntax Health Validation`](../../../../docs/jp/構文チェックを軽い検証に使う.md) の補助実装であり、syntax successだけでsemantic correctnessやtask completionを判定しません。
 
 ```text
 python script/syntax_health.py src/app.py src/lib.py
