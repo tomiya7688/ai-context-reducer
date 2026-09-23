@@ -159,7 +159,8 @@ Canonical templates       -> template / acr-toolbox template
 Validation                -> validation-plan / syntax-health / compact-log
 Context pack              -> context-pack-builder
 Source structure          -> language-specific symbols / dependency / graph tools -> source-structure-index
-Context priority          -> context-manifest / context-budget / hotspot-report
+Context manifest          -> Context Manifest -> context-manifest (optional)
+Context priority          -> context-budget / hotspot-report
 Git history health        -> git-history-health
 ```
 
@@ -168,6 +169,8 @@ Git history health        -> git-history-health
 `structural-search` はplain text searchでは候補が広すぎる場合に構文形状で絞ります。既に `ast-grep` があればbackendとして再利用し、無ければPython sourceだけstdlib AST fallbackを使います。外部toolは自動installしません。
 
 `source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
+
+`context-manifest` は [`Context Manifest`](../docs/context-manifest.md) の補助実装です。手法のSource of Truthはdocs側にあり、repository-wide file listやtool固有priorityを手法そのものにはしません。agentへ渡すmanifestはpointer中心かつboundedにし、現在taskとの関連でworking setを選びます。
 
 `architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/architecture-boundary-routing.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
 
