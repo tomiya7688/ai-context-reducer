@@ -9,6 +9,7 @@ spec.loader.exec_module(module)
 
 
 class OutlineAdapterTests(unittest.TestCase):
+    # test_detects_and_flattens_nested_outlineでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_detects_and_flattens_nested_outline(self):
         payload = [{
             'path': 'src/service.py',
@@ -45,11 +46,13 @@ class OutlineAdapterTests(unittest.TestCase):
         self.assertEqual(symbols[1]['owner_qualified_name'], 'src/service.py::Service')
         self.assertEqual(symbols[1]['line'], 7)
 
+    # test_existing_symbol_payload_is_unchangedでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_existing_symbol_payload_is_unchanged(self):
         payload = [{'file': 'a.py', 'symbols': [{'name': 'A', 'kind': 'ClassDef', 'line': 1}]}]
         self.assertFalse(module.is_ast_grep_outline(payload))
         self.assertIs(module.normalize_symbol_payload(payload), payload)
 
+    # test_signature_is_boundedでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_signature_is_bounded(self):
         payload = [{
             'path': 'src/a.py',
