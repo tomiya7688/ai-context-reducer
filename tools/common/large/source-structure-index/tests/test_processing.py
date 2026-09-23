@@ -9,6 +9,7 @@ spec.loader.exec_module(module)
 
 
 class SourceStructureProcessingTests(unittest.TestCase):
+    # test_build_normalizes_symbols_and_dependency_graphでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_build_normalizes_symbols_and_dependency_graph(self):
         symbols = [
             ('symbols.json', [
@@ -41,6 +42,7 @@ class SourceStructureProcessingTests(unittest.TestCase):
         self.assertIn(('module:pkg.a', 'module:pkg.b', 'depends_on'), edge_keys)
         self.assertFalse(index['input_truncated'])
 
+    # test_build_preserves_nested_symbol_ownership_and_metadataでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_build_preserves_nested_symbol_ownership_and_metadata(self):
         symbols = [
             ('outline.json', {
@@ -84,6 +86,7 @@ class SourceStructureProcessingTests(unittest.TestCase):
         self.assertEqual(method['signature'], 'def run(self):')
         self.assertEqual(method['owner_qualified_name'], 'src/service.py::Service')
 
+    # test_build_bridges_go_package_to_fileでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_build_bridges_go_package_to_file(self):
         symbols = [
             ('go-symbols.json', [
@@ -111,6 +114,7 @@ class SourceStructureProcessingTests(unittest.TestCase):
         )
 
 
+    # test_build_propagates_symbol_analyzer_warning_countsでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_build_propagates_symbol_analyzer_warning_counts(self):
         symbols = [
             ('symbols.json', {
@@ -132,6 +136,7 @@ class SourceStructureProcessingTests(unittest.TestCase):
 
 
 
+    # test_build_propagates_graph_analyzer_warning_countsでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_build_propagates_graph_analyzer_warning_counts(self):
         graphs = [
             ('graph.json', {
@@ -150,6 +155,7 @@ class SourceStructureProcessingTests(unittest.TestCase):
         )
 
 
+    # test_query_prefers_exact_nameでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_query_prefers_exact_name(self):
         index = {
             'nodes': [
@@ -161,6 +167,7 @@ class SourceStructureProcessingTests(unittest.TestCase):
         self.assertEqual('symbol:a::Thing', matches[0]['id'])
         self.assertFalse(truncated)
 
+    # test_expand_is_bounded_and_reports_fan_and_cyclesでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_expand_is_bounded_and_reports_fan_and_cycles(self):
         index = {
             'nodes': [
