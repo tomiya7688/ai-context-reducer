@@ -1,6 +1,6 @@
-# Releasing v1.0.0
+# Releasing v1.x
 
-v1.0.0は、機能追加が一段落し、残作業が主に新言語・追加backend・精度改善になった時点の最初のユーザー配布版です。
+v1.0.0は最初のユーザー配布版です。v1.0.xのパッチ版は、公開CLI / JSON contract / bundle contentsを維持した保守変更として同じcompletion gateで検証します。
 
 ## Release gate
 
@@ -27,7 +27,7 @@ Release作成前に `.github/workflows/release.yml` の全jobがgreenである�
 
 ## User distribution
 
-`release/RELEASE_MANIFEST.json` をv1.0.0配布内容のSource of Truthとします。
+`release/RELEASE_MANIFEST.json` を現在のv1.0.x配布内容のSource of Truthとします。
 
 必須内容:
 
@@ -46,14 +46,16 @@ Windows executableには `.exe` suffixを付けます。
 ## Platforms
 
 ```text
-ai-context-reducer-v1.0.0-windows-x64.zip
-ai-context-reducer-v1.0.0-windows-arm64.zip
-ai-context-reducer-v1.0.0-linux-x64.tar.gz
-ai-context-reducer-v1.0.0-linux-arm64.tar.gz
-ai-context-reducer-v1.0.0-macos-x64.tar.gz
-ai-context-reducer-v1.0.0-macos-arm64.tar.gz
+ai-context-reducer-v<version>-windows-x64.zip
+ai-context-reducer-v<version>-windows-arm64.zip
+ai-context-reducer-v<version>-linux-x64.tar.gz
+ai-context-reducer-v<version>-linux-arm64.tar.gz
+ai-context-reducer-v<version>-macos-x64.tar.gz
+ai-context-reducer-v<version>-macos-arm64.tar.gz
 SHA256SUMS
 ```
+
+現在のcandidate versionは `release/RELEASE_MANIFEST.json` の `release_version` と一致させます。
 
 ## Candidate validation
 
@@ -80,7 +82,7 @@ workflow_dispatchからpublishする場合も、matching tagがrepositoryに存�
 
 ## Post-release
 
-v1.0.0後の新言語対応、外部backend追加、heuristic改善は新しいIssueとして管理します。v1.0.0の完了条件へ後付けしません。
+v1.0.0後の新言語対応、外部backend追加、heuristic改善は新しいIssueとして管理します。patch releaseの完了条件へ新機能を後付けしません。
 
 
 ## v1.0.0 validation record

@@ -33,9 +33,9 @@ AI / Codex / Claude Code を使った開発で、AIに必要以上の情報を�
 
 要約は原典の代替ではなく索引として扱い、必要なら source / tests / docs / diff へ戻れる状態を維持します。
 
-## v1.0.0 Portable Distribution
+## v1.0.x Portable Distribution
 
-v1.0.0では次の6環境向けarchiveを配布します。
+v1.0.0以降のv1.0.xでは次の6環境向けarchiveを配布します。v1.0.1はv1.0.0と同じbundle構成・CLI / JSON contractを維持するパッチ版です。
 
 - Windows x64 / arm64
 - Linux x64 / arm64

@@ -17,7 +17,7 @@ on:
       version:
         description: 'Candidate version without v prefix'
         required: true
-        default: '1.0.0'
+        default: '1.0.1'
         type: string
       publish:
         description: 'Publish GitHub Release after every gate passes (requires matching existing tag)'
@@ -49,7 +49,7 @@ jobs:
           elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
             version="${GITHUB_REF_NAME#v}"
           else
-            version="1.0.0"
+            version="1.0.1"
           fi
           [ -n "$version" ]
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -133,7 +133,7 @@ jobs:
           elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
             version="${GITHUB_REF_NAME#v}"
           else
-            version="1.0.0"
+            version="1.0.1"
           fi
           echo "RELEASE_VERSION=$version" >> "$GITHUB_ENV"
           echo "RELEASE_TAG=v$version" >> "$GITHUB_ENV"
@@ -249,7 +249,7 @@ jobs:
           elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
             version="${GITHUB_REF_NAME#v}"
           else
-            version="1.0.0"
+            version="1.0.1"
           fi
           cd release-assets
           expected=(
