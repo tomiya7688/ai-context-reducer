@@ -158,7 +158,7 @@ Policy routing            -> policy-index / policy-check / acr-toolbox policy-ch
 Documentation duplication -> Documentation Duplication Control -> doc-duplicate-hints (hints)
 Context exclusion          -> Context Exclusion -> ignore-candidates (candidates)
 Canonical templates       -> template / acr-toolbox template
-Validation                -> validation-plan / syntax-health / compact-log
+Validation                -> validation-plan / Syntax Health Validation -> syntax-health (when available) / compact-log
 Context pack              -> context-pack-builder
 Source structure          -> language-specific symbols / dependency / graph tools -> source-structure-index
 Context manifest          -> Context Manifest -> context-manifest (optional)
@@ -179,6 +179,8 @@ Git history health        -> git-history-health
 `doc-duplicate-hints` は [`Documentation Duplication Control`](../docs/documentation-duplication-control.md) のhint実装です。重複候補を絞るだけで、どちらがSource of Truthか、intentional duplicationか、削除可能かは決定しません。自動削除・自動統合には使いません。
 
 `ignore-candidates` は [`Context Exclusion`](../docs/context-exclusion.md) の候補提示実装です。generated / logs / vendor / caches等を通常contextから外す候補を示すだけで、Source of Truth判定や `.gitignore` 等への適用は行いません。validationで必要なartifactはtask-specific evidenceとして別扱いします。
+
+`syntax-health` は [`Syntax Health Validation`](../docs/syntax-health-validation.md) の補助実装です。利用可能なparserの結果をcheap evidenceへ圧縮するだけで、syntax successをsemantic correctnessやtask completionとはみなしません。parser / grammarを自動installせず、必要なtargeted tests / compiler / runtime validationへroutingします。
 
 `architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/architecture-boundary-routing.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
 
