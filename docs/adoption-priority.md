@@ -37,6 +37,7 @@ Aだけで十分な小規模プロジェクトもあります。
 | 手法 | 導入するとよい兆候 |
 |---|---|
 | Current State summary | 実装済み機能・制約・未実装が増え、READMEだけでは現状を把握しにくい |
+| [Context Manifest](context-manifest.md) | source / tests / docs等の参照候補が多く、毎taskで候補を広く探し直している |
 | Task Routing | Issue / docs / subsystem が多く、タスクごとに読む資料が変わる |
 | Change Routing Map | 変更カテゴリから source / tests / docs を対応付けられる |
 | [Architecture Boundary Routing](architecture-boundary-routing.md) | project内に信頼できる責務境界・層・component・正式な通信経路がすでにあり、それを使えば最初のworking setを狭められる |
@@ -97,7 +98,7 @@ A Core
 + 必要なら Validation Routing
 ```
 
-Task Routing や Source Structure Index は通常不要です。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。test suiteが小さくfull runが安価ならChange / Test Impact Routingも不要です。Evidence Budgetも、target source / testsが明白な小taskでは形式化しません。
+Context Manifest、Task Routing や Source Structure Index は通常不要です。target source / tests / docsが明白な小taskでは、manifestを作らず直接pointerを渡します。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。test suiteが小さくfull runが安価ならChange / Test Impact Routingも不要です。Evidence Budgetも、target source / testsが明白な小taskでは形式化しません。
 
 ### Medium
 
