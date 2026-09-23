@@ -9,6 +9,7 @@ from scip_adapter import normalize_scip_print
 
 
 class ScipAdapterTests(unittest.TestCase):
+    # test_symbols_ownership_locations_and_dependenciesでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_symbols_ownership_locations_and_dependencies(self):
         payload = {
             'metadata': {
@@ -89,6 +90,7 @@ class ScipAdapterTests(unittest.TestCase):
         self.assertEqual(2, metadata['document_count'])
         self.assertEqual('scip-test', metadata['indexer']['name'])
 
+    # test_rejects_non_scip_shapeでadapter正規化・graph構築・失敗境界の契約が回帰していないことを検証する。
     def test_rejects_non_scip_shape(self):
         with self.assertRaises(ValueError):
             normalize_scip_print({'files': []})
