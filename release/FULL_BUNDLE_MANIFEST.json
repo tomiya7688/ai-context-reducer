@@ -1,0 +1,743 @@
+{
+  "schema_version": 1,
+  "bundle_kind": "full",
+  "target_release_version": "1.1.0",
+  "artifact_status": "target_contract",
+  "source_of_truth": "release/FULL_BUNDLE_MANIFEST.json",
+  "compatibility": {
+    "normal_bundle_manifest": "release/RELEASE_MANIFEST.json",
+    "normal_bundle_is_preserved": true,
+    "full_bundle_is_superset_of_normal_root": true,
+    "cli_contract": "tools/JSON_CONTRACT.md",
+    "cli_paths_unchanged_in_full_bundle": true
+  },
+  "platforms": [
+    "windows-x64",
+    "windows-arm64",
+    "linux-x64",
+    "linux-arm64",
+    "macos-x64",
+    "macos-arm64"
+  ],
+  "platform_rules": {
+    "windows_executable_suffix": ".exe",
+    "other_executable_suffix": "",
+    "go_binaries_are_prebuilt_per_platform": true,
+    "go_source_is_distributed": false,
+    "go_toolchain_required": false
+  },
+  "execution_policy": {
+    "install_missing_runtime_or_sdk": false,
+    "install_missing_external_tool": false,
+    "auto_run_large_or_heavy_analysis": false,
+    "auto_run_all_bundled_tools": false,
+    "gui_uses_existing_cli_json_contract": true,
+    "python_runtime_required_for_core_cli_or_gui": false
+  },
+  "layout": {
+    "normal_bundle_core": "/",
+    "gui": "gui/",
+    "python_fallback": "fallback/python/",
+    "profiles": "profiles/",
+    "templates": "templates/",
+    "japanese_docs": "docs/jp/",
+    "english_docs": "docs/en/"
+  },
+  "root_files": [
+    {
+      "bundle_path": "acr-toolbox{exe}",
+      "kind": "prebuilt_go_binary",
+      "source_module": "tools/common/native/acr-toolbox",
+      "normal_bundle_compatible": true,
+      "include_source": false
+    },
+    {
+      "bundle_path": "go-symbols{exe}",
+      "kind": "prebuilt_go_binary",
+      "source_module": "tools/go/small/go-symbols",
+      "normal_bundle_compatible": true,
+      "include_source": false
+    },
+    {
+      "bundle_path": "go-import-map{exe}",
+      "kind": "prebuilt_go_binary",
+      "source_module": "tools/go/medium/go-import-map",
+      "normal_bundle_compatible": true,
+      "include_source": false
+    },
+    {
+      "bundle_path": "go-package-graph{exe}",
+      "kind": "prebuilt_go_binary",
+      "source_module": "tools/go/large/go-package-graph",
+      "normal_bundle_compatible": true,
+      "include_source": false
+    },
+    {
+      "bundle_path": "affected-tests{exe}",
+      "kind": "prebuilt_go_binary",
+      "source_module": "tools/go/medium/affected-tests",
+      "normal_bundle_compatible": true,
+      "include_source": false
+    },
+    {
+      "bundle_path": "README.md",
+      "kind": "document",
+      "source": "README.md",
+      "normal_bundle_compatible": true
+    },
+    {
+      "bundle_path": "TOOLS_README.md",
+      "kind": "document",
+      "source": "tools/README.md",
+      "normal_bundle_compatible": true
+    },
+    {
+      "bundle_path": "LICENSE",
+      "kind": "license",
+      "source": "LICENSE",
+      "normal_bundle_compatible": true
+    },
+    {
+      "bundle_path": "RELEASE_MANIFEST.json",
+      "kind": "normal_bundle_manifest",
+      "source": "release/RELEASE_MANIFEST.json",
+      "normal_bundle_compatible": true
+    },
+    {
+      "bundle_path": "FULL_BUNDLE_MANIFEST.json",
+      "kind": "full_bundle_manifest",
+      "source": "release/FULL_BUNDLE_MANIFEST.json",
+      "normal_bundle_compatible": false
+    }
+  ],
+  "gui_files": [
+    {
+      "bundle_path": "gui/acr-hub{exe}",
+      "kind": "prebuilt_gui_entrypoint",
+      "required_for_release": true,
+      "implementation_issue": 25,
+      "screen_issue": 26,
+      "project_analysis_issue": 27,
+      "additional_runtime_required": false
+    }
+  ],
+  "setup_files": [
+    {
+      "source": "tools/setup.sh",
+      "bundle_path": "setup.sh",
+      "kind": "bundle_wrapper",
+      "layout_adapter_required": true
+    },
+    {
+      "source": "tools/setup.bat",
+      "bundle_path": "setup.bat",
+      "kind": "bundle_wrapper",
+      "layout_adapter_required": true
+    },
+    {
+      "source": "tools/analyze.sh",
+      "bundle_path": "analyze.sh",
+      "kind": "bundle_wrapper",
+      "layout_adapter_required": true
+    },
+    {
+      "source": "tools/analyze.bat",
+      "bundle_path": "analyze.bat",
+      "kind": "bundle_wrapper",
+      "layout_adapter_required": true
+    }
+  ],
+  "python_fallback_files": [
+    {
+      "source": "tools/common/large/context-budget/script/context_budget.py",
+      "bundle_path": "fallback/python/common/large/context-budget/script/context_budget.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/context-budget/script/messenger.py",
+      "bundle_path": "fallback/python/common/large/context-budget/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/context-budget/script/processing.py",
+      "bundle_path": "fallback/python/common/large/context-budget/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/context-manifest/script/context_manifest.py",
+      "bundle_path": "fallback/python/common/large/context-manifest/script/context_manifest.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/context-manifest/script/messenger.py",
+      "bundle_path": "fallback/python/common/large/context-manifest/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/context-manifest/script/processing.py",
+      "bundle_path": "fallback/python/common/large/context-manifest/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/hotspot-report/script/hotspot_report.py",
+      "bundle_path": "fallback/python/common/large/hotspot-report/script/hotspot_report.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/source-structure-index/script/ctags_adapter.py",
+      "bundle_path": "fallback/python/common/large/source-structure-index/script/ctags_adapter.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/source-structure-index/script/impact.py",
+      "bundle_path": "fallback/python/common/large/source-structure-index/script/impact.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/source-structure-index/script/messenger.py",
+      "bundle_path": "fallback/python/common/large/source-structure-index/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/source-structure-index/script/outline_adapter.py",
+      "bundle_path": "fallback/python/common/large/source-structure-index/script/outline_adapter.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/source-structure-index/script/processing.py",
+      "bundle_path": "fallback/python/common/large/source-structure-index/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/source-structure-index/script/scip_adapter.py",
+      "bundle_path": "fallback/python/common/large/source-structure-index/script/scip_adapter.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/source-structure-index/script/source_structure_index.py",
+      "bundle_path": "fallback/python/common/large/source-structure-index/script/source_structure_index.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/large/target-slice/script/target_slice.py",
+      "bundle_path": "fallback/python/common/large/target-slice/script/target_slice.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/acceptance-extractor/script/acceptance_extractor.py",
+      "bundle_path": "fallback/python/common/medium/acceptance-extractor/script/acceptance_extractor.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/architecture-boundary-router/script/architecture_boundary_router.py",
+      "bundle_path": "fallback/python/common/medium/architecture-boundary-router/script/architecture_boundary_router.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/architecture-boundary-router/script/commander.py",
+      "bundle_path": "fallback/python/common/medium/architecture-boundary-router/script/commander.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/architecture-boundary-router/script/messenger.py",
+      "bundle_path": "fallback/python/common/medium/architecture-boundary-router/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/architecture-boundary-router/script/processing.py",
+      "bundle_path": "fallback/python/common/medium/architecture-boundary-router/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/change-router/script/change_router.py",
+      "bundle_path": "fallback/python/common/medium/change-router/script/change_router.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/change-router/script/commander.py",
+      "bundle_path": "fallback/python/common/medium/change-router/script/commander.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/change-router/script/messenger.py",
+      "bundle_path": "fallback/python/common/medium/change-router/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/change-router/script/processing.py",
+      "bundle_path": "fallback/python/common/medium/change-router/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/compact-diff/script/compact_diff.py",
+      "bundle_path": "fallback/python/common/medium/compact-diff/script/compact_diff.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/compact-log/script/compact_log.py",
+      "bundle_path": "fallback/python/common/medium/compact-log/script/compact_log.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/context-pack-builder/script/commander.py",
+      "bundle_path": "fallback/python/common/medium/context-pack-builder/script/commander.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/context-pack-builder/script/context_pack_builder.py",
+      "bundle_path": "fallback/python/common/medium/context-pack-builder/script/context_pack_builder.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/context-pack-builder/script/messenger.py",
+      "bundle_path": "fallback/python/common/medium/context-pack-builder/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/context-pack-builder/script/processing.py",
+      "bundle_path": "fallback/python/common/medium/context-pack-builder/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/doc-duplicate-hints/script/doc_duplicate_hints.py",
+      "bundle_path": "fallback/python/common/medium/doc-duplicate-hints/script/doc_duplicate_hints.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/doc-duplicate-hints/script/messenger.py",
+      "bundle_path": "fallback/python/common/medium/doc-duplicate-hints/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/doc-duplicate-hints/script/processing.py",
+      "bundle_path": "fallback/python/common/medium/doc-duplicate-hints/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/exploration-stop-check/script/exploration_stop_check.py",
+      "bundle_path": "fallback/python/common/medium/exploration-stop-check/script/exploration_stop_check.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/ignore-candidates/script/ignore_candidates.py",
+      "bundle_path": "fallback/python/common/medium/ignore-candidates/script/ignore_candidates.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/policy-check/script/policy_check.py",
+      "bundle_path": "fallback/python/common/medium/policy-check/script/policy_check.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/policy-index/script/messenger.py",
+      "bundle_path": "fallback/python/common/medium/policy-index/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/policy-index/script/policy_index.py",
+      "bundle_path": "fallback/python/common/medium/policy-index/script/policy_index.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/policy-index/script/processing.py",
+      "bundle_path": "fallback/python/common/medium/policy-index/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/remote-delta/script/commander.py",
+      "bundle_path": "fallback/python/common/medium/remote-delta/script/commander.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/remote-delta/script/messenger.py",
+      "bundle_path": "fallback/python/common/medium/remote-delta/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/remote-delta/script/processing.py",
+      "bundle_path": "fallback/python/common/medium/remote-delta/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/remote-delta/script/remote_delta.py",
+      "bundle_path": "fallback/python/common/medium/remote-delta/script/remote_delta.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/responsibility-candidates/script/responsibility_candidates.py",
+      "bundle_path": "fallback/python/common/medium/responsibility-candidates/script/responsibility_candidates.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/structural-search/script/commander.py",
+      "bundle_path": "fallback/python/common/medium/structural-search/script/commander.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/structural-search/script/messenger.py",
+      "bundle_path": "fallback/python/common/medium/structural-search/script/messenger.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/structural-search/script/processing.py",
+      "bundle_path": "fallback/python/common/medium/structural-search/script/processing.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/structural-search/script/structural_search.py",
+      "bundle_path": "fallback/python/common/medium/structural-search/script/structural_search.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/template/script/template.py",
+      "bundle_path": "fallback/python/common/medium/template/script/template.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/medium/validation-plan/script/validation_plan.py",
+      "bundle_path": "fallback/python/common/medium/validation-plan/script/validation_plan.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/analyze-and-recommend/script/analyze_and_recommend.py",
+      "bundle_path": "fallback/python/common/small/analyze-and-recommend/script/analyze_and_recommend.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/doc-index/script/doc_index.py",
+      "bundle_path": "fallback/python/common/small/doc-index/script/doc_index.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/environment-plan/script/environment_plan.py",
+      "bundle_path": "fallback/python/common/small/environment-plan/script/environment_plan.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/external-tool-probe/script/external_tool_probe.py",
+      "bundle_path": "fallback/python/common/small/external-tool-probe/script/external_tool_probe.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/file-role-map/script/file_role_map.py",
+      "bundle_path": "fallback/python/common/small/file-role-map/script/file_role_map.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/git-history-health/script/git_history_health.py",
+      "bundle_path": "fallback/python/common/small/git-history-health/script/git_history_health.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/language-environment-plan/script/language_environment_plan.py",
+      "bundle_path": "fallback/python/common/small/language-environment-plan/script/language_environment_plan.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/language-run/script/language_run.py",
+      "bundle_path": "fallback/python/common/small/language-run/script/language_run.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/language-setup/script/language_setup.py",
+      "bundle_path": "fallback/python/common/small/language-setup/script/language_setup.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/materialize-tools/script/materialize_tools.py",
+      "bundle_path": "fallback/python/common/small/materialize-tools/script/materialize_tools.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/materialize-tools/script/selection.py",
+      "bundle_path": "fallback/python/common/small/materialize-tools/script/selection.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/path-find/script/path_find.py",
+      "bundle_path": "fallback/python/common/small/path-find/script/path_find.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/project-type-profile/script/project_type_profile.py",
+      "bundle_path": "fallback/python/common/small/project-type-profile/script/project_type_profile.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/repo-profile/script/repo_profile.py",
+      "bundle_path": "fallback/python/common/small/repo-profile/script/repo_profile.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/repo-stats/script/repo_stats.py",
+      "bundle_path": "fallback/python/common/small/repo-stats/script/repo_stats.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/scoped-guides/script/scoped_guides.py",
+      "bundle_path": "fallback/python/common/small/scoped-guides/script/scoped_guides.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/source-of-truth-candidates/script/source_of_truth_candidates.py",
+      "bundle_path": "fallback/python/common/small/source-of-truth-candidates/script/source_of_truth_candidates.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/syntax-health/script/syntax_health.py",
+      "bundle_path": "fallback/python/common/small/syntax-health/script/syntax_health.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/text-search/script/text_search.py",
+      "bundle_path": "fallback/python/common/small/text-search/script/text_search.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/tool-selector/script/tool_selector.py",
+      "bundle_path": "fallback/python/common/small/tool-selector/script/tool_selector.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/common/small/tree-view/script/tree_view.py",
+      "bundle_path": "fallback/python/common/small/tree-view/script/tree_view.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/c/large/c-include-graph/script/c_include_graph.py",
+      "bundle_path": "fallback/python/languages/c/large/c-include-graph/script/c_include_graph.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/c/medium/c-include-map/script/c_include_map.py",
+      "bundle_path": "fallback/python/languages/c/medium/c-include-map/script/c_include_map.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/c/small/c-symbols/script/c_symbols.py",
+      "bundle_path": "fallback/python/languages/c/small/c-symbols/script/c_symbols.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/cpp/large/cpp-include-graph/script/cpp_include_graph.py",
+      "bundle_path": "fallback/python/languages/cpp/large/cpp-include-graph/script/cpp_include_graph.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/cpp/medium/cpp-include-map/script/cpp_include_map.py",
+      "bundle_path": "fallback/python/languages/cpp/medium/cpp-include-map/script/cpp_include_map.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/cpp/small/cpp-symbols/script/cpp_symbols.py",
+      "bundle_path": "fallback/python/languages/cpp/small/cpp-symbols/script/cpp_symbols.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/csharp/large/csharp-project-graph/script/csharp_project_graph.py",
+      "bundle_path": "fallback/python/languages/csharp/large/csharp-project-graph/script/csharp_project_graph.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/csharp/medium/csharp-project-map/script/csharp_project_map.py",
+      "bundle_path": "fallback/python/languages/csharp/medium/csharp-project-map/script/csharp_project_map.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/csharp/small/csharp-symbols/script/csharp_symbols.py",
+      "bundle_path": "fallback/python/languages/csharp/small/csharp-symbols/script/csharp_symbols.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/gdscript/large/godot-scene-graph/script/godot_scene_graph.py",
+      "bundle_path": "fallback/python/languages/gdscript/large/godot-scene-graph/script/godot_scene_graph.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/gdscript/medium/gdscript-dependency-map/script/gdscript_dependency_map.py",
+      "bundle_path": "fallback/python/languages/gdscript/medium/gdscript-dependency-map/script/gdscript_dependency_map.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/gdscript/small/gdscript-symbols/script/gdscript_symbols.py",
+      "bundle_path": "fallback/python/languages/gdscript/small/gdscript-symbols/script/gdscript_symbols.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/python/large/python-module-graph/script/python_module_graph.py",
+      "bundle_path": "fallback/python/languages/python/large/python-module-graph/script/python_module_graph.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/python/medium/affected-tests/affected_tests.py",
+      "bundle_path": "fallback/python/languages/python/medium/affected-tests/affected_tests.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/python/medium/affected-tests/config.example.json",
+      "bundle_path": "fallback/python/languages/python/medium/affected-tests/config.example.json",
+      "kind": "python_fallback_config",
+      "required": true
+    },
+    {
+      "source": "tools/python/medium/affected-tests/script/affected_tests.py",
+      "bundle_path": "fallback/python/languages/python/medium/affected-tests/script/affected_tests.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/python/medium/python-import-map/script/python_import_map.py",
+      "bundle_path": "fallback/python/languages/python/medium/python-import-map/script/python_import_map.py",
+      "kind": "python_fallback",
+      "required": true
+    },
+    {
+      "source": "tools/python/small/python-symbols/script/python_symbols.py",
+      "bundle_path": "fallback/python/languages/python/small/python-symbols/script/python_symbols.py",
+      "kind": "python_fallback",
+      "required": true
+    }
+  ],
+  "profile_files": [
+    {
+      "source": "tools/profiles/README.md",
+      "bundle_path": "profiles/README.md",
+      "kind": "profile_support"
+    }
+  ],
+  "template_files": [
+    {
+      "source": "templates/AI_CONTEXT.md",
+      "bundle_path": "templates/AI_CONTEXT.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/CONTEXT_PACK.md",
+      "bundle_path": "templates/CONTEXT_PACK.md",
+      "kind": "template"
+    }
+  ],
+  "documentation_trees": [
+    {
+      "source": "docs/jp/",
+      "bundle_path": "docs/jp/",
+      "include": "**/*.md",
+      "required_for_release": true,
+      "source_of_truth": true,
+      "implementation_issue": 28
+    },
+    {
+      "source": "docs/en/",
+      "bundle_path": "docs/en/",
+      "include": "**/*.md",
+      "required_for_release": true,
+      "source_of_truth": false,
+      "translation_of": "docs/jp/",
+      "implementation_issue": 29
+    }
+  ],
+  "excluded_from_full_bundle": [
+    "**/*.go",
+    "**/go.mod",
+    "**/go.sum",
+    "**/tests/**",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    ".git/**",
+    ".github/**",
+    "release/validation/**",
+    "release/scripts/**"
+  ],
+  "resolution_policy": {
+    "tree_entries_are_expanded_when_building_archive": true,
+    "final_archive_file_list_must_match_resolved_manifest": true,
+    "missing_required_entry_fails_release": true,
+    "extra_unmanifested_file_fails_release": true,
+    "validation_implementation_issue": 32
+  }
+}
