@@ -91,6 +91,11 @@ func (server Server) handleRun(writer http.ResponseWriter, request *http.Request
 	}
 	result := server.Invoker.Invoke(request.Context(), backendRequest)
 	view := resultView(result)
+	if action.WritesFiles {
+		if output := strings.TrimSpace(input.Values["output"]); output != "" {
+			view.Summary = append(view.Summary, SummaryItem{Label: "requested_output", Value: output})
+		}
+	}
 	writeJSON(writer, http.StatusOK, map[string]any{
 		"action_id": action.ID,
 		"title":     action.Title,
