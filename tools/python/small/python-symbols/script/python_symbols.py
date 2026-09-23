@@ -8,6 +8,7 @@ TOOL = 'python-symbols'
 LANGUAGE = 'python'
 
 
+# 1ファイルのsymbolだけを解析し、read/parse失敗を空symbol一覧と区別して返す。
 def scan(path: Path):
     try:
         text = path.read_text(encoding='utf-8')
@@ -25,6 +26,7 @@ def scan(path: Path):
     return {'file': str(path), 'status': 'ok', 'symbols': symbols}
 
 
+# file/directoriesを解析対象へ展開し、missingやunsupported inputを別signalとして保持する。
 def collect(paths):
     files = []
     unsupported = []
@@ -42,6 +44,7 @@ def collect(paths):
     return rows, unsupported
 
 
+# symbol解析結果とwarningを集約し、不完全なscanをclean扱いしない結果を作る。
 def build_result(paths):
     rows, unsupported = collect(paths)
     parse_errors = sum(row['status'] == 'parse_failed' for row in rows)
@@ -61,6 +64,7 @@ def build_result(paths):
     }
 
 
+# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('paths', nargs='+')
