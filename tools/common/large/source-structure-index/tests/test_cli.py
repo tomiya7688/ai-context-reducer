@@ -9,6 +9,7 @@ SCRIPT = Path(__file__).parents[1] / 'script' / 'source_structure_index.py'
 
 
 class SourceStructureIndexCliTests(unittest.TestCase):
+    # test_build_query_expand_affected_round_tripでsource-structureのrouting・完全性・bounded出力契約を回帰検証する。
     def test_build_query_expand_affected_round_trip(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -88,6 +89,7 @@ class SourceStructureIndexCliTests(unittest.TestCase):
             self.assertEqual(['module:pkg.b', 'module:pkg.a'], affected_ids)
             self.assertEqual('targeted_dependents', affected_result['recommended_validation_scope'])
 
+    # test_build_accepts_ast_grep_outline_shapeでsource-structureのrouting・完全性・bounded出力契約を回帰検証する。
     def test_build_accepts_ast_grep_outline_shape(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
