@@ -2,6 +2,7 @@ package main
 
 import "testing"
 
+// TestAnalyzeExplicitMappingでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestAnalyzeExplicitMapping(t *testing.T) {
     cfg := config{Mappings: []mapping{{Source: "src/parser/*", Tests: []string{"tests/parser/test_parser.py"}}}}
     got := analyze([]string{"src/parser/lexer.py"}, cfg, depMap{})
@@ -12,23 +13,27 @@ func TestAnalyzeExplicitMapping(t *testing.T) {
     if !found { t.Fatalf("explicit test missing: %#v", got.TestCandidates) }
 }
 
+// TestAnalyzeBroadImpactでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestAnalyzeBroadImpact(t *testing.T) {
     got := analyze([]string{"packages/core/src/api.go"}, config{}, depMap{})
     if got.Fallback != "broader" { t.Fatalf("fallback=%s", got.Fallback) }
     if got.Confidence != "medium" { t.Fatalf("confidence=%s", got.Confidence) }
 }
 
+// TestAnalyzeNoChangesでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestAnalyzeNoChanges(t *testing.T) {
     got := analyze(nil, config{}, depMap{})
     if got.Confidence != "low" { t.Fatalf("confidence=%s", got.Confidence) }
     if got.Fallback != "subsystem-or-full" { t.Fatalf("fallback=%s", got.Fallback) }
 }
 
+// TestGlobRecursiveAndSuffixWildcardでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestGlobRecursiveAndSuffixWildcard(t *testing.T) {
     if !match("**/schema.*", "pkg/data/schema.json") { t.Fatal("recursive schema glob should match") }
     if !match("**/core/**", "packages/core/src/api.go") { t.Fatal("recursive core glob should match") }
 }
 
+// TestGoDefaultTestCandidateでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestGoDefaultTestCandidate(t *testing.T) {
     got := defaultsFor("src/parser/lexer.go")
     want := "src/parser/lexer_test.go"
@@ -36,6 +41,7 @@ func TestGoDefaultTestCandidate(t *testing.T) {
     t.Fatalf("missing %s in %#v", want, got)
 }
 
+// TestDependencyConsumersAddCandidatesでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestDependencyConsumersAddCandidates(t *testing.T) {
     deps := depMap{Files: []depRow{{File: "src/app/loader.py", Imports: []string{"pkg.parser.lexer"}}}}
     got := analyze([]string{"pkg/parser/lexer.py"}, config{}, deps)
@@ -47,6 +53,7 @@ func TestDependencyConsumersAddCandidates(t *testing.T) {
 }
 
 
+// TestIncompleteDependencyMapForcesBroaderFallbackでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestIncompleteDependencyMapForcesBroaderFallback(t *testing.T) {
     cfg := config{Mappings: []mapping{{Source: "src/parser/*", Tests: []string{"tests/test_parser.py"}}}}
     deps := depMap{ScanTruncated: true, ParseErrorCount: 2}
