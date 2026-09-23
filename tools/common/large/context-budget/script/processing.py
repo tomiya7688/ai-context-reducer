@@ -5,6 +5,7 @@ from pathlib import Path
 from messenger import file_size, read_text
 
 
+# byte数中心のcheap estimateで、探索前のcontext規模を低コストに把握する。
 def estimate_fast(path: Path):
     size = file_size(path)
     if size is None:
@@ -12,6 +13,7 @@ def estimate_fast(path: Path):
     return max(1, size // 4), size
 
 
+# 内容を読める範囲だけ数え、失敗件数を保持したより精密なestimateを作る。
 def estimate_accurate(path: Path):
     text = read_text(path)
     if text is None:
@@ -20,6 +22,7 @@ def estimate_accurate(path: Path):
     return max(1, len(text) // 4), size
 
 
+# 推定値とwarningを統合し、数値だけで完全性を誤認しないsummaryを作る。
 def summarize(
     rows: list[tuple[int, int, str]],
     top: int,
