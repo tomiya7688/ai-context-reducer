@@ -1,0 +1,262 @@
+# Syntax Health Validation
+
+この文書は、syntax / parser healthを低コストなvalidation evidenceとして利用し、問題が無いfileを大量に読まずに次の検証へ進むための方針を定義します。
+
+Syntax Healthは [Validation Routing](validation-routing.md) の一部です。
+
+> **syntax checkが成功しても、semantic correctness・type correctness・runtime behavior・Acceptance達成を意味しません。**
+
+cheap validationとして使い、変更内容に必要なtargeted tests / compiler / runtime / artifact validationへroutingします。
+
+## 1. 目的
+
+source変更後、構文として壊れていないことは比較的安く確認できる場合があります。
+
+~~~text
+changed source
+  -> cheap syntax / parser health
+  -> syntax issue?
+       yes -> fix / inspect failing files
+       no  -> required semantic validationへ進む
+~~~
+
+parser resultのうち問題fileだけをcompactに返せば、parse tree全文や正常file一覧をAIへ渡す必要はありません。
+
+目的はvalidationをsyntax checkだけへ縮小することではなく、**安い失敗を早く見つけ、後段の高コストvalidationを必要な形で実行すること**です。
+
+## 2. 適用するとよい条件
+
+次を満たす場合に有効です。
+
+- 対象languageのparser / compiler frontendが既に利用可能
+- changed sourceを構文単位で検査できる
+- syntax failureをtargetedに返せる
+- full build / full testより安く先に実行できる
+- parse tree全文ではなくhealth summaryだけで初期判断できる
+
+例:
+
+- 複数source fileを編集した直後のcheap gate
+- generated sourceのparse可能性確認
+- merge / mechanical edit後のsyntax regression確認
+- full testの前に明白なparse errorを除外したい場合
+
+## 3. syntax successが証明しないもの
+
+syntax health successから、次を推測してはいけません。
+
+- type checkが通る
+- import / dependency resolutionが正しい
+- symbolが存在する
+- API contractが互換
+- business logicが正しい
+- testsが通る
+- runtimeで起動する
+- performance requirementを満たす
+- package / distributionが正しい
+- UI / visual behaviorが正しい
+
+~~~text
+syntax valid
+  != semantic correct
+  != behavior correct
+  != task complete
+~~~
+
+そのため、syntax checkだけでcompletion判定しません。
+
+## 4. Validation Routing内の位置
+
+Validation Routingでは、変更種別から必要なevidenceを選びます。
+
+Syntax Healthはそのうちのcheap static evidenceです。
+
+~~~text
+change type
+  -> syntax health when useful and available
+  -> targeted semantic validation
+  -> broader validation only when required
+  -> completion evidence
+~~~
+
+### Pure logic change
+
+~~~text
+syntax health
+  -> targeted unit / regression tests
+~~~
+
+### Typed / compiled language change
+
+~~~text
+syntax / parser health
+  -> compiler / type checker
+  -> targeted tests
+~~~
+
+parserだけではtype / symbol resolutionを確認できません。
+
+### Runtime behavior change
+
+~~~text
+syntax health
+  -> targeted tests
+  -> bounded runtime / smoke
+~~~
+
+runtime Acceptanceがある場合は実行 evidenceが必要です。
+
+### Package / distribution change
+
+~~~text
+syntax health if source changed
+  -> source tests / build
+  -> artifact generation
+  -> artifact smoke
+~~~
+
+syntax successをartifact validationの代わりにはしません。
+
+## 5. parserが無い場合
+
+Syntax Healthのためだけにparser / grammar / SDKを自動installしません。
+
+~~~text
+parser already available
+  -> use cheap syntax health
+
+parser unavailable
+  -> report unavailable
+  -> use existing compiler / tests / other validation path
+~~~
+
+projectの標準環境構築としてparser導入がRequiredなら、そのtaskとして明示的に扱います。
+
+Context Reducer toolが不足dependencyを勝手にinstallすることはありません。
+
+## 6. parser coverageを確認する
+
+parser executableが存在しても、対象language / grammar / versionを正しく扱えるとは限りません。
+
+次の状態をsuccessと混同しません。
+
+- grammar unavailable
+- parser execution failure
+- unsupported syntax / language version
+- malformed saved summary
+- target fileを実際には見ていない
+- 0 files observed when files should have been checked
+
+backend unavailable / failed / input failureは、syntax issue 0件とは別の状態です。
+
+## 7. targeted validationへ進む条件
+
+syntax success後は、taskに必要な最小semantic evidenceへ進みます。
+
+代表例:
+
+- logic変更 -> matching unit / regression test
+- public function / type変更 -> compiler + direct consumers / tests
+- config / schema変更 -> parser/schema validation + producer / consumer tests
+- dependency変更 -> build / dependency resolution
+- runtime変更 -> smoke / deterministic runtime
+- UI変更 -> automated checks + Acceptanceに必要ならvisual confirmation
+- generated artifact変更 -> artifact-boundary validation
+
+どこまで進むかはSyntax Healthではなく、Validation RoutingとAcceptanceが決めます。
+
+## 8. broader / Large validationへ昇格する条件
+
+cheap validationだけでは影響範囲を十分に確認できない場合、より広いvalidationへ昇格します。
+
+例:
+
+- shared / core codeを変更した
+- public API / schema / protocolを変更した
+- dependency / build / package metadataを変更した
+- parser / grammar / compiler自体を変更した
+- changed areaの依存関係が不明
+- targeted test選択の確信が低い
+- syntaxは通るがcompiler / testが失敗する
+- cross-module / cross-package影響が判明した
+- runtime / artifact / visual Acceptanceがある
+- security / compatibility上の未確認領域が残る
+- user / projectのcompletion gateがbroader validationを要求する
+
+~~~text
+cheap evidence insufficient
+  -> targeted compiler / tests
+  -> subsystem validation
+  -> full / artifact / runtime validation only when required
+~~~
+
+最初から常にLarge validationを行うのではなく、必要性が出たときに昇格します。
+
+## 9. failure時のcontext
+
+syntax issueが見つかった場合も、全parse treeや全sourceを出力する必要はありません。
+
+通常は次で十分です。
+
+- failing file
+- issue count
+- bounded parser diagnostic
+- backend status
+
+その情報から対象file / line / surrounding sourceだけを追加で確認します。
+
+正常file一覧を大量にContext Packへ残しません。
+
+## 10. saved parser resultの再利用
+
+CIや別工程が既にparser summaryを生成している場合、その結果を再利用できます。
+
+~~~text
+existing parser / CI result
+  -> compact syntax health normalization
+  -> agent-visible failures only
+~~~
+
+同じsourceを別toolで再parseする必要がなければ、既存evidenceを再利用する方を優先します。
+
+ただしsummaryが古い場合はcurrent changeのevidenceには使いません。
+
+## 11. Small repoでの扱い
+
+小規模projectで標準compiler / testが十分速く、同じ範囲を直接検査できるなら、専用Syntax Health stepを追加しなくても構いません。
+
+~~~text
+cheap standard validation already sufficient
+  -> use it directly
+~~~
+
+validation step自体を増やしてmaintenance costを上げないことも重要です。
+
+## 12. 補助実装
+
+このrepositoryには tools/common/small/syntax-health があります。
+
+このtoolは、既に利用可能なTree-sitter parser / grammarまたは保存済みsummaryを利用し、syntax issueのあるfileだけをbounded JSONへ圧縮する**補助実装**です。
+
+- Tree-sitterやgrammarを自動installしない
+- backend unavailableを成功と混同しない
+- parser failureをsyntax issue 0件と混同しない
+- parse tree全文をagentへ返さない
+- syntax successをsemantic correctnessと判定しない
+- tool単体の成功をcompletion gateにしない
+
+projectのcompiler、IDE parser、language server、linter等で同じcheap evidenceを得られるなら、それを利用して構いません。
+
+## 13. 標準推奨
+
+- syntax / parser healthはcheap validationとして使う
+- parserが既に利用可能な場合だけ再利用を優先する
+- parser / grammarを自動installしない
+- backend unavailable / failedとissue 0件を区別する
+- syntax successをsemantic / type / runtime correctnessへ拡張解釈しない
+- syntax checkだけでtask completionを判定しない
+- taskに応じてtargeted tests / compiler / runtime / artifact validationへ進む
+- shared / public / unknown impactではbroader validationへ昇格する
+- failing filesだけをboundedに返し、正常parse tree全文をcontextへ入れない
+- 標準compiler / testsが十分安いSmall repoでは専用stepを増やさない
+- syntax-health toolを手法そのものにしない
