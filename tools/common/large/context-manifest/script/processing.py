@@ -7,6 +7,7 @@ ORDER = {'P0': 0, 'P1': 1, 'P2': 2, 'P3': 3, 'P4': 4}
 SOURCE_EXTS = {'.py', '.cs', '.go', '.rs', '.ts', '.js', '.cpp', '.c', '.h', '.java'}
 
 
+# task contextに有用なsource/test/docsを先に並べるためのcheap priorityを決める。
 def priority(path: Path) -> str:
     name = path.name
     text = path.as_posix().lower()
@@ -21,6 +22,7 @@ def priority(path: Path) -> str:
     return 'P4'
 
 
+# full contentを抱えずpath中心のbounded manifestへ集約し、truncationも明示する。
 def build_manifest(
     entries: list[dict[str, object]],
     limit: int,
