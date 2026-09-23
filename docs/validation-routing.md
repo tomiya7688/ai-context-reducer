@@ -31,6 +31,8 @@ Change type
 
 すべてを常に実行する必要はありません。
 
+syntax / parser healthは、既存parserが利用可能ならfull build/testより先に使えるcheap evidenceです。ただしsyntax successはsemantic correctnessやtask completionを意味しないため、その後のtargeted tests / compiler / runtime validationを変更内容に応じて選びます。parserをこの目的だけで自動installしません。詳細は [`Syntax Health Validation`](syntax-health-validation.md) を参照してください。
+
 ## Route by change type
 
 例:
@@ -195,6 +197,7 @@ Generated artifactは通常contextでは除外候補ですが、artifact自体�
 - test suiteが大きい場合はchange/test impact routingで実行範囲を絞る
 - impactがshared/public/unknownならbroader fallbackする
 - smallest sufficient validation を先に使う
+- syntax healthは利用可能な場合のcheap evidenceとして使い、syntax successだけでcompletion判定しない
 - GUI / interactive validation は必要な変更だけに限定し、可能なら headless checks を先に使う
 - ファイル生成を伴う検証は disposable workspace を優先する
 - evidence が実際に対象を検査したか確認する
