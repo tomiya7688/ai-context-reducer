@@ -1,6 +1,6 @@
 # context-manifest
 
-Repository filesをagent向けpriority manifestへ圧縮します。manifestはrouting hintであり、原典ファイルの代替ではありません。
+Repository filesをagent向けpriority manifestへ圧縮します。manifestはrouting hintであり、原典ファイルの代替ではありません。手法そのものは [`docs/context-manifest.md`](../../../../docs/context-manifest.md) を参照してください。
 
 ## Usage
 
