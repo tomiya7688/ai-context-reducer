@@ -11,6 +11,7 @@ EXTENDS = re.compile(r'^\s*extends\s+["\']([^"\']+)["\']', re.M)
 IGNORE_DIRS = {'.git', '.godot', 'build', 'dist', '.idea', '.vs'}
 
 
+# GDScript sourceだけを決定論的に列挙し、依存物や生成物を通常contextから外す。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -23,6 +24,7 @@ def source_files(root: Path):
     return found
 
 
+# GDScript依存をbounded mapへ集約し、truncationとparse失敗を完全性signalとして残す。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -63,6 +65,7 @@ def build_result(root: Path, limit: int):
     }
 
 
+# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')
