@@ -153,6 +153,8 @@ source validation
 
 これにより AI が packaging 実装全体を推測でレビューする代わりに、成果物境界で直接 evidence を取れます。
 
+Generated artifactは通常contextでは除外候補ですが、artifact自体がAcceptance evidenceになるtaskでは一時的にvalidation対象へ戻します。Source of Truthまで除外せず、検証後もartifact全文を通常contextへ常駐させません。詳細は [`Context Exclusion`](context-exclusion.md) を参照してください。
+
 ## Structured observation before broad code reading
 
 実行時の挙動調査では、可能なら座標・状態・イベント・判断結果などを bounded / structured log として記録します。
