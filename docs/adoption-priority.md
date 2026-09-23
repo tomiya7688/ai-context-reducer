@@ -46,6 +46,7 @@ Aだけで十分な小規模プロジェクトもあります。
 | Evidence Budget | Required evidenceが揃っても検索が続く、history / broad docsへ「念のため」で横展開しやすい |
 | Remote Delta First | 複数AI・複数チャット・複数開発者が同じremoteを更新する |
 | Validation Routing | 変更によって必要な検証方法が大きく異なる |
+| [Syntax Health Validation](syntax-health-validation.md) | parser / compiler frontendが既に利用でき、full build/testより安いsyntax checkを先に使える |
 | Change / Test Impact Routing | test suiteが大きい・遅い、source/test対応やdependency情報があり毎回full suiteを回している |
 | compact policy checks | 規約が長い、または機械判定できる規則が多い |
 | [Documentation Duplication Control](documentation-duplication-control.md) | README / AI guide / docs間で同じ規則や説明が増え、更新driftや再読costが目立つ |
@@ -100,7 +101,7 @@ A Core
 + 必要なら Validation Routing
 ```
 
-Context Manifest、Context Priority / Hotspot、Task Routing や Source Structure Index は通常不要です。target source / tests / docsが明白な小taskでは、manifestを作らず直接pointerを渡します。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。test suiteが小さくfull runが安価ならChange / Test Impact Routingも不要です。Evidence Budgetも、target source / testsが明白な小taskでは形式化しません。
+Context Manifest、Context Priority / Hotspot、Task Routing や Source Structure Index は通常不要です。Syntax Healthも標準compiler / testsが十分安ければ専用stepを追加せず、parser導入のためだけに環境を増やしません。target source / tests / docsが明白な小taskでは、manifestを作らず直接pointerを渡します。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。test suiteが小さくfull runが安価ならChange / Test Impact Routingも不要です。Evidence Budgetも、target source / testsが明白な小taskでは形式化しません。
 
 ### Medium
 
