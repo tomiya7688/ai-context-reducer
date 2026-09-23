@@ -1,6 +1,6 @@
 # doc-duplicate-hints
 
-Documentationの重複候補をagentへcompactな自己説明的JSONで返します。
+Documentationの重複候補をagentへcompactな自己説明的JSONで返します。これは [`Documentation Duplication Control`](../../../../docs/documentation-duplication-control.md) のhint toolであり、候補を自動削除・自動統合したり、Source of Truthを自動決定したりしません。
 
 ## Usage
 
