@@ -3,6 +3,7 @@ from __future__ import annotations
 SIGNATURE_LIMIT = 200
 
 
+# outline由来のsignatureをboundedにし、symbol情報がcontext budgetを圧迫しないようにする。
 def _bounded(value: object, limit: int = SIGNATURE_LIMIT) -> str | None:
     if value is None:
         return None
@@ -10,10 +11,12 @@ def _bounded(value: object, limit: int = SIGNATURE_LIMIT) -> str | None:
     return text if len(text) <= limit else text[:limit]
 
 
+# outline payloadの最小shapeだけを判定し、未知形式を無理に解釈しない。
 def _looks_like_outline_file(row: object) -> bool:
     return isinstance(row, dict) and bool(row.get('path')) and isinstance(row.get('items'), list)
 
 
+# ast-grep outlineとして扱えるpayloadかをcheapに判定する。
 def is_ast_grep_outline(payload: object) -> bool:
     if _looks_like_outline_file(payload):
         return True
@@ -22,6 +25,7 @@ def is_ast_grep_outline(payload: object) -> bool:
     return False
 
 
+# nested outlineをownership関係を保った共通symbol列へ平坦化する。
 def _flatten_items(path: str, language: str | None, items: list[dict], parents: tuple[str, ...] = ()) -> list[dict]:
     rows = []
     for item in items:
@@ -56,6 +60,7 @@ def _flatten_items(path: str, language: str | None, items: list[dict], parents: 
     return rows
 
 
+# 既存共通schemaを保ちつつoutline形式だけを安全に正規化する。
 def normalize_symbol_payload(payload: object) -> object:
     if not is_ast_grep_outline(payload):
         return payload
