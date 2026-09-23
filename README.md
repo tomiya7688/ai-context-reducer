@@ -101,6 +101,7 @@ acr-toolbox select <project-root>
 |---|---|
 | docs / Issues / subsystem が多い | Task Routing / Change Routing Map |
 | file / module の責務が分かりにくい | Responsibility Map |
+| 既存architectureに責務境界・層・正式な通信経路が明示されている | Architecture Boundary Routing |
 | monorepo / multi-appで局所ルールが多い | Hierarchical Context / Scoped AI Instructions |
 | Required evidenceが揃っても探索が止まりにくい | Evidence Budget / bounded evidence collection |
 | 現在の能力・制約がREADMEだけでは分からない | Current State summary |
