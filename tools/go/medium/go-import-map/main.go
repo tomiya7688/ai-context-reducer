@@ -33,6 +33,7 @@ type importOutput struct {
     ScanTruncated   bool        `json:"scan_truncated"`
 }
 
+// 1つのGo sourceをparseし、import一覧とparse失敗を区別して返す。
 func fileImports(path string) importRow {
     fset := token.NewFileSet()
     f, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly)
@@ -54,6 +55,7 @@ func fileImports(path string) importRow {
     return importRow{File: filepath.ToSlash(path), Status: "ok", Imports: imports}
 }
 
+// vendor等を避けながら解析対象Go sourceを決定論的に列挙する。
 func sourceFiles(root string) ([]string, error) {
     files := []string{}
     err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
@@ -75,6 +77,7 @@ func sourceFiles(root string) ([]string, error) {
     return files, nil
 }
 
+// file単位のimport依存をbounded mapへ集約し、truncationとparse失敗も保持する。
 func buildImportMap(root string, limit int) (importOutput, error) {
     allFiles, err := sourceFiles(root)
     if err != nil {
@@ -116,12 +119,14 @@ func buildImportMap(root string, limit int) (importOutput, error) {
     return result, nil
 }
 
+// import map結果を単一JSON表現で出力し、同内容のtext重複を避ける。
 func emit(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// CLI入力を検証し、bounded import mapと明示的failureを同じJSON契約で返す。
 func main() {
     limit := flag.Int("limit", 0, "maximum files to return; 0 means unlimited")
     flag.Parse()
