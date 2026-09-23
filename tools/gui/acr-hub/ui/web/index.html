@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="acr-session" content="__ACR_SESSION_TOKEN__">
+  <title>AI Context Reducer Hub</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">AI Context Reducer</p>
+      <h1>GUI Hub</h1>
+      <p class="subtitle">やりたいことから選び、必要なCLIだけを実行します。</p>
+    </div>
+    <div id="health" class="status-chip neutral">Ready</div>
+  </header>
+  <main class="layout">
+    <aside class="sidebar">
+      <label for="project-root">Project root</label>
+      <input id="project-root" class="project-input" type="text" placeholder="/path/to/project" autocomplete="off">
+      <p class="hint">Full Bundle内のCLIが、このpathを対象に実行されます。</p>
+      <nav id="categories" class="categories" aria-label="Categories"></nav>
+    </aside>
+    <section class="workspace">
+      <section>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Choose by purpose</p>
+            <h2 id="category-title">Project Analysis</h2>
+          </div>
+        </div>
+        <div id="actions" class="action-grid"></div>
+      </section>
+      <section id="run-panel" class="panel hidden" aria-live="polite">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Selected action</p>
+            <h2 id="action-title"></h2>
+            <p id="action-description" class="muted"></p>
+          </div>
+          <button id="close-panel" class="secondary" type="button">Close</button>
+        </div>
+        <form id="action-form">
+          <div id="fields" class="fields"></div>
+          <div id="heavy-confirm" class="warning-box hidden">
+            <label class="check-row">
+              <input id="allow-heavy" type="checkbox">
+              <span>Large / heavy解析を明示的に実行する</span>
+            </label>
+            <p>この確認なしではprocess自体を起動しません。</p>
+          </div>
+          <div class="button-row">
+            <button id="run-button" class="primary" type="submit">Run</button>
+            <button id="cancel-button" class="secondary hidden" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+      <section id="result-panel" class="panel hidden" aria-live="polite">
+        <div class="result-header">
+          <div>
+            <p class="eyebrow">Result</p>
+            <h2 id="result-headline"></h2>
+          </div>
+          <span id="result-state" class="status-chip neutral"></span>
+        </div>
+        <div id="summary" class="summary-grid"></div>
+        <p id="result-error" class="error-text hidden"></p>
+        <details id="detail-box">
+          <summary>詳細結果</summary>
+          <pre id="detail-output"></pre>
+        </details>
+        <details id="stderr-box" class="hidden">
+          <summary>stderr</summary>
+          <pre id="stderr-output"></pre>
+        </details>
+      </section>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
