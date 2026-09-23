@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 
 
+# 指定fileの必要範囲だけをboundedに切り出し、全file読込を避けるCLI境界を提供する。
 def main():
     parser = argparse.ArgumentParser(description='Return bounded excerpts around matching lines as self-describing JSON.')
     parser.add_argument('pattern')
