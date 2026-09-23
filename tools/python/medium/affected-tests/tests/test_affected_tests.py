@@ -13,6 +13,7 @@ spec.loader.exec_module(module)
 
 
 class AffectedTestsContractTests(unittest.TestCase):
+# このケースで安全側routingとエラー契約が回帰していないことを検証する。
     def test_dependency_map_consumers_add_candidates(self):
         dep_map = {
             'files': [
@@ -25,6 +26,7 @@ class AffectedTestsContractTests(unittest.TestCase):
         self.assertTrue(result['dependency_map']['complete'])
         self.assertIn('dependency-map consumers: 1', result['reasons'])
 
+# このケースで安全側routingとエラー契約が回帰していないことを検証する。
     def test_incomplete_dependency_map_forces_broader_fallback(self):
         dep_map = {
             'files': [],
@@ -44,6 +46,7 @@ class AffectedTestsContractTests(unittest.TestCase):
         self.assertIn('dependency_map_truncated', result['dependency_map']['reasons'])
         self.assertIn('parse_error_count=2', result['dependency_map']['reasons'])
 
+# このケースで安全側routingとエラー契約が回帰していないことを検証する。
     def test_missing_dependency_map_file_is_explicit_cli_failure(self):
         with tempfile.TemporaryDirectory() as raw:
             missing = Path(raw) / 'missing.json'

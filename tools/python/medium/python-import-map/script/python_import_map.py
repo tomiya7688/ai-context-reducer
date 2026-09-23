@@ -12,6 +12,7 @@ IGNORE_DIRS = {
 }
 
 
+# 1ファイルのimportだけを解析し、parse失敗と正常な空importsを区別する。
 def file_imports(path: Path):
     try:
         text = path.read_text(encoding='utf-8')
@@ -30,6 +31,7 @@ def file_imports(path: Path):
     return {'status': 'ok', 'imports': sorted(imports)}
 
 
+# 依存物・生成物を避けながら解析対象sourceを決定論的に列挙する。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -42,6 +44,7 @@ def source_files(root: Path):
     return found
 
 
+# 全体scanの完全性と依存edgeを自己説明的なgraph結果へ集約する。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -79,6 +82,7 @@ def build_result(root: Path, limit: int):
     }
 
 
+# CLI入力を検証し、通常結果と失敗状態を同じ機械可読契約で返す。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')

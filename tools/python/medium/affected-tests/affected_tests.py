@@ -8,6 +8,7 @@ from pathlib import Path
 TOOL = 'affected-tests'
 
 
+# Git境界から変更fileだけを取得し、後段のtest routingへ渡す。
 def git_changed(root, base):
     cmd = ['git', '-C', root, 'diff', '--name-only']
     if base:
@@ -18,6 +19,7 @@ def git_changed(root, base):
     return [line.strip().replace('\\', '/') for line in completed.stdout.splitlines() if line.strip()]
 
 
+# 任意config/input JSONを読み込み、未指定時は空設定として扱う。
 def load_json(path):
     if not path:
         return {}
@@ -25,6 +27,7 @@ def load_json(path):
         return json.load(handle)
 
 
+# naming conventionから安価なtest候補を作り、探索開始点を狭める。
 def defaults_for(path):
     normalized = path.replace('\\', '/')
     stem = Path(normalized).stem
@@ -38,6 +41,7 @@ def defaults_for(path):
     return out
 
 
+# 候補順を保ったまま重複pathを除き、agent向け出力の冗長化を防ぐ。
 def uniq(items):
     seen, out = set(), []
     for item in items:
@@ -48,6 +52,7 @@ def uniq(items):
     return out
 
 
+# dependency mapから変更対象のconsumerを拾い、見落としやすいtest候補を補う。
 def dependency_consumers(changed, dependency_map):
     needles = []
     for path in changed:
@@ -71,6 +76,7 @@ def dependency_consumers(changed, dependency_map):
     return uniq(consumers)
 
 
+# dependency mapのtruncation/errorを完全性signalへ変換し、安全側fallback判断に使う。
 def dependency_state(dependency_map, used):
     if not used:
         return {'used': False}
@@ -84,6 +90,7 @@ def dependency_state(dependency_map, used):
     return {'used': True, 'complete': not reasons, 'reasons': reasons}
 
 
+# 変更file・明示mapping・dependency情報を統合し、test候補とfallback方針を決める。
 def analyze(changed, cfg, dependency_map=None, dependency_map_used=False):
     dependency_map = dependency_map or {}
     mappings = cfg.get('mappings', [])
@@ -154,10 +161,12 @@ def analyze(changed, cfg, dependency_map=None, dependency_map_used=False):
     }
 
 
+# 解析結果をJSON出力境界へ渡し、textとの二重表現を避ける。
 def emit(value):
     print(json.dumps(value, ensure_ascii=False, indent=2))
 
 
+# CLI入力を検証し、通常結果と失敗状態を同じ機械可読契約で返す。
 def main():
     parser = argparse.ArgumentParser(description='Lightweight affected-test selector')
     parser.add_argument('--root', default='.')
