@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 SCRIPT = Path(__file__).parents[1] / 'script' / 'affected_tests.py'
+LEGACY_SCRIPT = Path(__file__).parents[1] / 'affected_tests.py'
 spec = importlib.util.spec_from_file_location('affected_tests', SCRIPT)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
@@ -59,6 +60,19 @@ class AffectedTestsContractTests(unittest.TestCase):
             result = json.loads(completed.stdout)
             self.assertEqual('affected-tests', result['tool'])
             self.assertEqual('dependency_map_read_failed', result['status'])
+
+
+    # 旧tool pathが標準script配置へ正しく委譲し、既存CLI互換性を維持することを検証する。
+    def test_legacy_entrypoint_forwards_to_script(self):
+        completed = subprocess.run(
+            [sys.executable, str(LEGACY_SCRIPT), '--changed', 'src/a.py'],
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertEqual('affected-tests', result['tool'])
+        self.assertEqual(['src/a.py'], result['changed_files'])
 
 
 if __name__ == '__main__':
