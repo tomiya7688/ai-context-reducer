@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestBuildImportMapDistinguishesParseFailureでparse失敗・unsupported input・truncation契約が回帰していないことを検証する。
 func TestBuildImportMapDistinguishesParseFailure(t *testing.T) {
     dir := t.TempDir()
     if err := os.WriteFile(filepath.Join(dir, "good.go"), []byte("package demo\nimport \"fmt\"\nvar _ = fmt.Println\n"), 0o644); err != nil {
@@ -35,6 +36,7 @@ func TestBuildImportMapDistinguishesParseFailure(t *testing.T) {
     }
 }
 
+// TestBuildImportMapTruncationIsRealでparse失敗・unsupported input・truncation契約が回帰していないことを検証する。
 func TestBuildImportMapTruncationIsReal(t *testing.T) {
     dir := t.TempDir()
     if err := os.WriteFile(filepath.Join(dir, "a.go"), []byte("package demo\n"), 0o644); err != nil {
