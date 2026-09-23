@@ -8,10 +8,12 @@ from messenger import collect_files
 from processing import build_manifest
 
 
+# manifestを単一JSON契約で出力し、AIが同じ情報をtextとJSONの両方から読む冗長性を避ける。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# CLI入力を検証し、boundedなmanifest生成結果と明示的failureを同じ契約で返す。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Build a prioritized context manifest as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
