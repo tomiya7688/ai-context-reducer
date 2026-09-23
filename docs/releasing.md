@@ -85,4 +85,4 @@ v1.0.0後の新言語対応、外部backend追加、heuristic改善は新しいI
 
 ## v1.0.0 validation record
 
-公開済みv1.0.0の最終検証記録は [`release-validation-v1.0.0.md`](release-validation-v1.0.0.md) を参照してください。
+公開済みv1.0.0の最終検証記録は [`release/validation/v1.0.0.md`](../release/validation/v1.0.0.md) を参照してください。

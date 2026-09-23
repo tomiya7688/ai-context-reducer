@@ -9,7 +9,6 @@ on:
       - 'release/**'
       - 'README.md'
       - 'LICENSE'
-      - '.github/scripts/release-acceptance.sh'
       - '.github/workflows/release.yml'
     tags:
       - 'v*'
@@ -62,7 +61,7 @@ jobs:
           test -f LICENSE
           test -f README.md
           test -f release/RELEASE_MANIFEST.json
-          bash -n .github/scripts/release-acceptance.sh
+          bash -n release/scripts/acceptance.sh
       - name: Compile and test all Python tools
         shell: bash
         run: |
@@ -171,7 +170,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bash .github/scripts/release-acceptance.sh "$BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance"
+          bash release/scripts/acceptance.sh "$BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance"
       - name: Package tar distribution
         if: matrix.archive == 'tar'
         shell: bash
@@ -223,7 +222,7 @@ jobs:
             test -x "$extracted/affected-tests"
           fi
 
-          bash .github/scripts/release-acceptance.sh "$extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance-extracted"
+          bash release/scripts/acceptance.sh "$extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance-extracted"
       - uses: actions/upload-artifact@v4
         with:
           name: release-v${{ env.RELEASE_VERSION }}-${{ matrix.name }}
