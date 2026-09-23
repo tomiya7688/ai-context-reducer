@@ -1,0 +1,262 @@
+# Context Manifest
+
+この文書は、AIへ渡す候補情報をいきなり全文で集めるのではなく、**原典へのpointerを小さい目録として先に持ち、そこから現在taskのworking setを選ぶ**手法を定義します。
+
+Context Manifestは仕様書でも要約集でもありません。必要な原典へ短く到達するためのrouting用indexです。
+
+## 1. Context Manifestとは
+
+Context Manifestは、現在または今後のtaskで参照候補になり得るsource / tests / docs / task / policy等を、内容そのものではなくpointer中心で列挙したものです。
+
+最小のentryは次の程度で十分です。
+
+~~~text
+pointer
+role / reason
+scope
+optional priority or status
+~~~
+
+例:
+
+~~~text
+docs/storage.md        specification      save format
+src/storage/           implementation     persistence
+tests/test_storage.py  validation         persistence
+issue #123             current task       save migration
+~~~
+
+file本文や長いsummaryをmanifestへ複製しません。
+
+## 2. 目的
+
+大きいrepositoryでは、task開始時に「何が存在するか」を確認するだけでREADME、docs一覧、source tree、test tree、Issue等を広く読むことがあります。
+
+Context Manifestはその探索を短いpointer一覧へ置き換えます。
+
+~~~text
+Task
+  -> Context Manifest
+  -> relevant pointers only
+  -> selected working set
+  -> original source / tests / docs
+~~~
+
+manifest自体を読めば実装判断が完結することを目指しません。**何を読むかを決めるところまで**を担当します。
+
+## 3. pointer中心にする
+
+manifestへ持たせる情報は、working set選択に必要な最小情報に限定します。
+
+推奨:
+
+- path / URL / Issue ID等のpointer
+- 情報の役割
+- 対象scope
+- task relevanceやpriorityの短いhint
+- generated / stale / unavailable等、routingに必要な状態
+
+通常は持たせない:
+
+- source本文
+- test本文
+- docs本文
+- 長い要約
+- 詳細な設計説明
+- full diff / full log
+- 原典と同じ制約文の複製
+
+判断に本文が必要になった時点でpointerから原典へ戻ります。
+
+## 4. Source of Truthを置き換えない
+
+Context Manifestは派生情報です。
+
+~~~text
+Source of Truth
+  -> source / tests / formal docs / Issue / policy
+
+Context Manifest
+  -> pointer / routing hint
+~~~
+
+manifestと原典が矛盾する場合は原典を優先します。
+
+長期的な仕様変更、設計判断、未完了要求をmanifestだけへ書き込みません。必要なら原典側を更新し、manifestは再生成または短く更新します。
+
+## 5. AI_CONTEXT / Current State / Context Packとの役割分担
+
+似た文書を増やして同じ情報を複製しないよう、責務を分けます。
+
+### AI_CONTEXT
+
+AI_CONTEXTは、repository全体で比較的長く有効な**入口・読む順番・重要制約・routing方針**を持ちます。
+
+~~~text
+AI_CONTEXT
+  -> where to start / stable routing rules
+~~~
+
+毎taskの候補file一覧を大量に載せません。
+
+### Current State
+
+[Current State](context-state.md) は、現在利用できる主要機能・制約・未実装等の**projectの現在地**を短く示します。
+
+~~~text
+Current State
+  -> what is currently true
+~~~
+
+file inventoryやtask working setの一覧にはしません。
+
+### Context Manifest
+
+Context Manifestは、**どの原典を候補として選べるか**をpointer中心で示します。
+
+~~~text
+Context Manifest
+  -> what can be selected
+~~~
+
+内容を複製せず、working set選択の前段に置きます。
+
+### Context Pack
+
+[Context Pack](context-pack.md) は、現在taskを進めるために**実際に選ばれた情報と完了条件**をまとめる一時パケットです。
+
+~~~text
+Context Pack
+  -> what this task actually needs
+~~~
+
+関係は次のように整理できます。
+
+~~~text
+AI_CONTEXT
+  -> stable entry / routing
+
+Current State
+  -> current capability / constraints
+
+Context Manifest (optional)
+  -> bounded candidate pointers
+
+Context Pack
+  -> selected task working set
+
+Original sources
+  -> final evidence / implementation truth
+~~~
+
+ManifestとContext Packを同じ内容の二重管理にしません。Manifestは候補、Context Packは今回選んだものです。
+
+## 6. bounded context
+
+manifestがrepository全体の巨大file listになったら目的を失います。
+
+agentへ見せるmanifestはboundedにします。
+
+- task relevanceで先に絞る
+- role / scopeごとに必要なentryだけ返す
+- entry数に上限を設ける
+- truncationが起きたら明示する
+- 追加候補が必要な場合だけexpandする
+
+tool内部でrepository全体をscanしても構いません。重要なのは、agent-visible outputを必要範囲へ限定することです。
+
+~~~text
+internal scan may be broad
+agent-visible manifest should be bounded
+~~~
+
+単純なsizeやfile種別だけで「必ず読むべき」と断定せず、現在taskとの関連を優先します。
+
+## 7. working set選択
+
+manifestを利用する場合でも、最終的なworking setはtaskから決めます。
+
+~~~text
+Goal / Required / Acceptance
+  -> manifest candidates
+  -> target source
+  -> matching tests
+  -> direct dependencies
+  -> detailed docs only if needed
+~~~
+
+manifestに載っているから読む、ではありません。
+
+候補が多い場合はTask Routing / Change Routing / Responsibility Map / Source Structure Index等を使ってさらに絞ります。
+
+## 8. 更新とstaleness
+
+manifestは原典より古くなり得ます。
+
+- 自動生成できるなら必要時に再生成する
+- manual manifestは小さく保つ
+- source移動や責務変更時にpointerを更新する
+- staleと判明したentryをrouting sourceとして使わない
+- 古いmanifestへ新しいsummaryを継ぎ足し続けない
+
+manifestを長期履歴の保存場所にしません。
+
+## 9. 作らない方がよい条件
+
+次のようなtaskではContext Manifestを作らない方が簡単です。
+
+- target source / tests / docsが依頼時点で明確
+- repositoryが小さく、候補探索がほぼ発生しない
+- 数fileだけの局所変更
+- 一度きりで再利用可能性が低いtask
+- manifest作成コストが直接pointerを渡すコストより大きい
+- AI_CONTEXT / Responsibility Map / Change Routing Mapだけで十分に絞れる
+
+例えば「この1fileのこの関数を修正し、対応testを直す」のようなtaskにrepository-wide manifestは不要です。
+
+導入判断は次で行います。
+
+~~~text
+expected repeated routing saving
+    > manifest creation + maintenance cost
+~~~
+
+## 10. 表現形式
+
+形式は固定しません。
+
+- Markdown
+- JSON
+- line-oriented text
+- database / IDE index
+- generated temporary artifact
+- existing repository metadata
+
+どの形式でも、pointer中心・bounded・原典優先・task relevance優先を守れば構いません。
+
+## 11. 補助実装
+
+このrepositoryには tools/common/large/context-manifest があります。
+
+これはrepository filesをscanし、file path / size /粗いpriorityを持つbounded JSON manifestへ変換する**補助実装**です。
+
+このtoolのpriority規則やJSON schemaはContext Manifest手法そのものではありません。
+
+- toolを使わずmanual pointer listでもよい
+- project固有indexを使ってもよい
+- toolのP0..P4はrouting hintであり絶対的な重要度ではない
+- task relevanceが分かる場合はtask-specific routingを優先する
+- tool outputも原典を置き換えない
+
+## 12. 標準推奨
+
+- Context Manifestは原典へのpointer目録として扱う
+- full contentや長いsummaryを複製しない
+- working set選択に必要な最小metadataだけを持つ
+- agent-visible outputをboundedにする
+- Source of Truthを置き換えない
+- AI_CONTEXT / Current State / Context Packと責務を分ける
+- manifest掲載を読む理由にせずtask relevanceを優先する
+- staleなmanifestを使い続けない
+- Small repoや対象明確な小taskでは作らない
+- 特定toolやJSON formatを手法の成立条件にしない
