@@ -55,6 +55,7 @@ Aだけで十分な小規模プロジェクトもあります。
 
 | 手法 | 向いているプロジェクト |
 |---|---|
+| [Context Priority / Hotspot](context-priority.md) | 大きいfileや変更集中領域があり、全文readより先にrouting粒度を選びたい |
 | Source Structure Index | 非常に大きいコードベース、巨大ファイル、多数のcall/dependency関係 |
 | changed-symbol routing | 大きいファイル内の一部symbolだけを頻繁に変更する |
 | artifact-boundary validation | build / package / distribution がsource treeと異なる |
@@ -98,7 +99,7 @@ A Core
 + 必要なら Validation Routing
 ```
 
-Context Manifest、Task Routing や Source Structure Index は通常不要です。target source / tests / docsが明白な小taskでは、manifestを作らず直接pointerを渡します。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。test suiteが小さくfull runが安価ならChange / Test Impact Routingも不要です。Evidence Budgetも、target source / testsが明白な小taskでは形式化しません。
+Context Manifest、Context Priority / Hotspot、Task Routing や Source Structure Index は通常不要です。target source / tests / docsが明白な小taskでは、manifestを作らず直接pointerを渡します。Hierarchical Contextも、rootの小さいAI入口だけで十分なら導入しません。test suiteが小さくfull runが安価ならChange / Test Impact Routingも不要です。Evidence Budgetも、target source / testsが明白な小taskでは形式化しません。
 
 ### Medium
 
@@ -137,6 +138,7 @@ A Core
 + Evidence Budget（探索停止が曖昧なtask）
 + Hierarchical Context（multi-app / local ruleがある場合）
 + Change / Test Impact Routing（test suiteが大きい場合）
++ Context Priority / Hotspot（size等を読む対象のランキングにはしない）
 + Source Structure Index
 + changed-symbol routing
 + split Context Pack
