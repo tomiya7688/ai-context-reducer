@@ -8,6 +8,7 @@ TOOL = 'csharp-project-map'
 REF = re.compile(r'<ProjectReference\s+Include="([^"]+)"')
 
 
+# C# project参照をbounded mapへ集約し、対象外や失敗をclean結果と混同しない。
 def build_result(root: Path, max_source_files: int):
     projects = []
     read_errors = 0
@@ -54,6 +55,7 @@ def build_result(root: Path, max_source_files: int):
     }
 
 
+# CLI入力を検証し、通常結果と失敗状態を同じ機械可読JSON契約で返す。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')
