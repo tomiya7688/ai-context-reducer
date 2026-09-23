@@ -1,8 +1,8 @@
 # ignore-candidates
 
-Repository内の、agent contextへ入れる価値が低い可能性が高いpathを自己説明的JSONで候補提示します。
+Repository内の、agent contextへ入れる価値が低い可能性が高いpathを自己説明的JSONで候補提示します。手法そのものは [`Context Exclusion`](../../../../docs/context-exclusion.md) を参照してください。
 
-このtoolはignore ruleを自動適用しません。`review_required_before_ignoring=true` を返し、人間/agentがSource of Truthを確認してからignoreへ反映する前提です。
+このtoolはignore ruleを自動適用しません。`review_required_before_ignoring=true` を返し、人間/agentがSource of Truthとvalidation用途を確認してからcontext exclusionを判断する前提です。`.gitignore` / `.ignore` 等の設定書換えやfile削除は行いません。
 
 ## Usage
 
