@@ -26,7 +26,7 @@
 - Source of Truth の明示
 - 現在タスクと unrelated refactor の分離
 - targeted validation と Unverified areas
-- generated files / logs / history を通常コンテキストから除外
+- [Context Exclusion](context-exclusion.md): generated files / logs / vendor / caches / broad historyを通常コンテキストから除外し、Source of Truthやvalidationに必要なartifactは除外しない
 
 Aだけで十分な小規模プロジェクトもあります。
 
