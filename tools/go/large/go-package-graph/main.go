@@ -34,6 +34,7 @@ type graphOutput struct {
     ScanTruncated   bool   `json:"scan_truncated"`
 }
 
+// go.modからmodule pathを読み、package nodeをrepo内の安定識別子へ寄せる。
 func modulePath(root string) string {
     file, err := os.Open(filepath.Join(root, "go.mod"))
     if err != nil {
@@ -50,6 +51,7 @@ func modulePath(root string) string {
     return ""
 }
 
+// 1つのGo sourceをparseし、import依存とparse失敗を別signalとして返す。
 func importsOf(path string) ([]string, string) {
     file, err := parser.ParseFile(token.NewFileSet(), path, nil, parser.ImportsOnly)
     if err != nil {
@@ -70,6 +72,7 @@ func importsOf(path string) ([]string, string) {
     return out, "ok"
 }
 
+// Go sourceのpackage名だけをparseし、失敗時は空packageと混同しない。
 func packageName(root, module, dir string) string {
     rel, _ := filepath.Rel(root, dir)
     rel = filepath.ToSlash(rel)
@@ -85,6 +88,7 @@ func packageName(root, module, dir string) string {
     return strings.TrimSuffix(module, "/") + "/" + rel
 }
 
+// vendor等を避けながらGo sourceを決定論的に列挙する。
 func sourceFiles(root string) ([]string, error) {
     files := []string{}
     err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
@@ -106,6 +110,7 @@ func sourceFiles(root string) ([]string, error) {
     return files, nil
 }
 
+// package依存をfile nodeへ橋渡しし、truncationとparse失敗を完全性signalとして保持する。
 func buildPackageGraph(root string, limit int) (graphOutput, error) {
     allFiles, err := sourceFiles(root)
     if err != nil {
@@ -169,12 +174,14 @@ func buildPackageGraph(root string, limit int) (graphOutput, error) {
     }, nil
 }
 
+// graph結果を単一JSON表現へ出力し、同内容のtext重複を避ける。
 func emitGraph(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// CLI入力を検証し、bounded package graphと明示的failureを同じJSON契約で返す。
 func main() {
     limit := flag.Int("limit", 0, "maximum source files to analyze; 0 means unlimited")
     flag.Parse()
