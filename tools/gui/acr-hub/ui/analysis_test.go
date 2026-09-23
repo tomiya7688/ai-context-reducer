@@ -98,3 +98,23 @@ func TestSelectorMappingUsesRunnableGUIAction(t *testing.T) {
 		t.Fatalf("unexpected mappings: %+v", rows)
 	}
 }
+
+// TestRecommendationCatalogCoversNativeSelectorTools はnative counterpart候補をRun導線へ繋ぎます。
+func TestRecommendationCatalogCoversNativeSelectorTools(t *testing.T) {
+	paths := []string{
+		"common/small/repo-profile", "common/small/text-search", "common/small/path-find", "common/small/doc-index",
+		"common/small/git-history-health", "common/small/syntax-health", "common/medium/compact-diff",
+		"common/medium/remote-delta", "common/medium/change-router", "common/medium/context-pack-builder",
+		"common/medium/validation-plan", "common/medium/compact-log", "common/medium/acceptance-extractor",
+		"common/medium/exploration-stop-check", "common/medium/responsibility-candidates",
+		"common/medium/doc-duplicate-hints", "common/large/hotspot-report", "common/large/context-manifest",
+		"common/large/source-structure-index", "common/large/target-slice", "common/large/context-budget",
+		"common/medium/policy-index",
+	}
+	for _, path := range paths {
+		rows := recommendationRows([]selectorTool{{ToolPath: path, Availability: "ready", Reason: "fixture"}}, "recommended")
+		if len(rows) != 1 || rows[0].ActionID == "" || rows[0].Kind == "unavailable" {
+			t.Fatalf("%s not runnable: %+v", path, rows)
+		}
+	}
+}

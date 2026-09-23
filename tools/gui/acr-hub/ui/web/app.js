@@ -24,6 +24,16 @@
   const stderrOutput = el("stderr-output");
   const resultError = el("result-error");
   const health = el("health");
+  const analyzeProjectButton = el("analyze-project");
+  const analysisState = el("analysis-state");
+  const recommendationsPanel = el("recommendations-panel");
+  const projectProfile = el("project-profile");
+  const recommendedList = el("recommended-list");
+  const conditionalList = el("conditional-list");
+  const unavailableSection = el("unavailable-section");
+  const unavailableList = el("unavailable-list");
+  const analysisDetail = el("analysis-detail");
+  const selectionDetail = el("selection-detail");
 
   async function loadCatalog() {
     const response = await fetch("/api/actions", { cache: "no-store" });
@@ -143,6 +153,7 @@
 
   function setRunning(running) {
     runButton.disabled = running;
+    analyzeProjectButton.disabled = running;
     cancelButton.classList.toggle("hidden", !running);
     health.textContent = running ? "Running" : "Ready";
     health.className = "status-chip " + (running ? "running" : "neutral");
@@ -178,14 +189,7 @@
     resultPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  async function runAction(event) {
-    event.preventDefault();
-    const action = state.activeAction;
-    if (!action) return;
-    if (action.heavy && !allowHeavy.checked) {
-      showLocalFailure("Large / heavy解析の明示確認が必要です。", "confirmation_required");
-      return;
-    }
+  async function executeAction(action, values = {}, heavyAllowed = false) {
     state.controller = new AbortController();
     setRunning(true);
     resultPanel.classList.add("hidden");
@@ -196,8 +200,8 @@
         body: JSON.stringify({
           action_id: action.id,
           project_root: projectRoot.value,
-          values: collectValues(),
-          allow_heavy: allowHeavy.checked,
+          values,
+          allow_heavy: heavyAllowed,
         }),
         signal: state.controller.signal,
       });
@@ -207,6 +211,130 @@
     } catch (error) {
       if (error.name === "AbortError") showLocalFailure("キャンセルしました。", "cancelled");
       else showLocalFailure(error.message || String(error));
+    } finally {
+      state.controller = null;
+      setRunning(false);
+    }
+  }
+
+  async function runAction(event) {
+    event.preventDefault();
+    const action = state.activeAction;
+    if (!action) return;
+    if (action.heavy && !allowHeavy.checked) {
+      showLocalFailure("Large / heavy解析の明示確認が必要です。", "confirmation_required");
+      return;
+    }
+    await executeAction(action, collectValues(), allowHeavy.checked);
+  }
+
+  function recommendationNeedsInput(action) {
+    return action.heavy || action.writes_files || (action.fields || []).some((field) => field.kind !== "project_root");
+  }
+
+  async function runRecommendation(row) {
+    if (!row.action_id) return;
+    const action = state.actions.find((item) => item.id === row.action_id);
+    if (!action) return;
+    if (recommendationNeedsInput(action)) {
+      state.activeCategory = action.category;
+      renderCategories();
+      renderActions();
+      selectAction(action);
+      return;
+    }
+    state.activeAction = action;
+    await executeAction(action, {}, false);
+  }
+
+  function recommendationCard(row) {
+    const card = document.createElement("div");
+    card.className = "recommendation-card " + row.kind;
+    const title = document.createElement("h4");
+    title.textContent = row.title;
+    const reason = document.createElement("p");
+    reason.textContent = row.reason || "selector recommendation";
+    const meta = document.createElement("div");
+    meta.className = "recommendation-meta";
+    for (const value of [row.kind, row.availability, row.activation].filter(Boolean)) {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = value;
+      meta.appendChild(badge);
+    }
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = row.kind === "unavailable" ? "secondary" : "primary";
+    button.textContent = row.kind === "unavailable" ? "Unavailable" : "Run";
+    button.disabled = !row.action_id;
+    if (row.action_id) button.addEventListener("click", () => runRecommendation(row));
+    card.append(title, reason, meta, button);
+    return card;
+  }
+
+  function renderRecommendationList(target, rows) {
+    target.innerHTML = "";
+    for (const row of rows) target.appendChild(recommendationCard(row));
+    if (!rows.length) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = "該当候補はありません。";
+      target.appendChild(empty);
+    }
+  }
+
+  function showProjectAnalysis(payload) {
+    analysisState.textContent = payload.state;
+    analysisState.className = "status-chip " + payload.state;
+    if (payload.state !== "success") {
+      showLocalFailure(payload.error || payload.headline || "Project Analysisに失敗しました。", payload.state || "failure");
+      return;
+    }
+    const types = (payload.detected_project_types || []).join(", ");
+    projectProfile.textContent = "size: " + (payload.project_size_class || "unknown") + (types ? " / type: " + types : "");
+    const unavailable = [...(payload.recommended || []), ...(payload.conditional || [])].filter((row) => row.kind === "unavailable");
+    const recommended = (payload.recommended || []).filter((row) => row.kind === "recommended");
+    const conditional = (payload.conditional || []).filter((row) => row.kind === "conditional");
+    renderRecommendationList(recommendedList, recommended);
+    renderRecommendationList(conditionalList, conditional);
+    renderRecommendationList(unavailableList, unavailable);
+    unavailableSection.classList.toggle("hidden", unavailable.length === 0);
+    analysisDetail.textContent = payload.analysis?.detail || "(no detail)";
+    selectionDetail.textContent = payload.selection?.detail || "(no detail)";
+    recommendationsPanel.classList.remove("hidden");
+    recommendationsPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  async function runProjectAnalysis() {
+    if (!projectRoot.value.trim()) {
+      showLocalFailure("Project rootを指定してください。");
+      return;
+    }
+    state.controller = new AbortController();
+    setRunning(true);
+    analysisState.textContent = "running";
+    analysisState.className = "status-chip running";
+    recommendationsPanel.classList.add("hidden");
+    try {
+      const response = await fetch("/api/project-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-ACR-Session": sessionToken },
+        body: JSON.stringify({ project_root: projectRoot.value }),
+        signal: state.controller.signal,
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Project Analysisに失敗しました");
+      showProjectAnalysis(payload);
+    } catch (error) {
+      if (error.name === "AbortError") {
+        analysisState.textContent = "cancelled";
+        analysisState.className = "status-chip cancelled";
+        showLocalFailure("Project Analysisをキャンセルしました。", "cancelled");
+      } else {
+        analysisState.textContent = "failure";
+        analysisState.className = "status-chip failure";
+        showLocalFailure(error.message || String(error));
+      }
     } finally {
       state.controller = null;
       setRunning(false);
@@ -228,6 +356,7 @@
   }
 
   form.addEventListener("submit", runAction);
+  analyzeProjectButton.addEventListener("click", runProjectAnalysis);
   cancelButton.addEventListener("click", () => state.controller?.abort());
   el("close-panel").addEventListener("click", () => runPanel.classList.add("hidden"));
   loadCatalog().catch((error) => {

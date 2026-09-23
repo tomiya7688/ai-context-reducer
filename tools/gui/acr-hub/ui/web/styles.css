@@ -78,3 +78,42 @@ pre { max-height: 420px; overflow: auto; border: 1px solid var(--border); border
   .fields { grid-template-columns: 1fr; }
   .topbar { padding: 22px 20px; }
 }
+
+.analysis-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--panel), var(--accent-soft));
+  box-shadow: var(--shadow);
+}
+.analysis-hero p:last-child { margin-bottom: 0; }
+.analysis-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.recommendation-section { margin-top: 18px; }
+.recommendation-section h3 { margin-bottom: 10px; font-size: 15px; }
+.recommendation-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.recommendation-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--panel);
+}
+.recommendation-card.recommended { border-left: 4px solid var(--success); }
+.recommendation-card.conditional { border-left: 4px solid var(--warning); }
+.recommendation-card.unavailable { border-left: 4px solid var(--unavailable); opacity: .86; }
+.recommendation-card h4 { margin: 0 0 7px; font-size: 14px; }
+.recommendation-card p { margin: 0 0 10px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.recommendation-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.recommendation-meta .badge { background: #eef0f3; color: var(--muted); }
+.recommendation-card .primary, .recommendation-card .secondary { padding: 7px 11px; font-size: 12px; }
+.recommendation-card button:disabled { cursor: not-allowed; opacity: .6; }
+.analysis-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.analysis-details h4 { margin: 12px 0 6px; }
+@media (max-width: 780px) {
+  .analysis-hero { align-items: flex-start; flex-direction: column; }
+  .analysis-controls { justify-content: flex-start; }
+  .analysis-details { grid-template-columns: 1fr; }
+}

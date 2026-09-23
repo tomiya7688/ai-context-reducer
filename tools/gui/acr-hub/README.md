@@ -61,4 +61,19 @@ go run . --bundle-root /path/to/full-bundle --project /path/to/project
 
 画面カテゴリとaction入力は `ui/catalog.go`、compact resultは `ui/summary.go`、HTTP/APIは `ui/server.go`、CLI process境界は `backend/` がSource of Truthです。
 
-ワンクリック `Analyze -> Select -> recommended actions` 導線は #27 で追加します。
+## One-click Project Analysis
+
+`Analyze project` は1操作で既存 `acr-toolbox analyze` と `acr-toolbox select` だけを順に実行します。
+
+```text
+Analyze
+  -> Select
+  -> recommended / conditional / unavailable
+  -> user chooses Run
+```
+
+selectorが返していないLarge機能をGUI側から追加しません。Small repoにはSmall向けの候補だけを表示します。
+
+各候補の `Run` は既存GUI actionへ接続します。追加入力が不要なactionはその場で実行し、入力やheavy確認が必要なactionは既存フォームへ移動します。Python-only等でGUI native backendが持たない候補は `unavailable` として明示し、別processへ勝手にfallbackしません。
+
+Project Analysis中に推奨された機能そのものを自動実行することはありません。

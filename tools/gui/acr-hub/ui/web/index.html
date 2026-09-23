@@ -24,6 +24,47 @@
       <nav id="categories" class="categories" aria-label="Categories"></nav>
     </aside>
     <section class="workspace">
+      <section class="analysis-hero">
+        <div>
+          <p class="eyebrow">One-click routing</p>
+          <h2>Project Analysis</h2>
+          <p class="muted">Analyze → Selectだけを実行し、次に使う候補を表示します。推奨機能は自動実行しません。</p>
+        </div>
+        <div class="analysis-controls">
+          <span id="analysis-state" class="status-chip neutral">Not analyzed</span>
+          <button id="analyze-project" class="primary" type="button">Analyze project</button>
+        </div>
+      </section>
+
+      <section id="recommendations-panel" class="panel hidden" aria-live="polite">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Recommended actions</p>
+            <h2>次に使う候補</h2>
+            <p id="project-profile" class="muted"></p>
+          </div>
+        </div>
+        <div class="recommendation-section">
+          <h3>推奨</h3>
+          <div id="recommended-list" class="recommendation-grid"></div>
+        </div>
+        <div class="recommendation-section">
+          <h3>条件付き</h3>
+          <div id="conditional-list" class="recommendation-grid"></div>
+        </div>
+        <div id="unavailable-section" class="recommendation-section hidden">
+          <h3>Unavailable</h3>
+          <div id="unavailable-list" class="recommendation-grid"></div>
+        </div>
+        <details>
+          <summary>Analyze / Select の詳細</summary>
+          <div class="analysis-details">
+            <div><h4>Analyze</h4><pre id="analysis-detail"></pre></div>
+            <div><h4>Select</h4><pre id="selection-detail"></pre></div>
+          </div>
+        </details>
+      </section>
+
       <section>
         <div class="section-heading">
           <div>
