@@ -6,6 +6,7 @@ import (
     "testing"
 )
 
+// TestBuildResultDistinguishesParseFailureでparse失敗・unsupported input・truncation契約が回帰していないことを検証する。
 func TestBuildResultDistinguishesParseFailure(t *testing.T) {
     dir := t.TempDir()
     path := filepath.Join(dir, "broken.go")
@@ -24,6 +25,7 @@ func TestBuildResultDistinguishesParseFailure(t *testing.T) {
     }
 }
 
+// TestBuildResultReportsUnsupportedAndMissingInputsでparse失敗・unsupported input・truncation契約が回帰していないことを検証する。
 func TestBuildResultReportsUnsupportedAndMissingInputs(t *testing.T) {
     dir := t.TempDir()
     txt := filepath.Join(dir, "notes.txt")
