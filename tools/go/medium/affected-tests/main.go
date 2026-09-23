@@ -62,7 +62,9 @@ type result struct {
 
 type stringList []string
 
+// CLI flagの複数指定値を安定した文字列表現へ戻す。
 func (s *stringList) String() string { return strings.Join(*s, ",") }
+// CLIで繰り返し指定された値を順序を保って蓄積する。
 func (s *stringList) Set(v string) error {
     if v != "" {
         *s = append(*s, normalize(v))
@@ -70,8 +72,10 @@ func (s *stringList) Set(v string) error {
     return nil
 }
 
+// path separatorを統一し、platform差でrouting候補がずれないようにする。
 func normalize(s string) string { return filepath.ToSlash(strings.TrimSpace(s)) }
 
+// Git境界から変更fileだけを取得し、test routingの入力working setを狭める。
 func gitChanged(root, base string) ([]string, error) {
     args := []string{"-C", root, "diff", "--name-only"}
     if base != "" {
@@ -94,6 +98,7 @@ func gitChanged(root, base string) ([]string, error) {
     return files, nil
 }
 
+// 任意JSON設定を読み込み、未指定と読み込み失敗を呼び出し側で区別できるようにする。
 func loadJSON(path string, dst any) error {
     if path == "" {
         return nil
@@ -105,6 +110,7 @@ func loadJSON(path string, dst any) error {
     return json.Unmarshal(data, dst)
 }
 
+// 命名規則からcheapなtest候補を作り、明示mappingがなくても最初の候補を返す。
 func defaultsFor(path string) []string {
     p := normalize(path)
     ext := strings.ToLower(filepath.Ext(filepath.FromSlash(p)))
@@ -148,6 +154,7 @@ func defaultsFor(path string) []string {
     return uniq(out)
 }
 
+// path要素をslash区切りで連結し、platform非依存のmatching keyを作る。
 func joinSlash(parts ...string) string {
     cleaned := []string{}
     for _, part := range parts {
@@ -158,6 +165,7 @@ func joinSlash(parts ...string) string {
     return strings.Join(cleaned, "/")
 }
 
+// 候補順を維持したまま重複を除き、出力と探索の冗長化を防ぐ。
 func uniq(items []string) []string {
     seen := map[string]bool{}
     out := make([]string, 0, len(items))
@@ -171,6 +179,7 @@ func uniq(items []string) []string {
     return out
 }
 
+// 設定globを正規表現へ変換し、routing ruleを決定論的に評価できるようにする。
 func globRegexp(pattern string) (*regexp.Regexp, error) {
     pattern = normalize(pattern)
     var b strings.Builder
@@ -194,6 +203,7 @@ func globRegexp(pattern string) (*regexp.Regexp, error) {
     return regexp.Compile(b.String())
 }
 
+// 正規化済みpathへglob ruleを適用し、mapping一致だけを判定する。
 func match(pattern, path string) bool {
     if pattern == "" {
         return false
@@ -202,6 +212,7 @@ func match(pattern, path string) bool {
     return err == nil && re.MatchString(normalize(path))
 }
 
+// dependency mapから変更fileのconsumerを拾い、見落としやすいtest候補を補う。
 func dependencyConsumers(changed []string, deps depMap) []string {
     needles := []string{}
     for _, p := range changed {
@@ -228,6 +239,7 @@ func dependencyConsumers(changed []string, deps depMap) []string {
     return uniq(consumers)
 }
 
+// dependency mapのtruncation/errorを完全性signalへ変換し、安全側fallback判断に使う。
 func dependencyState(deps depMap, used bool) dependencyMapState {
     if !used {
         return dependencyMapState{Used: false}
@@ -248,6 +260,7 @@ func dependencyState(deps depMap, used bool) dependencyMapState {
     return dependencyMapState{Used: true, Complete: len(reasons) == 0, Reasons: reasons}
 }
 
+// 変更file・mapping・dependency情報を統合し、test候補とbroader fallback方針を決める。
 func analyze(changed []string, cfg config, deps depMap, dependencyMapUsed ...bool) result {
     broad := cfg.BroaderPatterns
     if len(broad) == 0 {
@@ -332,12 +345,14 @@ func analyze(changed []string, cfg config, deps depMap, dependencyMapUsed ...boo
     }
 }
 
+// affected-test結果を単一JSON契約で出力し、表現の重複を避ける。
 func emitAffected(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
+// CLI入力を検証し、通常routingと明示的failureを同じ機械可読契約で返す。
 func main() {
     root := flag.String("root", ".", "repository root")
     base := flag.String("base", "", "git diff base, e.g. origin/main...HEAD")
