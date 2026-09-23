@@ -48,6 +48,7 @@ Aだけで十分な小規模プロジェクトもあります。
 | Validation Routing | 変更によって必要な検証方法が大きく異なる |
 | Change / Test Impact Routing | test suiteが大きい・遅い、source/test対応やdependency情報があり毎回full suiteを回している |
 | compact policy checks | 規約が長い、または機械判定できる規則が多い |
+| [Documentation Duplication Control](documentation-duplication-control.md) | README / AI guide / docs間で同じ規則や説明が増え、更新driftや再読costが目立つ |
 
 ### C — Conditional / 特定プロジェクト向け
 
