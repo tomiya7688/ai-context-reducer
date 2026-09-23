@@ -12,15 +12,18 @@ CTAGS_EXCLUDES = (
 )
 
 
+# 外部backendの長いerrorをboundedにし、診断情報だけをcontextへ残す。
 def _bounded_error(text: str, fallback: str) -> str:
     value = text.strip() or fallback
     return value if len(value) <= ERROR_TEXT_LIMIT else value[:ERROR_TEXT_LIMIT]
 
 
+# JSON入力を明示的に読み、形式不正を空入力と混同しない。
 def load_json(path: str) -> object:
     return json.loads(Path(path).read_text(encoding='utf-8'))
 
 
+# JSON Linesを1行ずつ読み、ctags等のstream出力をboundedに受け取る。
 def load_json_lines(path: str) -> list[object]:
     rows = []
     for number, line in enumerate(Path(path).read_text(encoding='utf-8').splitlines(), 1):
@@ -33,12 +36,14 @@ def load_json_lines(path: str) -> list[object]:
     return rows
 
 
+# 共通index結果を単一JSON表現で出力し、表現の重複を避ける。
 def write_json(path: str, payload: object) -> None:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
+# SCIP CLI結果を取得し、backend不在や失敗を明示した構造で返す。
 def scip_print_json(path: str) -> dict[str, object]:
     executable = shutil.which('scip')
     if not executable:
@@ -75,6 +80,7 @@ def scip_print_json(path: str) -> dict[str, object]:
     return {'ok': True, 'status': 'ok', 'backend': 'scip', 'payload': payload}
 
 
+# ctags JSON Linesを取得し、backend失敗を握り潰さず正規化前へ渡す。
 def ctags_json(path: str) -> dict[str, object]:
     executable = shutil.which('ctags')
     if not executable:
