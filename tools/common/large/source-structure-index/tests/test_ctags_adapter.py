@@ -15,6 +15,7 @@ from processing import build_index
 
 
 class CtagsAdapterTests(unittest.TestCase):
+    # 複数ctags kind/scopeを含むfixtureを共通化し、正規化境界を同条件で検証する。
     def sample_rows(self):
         return [
             {'_type': 'ptag', 'name': 'JSON_OUTPUT_VERSION', 'path': '1.0'},
@@ -26,6 +27,7 @@ class CtagsAdapterTests(unittest.TestCase):
             },
         ]
 
+    # test_scope_becomes_symbol_ownershipでsource-structureのrouting・完全性・bounded出力契約を回帰検証する。
     def test_scope_becomes_symbol_ownership(self):
         payload, metadata = normalize_ctags_rows(self.sample_rows())
         self.assertEqual(metadata['tag_count'], 2)
@@ -41,6 +43,7 @@ class CtagsAdapterTests(unittest.TestCase):
             index['edges'],
         )
 
+    # test_missing_ctags_backend_is_explicitでsource-structureのrouting・完全性・bounded出力契約を回帰検証する。
     def test_missing_ctags_backend_is_explicit(self):
         with mock.patch('messenger.shutil.which', return_value=None):
             result = ctags_json('src')
@@ -48,6 +51,7 @@ class CtagsAdapterTests(unittest.TestCase):
         self.assertEqual(result['status'], 'backend_unavailable')
         self.assertEqual(result['backend'], 'ctags')
 
+    # test_cli_accepts_existing_ctags_json_linesでsource-structureのrouting・完全性・bounded出力契約を回帰検証する。
     def test_cli_accepts_existing_ctags_json_lines(self):
         script = SCRIPT_DIR / 'source_structure_index.py'
         with tempfile.TemporaryDirectory() as tmp:
