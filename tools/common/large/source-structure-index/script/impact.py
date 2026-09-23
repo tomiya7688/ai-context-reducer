@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict, deque
 
 
+# platform差を吸収したpath keyへ正規化し、依存edgeの照合漏れを避ける。
 def _path_key(raw: str) -> str:
     value = str(raw).replace('\\', '/')
     while value.startswith('./'):
@@ -10,6 +11,7 @@ def _path_key(raw: str) -> str:
     return value
 
 
+# 変更nodeから逆依存を辿り、完全性signal付きのbounded impact scopeを作る。
 def affected_scope(index: dict, changed_files: list[str], max_results: int) -> dict:
     nodes_by_id = {
         str(node['id']): node
