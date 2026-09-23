@@ -22,6 +22,11 @@ type Recommendation struct {
 	Heavy        bool   `json:"heavy,omitempty"`
 }
 
+// ProjectAnalysisInput はワンクリック分析に必要なproject rootだけを受け取ります。
+type ProjectAnalysisInput struct {
+	ProjectRoot string `json:"project_root"`
+}
+
 // ProjectAnalysisView はAnalyze -> Selectの結果と候補だけをcompactに返します。
 type ProjectAnalysisView struct {
 	State                backend.State    `json:"state"`

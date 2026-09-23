@@ -38,6 +38,7 @@ func (server Server) Handler() (http.Handler, error) {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/actions", server.handleActions)
+	mux.HandleFunc("/api/project-analysis", server.handleProjectAnalysis)
 	mux.HandleFunc("/api/run", server.handleRun)
 	mux.HandleFunc("/api/health", server.handleHealth)
 	mux.HandleFunc("/", server.handleIndex(staticFS))
@@ -64,6 +65,28 @@ func (server Server) handleActions(writer http.ResponseWriter, request *http.Req
 		"actions":         Actions(),
 		"initial_project": server.InitialProject,
 	})
+}
+
+// handleProjectAnalysis はAnalyze -> Selectだけを1操作で実行し候補は自動実行しません。
+func (server Server) handleProjectAnalysis(writer http.ResponseWriter, request *http.Request) {
+	if request.Method != http.MethodPost {
+		http.Error(writer, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if server.SessionToken == "" || request.Header.Get("X-ACR-Session") != server.SessionToken {
+		http.Error(writer, "invalid session", http.StatusForbidden)
+		return
+	}
+	request.Body = http.MaxBytesReader(writer, request.Body, 64*1024)
+	var input ProjectAnalysisInput
+	decoder := json.NewDecoder(request.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&input); err != nil {
+		writeJSON(writer, http.StatusBadRequest, map[string]any{"state": "failure", "error": "invalid request body"})
+		return
+	}
+	view := projectAnalysis(request.Context(), server.Invoker, input.ProjectRoot)
+	writeJSON(writer, http.StatusOK, view)
 }
 
 // handleRun は固定catalogからRequestを組み立て、既存CLIだけを起動します。
