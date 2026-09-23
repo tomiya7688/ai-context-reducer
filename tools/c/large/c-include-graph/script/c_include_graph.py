@@ -14,6 +14,7 @@ IGNORE_DIRS = {
 EXTENSIONS = {'.c', '.h'}
 
 
+# 依存物・生成物を避けながら解析対象sourceを決定論的に列挙する。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -26,6 +27,7 @@ def source_files(root: Path):
     return found
 
 
+# 解析対象の完全性とinclude依存を集約し、truncationや失敗件数も結果へ残す。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -60,6 +62,7 @@ def build_result(root: Path, limit: int):
     }
 
 
+# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
 def main():
     parser = argparse.ArgumentParser(description='Build a local C include graph.')
     parser.add_argument('root', nargs='?', default='.')
