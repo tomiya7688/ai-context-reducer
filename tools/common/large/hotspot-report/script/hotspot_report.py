@@ -10,10 +10,12 @@ SKIP = {
 }
 
 
+# hotspot結果を単一JSON契約で出力し、同内容のtext重複を避ける。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+# CLI入力を検証し、hotspotを読むべき対象ではなく補助signalとしてboundedに集計する。
 def main():
     parser = argparse.ArgumentParser(description='Report large/deep repository hotspots as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')
@@ -35,6 +37,7 @@ def main():
     stat_error_count = 0
     walk_error_count = 0
 
+    # walk失敗をwarningへ変換し、不完全なhotspot集計をclean扱いしない。
     def on_walk_error(_error):
         nonlocal walk_error_count
         walk_error_count += 1
