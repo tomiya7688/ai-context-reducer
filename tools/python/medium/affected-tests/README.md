@@ -3,10 +3,10 @@
 changed filesから、まず実行するtest候補と安全側fallbackを選ぶportable implementationです。
 
 ```text
-python affected_tests.py --root .
-python affected_tests.py --base origin/main...HEAD
-python affected_tests.py --changed src/parser/lexer.py src/parser/parser.py
-python affected_tests.py --dependency-map import-map.json --changed pkg/parser/lexer.py
+python script/affected_tests.py --root .
+python script/affected_tests.py --base origin/main...HEAD
+python script/affected_tests.py --changed src/parser/lexer.py src/parser/parser.py
+python script/affected_tests.py --dependency-map import-map.json --changed pkg/parser/lexer.py
 ```
 
 出力は常にself-describing JSONです。旧 `--json` は互換性のため受理しますが、出力modeは変わりません。

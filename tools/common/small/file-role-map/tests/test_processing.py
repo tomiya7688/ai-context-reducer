@@ -1,7 +1,7 @@
 import importlib.util
 from pathlib import Path
 
-MODULE = Path(__file__).parent / 'script' / 'file_role_map.py'
+MODULE = Path(__file__).parents[1] / 'script' / 'file_role_map.py'
 spec = importlib.util.spec_from_file_location('file_role_map', MODULE)
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)

@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).with_name('script') / 'source_of_truth_candidates.py'
+SCRIPT = Path(__file__).parents[1] / 'script' / 'source_of_truth_candidates.py'
 spec = importlib.util.spec_from_file_location('source_of_truth_candidates', SCRIPT)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)

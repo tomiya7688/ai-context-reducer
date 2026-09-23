@@ -2,7 +2,7 @@ import importlib.util
 from collections import Counter
 from pathlib import Path
 
-MODULE = Path(__file__).parent / 'script' / 'tool_selector.py'
+MODULE = Path(__file__).parents[1] / 'script' / 'tool_selector.py'
 spec = importlib.util.spec_from_file_location('tool_selector', MODULE)
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)

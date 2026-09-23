@@ -231,7 +231,7 @@ targeted failure
 
 ### file -> likely tests
 
-- Python: `tools/python/medium/affected-tests/affected_tests.py`
+- Python: `tools/python/medium/affected-tests/script/affected_tests.py`
 - Go: `tools/go/medium/affected-tests/`
 
 対応範囲:

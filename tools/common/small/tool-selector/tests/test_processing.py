@@ -2,7 +2,7 @@ import importlib.util
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).with_name('script') / 'tool_selector.py'
+SCRIPT = Path(__file__).parents[1] / 'script' / 'tool_selector.py'
 spec = importlib.util.spec_from_file_location('tool_selector', SCRIPT)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
