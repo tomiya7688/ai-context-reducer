@@ -118,7 +118,9 @@
       "implementation_issue": 25,
       "screen_issue": 26,
       "project_analysis_issue": 27,
-      "additional_runtime_required": false
+      "additional_runtime_required": false,
+      "source_module": "tools/gui/acr-hub",
+      "backend_package": "tools/gui/acr-hub/backend"
     }
   ],
   "setup_files": [

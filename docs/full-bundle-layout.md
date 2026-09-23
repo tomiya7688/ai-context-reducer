@@ -118,7 +118,9 @@ GUI action
 
 GUI専用の分析ロジックをFull Bundle contractには追加しません。CLI単体利用、stdout / stderr / exit code、既存JSON contractを維持します。
 
-Large / heavy解析やSDK / runtime / external toolのinstallはGUIからも自動実行しません。GUI実装の詳細は #25-#27 で行います。
+Large / heavy解析やSDK / runtime / external toolのinstallはGUIからも自動実行しません。backend実装は `tools/gui/acr-hub/backend` に置き、bundle rootの既存CLIを直接起動します。stdout JSONは再構築せず、GUI用の実行状態だけを別に分類します。
+
+画面は同じ `tools/gui/acr-hub` moduleへ #26 で追加し、ワンクリック分析導線は #27 で実装します。
 
 ## 7. profiles / templates
 
