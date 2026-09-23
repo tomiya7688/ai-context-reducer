@@ -160,7 +160,7 @@ Validation                -> validation-plan / syntax-health / compact-log
 Context pack              -> context-pack-builder
 Source structure          -> language-specific symbols / dependency / graph tools -> source-structure-index
 Context manifest          -> Context Manifest -> context-manifest (optional)
-Context priority          -> context-budget / hotspot-report
+Context priority          -> Context Priority / Hotspot -> context-budget / hotspot-report (signals)
 Git history health        -> git-history-health
 ```
 
@@ -171,6 +171,8 @@ Git history health        -> git-history-health
 `source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
 
 `context-manifest` は [`Context Manifest`](../docs/context-manifest.md) の補助実装です。手法のSource of Truthはdocs側にあり、repository-wide file listやtool固有priorityを手法そのものにはしません。agentへ渡すmanifestはpointer中心かつboundedにし、現在taskとの関連でworking setを選びます。
+
+`context-budget` / `hotspot-report` は [`Context Priority / Hotspot`](../docs/context-priority.md) の補助signalです。size / cost / depth等はtask relevanceの代わりではなく、高精度routingやsliceが必要な場所を判断する材料として使います。hotspot上位を自動的に読む対象にはしません。
 
 `architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/architecture-boundary-routing.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
 
