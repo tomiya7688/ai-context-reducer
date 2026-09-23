@@ -1,6 +1,6 @@
 # hotspot-report
 
-Repository内部で大きい / 深いfileを探索し、agentが最初に読む候補をbounded JSONへ圧縮します。
+Repository内部で大きい / 深いfileを探索し、高精度routingやsliceを検討するためのhotspot候補をbounded JSONへ圧縮します。出力上位をagentが読むべき対象とみなさず、現在taskとの関連を最優先します。手法は [`Context Priority / Hotspot`](../../../../docs/context-priority.md) を参照してください。
 
 ## Usage
 
@@ -38,7 +38,7 @@ hotspots_truncated
 
 `input_missing` / `input_not_directory` / `input_read_failed` と、成功した0件を混同しません。scan途中のfilesystem errorは `ok_with_warnings` とcountで示します。
 
-各hotspotは `path / bytes / depth` を返します。これは設計良否を断定するscoreではなく、読む優先順位を決めるrouting hintです。
+各hotspotは `path / bytes / depth` を返します。これは設計良否を断定するscoreでも、読むべきfileのランキングでもありません。task relevanceを別途確認し、必要ならsymbol / dependency / slice等の高精度routingへ進むためのcheap signalです。
 
 ## Development routing
 
