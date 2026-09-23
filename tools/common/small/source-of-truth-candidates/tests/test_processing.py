@@ -10,15 +10,16 @@ spec.loader.exec_module(module)
 
 
 class SourceOfTruthCandidatesTests(unittest.TestCase):
-    # test_zero_limit_means_unlimited は対象機能の契約と回帰条件が維持されることを確認する。
+    # 0指定が候補数を切り捨てず、scan件数も正しく返すことを検証する。
     def test_zero_limit_means_unlimited(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / 'architecture.md').write_text('a', encoding='utf-8')
             (root / 'design.md').write_text('b', encoding='utf-8')
-            candidates, truncated = module.candidate_paths(root, 0)
+            candidates, truncated, scanned = module.candidate_paths(root, 0)
             self.assertEqual(candidates['architecture'], ['architecture.md', 'design.md'])
             self.assertFalse(truncated['architecture'])
+            self.assertEqual(2, scanned)
 
 
 if __name__ == '__main__':
