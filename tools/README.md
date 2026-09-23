@@ -155,6 +155,7 @@ Change routing            -> change-router
 Architecture boundaries   -> Architecture Boundary Routing -> architecture-boundary-router (optional)
 Affected tests            -> affected-tests
 Policy routing            -> policy-index / policy-check / acr-toolbox policy-check
+Documentation duplication -> Documentation Duplication Control -> doc-duplicate-hints (hints)
 Canonical templates       -> template / acr-toolbox template
 Validation                -> validation-plan / syntax-health / compact-log
 Context pack              -> context-pack-builder
@@ -173,6 +174,8 @@ Git history health        -> git-history-health
 `context-manifest` は [`Context Manifest`](../docs/context-manifest.md) の補助実装です。手法のSource of Truthはdocs側にあり、repository-wide file listやtool固有priorityを手法そのものにはしません。agentへ渡すmanifestはpointer中心かつboundedにし、現在taskとの関連でworking setを選びます。
 
 `context-budget` / `hotspot-report` は [`Context Priority / Hotspot`](../docs/context-priority.md) の補助signalです。size / cost / depth等はtask relevanceの代わりではなく、高精度routingやsliceが必要な場所を判断する材料として使います。hotspot上位を自動的に読む対象にはしません。
+
+`doc-duplicate-hints` は [`Documentation Duplication Control`](../docs/documentation-duplication-control.md) のhint実装です。重複候補を絞るだけで、どちらがSource of Truthか、intentional duplicationか、削除可能かは決定しません。自動削除・自動統合には使いません。
 
 `architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/architecture-boundary-routing.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
 
