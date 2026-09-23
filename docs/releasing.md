@@ -57,6 +57,16 @@ SHA256SUMS
 
 現在のcandidate versionは `release/RELEASE_MANIFEST.json` の `release_version` と一致させます。
 
+## Bundle variants
+
+v1.1.0以降は、軽量な通常版とGUI Hub付きFull Bundleを別artifactとして扱います。
+
+- 通常版: release/RELEASE_MANIFEST.json
+- Full Bundle: release/FULL_BUNDLE_MANIFEST.json
+- Full Bundle layout / compatibility: docs/full-bundle-layout.md
+
+Full Bundleは通常版root contentsをそのまま含む上位集合とし、Go sourceやGo toolchainを利用者へ要求しません。
+
 ## Candidate validation
 
 mainへのrelease関連変更でも同じcompletion workflowを実行します。この場合はReleaseを公開せず、`v1-release-candidate` artifactだけを生成します。
