@@ -69,6 +69,7 @@ func Actions() []Action {
 		{ID: "project-overview", Category: "project-analysis", Title: "プロジェクト概要を確認", Description: "repositoryの規模・言語・runtime等の事実を確認します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox analyze", Program: backend.ProgramACRToolbox},
 		{ID: "tool-routing", Category: "project-analysis", Title: "使う機能を選ぶ", Description: "現在のrepositoryに合う機能候補と探索停止条件を確認します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox select", Program: backend.ProgramACRToolbox},
 		{ID: "language-setup", Category: "project-analysis", Title: "言語解析の利用可否を確認", Description: "既存runtime/compilerを確認し、利用できる言語解析だけを候補化します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox language-setup", Program: backend.ProgramACRToolbox},
+		{ID: "git-history-health", Category: "project-analysis", Title: "Git履歴の大きさを確認", Description: "既存git-sizerが利用可能な場合だけ履歴・object sizeの懸念をcompactに確認します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox git-history-health", Program: backend.ProgramACRToolbox},
 		{ID: "context-manifest", Category: "context-reduction", Title: "参照候補を小さく一覧化", Description: "source・test・docsの候補をboundedなpointer一覧へ圧縮します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox context-manifest", Program: backend.ProgramACRToolbox},
 		{
 			ID: "context-budget", Category: "context-reduction", Title: "コンテキスト量を見積もる", Description: "大きな候補を読む前に概算コストを確認します。",
@@ -80,6 +81,9 @@ func Actions() []Action {
 			Fields: []Field{project, {ID: "goal", Label: "Goal", Kind: "text", Required: true, Placeholder: "今回実現すること"}, {ID: "acceptance", Label: "Acceptance", Kind: "text", Required: true, Placeholder: "完了条件"}, {ID: "output", Label: "Output file", Kind: "path", Required: true, Default: "CONTEXT_PACK.md"}},
 			WritesFiles: true, TechnicalCommand: "acr-toolbox context-pack-builder", Program: backend.ProgramACRToolbox,
 		},
+		{ID: "acceptance-extractor", Category: "context-reduction", Title: "Goalと完了条件を抽出", Description: "task文書からGoal / Required / Acceptance / Deferredだけをboundedに取得します。", Fields: []Field{{ID: "file", Label: "Task / specification Markdown", Kind: "path", Required: true}}, TechnicalCommand: "acr-toolbox acceptance-extractor", Program: backend.ProgramACRToolbox},
+		{ID: "exploration-stop", Category: "context-reduction", Title: "追加探索を止めてよいか確認", Description: "Goal / Required / Acceptance / source / testsが揃っているかを確認します。", Fields: []Field{{ID: "file", Label: "Context Markdown", Kind: "path", Required: true}}, TechnicalCommand: "acr-toolbox exploration-stop-check", Program: backend.ProgramACRToolbox},
+		{ID: "responsibility-candidates", Category: "context-reduction", Title: "責務表の候補を作る", Description: "大きいcode file候補からResponsibility Mapのstarterを作ります。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox responsibility-candidates", Program: backend.ProgramACRToolbox},
 		{
 			ID: "text-search", Category: "search-structure", Title: "文字列から候補を探す", Description: "full fileを読む前に一致箇所だけを絞ります。",
 			Fields: []Field{project, {ID: "query", Label: "Search text", Kind: "text", Required: true, Placeholder: "ServiceName"}, {ID: "glob", Label: "File glob", Kind: "text", Placeholder: "*.go", Help: "空なら全対象"}},
@@ -91,6 +95,9 @@ func Actions() []Action {
 			TechnicalCommand: "acr-toolbox find", Program: backend.ProgramACRToolbox,
 		},
 		{ID: "tree-view", Category: "search-structure", Title: "directory構造を小さく見る", Description: "repository全体を展開せずbounded treeを表示します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox tree", Program: backend.ProgramACRToolbox},
+		{ID: "doc-index", Category: "search-structure", Title: "文書の見出しだけ確認", Description: "Markdown全文を読む前に見出しとlineだけを確認します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox doc-index", Program: backend.ProgramACRToolbox},
+		{ID: "hotspot-report", Category: "search-structure", Title: "大きいfile候補を確認", Description: "size / depthを補助signalとして候補だけをboundedに表示します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox hotspot-report", Program: backend.ProgramACRToolbox},
+		{ID: "structure-query", Category: "search-structure", Title: "構造索引から対象を検索", Description: "既存Source Structure Indexからsymbol / module候補だけを検索します。", Fields: []Field{{ID: "index", Label: "Structure index JSON", Kind: "path", Required: true}, {ID: "pattern", Label: "Symbol / module pattern", Kind: "text", Required: true}}, TechnicalCommand: "acr-toolbox structure-index query", Program: backend.ProgramACRToolbox},
 		{
 			ID: "target-slice", Category: "search-structure", Title: "対象箇所だけ読む", Description: "pattern周辺のsourceだけをboundedに取り出します。",
 			Fields: []Field{{ID: "pattern", Label: "Pattern", Kind: "text", Required: true}, {ID: "file", Label: "Source file", Kind: "path", Required: true}},
@@ -103,6 +110,9 @@ func Actions() []Action {
 			Fields: []Field{project, {ID: "changed", Label: "Changed paths", Kind: "multiline", Placeholder: "src/foo.go\\ntests/foo_test.go", Help: "空ならGit差分を利用"}},
 			TechnicalCommand: "acr-toolbox change-router", Program: backend.ProgramACRToolbox,
 		},
+		{ID: "compact-diff", Category: "change-validation", Title: "Git差分を小さく確認", Description: "commit summary / changed files / shortstat / bounded diffだけを表示します。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox compact-diff", Program: backend.ProgramACRToolbox},
+		{ID: "remote-delta", Category: "change-validation", Title: "remoteとの差分を確認", Description: "remote divergenceをcompactに確認し、repository全体の再読を避けます。", Fields: []Field{project}, TechnicalCommand: "acr-toolbox remote-delta", Program: backend.ProgramACRToolbox},
+		{ID: "compact-log", Category: "change-validation", Title: "長い検証ログを圧縮", Description: "log fileからwarning / error周辺とtailだけを表示します。", Fields: []Field{{ID: "file", Label: "Log file", Kind: "path", Required: true}}, TechnicalCommand: "acr-toolbox compact-log", Program: backend.ProgramACRToolbox},
 		{ID: "validation-plan", Category: "change-validation", Title: "必要な検証を選ぶ", Description: "変更pathから最小のvalidation種類を選びます。", Fields: []Field{pathList("paths", "Changed paths", "project rootからの相対pathでも可")}, TechnicalCommand: "acr-toolbox validation-plan", Program: backend.ProgramACRToolbox},
 		{ID: "affected-tests", Category: "change-validation", Title: "影響するtestを選ぶ", Description: "changed pathから実行候補testを絞ります。", Fields: []Field{project, pathList("changed", "Changed paths", "1件以上指定")}, TechnicalCommand: "affected-tests", Program: backend.ProgramAffectedTests},
 		{ID: "syntax-health", Category: "change-validation", Title: "構文状態をcheapに確認", Description: "既存Tree-sitter等が利用可能な場合だけsyntax evidenceを取得します。", Fields: []Field{pathList("paths", "Target files", "parser未導入時はunavailableとして表示")}, TechnicalCommand: "acr-toolbox syntax-health", Program: backend.ProgramACRToolbox},
@@ -174,12 +184,20 @@ func buildRequest(input RunInput) (backend.Request, Action, error) {
 		request.Args = []string{"select", root}
 	case "language-setup":
 		request.Args = []string{"language-setup", root}
+	case "git-history-health":
+		request.Args = []string{"git-history-health", root}
 	case "context-manifest":
 		request.Args = []string{"context-manifest", root}
 	case "context-budget":
 		request.Args = []string{"context-budget", "--mode", value("mode"), "--top", "40", root}
 	case "context-pack":
 		request.Args = []string{"context-pack-builder", "--goal", value("goal"), "--acceptance", value("acceptance"), "--output", value("output"), root}
+	case "acceptance-extractor":
+		request.Args = []string{"acceptance-extractor", value("file")}
+	case "exploration-stop":
+		request.Args = []string{"exploration-stop-check", value("file")}
+	case "responsibility-candidates":
+		request.Args = []string{"responsibility-candidates", "--max", "120", root}
 	case "text-search":
 		request.Args = []string{"search", "--max-results", "50"}
 		if glob := value("glob"); glob != "" {
@@ -190,6 +208,12 @@ func buildRequest(input RunInput) (backend.Request, Action, error) {
 		request.Args = []string{"find", "--type", "file", "--max-results", "80", value("pattern"), root}
 	case "tree-view":
 		request.Args = []string{"tree", root}
+	case "doc-index":
+		request.Args = []string{"doc-index", root}
+	case "hotspot-report":
+		request.Args = []string{"hotspot-report", "--limit", "30", root}
+	case "structure-query":
+		request.Args = []string{"structure-index", "query", "--max-results", "40", value("index"), value("pattern")}
 	case "target-slice":
 		request.Args = []string{"slice", value("pattern"), value("file")}
 	case "large-plan":
@@ -200,6 +224,12 @@ func buildRequest(input RunInput) (backend.Request, Action, error) {
 			request.Args = append(request.Args, "--allow-heavy")
 		}
 		request.Args = append(request.Args, root)
+	case "compact-diff":
+		request.Args = []string{"compact-diff", root}
+	case "remote-delta":
+		request.Args = []string{"remote-delta", root}
+	case "compact-log":
+		request.Args = []string{"compact-log", value("file")}
 	case "change-routing":
 		request.Args = []string{"change-router"}
 		for _, changed := range splitLines(value("changed")) {
