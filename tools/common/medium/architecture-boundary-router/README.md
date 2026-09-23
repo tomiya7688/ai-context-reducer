@@ -1,6 +1,6 @@
 # architecture-boundary-router
 
-Project-provided architecture profileを、agentの最初のworking setを選ぶrouting hintへ変換します。特定architectureの適合checkerではありません。
+Project-provided architecture profileを、agentの最初のworking setを選ぶrouting hintへ変換します。特定architectureの適合checkerではありません。手法そのものは [`docs/architecture-boundary-routing.md`](../../../../docs/architecture-boundary-routing.md) を参照してください。
 
 ## Development routing
 
