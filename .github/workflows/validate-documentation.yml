@@ -1,0 +1,26 @@
+name: Validate documentation mapping
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+      - '.github/scripts/validate_documentation.py'
+      - '.github/scripts/test_validate_documentation.py'
+      - '.github/workflows/validate-documentation.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/scripts/validate_documentation.py'
+      - '.github/scripts/test_validate_documentation.py'
+      - '.github/workflows/validate-documentation.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test documentation validator
+        run: python3 .github/scripts/test_validate_documentation.py
+      - name: Validate document mapping and links
+        run: python3 .github/scripts/validate_documentation.py .
