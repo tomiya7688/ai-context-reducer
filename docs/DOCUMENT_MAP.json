@@ -20,187 +20,187 @@
       "id": "adoption-priority",
       "japanese": "docs/jp/導入優先度.md",
       "english": "docs/en/adoption-priority.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "adoption-prompt",
       "japanese": "docs/jp/導入依頼文.md",
       "english": "docs/en/adoption-prompt.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "architecture-boundary-routing",
       "japanese": "docs/jp/既存の設計境界で読む範囲を絞る.md",
       "english": "docs/en/architecture-boundary-routing.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "boilerplate-generation",
       "japanese": "docs/jp/定型文と定型ファイルを生成する.md",
       "english": "docs/en/boilerplate-generation.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "change-impact-routing",
       "japanese": "docs/jp/変更の影響範囲から検証対象を絞る.md",
       "english": "docs/en/change-impact-routing.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "change-routing-map",
       "japanese": "docs/jp/変更内容ごとの案内表.md",
       "english": "docs/en/change-routing-map.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "context-exclusion",
       "japanese": "docs/jp/通常は読まないものを決める.md",
       "english": "docs/en/context-exclusion.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "context-manifest",
       "japanese": "docs/jp/参照先の目録.md",
       "english": "docs/en/context-manifest.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "context-pack",
       "japanese": "docs/jp/作業用メモ.md",
       "english": "docs/en/context-pack.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "context-priority",
       "japanese": "docs/jp/読む候補の優先度を付ける.md",
       "english": "docs/en/context-priority.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "context-reduction-basics",
       "japanese": "docs/jp/コンテキスト削減の基本.md",
       "english": "docs/en/context-reduction-basics.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "context-state",
       "japanese": "docs/jp/現在の状態を短くまとめる.md",
       "english": "docs/en/context-state.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "documentation-duplication-control",
       "japanese": "docs/jp/文書の重複を管理する.md",
       "english": "docs/en/documentation-duplication-control.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "evidence-budget",
       "japanese": "docs/jp/確認する根拠の量を決める.md",
       "english": "docs/en/evidence-budget.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "exploration-control",
       "japanese": "docs/jp/探索を止める条件を決める.md",
       "english": "docs/en/exploration-control.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "external-tool-reference-policy",
       "japanese": "docs/jp/外部ツール掲載基準.md",
       "english": "docs/en/external-tool-reference-policy.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "external-tools",
       "japanese": "docs/jp/外部ツールの使い方.md",
       "english": "docs/en/external-tools.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "full-bundle-layout",
       "japanese": "docs/jp/Full Bundleの配布構成.md",
       "english": "docs/en/full-bundle-layout.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "guide",
       "japanese": "docs/jp/基本方針.md",
       "english": "docs/en/guide.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "hierarchical-context",
       "japanese": "docs/jp/場所ごとの指示.md",
       "english": "docs/en/hierarchical-context.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "language-tool-setup",
       "japanese": "docs/jp/言語別ツールの選び方.md",
       "english": "docs/en/language-tool-setup.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "policy-routing",
       "japanese": "docs/jp/規則の確認先を絞る.md",
       "english": "docs/en/policy-routing.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "portable-tools",
       "japanese": "docs/jp/追加インストールを減らすツール運用.md",
       "english": "docs/en/portable-tools.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "releasing",
       "japanese": "docs/jp/リリース手順.md",
       "english": "docs/en/releasing.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "remote-context",
       "japanese": "docs/jp/リモートとの差分を先に確認する.md",
       "english": "docs/en/remote-context.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "responsibility-map",
       "japanese": "docs/jp/ファイルとモジュールの役割表.md",
       "english": "docs/en/responsibility-map.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "source-structure-index",
       "japanese": "docs/jp/コード構造の索引.md",
       "english": "docs/en/source-structure-index.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "syntax-health-validation",
       "japanese": "docs/jp/構文チェックを軽い検証に使う.md",
       "english": "docs/en/syntax-health-validation.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "task-routing",
       "japanese": "docs/jp/作業別の案内表.md",
       "english": "docs/en/task-routing.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "validation-routing",
       "japanese": "docs/jp/変更内容に応じて検証を選ぶ.md",
       "english": "docs/en/validation-routing.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     },
     {
       "id": "method-index",
       "japanese": "docs/jp/手法一覧.md",
       "english": "docs/en/method-index.md",
-      "english_status": "pending_translation"
+      "english_status": "translated"
     }
   ]
 }
