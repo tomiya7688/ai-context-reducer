@@ -126,6 +126,17 @@ class DocumentationValidationTests(unittest.TestCase):
         self.en.write_text("# Example\n", encoding="utf-8")
         self.assert_error_contains("must link to its Japanese Source of Truth")
 
+    def test_escaped_markdown_backtick_is_detected(self) -> None:
+        (self.root / "README.en.md").write_text(
+            "# Example\n\n"
+            "English | [日本語](README.md)\n\n"
+            "[English docs](docs/en/)\n\n"
+            "[Releases](https://github.com/tomiya7688/ai-context-reducer/releases)\n\n"
+            "\\\`broken\\\`\n",
+            encoding="utf-8",
+        )
+        self.assert_error_contains("escaped backtick breaks Markdown code formatting")
+
     def test_missing_root_language_switch_is_detected(self) -> None:
         (self.root / "README.en.md").write_text(
             "# Example\n\n"
