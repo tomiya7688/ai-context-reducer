@@ -1,5 +1,7 @@
 # ai-context-reducer
 
+日本語 | [English](README.en.md)
+
 AI / Codex / Claude Code を使った開発で、AIに必要以上の情報を読ませず、必要な設計・実装情報へ正確にたどり着くための考え方と手法をまとめたリポジトリです。
 
 中心にあるのは手法と文書です。繰り返し作業や機械的に処理できる部分をAIのコンテキスト外へ出すために、補助的なportable toolも提供します。主要なCommon機能は `acr-toolbox` 単体バイナリで利用できます。
@@ -33,9 +35,11 @@ AI / Codex / Claude Code を使った開発で、AIに必要以上の情報を�
 
 要約は原典の代替ではなく索引として扱い、必要なら source / tests / docs / diff へ戻れる状態を維持します。
 
-## v1.0.x Portable Distribution
+## リリースとダウンロード
 
-v1.0.0以降のv1.0.xでは次の6環境向けarchiveを配布します。v1.0.1はv1.0.0と同じbundle構成・CLI / JSON contractを維持するパッチ版です。
+公開済みarchiveは [GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases) から取得できます。
+
+現在のv1.0.x Portable Distributionでは次の6環境向けarchiveを配布します。v1.0.1はv1.0.0と同じbundle構成・CLI / JSON contractを維持するパッチ版です。
 
 - Windows x64 / arm64
 - Linux x64 / arm64
@@ -65,9 +69,11 @@ acr-toolbox select <project-root>
 
 `acr-toolbox version` はrelease version / commit / OS / architectureをJSONで返します。
 
+v1.1.0では軽量な通常版を維持したまま、別archiveとしてGUI Hub付きFull Bundleを追加します。Full Bundleは通常版CLI contractを維持するsupersetで、利用者にGo toolchainの追加導入を要求しません。構成は [`docs/jp/Full Bundleの配布構成.md`](docs/jp/Full%20Bundleの配布構成.md)、Release手順は [`docs/jp/リリース手順.md`](docs/jp/リリース手順.md) を参照してください。
+
 ## Codex / Claude Code へ導入させる
 
-最初に読ませるのは基本的に次の3つだけです。
+最初に読ませる入口は基本的に次の4つだけです。
 
 1. この `README.md`
 2. [`docs/jp/コンテキスト削減の基本.md`](docs/jp/コンテキスト削減の基本.md)
@@ -145,7 +151,7 @@ remote競合があり得る場合は、実装前に compact remote delta を挟�
 
 ## 文書
 
-日本語文書は `docs/jp/` をSource of Truthとします。英語版は `docs/en/` に翻訳として配置し、日英対応は `docs/DOCUMENT_MAP.json` で管理します。英語文書の作成は #29 で進めます。
+日本語文書は [`docs/jp/`](docs/jp/) をSource of Truthとします。英語版は [`docs/en/`](docs/en/) に翻訳として配置し、日英対応は [`docs/DOCUMENT_MAP.json`](docs/DOCUMENT_MAP.json) で管理します。英語入口は [`README.en.md`](README.en.md) です。
 
 導入時に全部読む必要はありません。
 
