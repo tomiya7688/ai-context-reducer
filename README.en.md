@@ -4,7 +4,7 @@ English | [日本語](README.md)
 
 A repository of principles and methods for helping AI systems such as Codex and Claude Code reach the design and implementation information they need without reading more context than necessary.
 
-The main focus is the methods and documentation. Portable helper tools are also provided so repeated work and mechanically decidable processing can happen outside the AI context. Major Common capabilities are available through the single \`acr-toolbox\` binary.
+The main focus is the methods and documentation. Portable helper tools are also provided so repeated work and mechanically decidable processing can happen outside the AI context. Major Common capabilities are available through the single `acr-toolbox` binary.
 
 ## Three principles to understand first
 
@@ -26,12 +26,12 @@ Once enough information is available, stop exploring.
 
 Priority:
 
-\`\`\`text
+```text
 accuracy
   > speed of reaching the work target
   > amount of context reduction
   > amount of automation
-\`\`\`
+```
 
 Treat summaries as indexes rather than replacements for original sources, and preserve a path back to source / tests / docs / diff when needed.
 
@@ -47,27 +47,27 @@ The current v1.0.x portable distribution provides archives for:
 
 Each normal archive contains:
 
-- \`acr-toolbox\`
-- \`go-symbols\`
-- \`go-import-map\`
-- \`go-package-graph\`
-- \`affected-tests\`
-- \`README.md\`
-- \`TOOLS_README.md\`
-- \`LICENSE\`
-- \`RELEASE_MANIFEST.json\`
+- `acr-toolbox`
+- `go-symbols`
+- `go-import-map`
+- `go-package-graph`
+- `affected-tests`
+- `README.md`
+- `TOOLS_README.md`
+- `LICENSE`
+- `RELEASE_MANIFEST.json`
 
-A common \`SHA256SUMS\` file is published alongside the six archives.
+A common `SHA256SUMS` file is published alongside the six archives.
 
 Before distribution, GitHub Actions builds the actual native binaries for all six targets, runs E2E with those binaries, creates the archives, extracts them again, and verifies their contents. Source-side unit tests alone do not satisfy the Release gate.
 
-\`\`\`text
+```text
 acr-toolbox version
 acr-toolbox analyze <project-root>
 acr-toolbox select <project-root>
-\`\`\`
+```
 
-\`acr-toolbox version\` returns the release version, commit, OS, and architecture as JSON.
+`acr-toolbox version` returns the release version, commit, OS, and architecture as JSON.
 
 Starting with v1.1.0, the lightweight normal bundle remains available and a separate GUI Hub Full Bundle is added as a superset. The Full Bundle keeps the normal CLI contract and does not require users to install a Go toolchain. See [Full Bundle Distribution Design](docs/en/full-bundle-layout.md) and [Releasing v1.x](docs/en/releasing.md).
 
@@ -75,10 +75,10 @@ Starting with v1.1.0, the lightweight normal bundle remains available and a sepa
 
 The initial entry points are:
 
-1. this \`README.en.md\`
+1. this `README.en.md`
 2. [Context Reduction Basics](docs/en/context-reduction-basics.md)
 3. [Adoption Priority](docs/en/adoption-priority.md)
-4. [\`templates/AI_CONTEXT.md\`](templates/AI_CONTEXT.md)
+4. [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
 
 Then shallow-inspect the target repository and adopt **only the methods with meaningful expected benefit**, rather than everything.
 
@@ -88,13 +88,13 @@ A ready-to-use request is available in [Adoption Prompt](docs/en/adoption-prompt
 
 Keep the Core useful for almost every project small:
 
-- a small \`AI_CONTEXT.md\` or equivalent AI entry point
+- a small `AI_CONTEXT.md` or equivalent AI entry point
 - Search first, read second
 - stop exploring once Goal / Required / Acceptance are known
 - explicit Source of Truth
 - do not mix unrelated refactors into the current task
 - targeted validation
-- explicitly record unverified areas as \`Unverified\`
+- explicitly record unverified areas as `Unverified`
 - normally exclude logs / generated artifacts / history from context
 
 For a small repository, it is fine to stop here.
@@ -125,7 +125,7 @@ See [Adoption Priority](docs/en/adoption-priority.md) for detailed adoption sign
 
 ## Standard flow
 
-\`\`\`text
+```text
 AI_CONTEXT / existing agent guide
         ↓
 shallow inspection
@@ -145,25 +145,25 @@ implementation
 smallest sufficient validation
         ↓
 compact result + Unverified areas
-\`\`\`
+```
 
 When remote conflicts are possible, insert a compact remote delta before implementation.
 
 ## Documentation
 
-Japanese documentation under [\`docs/jp/\`](docs/jp/) is the Source of Truth. English translations are under [\`docs/en/\`](docs/en/). Japanese/English document pairs are managed by [\`docs/DOCUMENT_MAP.json\`](docs/DOCUMENT_MAP.json).
+Japanese documentation under [`docs/jp/`](docs/jp/) is the Source of Truth. English translations are under [`docs/en/`](docs/en/). Japanese/English document pairs are managed by [`docs/DOCUMENT_MAP.json`](docs/DOCUMENT_MAP.json).
 
 You do not need to read all documentation when adopting the project.
 
-- **Method Index**: [\`docs/en/method-index.md\`](docs/en/method-index.md) — one-line descriptions of each method and links to the detailed documents
-- Basic principles: [\`docs/en/context-reduction-basics.md\`](docs/en/context-reduction-basics.md)
-- Adoption decisions: [\`docs/en/adoption-priority.md\`](docs/en/adoption-priority.md)
-- Adoption prompt: [\`docs/en/adoption-prompt.md\`](docs/en/adoption-prompt.md)
-- Basic guide: [\`docs/en/guide.md\`](docs/en/guide.md)
-- External tool reference policy: [\`docs/en/external-tool-reference-policy.md\`](docs/en/external-tool-reference-policy.md)
-- Release / completion gate: [\`docs/en/releasing.md\`](docs/en/releasing.md)
-- AI entry-point template: [\`templates/AI_CONTEXT.md\`](templates/AI_CONTEXT.md)
-- Task template: [\`templates/CONTEXT_PACK.md\`](templates/CONTEXT_PACK.md)
+- **Method Index**: [`docs/en/method-index.md`](docs/en/method-index.md) — one-line descriptions of each method and links to the detailed documents
+- Basic principles: [`docs/en/context-reduction-basics.md`](docs/en/context-reduction-basics.md)
+- Adoption decisions: [`docs/en/adoption-priority.md`](docs/en/adoption-priority.md)
+- Adoption prompt: [`docs/en/adoption-prompt.md`](docs/en/adoption-prompt.md)
+- Basic guide: [`docs/en/guide.md`](docs/en/guide.md)
+- External tool reference policy: [`docs/en/external-tool-reference-policy.md`](docs/en/external-tool-reference-policy.md)
+- Release / completion gate: [`docs/en/releasing.md`](docs/en/releasing.md)
+- AI entry-point template: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
+- Task template: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
 
 Detailed links for individual methods are kept in the [Method Index](docs/en/method-index.md) rather than duplicated here.
 
@@ -182,10 +182,10 @@ When linking to a concrete external tool, the general rule is to include only to
 
 This project's own practices must not cause context bloat.
 
-\`\`\`text
+```text
 expected repeated context saving
     > adoption + maintenance cost
-\`\`\`
+```
 
 Do not add a mechanism that fails this condition.
 
