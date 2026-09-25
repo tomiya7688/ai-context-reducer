@@ -123,8 +123,53 @@ def validate_relative_links(
                 )
 
 
+def links_from(source: Path) -> list[Path]:
+    text = source.read_text(encoding="utf-8")
+    targets: list[Path] = []
+    for match in MARKDOWN_LINK_RE.finditer(text):
+        target = resolve_relative_link(source.parents[0], source, match.group(1))
+        if target is not None:
+            targets.append(target)
+    return targets
+
+
+def validate_root_navigation(repo_root: Path, errors: list[str]) -> list[Path]:
+    japanese_readme = repo_root / "README.md"
+    english_readme = repo_root / "README.en.md"
+    for path in (japanese_readme, english_readme):
+        if not path.is_file():
+            fail(errors, f"missing root language entry: {path.name}")
+    if not japanese_readme.is_file() or not english_readme.is_file():
+        return [path for path in (japanese_readme, english_readme) if path.is_file()]
+
+    jp_text = japanese_readme.read_text(encoding="utf-8")
+    en_text = english_readme.read_text(encoding="utf-8")
+    jp_targets = links_from(japanese_readme)
+    en_targets = links_from(english_readme)
+
+    if english_readme.resolve() not in jp_targets:
+        fail(errors, "README.md must link to README.en.md")
+    if japanese_readme.resolve() not in en_targets:
+        fail(errors, "README.en.md must link to README.md")
+
+    jp_root = (repo_root / "docs" / "jp").resolve()
+    en_root = (repo_root / "docs" / "en").resolve()
+    if not any(target == jp_root or jp_root in target.parents for target in jp_targets):
+        fail(errors, "README.md must link to docs/jp")
+    if not any(target == en_root or en_root in target.parents for target in en_targets):
+        fail(errors, "README.en.md must link to docs/en")
+
+    releases_url = "https://github.com/tomiya7688/ai-context-reducer/releases"
+    if releases_url not in jp_text:
+        fail(errors, "README.md must link to GitHub Releases")
+    if releases_url not in en_text:
+        fail(errors, "README.en.md must link to GitHub Releases")
+    return [japanese_readme, english_readme]
+
+
 def validate(repo_root: Path) -> list[str]:
     errors: list[str] = []
+    root_readmes = validate_root_navigation(repo_root, errors)
     mapping = load_mapping(repo_root, errors)
     documents = mapping.get("documents", []) if isinstance(mapping, dict) else []
     if not isinstance(documents, list):
@@ -223,7 +268,7 @@ def validate(repo_root: Path) -> list[str]:
             )
 
     all_docs = [repo_root / path for path in sorted(actual_jp | actual_en)]
-    validate_relative_links(repo_root, all_docs, errors)
+    validate_relative_links(repo_root, root_readmes + all_docs, errors)
     return errors
 
 
