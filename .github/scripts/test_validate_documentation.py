@@ -23,6 +23,20 @@ class DocumentationValidationTests(unittest.TestCase):
             "> Japanese Source of Truth: [日本語](../jp/日本語.md)\n",
             encoding="utf-8",
         )
+        (self.root / "README.md").write_text(
+            "# Example\n\n"
+            "日本語 | [English](README.en.md)\n\n"
+            "[日本語 docs](docs/jp/)\n\n"
+            "[Releases](https://github.com/tomiya7688/ai-context-reducer/releases)\n",
+            encoding="utf-8",
+        )
+        (self.root / "README.en.md").write_text(
+            "# Example\n\n"
+            "English | [日本語](README.md)\n\n"
+            "[English docs](docs/en/)\n\n"
+            "[Releases](https://github.com/tomiya7688/ai-context-reducer/releases)\n",
+            encoding="utf-8",
+        )
         self.write_mapping()
 
     def tearDown(self) -> None:
@@ -111,6 +125,33 @@ class DocumentationValidationTests(unittest.TestCase):
     def test_missing_language_navigation_is_detected(self) -> None:
         self.en.write_text("# Example\n", encoding="utf-8")
         self.assert_error_contains("must link to its Japanese Source of Truth")
+
+    def test_missing_root_language_switch_is_detected(self) -> None:
+        (self.root / "README.en.md").write_text(
+            "# Example\n\n"
+            "[English docs](docs/en/)\n\n"
+            "[Releases](https://github.com/tomiya7688/ai-context-reducer/releases)\n",
+            encoding="utf-8",
+        )
+        self.assert_error_contains("README.en.md must link to README.md")
+
+    def test_missing_docs_entry_is_detected(self) -> None:
+        (self.root / "README.md").write_text(
+            "# Example\n\n"
+            "[English](README.en.md)\n\n"
+            "[Releases](https://github.com/tomiya7688/ai-context-reducer/releases)\n",
+            encoding="utf-8",
+        )
+        self.assert_error_contains("README.md must link to docs/jp")
+
+    def test_missing_release_entry_is_detected(self) -> None:
+        (self.root / "README.en.md").write_text(
+            "# Example\n\n"
+            "[日本語](README.md)\n\n"
+            "[English docs](docs/en/)\n",
+            encoding="utf-8",
+        )
+        self.assert_error_contains("README.en.md must link to GitHub Releases")
 
 
 if __name__ == "__main__":
