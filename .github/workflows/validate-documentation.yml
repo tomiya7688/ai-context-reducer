@@ -3,12 +3,16 @@ name: Validate documentation mapping
 on:
   push:
     paths:
+      - 'README.md'
+      - 'README.en.md'
       - 'docs/**'
       - '.github/scripts/validate_documentation.py'
       - '.github/scripts/test_validate_documentation.py'
       - '.github/workflows/validate-documentation.yml'
   pull_request:
     paths:
+      - 'README.md'
+      - 'README.en.md'
       - 'docs/**'
       - '.github/scripts/validate_documentation.py'
       - '.github/scripts/test_validate_documentation.py'
