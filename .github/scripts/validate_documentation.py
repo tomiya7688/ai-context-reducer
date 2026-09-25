@@ -133,6 +133,16 @@ def links_from(source: Path) -> list[Path]:
     return targets
 
 
+def validate_markdown_code_escapes(source: Path, repo_root: Path, errors: list[str]) -> None:
+    text = source.read_text(encoding="utf-8")
+    if "\\`" in text:
+        fail(
+            errors,
+            f"{source.relative_to(repo_root).as_posix()}: "
+            "escaped backtick breaks Markdown code formatting",
+        )
+
+
 def validate_root_navigation(repo_root: Path, errors: list[str]) -> list[Path]:
     japanese_readme = repo_root / "README.md"
     english_readme = repo_root / "README.en.md"
@@ -144,6 +154,8 @@ def validate_root_navigation(repo_root: Path, errors: list[str]) -> list[Path]:
 
     jp_text = japanese_readme.read_text(encoding="utf-8")
     en_text = english_readme.read_text(encoding="utf-8")
+    validate_markdown_code_escapes(japanese_readme, repo_root, errors)
+    validate_markdown_code_escapes(english_readme, repo_root, errors)
     jp_targets = links_from(japanese_readme)
     en_targets = links_from(english_readme)
 
