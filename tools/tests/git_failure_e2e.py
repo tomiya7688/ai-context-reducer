@@ -36,7 +36,7 @@ def git(root: Path, *args: str) -> None:
 
 def main() -> None:
     if len(sys.argv) != 2:
-        raise SystemExit('usage: test_git_failure_e2e.py <acr-toolbox>')
+        raise SystemExit('usage: git_failure_e2e.py <acr-toolbox>')
     binary = Path(sys.argv[1]).resolve()
     if not binary.is_file():
         raise FileNotFoundError(binary)
