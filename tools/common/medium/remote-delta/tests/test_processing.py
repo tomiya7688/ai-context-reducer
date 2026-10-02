@@ -1,11 +1,17 @@
+import contextlib
+import importlib
+import io
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT_DIR = Path(__file__).resolve().parents[1] / 'script'
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from processing import compact_remote_delta
+import commander
+remote_delta = importlib.import_module('remote_delta')
 
 
 class CompactRemoteDeltaTests(unittest.TestCase):
@@ -55,6 +61,54 @@ class CompactRemoteDeltaTests(unittest.TestCase):
         self.assertIsNone(result['ahead'])
         self.assertIsNone(result['behind'])
         self.assertEqual(result['changed_files'], [])
+
+    # test_build_remote_delta_distinguishes_environment_ref_and_query_failures はGit failure種別の契約を固定する。
+    def test_build_remote_delta_distinguishes_environment_ref_and_query_failures(self):
+        root = Path('.')
+        with patch.object(commander, 'git_result', return_value=(False, '', 'git_unavailable')):
+            result = commander.build_remote_delta(root, 'HEAD', 'origin/main', 40)
+        self.assertEqual(result['status'], 'git_unavailable')
+
+        with patch.object(commander, 'git_result', return_value=(False, '', 'git_query_failed')):
+            result = commander.build_remote_delta(root, 'HEAD', 'origin/main', 40)
+        self.assertEqual(result['status'], 'git_unavailable_or_not_repository')
+
+        with patch.object(commander, 'git_result', side_effect=[
+            (True, 'true', ''), (True, '', ''), (False, '', 'git_query_failed'),
+            (False, '', 'remote_unavailable'),
+        ]):
+            result = commander.build_remote_delta(root, 'HEAD', 'origin/missing', 40)
+        self.assertEqual(result['status'], 'remote_unavailable')
+
+        with patch.object(commander, 'git_result', side_effect=[
+            (True, 'true', ''), (True, '', ''), (False, '', 'git_query_failed'),
+            (False, '', 'git_query_failed'),
+        ]):
+            result = commander.build_remote_delta(root, 'HEAD', 'origin/main', 40)
+        self.assertEqual(result['status'], 'git_query_failed')
+
+        with patch.object(commander, 'git_result', side_effect=[
+            (True, 'true', ''), (True, '', ''), (True, 'abc123', ''),
+            (False, '', 'git_query_failed'), (True, '0', ''), (True, '', ''),
+            (True, '', ''), (True, '', ''),
+        ]):
+            result = commander.build_remote_delta(root, 'missing-base', 'origin/main', 40)
+        self.assertEqual(result['status'], 'git_query_failed')
+
+    # test_cli_exit_code_matches_query_status はfailure statusをshell成功として返さない。
+    def test_cli_exit_code_matches_query_status(self):
+        for status, expected_code in (('git_query_failed', 2), ('remote_unavailable', 0)):
+            with self.subTest(status=status):
+                result = {'tool': 'remote-delta', 'status': status}
+                with patch.object(remote_delta, 'build_remote_delta', return_value=result), \
+                        patch.object(sys, 'argv', ['remote-delta']), \
+                        contextlib.redirect_stdout(io.StringIO()):
+                    if expected_code:
+                        with self.assertRaises(SystemExit) as raised:
+                            remote_delta.main()
+                        self.assertEqual(raised.exception.code, expected_code)
+                    else:
+                        remote_delta.main()
 
 
 if __name__ == '__main__':

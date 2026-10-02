@@ -53,6 +53,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Build host toolbox
         working-directory: tools/common/native/acr-toolbox
         shell: bash
@@ -93,6 +96,11 @@ jobs:
           printf '{"name":"World"}\n' > "$RUNNER_TEMP/acr-template-smoke/vars.json"
           "$BIN" template --template "$RUNNER_TEMP/acr-template-smoke/template.txt" --vars "$RUNNER_TEMP/acr-template-smoke/vars.json" --out "$RUNNER_TEMP/acr-template-smoke/out.txt" --required name --template-id smoke --template-version 1
           "$BIN" template --template "$RUNNER_TEMP/acr-template-smoke/template.txt" --vars "$RUNNER_TEMP/acr-template-smoke/vars.json" --out "$RUNNER_TEMP/acr-template-smoke/out.txt" --required name --check
+      - name: Smoke Git failure semantics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/tests/test_git_failure_e2e.py "${{ matrix.binary }}"
       - name: Smoke text pipeline
         shell: bash
         run: |

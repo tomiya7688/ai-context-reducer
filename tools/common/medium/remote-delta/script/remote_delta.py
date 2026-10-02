@@ -22,6 +22,8 @@ def main():
         max_files=args.max_files,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    if result['status'] in {'git_unavailable', 'git_unavailable_or_not_repository', 'git_query_failed'}:
+        raise SystemExit(2)
 
 
 if __name__ == '__main__':
