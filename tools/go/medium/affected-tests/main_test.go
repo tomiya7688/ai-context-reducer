@@ -74,3 +74,21 @@ func TestIncompleteDependencyMapForcesBroaderFallback(t *testing.T) {
         t.Fatalf("unexpected dependency state: %#v", got.DependencyMap)
     }
 }
+
+func TestUnavailableParseCheckForcesBroaderFallback(t *testing.T) {
+	available := false
+	deps := depMap{Files: []depRow{}, ParseCheckAvailable: &available}
+	state := dependencyState(deps, true)
+	if state.Complete {
+		t.Fatal("map with unavailable syntax check must be incomplete")
+	}
+	found := false
+	for _, reason := range state.Reasons {
+		if reason == "dependency_map_parse_check_unavailable" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("missing parse-check reason: %#v", state.Reasons)
+	}
+}

@@ -83,6 +83,8 @@ def dependency_state(dependency_map, used):
     reasons = []
     if dependency_map.get('scan_truncated') or dependency_map.get('truncated'):
         reasons.append('dependency_map_truncated')
+    if dependency_map.get('parse_check_available') is False:
+        reasons.append('dependency_map_parse_check_unavailable')
     for key in ('parse_error_count', 'read_error_count', 'walk_error_count'):
         count = dependency_map.get(key, 0)
         if isinstance(count, int) and count > 0:
