@@ -70,6 +70,7 @@ func collectMediumFiles(root, language string) ([]string, int, error) {
 	return files, walkErrors, err
 }
 
+// containsBuildDirectory は対象root相対pathにC#の除外directoryが含まれるか判定する。
 func containsBuildDirectory(path, root string) bool {
 	rel, err := filepath.Rel(root, path)
 	if err != nil {
@@ -83,6 +84,7 @@ func containsBuildDirectory(path, root string) bool {
 	return false
 }
 
+// mediumIgnoreDirectory はlanguage別analyzerと同じ除外directoryかを判定する。
 func mediumIgnoreDirectory(language, name string) bool {
 	lower := strings.ToLower(name)
 	switch language {
@@ -97,6 +99,7 @@ func mediumIgnoreDirectory(language, name string) bool {
 	}
 }
 
+// uniqueSorted は重複dependencyを除き、決定論的な順序へ並べる。
 func uniqueSorted(values []string) []string {
 	seen := map[string]bool{}
 	out := []string{}
@@ -176,6 +179,7 @@ func scanImports(path, language string) (map[string]any, bool, bool) {
 	return row, parseFailed, readErr
 }
 
+// scanDependencyRow は言語固有rowとdependency field名、read失敗状態を返す。
 func scanDependencyRow(path, language string) (map[string]any, string, bool) {
 	if language == "python" || language == "go" {
 		row, _, readErr := scanImports(path, language)
@@ -264,6 +268,7 @@ func sourceFilesForProject(root, projectPath string, limit int) ([]string, int, 
 	return files, total, truncated, walkErrors + boolInt(err != nil)
 }
 
+// boolInt はWalkDir失敗をwalk error件数へ加算する値に変換する。
 func boolInt(value bool) int {
 	if value {
 		return 1

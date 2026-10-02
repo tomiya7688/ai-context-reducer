@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// writeFixture は複数言語fixtureを親directoryから作成する。
 func writeFixture(t *testing.T, root, name, body string) {
 	t.Helper()
 	path := filepath.Join(root, filepath.FromSlash(name))
@@ -79,6 +80,7 @@ func TestMediumDependencyContracts(t *testing.T) {
 	}
 }
 
+// TestGoImportParseFailureIsReported はGo parse errorの件数とstatusを検証する。
 func TestGoImportParseFailureIsReported(t *testing.T) {
 	root := t.TempDir()
 	writeFixture(t, root, "broken.go", "package demo\nimport (\n\"fmt\"\n")
@@ -91,6 +93,7 @@ func TestGoImportParseFailureIsReported(t *testing.T) {
 	}
 }
 
+// TestCSharpSourceListingTruncationMatchesContract はsource listing上限とtotalを検証する。
 func TestCSharpSourceListingTruncationMatchesContract(t *testing.T) {
 	root := t.TempDir()
 	writeFixture(t, root, "Demo.csproj", "<Project />")
