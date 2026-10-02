@@ -35,8 +35,12 @@ type importOutput struct {
 
 // 1つのGo sourceをparseし、import一覧とparse失敗を区別して返す。
 func fileImports(path string) importRow {
+    source, err := os.ReadFile(path)
+    if err != nil {
+        return importRow{File: filepath.ToSlash(path), Status: "read_failed", Imports: []string{}, Error: err.Error()}
+    }
     fset := token.NewFileSet()
-    f, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly)
+    f, err := parser.ParseFile(fset, path, source, parser.ImportsOnly)
     if err != nil {
         return importRow{File: filepath.ToSlash(path), Status: "parse_failed", Imports: []string{}, Error: err.Error()}
     }
@@ -83,6 +87,11 @@ func buildImportMap(root string, limit int) (importOutput, error) {
     if err != nil {
         return importOutput{}, err
     }
+    return buildImportMapFromFiles(root, allFiles, limit), nil
+}
+
+// file一覧をbounded import mapとfailure countへ集約する。
+func buildImportMapFromFiles(root string, allFiles []string, limit int) importOutput {
     if limit < 0 {
         limit = 0
     }
@@ -116,7 +125,7 @@ func buildImportMap(root string, limit int) (importOutput, error) {
     if result.ParseErrorCount > 0 || result.ReadErrorCount > 0 || result.ScanTruncated {
         result.Status = "ok_with_warnings"
     }
-    return result, nil
+    return result
 }
 
 // import map結果を単一JSON表現で出力し、同内容のtext重複を避ける。
