@@ -75,6 +75,7 @@ func TestIncompleteDependencyMapForcesBroaderFallback(t *testing.T) {
     }
 }
 
+// TestUnavailableParseCheckForcesBroaderFallback はsyntax検査不可mapのfallbackを確認する。
 func TestUnavailableParseCheckForcesBroaderFallback(t *testing.T) {
 	available := false
 	deps := depMap{Files: []depRow{}, ParseCheckAvailable: &available}
