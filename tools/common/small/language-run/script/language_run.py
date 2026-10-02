@@ -28,6 +28,18 @@ def main():
     ap.add_argument('--out',default='.acr/language')
     args=ap.parse_args()
     root=Path(args.root).resolve(); acr=Path(args.acr_root).resolve(); out=(root/args.out).resolve()
+    if not root.exists():
+        status='input_missing'
+    elif not root.is_dir():
+        status='input_not_directory'
+    else:
+        status=''
+    if status:
+        print(json.dumps({
+            'tool':'language-run','status':status,'project_root':str(root),'output_directory':str(out),
+            'results':[],'failure_count':1,'skip_count':0,
+        },ensure_ascii=False,indent=2))
+        raise SystemExit(2)
     py=shutil.which('python3') or shutil.which('python')
     results=[]
     for lang in ('python','csharp','c','cpp','gdscript'):

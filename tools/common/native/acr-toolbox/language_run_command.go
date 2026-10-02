@@ -55,6 +55,18 @@ func cmdLanguageRun(args []string) int {
     outDir:=*out
     if !filepath.IsAbs(outDir) { outDir=filepath.Join(absRoot,outDir) }
 
+    rootInfo, statErr := os.Stat(absRoot)
+    if statErr != nil {
+        status := "input_read_failed"
+        if os.IsNotExist(statErr) { status = "input_missing" }
+        emitLanguageRunInputFailure(status, absRoot, outDir)
+        return 2
+    }
+    if !rootInfo.IsDir() {
+        emitLanguageRunInputFailure("input_not_directory", absRoot, outDir)
+        return 2
+    }
+
     walked,err:=walkWithOptions(absRoot,false)
     if err!=nil {
         selectorWriteJSON(map[string]any{"tool":"language-run","status":"scan_failed","error":selectorBoundedText(err.Error(),800)})
@@ -88,4 +100,12 @@ func cmdLanguageRun(args []string) int {
     })
     if failed>0 { return 1 }
     return 0
+}
+
+// emitLanguageRunInputFailure は未取得rootを空の成功scanと混同させないJSONを返す。
+func emitLanguageRunInputFailure(status, root, outDir string) {
+    selectorWriteJSON(map[string]any{
+        "tool":"language-run","status":status,"project_root":root,"output_directory":outDir,
+        "results":[]languageRunResult{},"failure_count":1,"skip_count":0,
+    })
 }
