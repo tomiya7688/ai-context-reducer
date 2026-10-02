@@ -46,7 +46,7 @@ def build_index(root: Path, max_documents: int, max_headings_per_document: int) 
 
     return {
         'tool': 'doc-index',
-        'status': 'ok',
+        'status': 'ok_with_warnings' if read_error_paths else 'ok',
         'project_root': str(root),
         'markdown_files_scanned': documents_scanned,
         'read_error_paths': read_error_paths,
@@ -70,6 +70,8 @@ def main():
     else:
         result = build_index(root, max(0, args.max_documents), max(0, args.max_headings_per_document))
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    if result['status'] in {'input_missing', 'input_not_directory'}:
+        raise SystemExit(2)
 
 if __name__ == '__main__':
     main()
