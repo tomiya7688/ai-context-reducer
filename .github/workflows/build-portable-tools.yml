@@ -100,7 +100,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python tools/tests/test_git_failure_e2e.py "${{ matrix.binary }}"
+          python tools/tests/git_failure_e2e.py "${{ matrix.binary }}"
       - name: Smoke text pipeline
         shell: bash
         run: |
