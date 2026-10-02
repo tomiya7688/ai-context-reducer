@@ -101,6 +101,11 @@ jobs:
         run: |
           set -euo pipefail
           python tools/tests/git_failure_e2e.py "${{ matrix.binary }}"
+      - name: Smoke language-run root semantics
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/tests/language_run_root_e2e.py "${{ matrix.binary }}"
       - name: Smoke text pipeline
         shell: bash
         run: |
