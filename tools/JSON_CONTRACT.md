@@ -93,6 +93,8 @@ Downstream indexes may accept older list-only analyzer output for compatibility,
 
 Dependency/import/graph analyzers should expose completeness separately from an empty dependency set. Use explicit counts such as `parse_error_count` / `read_error_count` and a real `scan_truncated` flag. A downstream affected-scope tool must not treat a truncated or partially failed graph as complete evidence.
 
+When an implementation cannot perform a language's syntax check, it must not report an invented `parse_error_count: 0`. It may emit `parse_error_count: null` together with `parse_check_available: false`; consumers must mark the map incomplete and use their broader fallback. Implementations that can check syntax should report an integer count and `parse_check_available: true`.
+
 ## Compatibility
 
 Treat field removal, renaming, type changes, or status semantic changes as output-contract changes. Validate them with targeted contract tests. Python and Go implementations that advertise the same CLI contract should produce semantically equivalent fields, even when their internals are independent.

@@ -36,6 +36,7 @@ type depMap struct {
     Status          string   `json:"status,omitempty"`
     Files           []depRow `json:"files"`
     ParseErrorCount int      `json:"parse_error_count,omitempty"`
+    ParseCheckAvailable *bool `json:"parse_check_available,omitempty"`
     ReadErrorCount  int      `json:"read_error_count,omitempty"`
     WalkErrorCount  int      `json:"walk_error_count,omitempty"`
     ScanTruncated   bool     `json:"scan_truncated,omitempty"`
@@ -251,6 +252,9 @@ func dependencyState(deps depMap, used bool) dependencyMapState {
     if deps.ParseErrorCount > 0 {
         reasons = append(reasons, fmt.Sprintf("parse_error_count=%d", deps.ParseErrorCount))
     }
+    if deps.ParseCheckAvailable != nil && !*deps.ParseCheckAvailable {
+        reasons = append(reasons, "dependency_map_parse_check_unavailable")
+    }
     if deps.ReadErrorCount > 0 {
         reasons = append(reasons, fmt.Sprintf("read_error_count=%d", deps.ReadErrorCount))
     }
@@ -314,7 +318,7 @@ func analyze(changed []string, cfg config, deps depMap, dependencyMapUsed ...boo
         reasons = append(reasons, "no mapping or naming candidate")
     }
 
-    used := len(deps.Files) > 0 || deps.ScanTruncated || deps.Truncated || deps.ParseErrorCount > 0 || deps.ReadErrorCount > 0 || deps.WalkErrorCount > 0
+    used := len(deps.Files) > 0 || deps.ScanTruncated || deps.Truncated || deps.ParseErrorCount > 0 || (deps.ParseCheckAvailable != nil && !*deps.ParseCheckAvailable) || deps.ReadErrorCount > 0 || deps.WalkErrorCount > 0
     if len(dependencyMapUsed) > 0 {
         used = dependencyMapUsed[0]
     }
