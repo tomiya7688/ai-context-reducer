@@ -1,7 +1,11 @@
 import importlib.util
+import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 SCRIPT = Path(__file__).parents[1] / 'script' / 'tree_view.py'
 spec = importlib.util.spec_from_file_location('tree_view', SCRIPT)
@@ -31,6 +35,27 @@ class TreeViewTests(unittest.TestCase):
             (root / 'dir').mkdir()
             result = module.build_tree(root, 1, 0)
             self.assertEqual(result['entries'][0]['kind'], 'directory')
+
+    # test_build_tree_marks_read_failure_warns は部分走査のread errorをclean成功として返さない。
+    def test_build_tree_marks_read_failure_warns(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with patch.object(Path, 'iterdir', side_effect=PermissionError('denied')):
+                result = module.build_tree(root, 3, 0)
+            self.assertEqual(result['status'], 'ok_with_warnings')
+            self.assertEqual(result['read_error_paths'], ['.'])
+
+    # test_cli_rejects_missing_and_file_roots はroot取得失敗を正常な空treeとして返さない。
+    def test_cli_rejects_missing_and_file_roots(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            file = root / 'root.txt'
+            file.write_text('x', encoding='utf-8')
+            missing = root / 'missing'
+            for target, status in ((missing, 'input_missing'), (file, 'input_not_directory')):
+                completed = subprocess.run([sys.executable, str(SCRIPT), str(target)], capture_output=True, text=True)
+                self.assertEqual(completed.returncode, 2)
+                self.assertEqual(json.loads(completed.stdout)['status'], status)
 
 
 if __name__ == '__main__':

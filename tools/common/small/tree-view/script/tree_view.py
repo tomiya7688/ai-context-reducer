@@ -43,7 +43,7 @@ def build_tree(root: Path, max_depth: int, max_entries: int) -> dict[str, object
     collect_tree(root, root, 1, max_depth, max_entries, state)
     return {
         'tool': 'tree-view',
-        'status': 'ok',
+        'status': 'ok_with_warnings' if state['read_error_paths'] else 'ok',
         'project_root': str(root),
         'max_depth': max_depth,
         'max_entries': max_entries,
@@ -66,6 +66,8 @@ def main():
     else:
         result = build_tree(root, max(0, args.max_depth), max(0, args.max_entries))
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    if result['status'] in {'input_missing', 'input_not_directory'}:
+        raise SystemExit(2)
 
 
 if __name__ == '__main__':
