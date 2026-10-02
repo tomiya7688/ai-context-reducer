@@ -30,6 +30,22 @@ func TestBuildPackageGraphReportsParseFailure(t *testing.T) {
     }
 }
 
+// TestBuildPackageGraphReportsReadFailureでfile read失敗がread countへ反映され、parse countと分離されることを検証する。
+func TestBuildPackageGraphReportsReadFailure(t *testing.T) {
+    dir := t.TempDir()
+    if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module example.com/demo\n"), 0o644); err != nil {
+        t.Fatal(err)
+    }
+    missing := filepath.Join(dir, "missing.go")
+    if _, status := importsOf(missing); status != "read_failed" {
+        t.Fatalf("read failure status = %q, want read_failed", status)
+    }
+    result := buildPackageGraphFromFiles(dir, []string{missing}, 0)
+    if result.Status != "ok_with_warnings" || result.ReadErrorCount != 1 || result.ParseErrorCount != 0 {
+        t.Fatalf("read failure was reported as clean or as parse failure: %#v", result)
+    }
+}
+
 // TestBuildPackageGraphTruncationIsRealでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestBuildPackageGraphTruncationIsReal(t *testing.T) {
     dir := t.TempDir()
