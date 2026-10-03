@@ -99,29 +99,12 @@ Keep the Core useful for almost every project small:
 
 For a small repository, it is fine to stop here.
 
-## Add methods according to expected benefit
+## Find methods from the problem you have
 
-Choose additional methods from the characteristics of the target project.
+You do not need to memorize method names. Start with the problem that is slowing you down, then choose only what fits your project.
 
-| Situation | Methods to prioritize |
-|---|---|
-| many docs / Issues / subsystems | Task Routing / Change Routing Map |
-| file / module responsibilities are unclear | Responsibility Map |
-| the existing architecture defines responsibility boundaries, layers, or official communication paths | Architecture Boundary Routing |
-| monorepo / multi-app with many local rules | Hierarchical Context / Scoped AI Instructions |
-| exploration continues after Required evidence is available | Evidence Budget / bounded evidence collection |
-| README alone no longer describes current capabilities and constraints | Current State summary |
-| multiple AIs, chats, or people update the remote | Remote Delta First |
-| huge codebase / expensive call or dependency exploration | Source Structure Index / changed-symbol routing |
-| large test suite is fully run for every change | Change / Test Impact Routing |
-| GUI / game / editor | headless-first + visual confirmation when needed |
-| random / time-dependent / simulation | deterministic seam / fixed input / bounded runtime |
-| package / distribution differs from source | artifact-boundary validation |
-| save / conversion / export creates temporary files | disposable validation workspace |
-| many coding rules | Policy Routing + compact policy checks |
-| repeated license / NOTICE / header text | Boilerplate Generation |
-
-See [Adoption Priority](docs/en/adoption-priority.md) for detailed adoption signals and project-size guidance.
+- Find methods by problem and open their explanations: [Method Index](docs/en/method-index.md)
+- Decide what fits your project size and characteristics: [Adoption Priority](docs/en/adoption-priority.md)
 
 ## Standard flow
 
