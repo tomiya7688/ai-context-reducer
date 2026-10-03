@@ -99,29 +99,12 @@ v1.1.0では軽量な通常版を維持したまま、別archiveとしてGUI Hub
 
 小規模repoではここまでで終了して構いません。
 
-## 効果に応じて追加する
+## 困りごとから手法を探す
 
-追加手法は、対象プロジェクトの特徴から選びます。
+手法名を覚える必要はありません。困っていることに近い入口から候補を探し、対象プロジェクトに必要なものだけ選びます。
 
-| 状況 | 優先する手法 |
-|---|---|
-| docs / Issues / subsystem が多い | Task Routing / Change Routing Map |
-| file / module の責務が分かりにくい | Responsibility Map |
-| 既存architectureに責務境界・層・正式な通信経路が明示されている | Architecture Boundary Routing |
-| monorepo / multi-appで局所ルールが多い | Hierarchical Context / Scoped AI Instructions |
-| Required evidenceが揃っても探索が止まりにくい | Evidence Budget / bounded evidence collection |
-| 現在の能力・制約がREADMEだけでは分からない | Current State summary |
-| 複数AI・複数チャット・複数人がremoteを更新 | Remote Delta First |
-| 巨大codebase・call/dependency探索が重い | Source Structure Index / changed-symbol routing |
-| test suiteが大きく毎回full runしている | Change / Test Impact Routing |
-| GUI / game / editor | headless-first + visual confirmation when needed |
-| random / time-dependent / simulation | deterministic seam / fixed input / bounded runtime |
-| package / distribution がsourceと異なる | artifact-boundary validation |
-| 保存・変換・exportで一時ファイルが増える | disposable validation workspace |
-| coding rules が多い | Policy Routing + compact policy checks |
-| license / NOTICE / header 等が反復する | Boilerplate Generation |
-
-詳細な優先度と「こういうプロジェクト向き」は [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md) を参照してください。
+- 困りごとに合う手法と詳しい説明: [`docs/jp/手法一覧.md`](docs/jp/手法一覧.md)
+- プロジェクトの規模や特徴に応じた導入判断: [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md)
 
 ## 標準フロー
 
