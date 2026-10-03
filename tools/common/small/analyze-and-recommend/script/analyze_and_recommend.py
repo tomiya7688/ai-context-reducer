@@ -158,6 +158,7 @@ def main():
     else:
         out = analyze(root)
     print(json.dumps(out, ensure_ascii=False, indent=2))
+    return 0 if out['status'] in {'ok', 'ok_with_warnings'} else 2
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

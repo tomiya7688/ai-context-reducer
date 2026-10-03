@@ -21,14 +21,16 @@ def main():
     parser.add_argument('--max-files', type=int, default=0, help='Optional safety limit. 0 means no file-count limit.')
     parser.add_argument('--include-ignored', action='store_true')
     args = parser.parse_args()
+    if args.top < 0 or args.max_files < 0:
+        parser.error('--top and --max-files must be non-negative')
 
     root = Path(args.root).resolve()
     if not root.exists():
         emit({'tool': 'context-budget', 'status': 'input_missing', 'root_path': str(root)})
-        return
+        return 2
     if not root.is_dir():
         emit({'tool': 'context-budget', 'status': 'input_not_directory', 'root_path': str(root)})
-        return
+        return 2
 
     estimator = estimate_accurate if args.mode == 'accurate' else estimate_fast
     rows = []
@@ -60,7 +62,8 @@ def main():
     )
     result['root_path'] = str(root)
     emit(result)
+    return 0 if result['status'] in {'ok', 'ok_with_warnings'} else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

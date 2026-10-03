@@ -51,6 +51,8 @@ def main():
     parser.add_argument('root', nargs='?', default='.')
     parser.add_argument('--per-role-limit', type=int, default=20, help='Maximum candidates per role. 0 means unlimited.')
     args = parser.parse_args()
+    if args.per_role_limit < 0:
+        parser.error('--per-role-limit must be non-negative')
 
     root = Path(args.root).resolve()
     if not root.exists():
@@ -76,7 +78,8 @@ def main():
             'roles': roles,
         }
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['status'] == 'ok' else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

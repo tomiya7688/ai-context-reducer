@@ -62,6 +62,8 @@ def main():
     ap.add_argument('--max-documents', type=int, default=0, help='Optional output limit. 0 means unlimited.')
     ap.add_argument('--max-headings-per-document', type=int, default=60, help='Heading output limit per document. 0 means unlimited.')
     args = ap.parse_args()
+    if args.max_documents < 0 or args.max_headings_per_document < 0:
+        ap.error('--max-documents and --max-headings-per-document must be non-negative')
     root = Path(args.root).resolve()
     if not root.exists():
         result = {'tool': 'doc-index', 'status': 'input_missing', 'project_root': str(root)}
@@ -70,8 +72,7 @@ def main():
     else:
         result = build_index(root, max(0, args.max_documents), max(0, args.max_headings_per_document))
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    if result['status'] in {'input_missing', 'input_not_directory'}:
-        raise SystemExit(2)
+    return 0 if result['status'] in {'ok', 'ok_with_warnings'} else 2
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

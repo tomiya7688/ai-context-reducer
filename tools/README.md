@@ -71,6 +71,7 @@ processing      -> matching / analysis / rendering
 ## Output policy
 
 Machine outputの共通契約は `tools/JSON_CONTRACT.md` をSource of Truthとします。
+対象Python CLIのstatusとprocess exit code対応表は `tools/PYTHON_CLI_EXIT_POLICY.md` を参照してください。
 
 - JSONが自然な結果形式なら、README/helpを毎回読まなくても意味が分かる自己説明的JSONを優先する
 - 同じ事実をprose summaryとstructured fieldへ二重に入れない

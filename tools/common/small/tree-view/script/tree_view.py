@@ -58,6 +58,8 @@ def main():
     ap.add_argument('--max-depth', type=int, default=3)
     ap.add_argument('--max-entries', type=int, default=300, help='Output limit. 0 means unlimited within max-depth.')
     args = ap.parse_args()
+    if args.max_depth < 0 or args.max_entries < 0:
+        ap.error('--max-depth and --max-entries must be non-negative')
     root = Path(args.root).resolve()
     if not root.exists():
         result = {'tool': 'tree-view', 'status': 'input_missing', 'project_root': str(root)}
@@ -66,9 +68,8 @@ def main():
     else:
         result = build_tree(root, max(0, args.max_depth), max(0, args.max_entries))
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    if result['status'] in {'input_missing', 'input_not_directory'}:
-        raise SystemExit(2)
+    return 0 if result['status'] in {'ok', 'ok_with_warnings'} else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
