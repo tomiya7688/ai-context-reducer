@@ -19,7 +19,7 @@ class ContextBudgetCliTest(unittest.TestCase):
                 capture_output=True,
                 check=False,
             )
-            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(2, result.returncode, result.stderr)
             payload = json.loads(result.stdout)
             self.assertEqual('input_missing', payload['status'])
 
@@ -34,7 +34,7 @@ class ContextBudgetCliTest(unittest.TestCase):
                 capture_output=True,
                 check=False,
             )
-            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(2, result.returncode, result.stderr)
             payload = json.loads(result.stdout)
             self.assertEqual('input_not_directory', payload['status'])
 
