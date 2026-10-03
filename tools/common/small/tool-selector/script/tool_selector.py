@@ -235,7 +235,8 @@ def main():
     elif not root.is_dir(): result = {'tool': 'tool-selector', 'status': 'input_not_directory', 'project_root': str(root)}
     else: result = build_selection(root, goal=args.goal, task_file=args.task_file, changed_files=args.changed, validation_intent=args.validation_intent)
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['status'] == 'ok' else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

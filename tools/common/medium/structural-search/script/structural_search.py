@@ -15,6 +15,8 @@ def main():
     parser.add_argument('--backend', choices=['auto', 'ast-grep', 'fallback'], default='auto')
     parser.add_argument('--max-results', type=int, default=40, help='Maximum matches returned to the caller. 0 means unlimited.')
     args = parser.parse_args()
+    if args.max_results < 0:
+        parser.error('--max-results must be non-negative')
 
     result = search_structure(
         Path(args.root).resolve(),
@@ -24,7 +26,8 @@ def main():
         args.backend,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['status'] in {'ok', 'backend_unavailable', 'backend_unavailable_for_language'} else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

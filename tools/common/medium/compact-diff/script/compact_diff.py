@@ -25,6 +25,8 @@ def main():
     parser.add_argument('--head', default='HEAD')
     parser.add_argument('--max-lines', type=int, default=120)
     args = parser.parse_args()
+    if args.max_lines < 0:
+        parser.error('--max-lines must be non-negative')
 
     repository_ok, _, repository_error = run_git('rev-parse', '--is-inside-work-tree')
     if not repository_ok:
@@ -63,9 +65,8 @@ def main():
         }
 
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    if result['status'] != 'ok':
-        raise SystemExit(2)
+    return 0 if result['status'] == 'ok' else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

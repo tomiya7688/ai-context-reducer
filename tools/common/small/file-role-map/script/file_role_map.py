@@ -75,6 +75,8 @@ def main():
     parser.add_argument('--max-files', type=int, default=0, help='Optional safety limit. 0 means unlimited.')
     parser.add_argument('--examples', type=int, default=12, help='Example paths per role. 0 means unlimited.')
     args = parser.parse_args()
+    if args.max_files < 0 or args.examples < 0:
+        parser.error('--max-files and --examples must be non-negative')
 
     root = Path(args.root).resolve()
     if not root.exists():
@@ -84,7 +86,8 @@ def main():
     else:
         result = build_role_map(root, args.max_files, max(0, args.examples))
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['status'] == 'ok' else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

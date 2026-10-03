@@ -14,6 +14,8 @@ def main():
     parser.add_argument('--remote', default='origin/HEAD')
     parser.add_argument('--max-files', type=int, default=40)
     args = parser.parse_args()
+    if args.max_files < 0:
+        parser.error('--max-files must be non-negative')
 
     result = build_remote_delta(
         Path(args.root).resolve(),
@@ -22,9 +24,8 @@ def main():
         max_files=args.max_files,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    if result['status'] in {'git_unavailable', 'git_unavailable_or_not_repository', 'git_query_failed'}:
-        raise SystemExit(2)
+    return 0 if result['status'] in {'ok', 'remote_unavailable'} else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

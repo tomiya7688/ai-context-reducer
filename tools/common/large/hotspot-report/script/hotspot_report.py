@@ -22,14 +22,16 @@ def main():
     parser.add_argument('--limit', type=int, default=30)
     parser.add_argument('--max-files', type=int, default=0, help='Optional safety limit. 0 means unlimited.')
     args = parser.parse_args()
+    if args.limit < 0 or args.max_files < 0:
+        parser.error('--limit and --max-files must be non-negative')
 
     root = Path(args.root).resolve()
     if not root.exists():
         emit({'tool': 'hotspot-report', 'status': 'input_missing', 'root': str(root)})
-        return
+        return 2
     if not root.is_dir():
         emit({'tool': 'hotspot-report', 'status': 'input_not_directory', 'root': str(root)})
-        return
+        return 2
 
     rows = []
     scanned = 0
@@ -80,7 +82,8 @@ def main():
         'hotspots': rows[:limit] if limit > 0 else [],
         'hotspots_truncated': limit == 0 and bool(rows) or (limit > 0 and len(rows) > limit),
     })
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

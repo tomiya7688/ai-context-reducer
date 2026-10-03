@@ -19,7 +19,8 @@ class CompactDiffTests(unittest.TestCase):
             (True, 'true', ''), (True, '', ''), (True, '', ''),
             (True, '', ''), (True, '', ''),
         ]), patch.object(sys, 'argv', ['compact-diff']), contextlib.redirect_stdout(io.StringIO()) as output:
-            module.main()
+            code = module.main()
+        self.assertEqual(code, 0)
         self.assertEqual(module.json.loads(output.getvalue())['status'], 'ok')
 
     # test_main_returns_distinct_failures はGit環境・repository・query failureをexit 2にする。
@@ -37,9 +38,9 @@ class CompactDiffTests(unittest.TestCase):
                 output = io.StringIO()
                 with patch.object(module, 'run_git', side_effect=results), \
                         patch.object(sys, 'argv', ['compact-diff']), \
-                        contextlib.redirect_stdout(output), self.assertRaises(SystemExit) as raised:
-                    module.main()
-                self.assertEqual(raised.exception.code, 2)
+                        contextlib.redirect_stdout(output):
+                    code = module.main()
+                self.assertEqual(code, 2)
                 self.assertEqual(module.json.loads(output.getvalue())['status'], expected)
 
 

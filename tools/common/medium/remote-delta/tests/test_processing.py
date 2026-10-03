@@ -103,12 +103,7 @@ class CompactRemoteDeltaTests(unittest.TestCase):
                 with patch.object(remote_delta, 'build_remote_delta', return_value=result), \
                         patch.object(sys, 'argv', ['remote-delta']), \
                         contextlib.redirect_stdout(io.StringIO()):
-                    if expected_code:
-                        with self.assertRaises(SystemExit) as raised:
-                            remote_delta.main()
-                        self.assertEqual(raised.exception.code, expected_code)
-                    else:
-                        remote_delta.main()
+                    self.assertEqual(remote_delta.main(), expected_code)
 
 
 if __name__ == '__main__':
