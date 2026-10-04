@@ -74,9 +74,9 @@ try {
 $plainPythonShim = Join-Path $tempRoot 'plain-python-shim'
 New-Item -ItemType Directory -Force $plainPythonShim | Out-Null
 Copy-Item $nativeStub (Join-Path $plainPythonShim 'python.exe')
+Copy-Item $nativeStub (Join-Path $plainPythonShim 'where.exe')
 try {
-    # Keep only Windows system directories so the Python Launcher is absent and
-    # setup.bat must take its plain `python` fallback.
+    # The where.exe stub forces setup.bat to skip `py` and select this `python`.
     $env:PATH = "$plainPythonShim;$env:SystemRoot\System32;$env:SystemRoot"
     $env:ACR_SETUP_STUB_PY_FAIL = ''
     $plainSuccess = Invoke-Setup $pythonRoot $project
