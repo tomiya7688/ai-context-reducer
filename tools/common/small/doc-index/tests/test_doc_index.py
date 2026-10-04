@@ -59,6 +59,37 @@ class DocIndexTests(unittest.TestCase):
                 self.assertEqual(completed.returncode, 2)
                 self.assertEqual(json.loads(completed.stdout)['status'], status)
 
+    # test_build_index_does_not_report_exact_document_limit_as_truncated は、文書数が上限と一致する場合は省略扱いにしないことを確認する。
+    def test_build_index_does_not_report_exact_document_limit_as_truncated(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'a.md').write_text('# A\n', encoding='utf-8')
+            (root / 'b.md').write_text('# B\n', encoding='utf-8')
+            (root / 'c.md').write_text('No headings here.\n', encoding='utf-8')
+            result = module.build_index(root, 2, 0)
+            self.assertEqual(len(result['documents']), 2)
+            self.assertFalse(result['documents_truncated'])
+
+    # test_build_index_ignores_headingless_files_when_checking_document_limit は、見出しのないMarkdownを文書数上限の判定から除外することを確認する。
+    def test_build_index_ignores_headingless_files_when_checking_document_limit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'a.md').write_text('# A\n', encoding='utf-8')
+            (root / 'b.md').write_text('No headings here.\n', encoding='utf-8')
+            result = module.build_index(root, 1, 0)
+            self.assertEqual(len(result['documents']), 1)
+            self.assertFalse(result['documents_truncated'])
+
+    # test_build_index_does_not_report_truncation_below_document_limit は、対象文書が上限未満なら省略なしと報告することを確認する。
+    def test_build_index_does_not_report_truncation_below_document_limit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'a.md').write_text('# A\n', encoding='utf-8')
+            (root / 'b.md').write_text('No headings here.\n', encoding='utf-8')
+            result = module.build_index(root, 2, 0)
+            self.assertEqual(len(result['documents']), 1)
+            self.assertFalse(result['documents_truncated'])
+
 
 if __name__ == '__main__':
     unittest.main()

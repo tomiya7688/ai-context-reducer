@@ -34,15 +34,15 @@ def build_index(root: Path, max_documents: int, max_headings_per_document: int) 
             if max_headings_per_document == 0 or len(headings) < max_headings_per_document:
                 headings.append({'line': n, 'level': len(m.group(1)), 'title': m.group(2)[:120]})
         if headings:
+            if max_documents > 0 and len(documents) >= max_documents:
+                documents_truncated = True
+                break
             documents.append({
                 'path': p.relative_to(root).as_posix(),
                 'heading_count': total_headings,
                 'headings': headings,
                 'headings_truncated': max_headings_per_document > 0 and total_headings > len(headings),
             })
-            if max_documents > 0 and len(documents) >= max_documents:
-                documents_truncated = True
-                break
 
     return {
         'tool': 'doc-index',
