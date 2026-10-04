@@ -10,7 +10,7 @@ IGNORE_DIRS = {
 }
 
 
-# _path_key はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _path_key はresolve失敗時もabsolute pathを使い、fileの重複判定keyを作ります。
 def _path_key(path: Path) -> str:
     try:
         return str(path.resolve())
@@ -18,7 +18,7 @@ def _path_key(path: Path) -> str:
         return str(path.absolute())
 
 
-# discover_policy_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# discover_policy_files は入力を文書fileへ展開し、missing・unsupported・walk errorを分けます。
 def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list[str], int]:
     files: list[Path] = []
     seen: set[str] = set()
@@ -26,7 +26,7 @@ def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list
     unsupported: list[str] = []
     walk_error_count = 0
 
-    # add_file はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # add_file は対応拡張子だけをpath keyで重複排除して収集します。
     def add_file(path: Path) -> None:
         if path.suffix.lower() not in DOC_EXTS:
             return

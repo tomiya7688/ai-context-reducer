@@ -9,7 +9,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
 
-# paths はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # paths は推薦rowから指定fieldの値を順序を保って取り出します。
 def paths(rows, key):
     return [row[key] for row in rows]
 

@@ -11,7 +11,7 @@ SKIP = {
 }
 
 
-# role はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# role はpath・拡張子・directory名からtest・source・documentなどのroleを分類します。
 def role(path: Path) -> str:
     parts = {part.lower() for part in path.parts}
     low = '/'.join(part.lower() for part in path.parts)

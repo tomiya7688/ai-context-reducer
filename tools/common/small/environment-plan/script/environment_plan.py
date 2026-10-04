@@ -36,7 +36,7 @@ def probe(root: Path):
     }
 
 
-# plan はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# plan は検出済み環境から利用可能なtoolとfallback構成を決めます。
 def plan(info):
     keep = []
     fallback = []

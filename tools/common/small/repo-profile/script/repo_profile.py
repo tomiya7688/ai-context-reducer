@@ -36,7 +36,7 @@ def walk(root: Path, max_files: int) -> tuple[list[Path], bool, dict[str, object
     stats: dict[str, object] = {'walk_error_count': 0, 'walk_error_paths': []}
     wanted = max_files + 1 if max_files > 0 else 0
 
-    # on_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # on_error はwalk error件数を増やし、上限内だけerror pathを記録します。
     def on_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -52,7 +52,7 @@ def walk(root: Path, max_files: int) -> tuple[list[Path], bool, dict[str, object
     return files, False, stats
 
 
-# portable_language_metrics はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# portable_language_metrics は拡張子からlanguage別件数を集計し、未計測metricを分けます。
 def portable_language_metrics(files: list[Path]) -> tuple[dict[str, int], list[dict[str, object]]]:
     languages = Counter()
     for path in files:

@@ -17,7 +17,7 @@ MANIFEST_FORMAT = 'acr-materialized-tools-v1'
 MANIFEST_NAME = '.acr-materialized-tools.json'
 
 
-# sha256_file はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# sha256_file はfileをchunk単位で読み、内容全体のSHA-256を計算します。
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open('rb') as handle:
@@ -26,7 +26,7 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-# source_revision はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# source_revision はsource repositoryのHEADを取得し、Git unavailable時はrevisionなしにします。
 def source_revision(source: Path) -> str | None:
     if not shutil.which('git'):
         return None
@@ -43,7 +43,7 @@ def source_revision(source: Path) -> str | None:
     return value if result.returncode == 0 and value else None
 
 
-# source_relative はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# source_relative はroot相対POSIX pathを返し、root外・解決失敗時は元pathを保ちます。
 def source_relative(path: Path, source: Path) -> str:
     try:
         return path.resolve().relative_to(source.resolve()).as_posix()
@@ -51,7 +51,7 @@ def source_relative(path: Path, source: Path) -> str:
         return path.as_posix()
 
 
-# plan_materialization はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# plan_materialization はsource有無とoverwrite可否からcopy actionを計画します。
 def plan_materialization(source: Path, out: Path, selected: list[dict[str, object]], overwrite: bool) -> tuple[list[dict], list[str]]:
     actions = []
     missing_sources = []
@@ -88,7 +88,7 @@ def plan_materialization(source: Path, out: Path, selected: list[dict[str, objec
     return actions, sorted(missing_sources)
 
 
-# manifest_payload はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# manifest_payload は実行mode・revision・copy対象から再現用manifestを作ります。
 def manifest_payload(mode: str, revision: str | None, actions: list[dict]) -> dict:
     return {
         'format': MANIFEST_FORMAT,
@@ -106,7 +106,7 @@ def manifest_payload(mode: str, revision: str | None, actions: list[dict]) -> di
     }
 
 
-# atomic_copy はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# atomic_copy は一時file経由でcopyし、replaceまでdestinationの旧内容を保ちます。
 def atomic_copy(source: Path, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary_name = tempfile.mkstemp(prefix='.acr-copy-', dir=destination.parent)
@@ -122,7 +122,7 @@ def atomic_copy(source: Path, destination: Path) -> None:
             pass
 
 
-# atomic_write_json はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# atomic_write_json はJSONを一時fileへ書き、replaceでmanifestを確定します。
 def atomic_write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary_name = tempfile.mkstemp(prefix='.acr-manifest-', dir=path.parent)
@@ -138,7 +138,7 @@ def atomic_write_json(path: Path, payload: dict) -> None:
             pass
 
 
-# execute はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# execute はdry-runまたはapplyを実行し、copy結果とmanifest statusを返します。
 def execute(source: Path, out: Path, apply: bool, overwrite: bool) -> dict:
     base = {
         'tool': TOOL,

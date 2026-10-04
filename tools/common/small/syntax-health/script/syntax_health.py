@@ -16,7 +16,7 @@ def emit(value: object) -> None:
     print(json.dumps(value, ensure_ascii=False, indent=2))
 
 
-# int_value はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# int_value は整数入力を数値化し、bool以外の不正型はzeroへ丸めます。
 def int_value(value: object) -> int:
     if isinstance(value, bool):
         return int(value)
@@ -67,7 +67,7 @@ def summarize(payload: object, max_files: int) -> dict[str, object]:
     }
 
 
-# run_tree_sitter はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_tree_sitter はtree-sitterを起動し、未導入・実行失敗・解析結果を区別します。
 def run_tree_sitter(targets: list[str]) -> tuple[object | None, str | None, str]:
     executable = shutil.which('tree-sitter')
     if executable is None:

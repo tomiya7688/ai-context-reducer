@@ -10,7 +10,7 @@ IGNORE_DIRS = {
 }
 
 
-# iter_documents はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# iter_documents は文書を順に読み、読取不能数を更新しながらyieldします。
 def iter_documents(root: Path, scan_stats: dict[str, int] | None = None):
     stats = scan_stats if scan_stats is not None else {'walk_error_count': 0}
     stats.setdefault('walk_error_count', 0)

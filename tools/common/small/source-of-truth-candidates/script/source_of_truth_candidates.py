@@ -16,7 +16,7 @@ DOC_EXTS = {'.md', '.txt', '.rst'}
 SKIP = {'.git', '.venv', 'venv', 'node_modules', 'build', 'dist', 'bin', 'obj', '__pycache__', 'vendor'}
 
 
-# candidate_paths はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# candidate_paths はrole別source-of-truth候補を集め、上限超過と走査件数を示します。
 def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str]], dict[str, bool], int]:
     hits = {key: [] for key in NAMES}
     truncated = {key: False for key in NAMES}

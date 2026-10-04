@@ -12,7 +12,7 @@ DATA_EXTS = {'.json', '.yaml', '.yml', '.toml', '.csv'}
 SOURCE_EXTS = {'.py', '.cs', '.go', '.c', '.h', '.cpp', '.hpp', '.gd'}
 
 
-# path_terms はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# path_terms はpathを小文字の英数字termへ分割し、rule照合用の集合を返します。
 def path_terms(path: str) -> set[str]:
     return {part for part in re.split(r'[^a-z0-9]+', path.lower()) if part}
 

@@ -19,7 +19,7 @@ def term_present(text: str, term: str) -> bool:
     return re.search(rf'(?<![a-z0-9_]){re.escape(term)}(?![a-z0-9_])', text) is not None
 
 
-# section はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# section は見出し本文を次の見出しまで集め、行数limitによる省略を示します。
 def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
     limit = max(0, limit)
     out = []
@@ -31,7 +31,7 @@ def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
     return out[:limit], len(out) > limit
 
 
-# extract_sections はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# extract_sections は既知の見出し語に対応する本文と各sectionの省略状態を抽出します。
 def extract_sections(lines: list[str], limit: int) -> tuple[dict[str, list[str]], dict[str, bool]]:
     sections = {key: [] for key in HEADINGS}
     truncated = {key: False for key in HEADINGS}

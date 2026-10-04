@@ -18,7 +18,7 @@ def is_policy_line(line: str) -> bool:
     return any(term in line for term in JAPANESE_RULE_TERMS)
 
 
-# policy_findings はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# policy_findings はheading contextを保持しながらpolicy該当行をyieldします。
 def policy_findings(lines: list[str]):
     heading = ''
     for number, line in enumerate(lines, 1):

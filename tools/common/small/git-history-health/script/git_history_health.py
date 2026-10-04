@@ -17,7 +17,7 @@ def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# bounded はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# bounded はerror文をtrimし、上限を超えるdiagnosticを一定長に切ります。
 def bounded(text: str) -> str:
     text = text.strip()
     return text if len(text) <= ERROR_LIMIT else text[:ERROR_LIMIT]
@@ -72,7 +72,7 @@ def summarize(payload: object, min_concern: float, max_findings: int) -> dict[st
     }
 
 
-# run_git_sizer はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_git_sizer はgit-sizerをJSON modeで起動し、未導入・実行失敗・metricを分けます。
 def run_git_sizer(root: Path) -> tuple[object | None, str | None, str]:
     executable = shutil.which('git-sizer')
     if not executable:

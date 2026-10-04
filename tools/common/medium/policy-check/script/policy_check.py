@@ -4,14 +4,14 @@ from pathlib import Path
 
 IGNORE={'.git','.hg','.svn','.venv','venv','node_modules','bin','obj','build','dist','__pycache__','.godot','.idea','.vs','vendor'}
 
-# globmatch はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# globmatch はPOSIX風globでpathを照合し、末尾/**のdirectory境界も扱います。
 def globmatch(path,pat):
     path=path.replace('\\','/')
     if fnmatch.fnmatchcase(path,pat): return True
     if pat.endswith('/**') and (path==pat[:-3] or path.startswith(pat[:-2])): return True
     return False
 
-# suppression はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# suppression はrule idに対応するignore markerから理由を取り出し、形式不正を区別します。
 def suppression(line,rid):
     marker=f'acr-ignore {rid}'
     i=line.find(marker)

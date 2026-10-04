@@ -24,7 +24,7 @@ func affectedFixture() structureIndex {
     }
 }
 
-// TestAffectedStructureFindsTransitiveDependents は対象機能の契約と回帰条件が維持されることを確認します。
+// TestAffectedStructureFindsTransitiveDependents は依存先のさらに上流にあるconsumerも返すことを確認します。
 func TestAffectedStructureFindsTransitiveDependents(t *testing.T) {
     result := affectedStructure(affectedFixture(), []string{"b.go"}, 80)
     if result["impact_uncertain"].(bool) {
@@ -45,7 +45,7 @@ func TestAffectedStructureFindsTransitiveDependents(t *testing.T) {
     }
 }
 
-// TestAffectedStructureTruncationRequiresBroaderValidation は対象機能の契約と回帰条件が維持されることを確認します。
+// TestAffectedStructureTruncationRequiresBroaderValidation はgraph省略時に検証範囲を広げるsignalを出すことを確認します。
 func TestAffectedStructureTruncationRequiresBroaderValidation(t *testing.T) {
     result := affectedStructure(affectedFixture(), []string{"b.go"}, 2)
     if !result["affected_modules_truncated"].(bool) {
@@ -59,7 +59,7 @@ func TestAffectedStructureTruncationRequiresBroaderValidation(t *testing.T) {
     }
 }
 
-// TestAffectedStructureUnmatchedFileIsUncertain は対象機能の契約と回帰条件が維持されることを確認します。
+// TestAffectedStructureUnmatchedFileIsUncertain はgraph未登録の変更fileを確定的な非影響と扱わないことを確認します。
 func TestAffectedStructureUnmatchedFileIsUncertain(t *testing.T) {
     result := affectedStructure(affectedFixture(), []string{"missing.go"}, 80)
     if !result["impact_uncertain"].(bool) {

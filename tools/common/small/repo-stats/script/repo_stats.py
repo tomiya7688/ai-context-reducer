@@ -32,7 +32,7 @@ def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# empty_language_row はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# empty_language_row は未計測metricをNoneで示すlanguage集計の初期rowを返します。
 def empty_language_row() -> dict[str, int | None]:
     return {
         'file_count': 0,

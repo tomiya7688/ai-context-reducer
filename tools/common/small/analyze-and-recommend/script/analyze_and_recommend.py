@@ -40,7 +40,7 @@ def git_result(root, *args):
     return result.returncode == 0, result.stdout.strip()
 
 
-# implementation_plan はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# implementation_plan はOS別native binaryとPython fallbackを探し、実行計画を返します。
 def implementation_plan(repo_root):
     system = platform.system().lower()
     arch = platform.machine().lower()
@@ -69,7 +69,7 @@ def is_test_path(path: Path, root: Path) -> bool:
     return name.startswith('test_') or name.endswith('_test.py') or name.endswith('_test.go') or bool({'test', 'tests'} & parts)
 
 
-# analyze はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# analyze はfile・language・project typeを集計し、tool選定用repo profileを作ります。
 def analyze(root: Path) -> dict[str, object]:
     paths = list(walk(root))
     langs = Counter()

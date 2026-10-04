@@ -5,7 +5,7 @@ import shutil
 import subprocess
 
 
-# run_git はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_git はGit subprocessのstdout・stderr・終了状態を呼び出し側へ返します。
 def run_git(*args: str) -> tuple[bool, str, str]:
     executable = shutil.which('git')
     if executable is None:

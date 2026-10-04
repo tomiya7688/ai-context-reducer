@@ -18,7 +18,7 @@ materialize_spec.loader.exec_module(materialize)
 
 
 class MaterializeToolsTests(unittest.TestCase):
-    # make_python_source はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # make_python_source はfixture rootに全Python tool pathの最小source fileを作ります。
     def make_python_source(self, root: Path) -> None:
         for relative in selection.PYTHON_TOOL_PATHS:
             path = root / 'tools' / relative

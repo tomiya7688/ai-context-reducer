@@ -7,7 +7,7 @@ import (
     "testing"
 )
 
-// TestStatsPortableJSONContract は対象機能の契約と回帰条件が維持されることを確認します。
+// TestStatsPortableJSONContract はstatsのJSONに集計値とmachine-readable statusが含まれることを確認します。
 func TestStatsPortableJSONContract(t *testing.T) {
     root := t.TempDir()
     if err := os.MkdirAll(filepath.Join(root, "src"), 0o755); err != nil {
@@ -45,7 +45,7 @@ func TestStatsPortableJSONContract(t *testing.T) {
     }
 }
 
-// TestStatsExplicitFileLimitIsVisible は対象機能の契約と回帰条件が維持されることを確認します。
+// TestStatsExplicitFileLimitIsVisible は指定したfile limitと実際の省略状態を出力することを確認します。
 func TestStatsExplicitFileLimitIsVisible(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "big.py"), []byte("1234567890\n"), 0o644); err != nil {
@@ -62,7 +62,7 @@ func TestStatsExplicitFileLimitIsVisible(t *testing.T) {
     }
 }
 
-// TestParseSCCStatsCompactsAggregateOnly は対象機能の契約と回帰条件が維持されることを確認します。
+// TestParseSCCStatsCompactsAggregateOnly はSCC parserがaggregate情報だけを保持してcompact rowにすることを確認します。
 func TestParseSCCStatsCompactsAggregateOnly(t *testing.T) {
     raw := []byte(`[
         {"Name":"Go","Count":2,"Lines":100,"Bytes":5000,"Code":70,"Comment":20,"Blank":10,"Complexity":9,"Files":[{"Location":"do-not-forward.go"}]},

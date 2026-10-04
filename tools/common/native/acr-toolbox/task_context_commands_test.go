@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-// TestContextTermPresentUsesASCIIWordBoundaries は対象機能の契約と回帰条件が維持されることを確認します。
+// TestContextTermPresentUsesASCIIWordBoundaries はASCII termをword boundaryで照合し部分語を除くことを確認します。
 func TestContextTermPresentUsesASCIIWordBoundaries(t *testing.T) {
     if contextTermPresent("latest", "test") {
         t.Fatal("test must not match inside latest")
@@ -18,7 +18,7 @@ func TestContextTermPresentUsesASCIIWordBoundaries(t *testing.T) {
     }
 }
 
-// TestExtractAcceptanceSectionsAndTruncation は対象機能の契約と回帰条件が維持されることを確認します。
+// TestExtractAcceptanceSectionsAndTruncation はAcceptance本文の抽出と上限到達時の省略signalを確認します。
 func TestExtractAcceptanceSectionsAndTruncation(t *testing.T) {
     lines := []string{
         "# Goal",
@@ -38,7 +38,7 @@ func TestExtractAcceptanceSectionsAndTruncation(t *testing.T) {
     }
 }
 
-// TestExplorationStopRejectsSubstringFalsePositive は対象機能の契約と回帰条件が維持されることを確認します。
+// TestExplorationStopRejectsSubstringFalsePositive は必須語を含むだけの長い単語を完了条件に数えないことを確認します。
 func TestExplorationStopRejectsSubstringFalsePositive(t *testing.T) {
     result := evaluateExplorationStop("Goal Required Acceptance source latest")
     checks := result["checks"].(map[string]bool)
@@ -50,7 +50,7 @@ func TestExplorationStopRejectsSubstringFalsePositive(t *testing.T) {
     }
 }
 
-// TestExplorationStopSupportsJapaneseTerms は対象機能の契約と回帰条件が維持されることを確認します。
+// TestExplorationStopSupportsJapaneseTerms は日本語の探索条件語も停止判定に使えることを確認します。
 func TestExplorationStopSupportsJapaneseTerms(t *testing.T) {
     result := evaluateExplorationStop("目的 要件 完了条件 対象ファイル 検証")
     if !result["stop_broad_exploration"].(bool) {

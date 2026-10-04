@@ -30,12 +30,12 @@ def normalized(path: str) -> str:
     return value.rstrip('/')
 
 
-# matches_pattern はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# matches_pattern はbasenameまたはroot相対pathがglob patternに一致するか判定します。
 def matches_pattern(name: str, rel: str, pattern: str) -> bool:
     return fnmatch.fnmatchcase(name, pattern) or fnmatch.fnmatchcase(rel, pattern)
 
 
-# portable_find はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# portable_find は外部fdなしで走査し、深さ・訪問・結果上限の省略状態を返します。
 def portable_find(
     root: Path,
     pattern: str,
@@ -90,7 +90,7 @@ def portable_find(
     return results, results_truncated, scan_truncated, stats
 
 
-# fd_find はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# fd_find はfdを指定filterと上限で実行し、終了状態とtruncationを返します。
 def fd_find(
     executable: str,
     root: Path,

@@ -13,7 +13,7 @@ def normalized_stem(rel: str) -> str:
     return stem
 
 
-# route_candidates はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# route_candidates は変更file名から関連test・document候補と上限状態を作ります。
 def route_candidates(rel: str, index: list[dict[str, object]], limit: int) -> dict[str, object]:
     stem = normalized_stem(rel)
     tests: list[str] = []

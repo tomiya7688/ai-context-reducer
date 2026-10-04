@@ -63,7 +63,7 @@ func scipTestPayload() map[string]any {
     }
 }
 
-// TestNormalizeSCIPPrintBuildsRoutingDependencies は対象機能の契約と回帰条件が維持されることを確認します。
+// TestNormalizeSCIPPrintBuildsRoutingDependencies はSCIP symbol relationからrouting用依存edgeを組み立てることを確認します。
 func TestNormalizeSCIPPrintBuildsRoutingDependencies(t *testing.T) {
     symbols, graph, err := normalizeSCIPPrint(scipTestPayload())
     if err != nil {
@@ -122,7 +122,7 @@ func TestNormalizeSCIPPrintBuildsRoutingDependencies(t *testing.T) {
     }
 }
 
-// TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex は対象機能の契約と回帰条件が維持されることを確認します。
+// TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex はSCIP index生成時に入力fileのownershipを残すことを確認します。
 func TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex(t *testing.T) {
     root := t.TempDir()
     input := filepath.Join(root, "index.json")
@@ -179,7 +179,7 @@ func TestPrepareStructureSCIPBuildArgsPreservesOwnershipInFinalIndex(t *testing.
     }
 }
 
-// TestMissingSCIPCLIIsExplicit は対象機能の契約と回帰条件が維持されることを確認します。
+// TestMissingSCIPCLIIsExplicit はCLI未導入を空の成功結果ではなく明示的な失敗として返すことを確認します。
 func TestMissingSCIPCLIIsExplicit(t *testing.T) {
     t.Setenv("PATH", "")
     _, failure := loadSCIPPrintJSON("index.scip", true)
@@ -188,7 +188,7 @@ func TestMissingSCIPCLIIsExplicit(t *testing.T) {
     }
 }
 
-// TestSCIPErrorIsBounded は対象機能の契約と回帰条件が維持されることを確認します。
+// TestSCIPErrorIsBounded は長いSCIP error textを設定した上限内に収めることを確認します。
 func TestSCIPErrorIsBounded(t *testing.T) {
     value := boundedSCIPError(strings.Repeat("x", structureSCIPErrorLimit+500))
     if len(value) > structureSCIPErrorLimit+32 || !strings.HasSuffix(value, "... truncated") {

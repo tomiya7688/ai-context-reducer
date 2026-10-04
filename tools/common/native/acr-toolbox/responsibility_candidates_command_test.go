@@ -7,7 +7,7 @@ import (
     "testing"
 )
 
-// TestResponsibilityScanExactCapIsNotTruncated は対象機能の契約と回帰条件が維持されることを確認します。
+// TestResponsibilityScanExactCapIsNotTruncated はfile数がlimitと等しい時に省略flagを立てないことを確認します。
 func TestResponsibilityScanExactCapIsNotTruncated(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "a.py"), []byte("a"), 0o644); err != nil {
@@ -23,7 +23,7 @@ func TestResponsibilityScanExactCapIsNotTruncated(t *testing.T) {
     }
 }
 
-// TestResponsibilityScanTruncatesOnlyWithAdditionalCodeFile は対象機能の契約と回帰条件が維持されることを確認します。
+// TestResponsibilityScanTruncatesOnlyWithAdditionalCodeFile は追加code fileがある場合だけ走査省略を示すことを確認します。
 func TestResponsibilityScanTruncatesOnlyWithAdditionalCodeFile(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "a.py"), []byte("a"), 0o644); err != nil {
@@ -39,7 +39,7 @@ func TestResponsibilityScanTruncatesOnlyWithAdditionalCodeFile(t *testing.T) {
     }
 }
 
-// TestResponsibilityScanDefaultIsUnlimitedAndIgnoresDependencies は対象機能の契約と回帰条件が維持されることを確認します。
+// TestResponsibilityScanDefaultIsUnlimitedAndIgnoresDependencies は既定で全code fileを走査しdependencyを除くことを確認します。
 func TestResponsibilityScanDefaultIsUnlimitedAndIgnoresDependencies(t *testing.T) {
     root := t.TempDir()
     for _, name := range []string{"a.py", "b.go", "c.ts"} {
@@ -61,7 +61,7 @@ func TestResponsibilityScanDefaultIsUnlimitedAndIgnoresDependencies(t *testing.T
     }
 }
 
-// TestResponsibilityMarkdownIsBoundedAndSelfExplaining は対象機能の契約と回帰条件が維持されることを確認します。
+// TestResponsibilityMarkdownIsBoundedAndSelfExplaining はreportに説明見出しを付け、指定長で切ることを確認します。
 func TestResponsibilityMarkdownIsBoundedAndSelfExplaining(t *testing.T) {
     rows := []responsibilityCandidateRow{
         {Path: "small.py", Size: 1, SizeAvailable: true},

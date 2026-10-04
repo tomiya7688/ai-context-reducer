@@ -20,7 +20,7 @@ TOOLS={
     'gdscript':('gdscript/small/gdscript-symbols','gdscript/medium/gdscript-dependency-map','gdscript/large/godot-scene-graph'),
 }
 
-# first はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# first は候補executableを順に検索し、最初に利用できるpathを返します。
 def first(names):
     for n in names:
         p=shutil.which(n)

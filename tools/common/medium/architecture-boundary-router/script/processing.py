@@ -3,7 +3,7 @@ from __future__ import annotations
 import fnmatch
 
 
-# match_any はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# match_any は区切り文字を正規化したpathが指定globのいずれかに一致するか判定します。
 def match_any(path: str, patterns: list[str]) -> bool:
     normalized = path.replace('\\', '/')
     return any(fnmatch.fnmatch(normalized, pattern) for pattern in patterns)
@@ -25,7 +25,7 @@ def classify(path: str, profile: dict[str, object]) -> dict[str, object]:
     return {'path': path, 'layer': layer, 'role': role, 'boundary': boundary}
 
 
-# route_hint はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# route_hint はboundary・layer・role情報から、最初に確認する範囲を案内します。
 def route_hint(item: dict[str, object]) -> str:
     if item['boundary']:
         return 'inspect boundary contract and both sides before broader expansion'

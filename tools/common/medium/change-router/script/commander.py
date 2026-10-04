@@ -6,12 +6,12 @@ from messenger import candidate_index, changed_files
 from processing import route_candidates
 
 
-# _dedupe はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _dedupe は空値を除き、候補の初出順を保って重複を除去します。
 def _dedupe(values: list[str]) -> list[str]:
     return list(dict.fromkeys(value for value in values if value))
 
 
-# route_changes はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# route_changes は変更pathと候補indexから検証対象と根拠を含むrouting結果を作ります。
 def route_changes(
     root: Path,
     base: str | None,

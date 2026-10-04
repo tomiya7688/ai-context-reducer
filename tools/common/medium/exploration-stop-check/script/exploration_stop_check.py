@@ -22,7 +22,7 @@ def term_present(text: str, term: str) -> bool:
     return re.search(rf'(?<![a-z0-9_]){re.escape(term)}(?![a-z0-9_])', text) is not None
 
 
-# evaluate はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# evaluate は入力文から必須の探索完了条件を照合し、未達項目を返します。
 def evaluate(text: str) -> dict[str, object]:
     lowered = text.lower()
     checks = {key: any(term_present(lowered, word) for word in words) for key, words in CHECKS.items()}
