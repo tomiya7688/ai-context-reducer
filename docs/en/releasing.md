@@ -6,26 +6,25 @@ v1.0.0 is the first user distribution. v1.0.x patch releases are maintenance cha
 
 ## Release gate
 
-Before creating a Release, every job in `.github/workflows/release.yml` must be green.
+The current Release gate is `.github/workflows/release.yml`. This workflow and `release/scripts/acceptance.sh` are the source of truth for what is actually checked.
 
-The completion CI verifies:
+### Source validation
 
-1. repository consistency / `git diff --check`
-2. compile + tests for all Python tools
-3. tests for all Go modules
-4. native builds on Windows x64 / arm64, Linux x64 / arm64, and macOS x64 / arm64
-5. E2E using the binaries that will actually be distributed on each platform
-6. Small / Medium language fallbacks
-7. policy success / violation exit codes
-8. template generate / check / drift detection
-9. scoped guide resolution
-10. major search / find / routing / context / Git commands
-11. actual execution of standalone Go tools
-12. archive extraction and required-file verification
-13. existence of all six archives
-14. generation of `SHA256SUMS`
+On an Ubuntu runner, CI checks repository consistency and the acceptance script syntax, compiles and tests all Python tools, and runs `go vet`, `go test`, and `go test -race` for every Go module.
 
-If any gate fails, the Release job does not run.
+### Normal distribution validation
+
+Each Windows x64 / arm64, Linux x64 / arm64, and macOS x64 / arm64 runner builds the binaries for the normal bundle and runs `release/scripts/acceptance.sh` against a fixture. The acceptance suite checks output from major commands, statuses and exit codes for cases such as policy violations, template drift, and confirmation required for Large execution, plus generated artifacts.
+
+### Archive validation and re-extracted E2E
+
+After creating each archive, CI extracts it, verifies its contents, and **runs the same full acceptance script again against the extracted archive**. It then verifies that all six archives exist and generates `SHA256SUMS`. The Release job runs only when every required job succeeds.
+
+### Full Bundle / v1.1.0 gates planned but not included
+
+The current workflow covers the normal distribution binaries. It does not yet verify the Full Bundle / GUI Hub, end-to-end inputs / outputs / side effects for every user-facing Python entrypoint and wrapper, or the absence of additional runtime requirements in a clean environment.
+
+For v1.1.0, these checks are expected to become part of the #32 completion gate. #33 covers expected inputs, outputs, exit codes, and generated artifacts across source / script execution, built binaries, and re-extracted archives. #34 checks that users do not need additional environment setup and that optional dependencies behave correctly when unavailable. These guarantees are not complete until their checks are implemented and CI is green.
 
 ## User distribution
 
@@ -71,7 +70,7 @@ The Full Bundle is a superset that preserves the normal bundle root contents. It
 
 ## Candidate validation
 
-Release-related changes on `main` run the same completion workflow. In that case, the workflow does not publish a Release; it only produces the `v1-release-candidate` artifact.
+When a push to `main` matches the workflow's path filters, it runs the same completion gates and produces the `v1-release-candidate` artifact. A push that changes only release documentation, for example, does not start this workflow if it does not match those filters. Candidate CI does not publish a Release.
 
 A green candidate CI on `main` does not automatically create a tag or GitHub Release.
 
