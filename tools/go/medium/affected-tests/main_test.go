@@ -4,75 +4,116 @@ import "testing"
 
 // TestAnalyzeExplicitMappingでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestAnalyzeExplicitMapping(t *testing.T) {
-    cfg := config{Mappings: []mapping{{Source: "src/parser/*", Tests: []string{"tests/parser/test_parser.py"}}}}
-    got := analyze([]string{"src/parser/lexer.py"}, cfg, depMap{})
-    if got.Confidence != "high" { t.Fatalf("confidence=%s", got.Confidence) }
-    if got.Fallback != "none" { t.Fatalf("fallback=%s", got.Fallback) }
-    found := false
-    for _, x := range got.TestCandidates { if x == "tests/parser/test_parser.py" { found = true } }
-    if !found { t.Fatalf("explicit test missing: %#v", got.TestCandidates) }
+	cfg := config{Mappings: []mapping{{Source: "src/parser/*", Tests: []string{"tests/parser/test_parser.py"}}}}
+	got := analyze([]string{"src/parser/lexer.py"}, cfg, depMap{})
+	if got.Confidence != "high" {
+		t.Fatalf("confidence=%s", got.Confidence)
+	}
+	if got.Fallback != "none" {
+		t.Fatalf("fallback=%s", got.Fallback)
+	}
+	found := false
+	for _, x := range got.TestCandidates {
+		if x == "tests/parser/test_parser.py" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("explicit test missing: %#v", got.TestCandidates)
+	}
 }
 
 // TestAnalyzeBroadImpactでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestAnalyzeBroadImpact(t *testing.T) {
-    got := analyze([]string{"packages/core/src/api.go"}, config{}, depMap{})
-    if got.Fallback != "broader" { t.Fatalf("fallback=%s", got.Fallback) }
-    if got.Confidence != "medium" { t.Fatalf("confidence=%s", got.Confidence) }
+	got := analyze([]string{"packages/core/src/api.go"}, config{}, depMap{})
+	if got.Fallback != "broader" {
+		t.Fatalf("fallback=%s", got.Fallback)
+	}
+	if got.Confidence != "medium" {
+		t.Fatalf("confidence=%s", got.Confidence)
+	}
 }
 
 // TestAnalyzeNoChangesでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestAnalyzeNoChanges(t *testing.T) {
-    got := analyze(nil, config{}, depMap{})
-    if got.Confidence != "low" { t.Fatalf("confidence=%s", got.Confidence) }
-    if got.Fallback != "subsystem-or-full" { t.Fatalf("fallback=%s", got.Fallback) }
+	got := analyze(nil, config{}, depMap{})
+	if got.Confidence != "low" {
+		t.Fatalf("confidence=%s", got.Confidence)
+	}
+	if got.Fallback != "subsystem-or-full" {
+		t.Fatalf("fallback=%s", got.Fallback)
+	}
 }
 
 // TestGlobRecursiveAndSuffixWildcardでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestGlobRecursiveAndSuffixWildcard(t *testing.T) {
-    if !match("**/schema.*", "pkg/data/schema.json") { t.Fatal("recursive schema glob should match") }
-    if !match("**/core/**", "packages/core/src/api.go") { t.Fatal("recursive core glob should match") }
+	if !match("**/schema.*", "pkg/data/schema.json") {
+		t.Fatal("recursive schema glob should match")
+	}
+	if !match("**/core/**", "packages/core/src/api.go") {
+		t.Fatal("recursive core glob should match")
+	}
 }
 
 // TestGoDefaultTestCandidateでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestGoDefaultTestCandidate(t *testing.T) {
-    got := defaultsFor("src/parser/lexer.go")
-    want := "src/parser/lexer_test.go"
-    for _, x := range got { if x == want { return } }
-    t.Fatalf("missing %s in %#v", want, got)
+	got := defaultsFor("src/parser/lexer.go")
+	want := "src/parser/lexer_test.go"
+	for _, x := range got {
+		if x == want {
+			return
+		}
+	}
+	t.Fatalf("missing %s in %#v", want, got)
 }
 
 // TestDependencyConsumersAddCandidatesでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestDependencyConsumersAddCandidates(t *testing.T) {
-    deps := depMap{Files: []depRow{{File: "src/app/loader.py", Imports: []string{"pkg.parser.lexer"}}}}
-    got := analyze([]string{"pkg/parser/lexer.py"}, config{}, deps)
-    foundReason := false
-    for _, reason := range got.Reasons {
-        if reason == "dependency-map consumers: 1" { foundReason = true }
-    }
-    if !foundReason { t.Fatalf("dependency-map reason missing: %#v", got.Reasons) }
+	deps := depMap{Files: []depRow{{File: "src/app/loader.py", Imports: []string{"pkg.parser.lexer"}}}}
+	got := analyze([]string{"pkg/parser/lexer.py"}, config{}, deps)
+	foundReason := false
+	for _, reason := range got.Reasons {
+		if reason == "dependency-map consumers: 1" {
+			foundReason = true
+		}
+	}
+	if !foundReason {
+		t.Fatalf("dependency-map reason missing: %#v", got.Reasons)
+	}
 }
-
 
 // TestIncompleteDependencyMapForcesBroaderFallbackでparse失敗・truncation・routing契約が回帰していないことを検証する。
 func TestIncompleteDependencyMapForcesBroaderFallback(t *testing.T) {
-    cfg := config{Mappings: []mapping{{Source: "src/parser/*", Tests: []string{"tests/test_parser.py"}}}}
-    deps := depMap{ScanTruncated: true, ParseErrorCount: 2}
-    got := analyze([]string{"src/parser/lexer.py"}, cfg, deps, true)
-    if got.Status != "ok_with_warnings" {
-        t.Fatalf("status=%s", got.Status)
-    }
-    if !got.ImpactUncertain {
-        t.Fatal("expected impact uncertainty")
-    }
-    if got.Confidence != "medium" {
-        t.Fatalf("confidence=%s", got.Confidence)
-    }
-    if got.Fallback != "broader-or-full" {
-        t.Fatalf("fallback=%s", got.Fallback)
-    }
-    if !got.DependencyMap.Used || got.DependencyMap.Complete {
-        t.Fatalf("unexpected dependency state: %#v", got.DependencyMap)
-    }
+	cfg := config{Mappings: []mapping{{Source: "src/parser/*", Tests: []string{"tests/test_parser.py"}}}}
+	deps := depMap{ScanTruncated: true, ParseErrorCount: 2}
+	got := analyze([]string{"src/parser/lexer.py"}, cfg, deps, true)
+	if got.Status != "ok_with_warnings" {
+		t.Fatalf("status=%s", got.Status)
+	}
+	if !got.ImpactUncertain {
+		t.Fatal("expected impact uncertainty")
+	}
+	if got.Confidence != "medium" {
+		t.Fatalf("confidence=%s", got.Confidence)
+	}
+	if got.Fallback != "broader-or-full" {
+		t.Fatalf("fallback=%s", got.Fallback)
+	}
+	if !got.DependencyMap.Used || got.DependencyMap.Complete {
+		t.Fatalf("unexpected dependency state: %#v", got.DependencyMap)
+	}
+}
+
+// TestDependencyWalkErrorForcesBroaderFallback はlanguage-medium-runの走査警告がtest impactのfallbackへ届くことを確認します。
+func TestDependencyWalkErrorForcesBroaderFallback(t *testing.T) {
+	deps := depMap{WalkErrorCount: 1}
+	got := analyze([]string{"src/parser/lexer.go"}, config{}, deps, true)
+	if got.Status != "ok_with_warnings" || !got.ImpactUncertain || got.Fallback != "broader-or-full" {
+		t.Fatalf("walk error did not reach test impact: %#v", got)
+	}
+	if len(got.DependencyMap.Reasons) != 1 || got.DependencyMap.Reasons[0] != "walk_error_count=1" {
+		t.Fatalf("missing walk error reason: %#v", got.DependencyMap.Reasons)
+	}
 }
 
 // TestUnavailableParseCheckForcesBroaderFallback はsyntax検査不可mapのfallbackを確認する。
