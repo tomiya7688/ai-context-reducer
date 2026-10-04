@@ -173,8 +173,8 @@ expect_dir "$OUT/language-small"
 expect_dir "$OUT/language-medium"
 expect_file "$OUT/language-small/python_small_python_symbols.json"
 expect_file "$OUT/language-small/go_small_go_symbols.json"
-expect_file "$OUT/language-medium/python_medium_python_import_map.json"
-expect_file "$OUT/language-medium/go_medium_go_import_map.json"
+expect_file "$OUT/language-medium/tools_python_medium_python_import_map.json"
+expect_file "$OUT/language-medium/tools_go_medium_go_import_map.json"
 
 cat > "$ROOT/policy-pass.json" <<'EOF'
 {"rules":[{"id":"REL001","paths":["src/**"],"severity":"error","forbid":"__never_present__"}]}
