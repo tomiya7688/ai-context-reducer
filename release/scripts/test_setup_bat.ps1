@@ -98,3 +98,4 @@ try {
 }
 
 Write-Host 'setup.bat success and failure propagation checks passed.'
+exit 0
