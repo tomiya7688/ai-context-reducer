@@ -20,11 +20,11 @@ Each Windows x64 / arm64, Linux x64 / arm64, and macOS x64 / arm64 runner builds
 
 After creating each archive, CI extracts it, verifies its contents, and **runs the same full acceptance script again against the extracted archive**. It then verifies that all six archives exist and generates `SHA256SUMS`. The Release job runs only when every required job succeeds.
 
-### Full Bundle / v1.1.0 gates planned but not included
+### Full Bundle smoke and remaining v1.1.0 gates
 
-The current workflow covers the normal distribution binaries. It does not yet verify the Full Bundle / GUI Hub, end-to-end inputs / outputs / side effects for every user-facing Python entrypoint and wrapper, or the absence of additional runtime requirements in a clean environment.
+For each platform's E2E, CI also assembles a smoke Full Bundle from the normal distribution core and the GUI Hub binary, then checks startup on a loopback URL and the health API response. This is a startup-boundary smoke; it does not validate a complete archive resolved from the Full Bundle manifest or every GUI action.
 
-For v1.1.0, these checks are expected to become part of the #32 completion gate. #33 covers expected inputs, outputs, exit codes, and generated artifacts across source / script execution, built binaries, and re-extracted archives. #34 checks that users do not need additional environment setup and that optional dependencies behave correctly when unavailable. These guarantees are not complete until their checks are implemented and CI is green.
+The current workflow does not verify end-to-end inputs / outputs / side effects for every user-facing Python entrypoint and wrapper, or the absence of additional runtime requirements in a clean environment. For v1.1.0, these checks are expected to become part of the #32 completion gate. #33 covers expected inputs, outputs, exit codes, and generated artifacts across source / script execution, built binaries, and re-extracted archives. #34 checks that users do not need additional environment setup and that optional dependencies behave correctly when unavailable. These guarantees are not complete until their checks are implemented and CI is green.
 
 ## User distribution
 

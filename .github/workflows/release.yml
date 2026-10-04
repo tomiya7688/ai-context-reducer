@@ -62,6 +62,7 @@ jobs:
           test -f README.md
           test -f release/RELEASE_MANIFEST.json
           bash -n release/scripts/acceptance.sh
+          bash -n release/scripts/acr_hub_loopback_smoke.sh
       - name: Compile and test all Python tools
         shell: bash
         run: |
@@ -162,6 +163,13 @@ jobs:
           build_tool tools/go/large/go-package-graph go-package-graph "-s -w"
           build_tool tools/go/medium/affected-tests affected-tests "-s -w"
 
+          GUI_HUB_BIN="$RUNNER_TEMP/acr-hub${{ matrix.ext }}"
+          (
+            cd tools/gui/acr-hub
+            go build -trimpath -ldflags="-s -w" -o "$GUI_HUB_BIN" .
+          )
+          echo "GUI_HUB_BIN=$GUI_HUB_BIN" >> "$GITHUB_ENV"
+
           cp README.md "$BUNDLE/README.md"
           cp tools/README.md "$BUNDLE/TOOLS_README.md"
           cp LICENSE "$BUNDLE/LICENSE"
@@ -171,6 +179,7 @@ jobs:
         run: |
           set -euo pipefail
           bash release/scripts/acceptance.sh "$BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance"
+          bash release/scripts/acr_hub_loopback_smoke.sh "$BUNDLE" "$GUI_HUB_BIN" "$RUNNER_TEMP/acr-hub-smoke-bundle"
       - name: Package tar distribution
         if: matrix.archive == 'tar'
         shell: bash
@@ -223,6 +232,7 @@ jobs:
           fi
 
           bash release/scripts/acceptance.sh "$extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance-extracted"
+          bash release/scripts/acr_hub_loopback_smoke.sh "$extracted" "$GUI_HUB_BIN" "$RUNNER_TEMP/acr-hub-smoke-bundle-extracted"
       - uses: actions/upload-artifact@v4
         with:
           name: release-v${{ env.RELEASE_VERSION }}-${{ matrix.name }}
