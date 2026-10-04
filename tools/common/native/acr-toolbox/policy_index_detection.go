@@ -29,7 +29,7 @@ func isNativePolicyLine(line string) bool {
     return false
 }
 
-// nativePolicyFindings はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// nativePolicyFindings はrulesを対象fileへ適用し、違反とscan不完全性を返します。
 func nativePolicyFindings(path string, lines []string) []policyFinding {
     heading := ""
     findings := []policyFinding{}

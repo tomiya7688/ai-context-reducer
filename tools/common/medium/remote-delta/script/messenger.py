@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 
 
-# git_result はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# git_result はGit queryの実行可否・stdout・error kindを呼び出し側へ返します。
 def git_result(root: Path, *args: str) -> tuple[bool, str, str]:
     executable = shutil.which('git')
     if executable is None:

@@ -16,7 +16,7 @@ func writePolicyFixture(t *testing.T, root string, cfg policyRuleConfig) string 
   return p
 }
 
-// TestPolicyCheckPathScopeAndSuppression は対象機能の契約と回帰条件が維持されることを確認します。
+// TestPolicyCheckPathScopeAndSuppression は対象scopeの違反だけを返しignore markerで抑制することを確認します。
 func TestPolicyCheckPathScopeAndSuppression(t *testing.T){
   root:=t.TempDir()
   if err:=os.MkdirAll(filepath.Join(root,"src","ui"),0755);err!=nil{t.Fatal(err)}
@@ -29,7 +29,7 @@ func TestPolicyCheckPathScopeAndSuppression(t *testing.T){
   if code:=cmdPolicyCheck([]string{"--rules",rules,root});code!=0{t.Fatalf("expected suppressed scoped rule to pass, got %d",code)}
 }
 
-// TestPolicyCheckViolationReturnsOne は対象機能の契約と回帰条件が維持されることを確認します。
+// TestPolicyCheckViolationReturnsOne はerror severityの違反でexit code 1を返すことを確認します。
 func TestPolicyCheckViolationReturnsOne(t *testing.T){
   root:=t.TempDir()
   if err:=os.WriteFile(filepath.Join(root,"a.txt"),[]byte("forbidden\n"),0644);err!=nil{t.Fatal(err)}
@@ -37,7 +37,7 @@ func TestPolicyCheckViolationReturnsOne(t *testing.T){
   if code:=cmdPolicyCheck([]string{"--rules",rules,root});code!=1{t.Fatalf("expected violation code 1, got %d",code)}
 }
 
-// TestPolicyCheckWarningAndSemanticRuleDoNotFail は対象機能の契約と回帰条件が維持されることを確認します。
+// TestPolicyCheckWarningAndSemanticRuleDoNotFail はwarningとsemantic ruleだけでは失敗終了しないことを確認します。
 func TestPolicyCheckWarningAndSemanticRuleDoNotFail(t *testing.T){
   root:=t.TempDir()
   if err:=os.WriteFile(filepath.Join(root,"a.txt"),[]byte("hello\n"),0644);err!=nil{t.Fatal(err)}
@@ -48,7 +48,7 @@ func TestPolicyCheckWarningAndSemanticRuleDoNotFail(t *testing.T){
   if code:=cmdPolicyCheck([]string{"--rules",rules,root});code!=0{t.Fatalf("expected warning/unsupported semantic rule not to fail, got %d",code)}
 }
 
-// TestPolicyGlobDoubleStar は対象機能の契約と回帰条件が維持されることを確認します。
+// TestPolicyGlobDoubleStar は** patternがnested pathを含むfile範囲へ一致することを確認します。
 func TestPolicyGlobDoubleStar(t *testing.T){
   rx,err:=policyGlobRegex("src/ui/**");if err!=nil{t.Fatal(err)}
   if !rx.MatchString("src/ui/a/b.py"){t.Fatal("expected recursive glob match")}

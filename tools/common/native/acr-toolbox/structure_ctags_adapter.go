@@ -19,7 +19,7 @@ type structureCtagsFailure struct {
     Error  string
 }
 
-// boundedCtagsError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// boundedCtagsError はctags実行失敗を診断出力に収まる長さへ制限します。
 func boundedCtagsError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= structureCtagsErrorLimit {
@@ -52,7 +52,7 @@ func parseCtagsJSONLines(data []byte) ([]any, error) {
     return rows, nil
 }
 
-// ctagsQualified はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// ctagsQualified はctags行のscope情報からlanguage-qualified symbol名を組み立てます。
 func ctagsQualified(path, scope, name string) string {
     if scope != "" {
         return path + "::" + scope + "::" + name
@@ -174,7 +174,7 @@ func normalizeCtagsRows(raw any) (map[string]any, map[string]any, map[string]any
     return symbols, graph, metadata, nil
 }
 
-// sortStrings はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// sortStrings は文字列の重複を除き、出力を決定的な順序へ整えます。
 func sortStrings(values []string) {
     for i := 1; i < len(values); i++ {
         value := values[i]
@@ -245,7 +245,7 @@ func writeCtagsAdapterJSON(path string, payload any) error {
     return os.WriteFile(path, data, 0o644)
 }
 
-// prepareStructureCtagsBuildArgs はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// prepareStructureCtagsBuildArgs は対象fileとctags optionを検証し、実行引数を作成します。
 func prepareStructureCtagsBuildArgs(args []string) ([]string, func(), *structureCtagsFailure) {
     remaining := []string{}
     sources := []string{}

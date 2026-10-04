@@ -11,7 +11,7 @@ SCRIPT = Path(__file__).parents[1] / 'script' / 'path_find.py'
 
 
 class PathFindTests(unittest.TestCase):
-    # run_tool はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # run_tool はpath-find CLIの終了codeとJSON結果をまとめて返します。
     def run_tool(self, *args: str) -> tuple[int, dict]:
         result = subprocess.run(
             [sys.executable, str(SCRIPT), *args],
@@ -21,7 +21,7 @@ class PathFindTests(unittest.TestCase):
         )
         return result.returncode, json.loads(result.stdout)
 
-    # test_default_scan_is_unlimited_and_dependency_dirs_are_pruned は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_default_scan_is_unlimited_and_dependency_dirs_are_pruned は既定では全件を探しdependency subtreeを除くことを確認します。
     def test_default_scan_is_unlimited_and_dependency_dirs_are_pruned(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -42,7 +42,7 @@ class PathFindTests(unittest.TestCase):
             self.assertTrue(payload['results'][0]['path'].endswith('target.txt'))
             self.assertFalse(payload['scan_truncated'])
 
-    # test_result_limit_and_scan_limit_are_distinct は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_result_limit_and_scan_limit_are_distinct は返却件数の上限と走査上限を別fieldで示すことを確認します。
     def test_result_limit_and_scan_limit_are_distinct(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -59,7 +59,7 @@ class PathFindTests(unittest.TestCase):
             self.assertTrue(payload['scan_truncated'])
             self.assertEqual(payload['status'], 'partial')
 
-    # test_missing_root_is_not_empty_success は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_missing_root_is_not_empty_success は存在しないrootを0件の正常検索として返さないことを確認します。
     def test_missing_root_is_not_empty_success(self):
         code, payload = self.run_tool('*', '/definitely/missing/acr-path-find', '--backend', 'portable')
         self.assertEqual(code, 2)

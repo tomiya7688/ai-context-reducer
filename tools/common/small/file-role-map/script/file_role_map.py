@@ -11,7 +11,7 @@ SKIP = {
 }
 
 
-# role はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# role はpath・拡張子・directory名からtest・source・documentなどのroleを分類します。
 def role(path: Path) -> str:
     parts = {part.lower() for part in path.parts}
     low = '/'.join(part.lower() for part in path.parts)
@@ -68,7 +68,7 @@ def build_role_map(root: Path, max_files: int, example_limit: int) -> dict[str, 
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は対象fileをroleへ分類し、件数・上限・走査不完全性を返します。
 def main():
     parser = argparse.ArgumentParser(description='Classify repository files by likely context role as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')

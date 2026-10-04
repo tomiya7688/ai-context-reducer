@@ -5,7 +5,7 @@ import re
 
 RX=re.compile(r'\{\{\s*([A-Za-z_][A-Za-z0-9_.-]*)\s*\}\}')
 
-# scalar はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# scalar はJSON scalarをtemplate変数用文字列へ変換し、複合値は拒否します。
 def scalar(v):
     if v is None:return ''
     if isinstance(v,bool):return 'true' if v else 'false'
@@ -18,7 +18,7 @@ def render(data,vars):
     text=RX.sub(lambda m:vars.get(m.group(1),m.group(0)),text)
     return text.encode('utf-8'),sorted(set(RX.findall(text)))
 
-# diff_hint はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# diff_hint は2つのbyte列の最初の相違行から短いtemplate drift説明を作ります。
 def diff_hint(old,new):
     if old==new:return None
     a=old.decode('utf-8','replace').replace('\r\n','\n').split('\n')
@@ -28,7 +28,7 @@ def diff_hint(old,new):
         if x!=y:return {'first_changed_line':i+1,'before':x[:160],'after':y[:160],'old_line_count':len(a),'new_line_count':len(b)}
     return {'old_line_count':len(a),'new_line_count':len(b)}
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はtemplateのlist・check・materialize操作を検証し、driftや生成結果を報告します。
 def main():
     ap=argparse.ArgumentParser(description='Deterministic canonical template generator.')
     ap.add_argument('--template',required=True);ap.add_argument('--vars',required=True);ap.add_argument('--out',required=True)

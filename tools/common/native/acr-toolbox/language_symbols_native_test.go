@@ -6,7 +6,7 @@ import (
     "testing"
 )
 
-// TestNativeSmallSymbolAnalyzers は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestNativeSmallSymbolAnalyzers は対応言語ごとにsymbol位置とwarningを返すことを確認します。
 func TestNativeSmallSymbolAnalyzers(t *testing.T) {
     cases := []struct{
         language string

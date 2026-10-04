@@ -9,13 +9,13 @@ from pathlib import Path
 SCRIPT=Path(__file__).resolve().parents[1]/"script"/"policy_check.py"
 
 class PolicyCheckTests(unittest.TestCase):
-    # run_tool はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # run_tool は一時rules fileを用意してpolicy CLIを実行し、exit statusを返します。
     def run_tool(self, root, rules):
         rules_path=Path(root)/"rules.json"
         rules_path.write_text(json.dumps({"rules":rules}),encoding="utf-8")
         return subprocess.run([sys.executable,str(SCRIPT),"--rules",str(rules_path),str(root)],text=True,capture_output=True)
 
-    # test_path_scope_and_suppression は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_path_scope_and_suppression はpath rule適用とfile内suppressionが違反判定を変えることを確認します。
     def test_path_scope_and_suppression(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
@@ -29,7 +29,7 @@ class PolicyCheckTests(unittest.TestCase):
             self.assertEqual(out["error_count"],0)
             self.assertEqual(len(out["suppressions"]),1)
 
-    # test_violation_exit_one は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_violation_exit_one はerror severityの違反をCLIがexit code 1で返すことを確認します。
     def test_violation_exit_one(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
@@ -38,7 +38,7 @@ class PolicyCheckTests(unittest.TestCase):
             self.assertEqual(p.returncode,1)
             self.assertEqual(json.loads(p.stdout)["status"],"violations")
 
-    # test_warning_and_semantic_rule は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_warning_and_semantic_rule はwarning ruleと意味検査ruleが別severityで出ることを確認します。
     def test_warning_and_semantic_rule(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)

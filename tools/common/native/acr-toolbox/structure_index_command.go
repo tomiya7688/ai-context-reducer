@@ -15,9 +15,9 @@ const structureIndexFormat = "acr-source-structure-index-v1"
 
 type structureStringList []string
 
-// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// String はroot指定flagの値をコンマ区切りで表示します。
 func (s *structureStringList) String() string { return strings.Join(*s, ",") }
-// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// Set は複数rootを受け取るCLI値を個別pathへ分割します。
 func (s *structureStringList) Set(value string) error {
     *s = append(*s, value)
     return nil
@@ -58,13 +58,13 @@ func emitStructureJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// structureMap はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// structureMap はpayloadからobject値を取り出し、型違いを空mapとして扱います。
 func structureMap(raw any) (map[string]any, bool) {
     value, ok := raw.(map[string]any)
     return value, ok
 }
 
-// structureString はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// structureString はpayload fieldを文字列として読み、数値等の型違いを無視します。
 func structureString(value any) string {
     if text, ok := value.(string); ok {
         return text
@@ -72,7 +72,7 @@ func structureString(value any) string {
     return ""
 }
 
-// structureInt はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// structureInt は整数または整数値のJSON numberを構造index用に読み取ります。
 func structureInt(value any) int {
     switch n := value.(type) {
     case float64:
@@ -95,7 +95,7 @@ func normalizeStructurePath(raw, root string) string {
     return filepath.ToSlash(path)
 }
 
-// pythonModuleFromPath はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// pythonModuleFromPath はPython file pathをpackage境界を考慮したmodule名へ変換します。
 func pythonModuleFromPath(path string) string {
     if !strings.HasSuffix(strings.ToLower(path), ".py") {
         return ""
@@ -107,7 +107,7 @@ func pythonModuleFromPath(path string) string {
     return strings.ReplaceAll(strings.Trim(value, "/"), "/", ".")
 }
 
-// goPackageFromPath はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// goPackageFromPath はgo.modとsource pathからGo import pathを解決します。
 func goPackageFromPath(module, path string) string {
     if module == "" || !strings.HasSuffix(strings.ToLower(path), ".go") {
         return ""
@@ -119,12 +119,12 @@ func goPackageFromPath(module, path string) string {
     return strings.TrimSuffix(module, "/") + "/" + strings.Trim(parent, "/")
 }
 
-// structureEdgeKey はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// structureEdgeKey は依存edgeの両端を正規化し、重複判定用のkeyを作ります。
 func structureEdgeKey(edge structureEdge) string {
     return edge.From + "\x00" + edge.To + "\x00" + edge.Kind
 }
 
-// addStructureNode はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// addStructureNode はsource位置とsymbol情報を統合し、indexへnodeを一度だけ登録します。
 func addStructureNode(nodes map[string]structureNode, node structureNode) {
     if node.ID == "" || node.Kind == "" {
         return
@@ -143,7 +143,7 @@ func addStructureNode(nodes map[string]structureNode, node structureNode) {
     nodes[node.ID] = current
 }
 
-// payloadTruncated はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// payloadTruncated はanalyzer payloadに候補省略が明示されているかを確認します。
 func payloadTruncated(payload map[string]any) bool {
     for key, value := range payload {
         if strings.HasSuffix(key, "truncated") {
@@ -361,7 +361,7 @@ func queryStructureNodes(index structureIndex, pattern string, limit int) ([]str
     return rows, false
 }
 
-// resolveStructureTarget はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// resolveStructureTarget は依存先表記をindex内の一意なnodeへ対応づけます。
 func resolveStructureTarget(index structureIndex, target string) (string, []structureNode) {
     matches, _ := queryStructureNodes(index, target, 0)
     needle := strings.ToLower(target)
@@ -381,7 +381,7 @@ func resolveStructureTarget(index structureIndex, target string) (string, []stru
     return "target_not_found", nil
 }
 
-// structureCycleGroups はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// structureCycleGroups は依存graphの強連結componentを循環groupとして返します。
 func structureCycleGroups(nodeIDs map[string]bool, edges []structureEdge) [][]string {
     graph := map[string][]string{}
     for _, edge := range edges {
@@ -439,7 +439,7 @@ func structureCycleGroups(nodeIDs map[string]bool, edges []structureEdge) [][]st
     return groups
 }
 
-// expandStructure はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// expandStructure は選択nodeから依存・参照関係を指定深さまでたどります。
 func expandStructure(index structureIndex, start string, depth, maxNodes int, direction string) map[string]any {
     nodes := map[string]structureNode{}
     outgoing := map[string][]structureEdge{}

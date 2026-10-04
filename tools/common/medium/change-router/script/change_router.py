@@ -7,12 +7,12 @@ from pathlib import Path
 from commander import route_changes
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit は変更pathから選んだ関連file・testとrouting根拠をJSONへ出力します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は変更pathとrepository indexから関連file・test候補を順位付けします。
 def main() -> int:
     parser = argparse.ArgumentParser(
         description='Route changed files to likely tests and docs as self-describing JSON.'

@@ -6,7 +6,7 @@ from messenger import git_result
 from processing import compact_remote_delta
 
 
-# _int_or_none はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _int_or_none は整数文字列を変換し、parse不能な値をNoneで示します。
 def _int_or_none(text: str) -> int | None:
     try:
         return int(text)

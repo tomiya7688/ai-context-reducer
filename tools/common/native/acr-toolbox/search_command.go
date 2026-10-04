@@ -24,9 +24,9 @@ var errSearchEnough = errors.New("search result limit reached")
 
 type searchStringList []string
 
-// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// String は検索対象のflag値をコンマ区切りで表示します。
 func (s *searchStringList) String() string { return strings.Join(*s, ",") }
-// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// Set はコンマ区切りのCLI値を検索対象一覧へ分解します。
 func (s *searchStringList) Set(value string) error {
     *s = append(*s, value)
     return nil
@@ -82,7 +82,7 @@ func searchNonNegative(value int) int {
     return value
 }
 
-// boundedSearchError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// boundedSearchError は検索backendの診断文をJSON向けの長さへ制限します。
 func boundedSearchError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= 1200 {
@@ -118,7 +118,7 @@ func searchAllowedPath(rel, name string, globs, excludes []string) bool {
     return false
 }
 
-// portableSearch はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// portableSearch は外部grepなしでfile内容を検索し、match上限と走査失敗を記録します。
 func portableSearch(
     root, pattern string,
     ignoreCase, fixedString bool,
@@ -258,7 +258,7 @@ func portableSearch(
     return matches, truncated, stats, nil
 }
 
-// ripgrepSearch はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// ripgrepSearch はripgrepのJSON出力を読み、matchとcommand failureを構造化して返します。
 func ripgrepSearch(
     executable, root, pattern string,
     ignoreCase, fixedString bool,

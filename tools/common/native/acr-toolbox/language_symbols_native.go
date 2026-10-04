@@ -83,7 +83,7 @@ var nativePatterns = map[string][]symbolPattern{
     },
 }
 
-// collectNativeLanguageFiles は対象scopeを走査し、agentへ渡す候補情報を収集します。
+// collectNativeLanguageFiles は対応言語のsource fileを列挙し、walk failureを記録します。
 func collectNativeLanguageFiles(root, language string) ([]string, error) {
     exts := nativeSymbolExtensions[language]
     files := []string{}
@@ -100,7 +100,7 @@ func collectNativeLanguageFiles(root, language string) ([]string, error) {
     return files, err
 }
 
-// scanNativeSymbols は対象scopeを走査し、agentへ渡す候補情報を収集します。
+// scanNativeSymbols は各source fileのsymbolを抽出し、warningと未完了状態を集約します。
 func scanNativeSymbols(path, language string) nativeSymbolFile {
     h, err := os.Open(path)
     if err != nil { return nativeSymbolFile{File:filepath.ToSlash(path),Status:"read_failed",Symbols:[]nativeSymbol{},Error:err.Error()} }

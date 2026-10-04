@@ -14,7 +14,7 @@ IGNORE_DIRS = {
 EXTENSIONS = {'.cpp', '.cc', '.cxx', '.hpp', '.hh', '.hxx', '.h'}
 
 
-# 依存物・生成物を避けながら解析対象sourceを決定論的に列挙する。
+# C++ graph対象のsource/headerを絞り、生成物を除いてpath順に走査します。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -27,7 +27,7 @@ def source_files(root: Path):
     return found
 
 
-# 解析対象の完全性とinclude依存を集約し、truncationや失敗件数も結果へ残す。
+# C++ include edgeを全体graphへ統合し、truncation・read errorをartifactに残します。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -62,7 +62,7 @@ def build_result(root: Path, limit: int):
     }
 
 
-# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はC++ include関係を集約し、graph artifactと未走査情報を出力します。
 def main():
     parser = argparse.ArgumentParser(description='Build a local C++ include graph.')
     parser.add_argument('root', nargs='?', default='.')

@@ -10,7 +10,7 @@ spec.loader.exec_module(module)
 
 
 class ResponsibilityCandidatesTests(unittest.TestCase):
-    # test_exact_scan_cap_is_not_truncated は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_exact_scan_cap_is_not_truncated は対象file数がscan capと一致しても省略扱いしないことを確認します。
     def test_exact_scan_cap_is_not_truncated(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -23,7 +23,7 @@ class ResponsibilityCandidatesTests(unittest.TestCase):
             self.assertEqual(0, stat_errors)
             self.assertEqual(0, walk_errors)
 
-    # test_additional_code_file_marks_explicit_scan_truncation は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_additional_code_file_marks_explicit_scan_truncation はcapを超えるsourceがある時にscan省略を明示することを確認します。
     def test_additional_code_file_marks_explicit_scan_truncation(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -34,7 +34,7 @@ class ResponsibilityCandidatesTests(unittest.TestCase):
             self.assertEqual(1, scanned)
             self.assertTrue(truncated)
 
-    # test_default_scan_is_unlimited は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_default_scan_is_unlimited は既定scan設定に隠れた件数上限がないことを確認します。
     def test_default_scan_is_unlimited(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -36,7 +36,7 @@ func emitIgnoreCandidatesJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// scanNativeIgnoreCandidates は対象scopeを走査し、agentへ渡す候補情報を収集します。
+// scanNativeIgnoreCandidates はignore候補の入力範囲を走査し、読取・walk失敗を数えます。
 func scanNativeIgnoreCandidates(root string) ([]ignoreCandidate, int) {
     candidates := []ignoreCandidate{}
     walkErrors := 0

@@ -25,7 +25,7 @@ EXTERNAL_CANDIDATES = ('rg', 'fd', 'ast-grep', 'sg', 'ctags', 'scip', 'tree-sitt
 PHASE_ORDER = {'orient': 0, 'search': 1, 'scope': 2, 'inspect': 3, 'validate': 4, 'stop': 5}
 
 
-# iter_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# iter_files はtool metadataを読む対象fileを除外directoryを避けながら返します。
 def iter_files(root: Path):
     for current, dirs, names in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
@@ -34,7 +34,7 @@ def iter_files(root: Path):
             yield current_path / name
 
 
-# detect_types_from_relative_path はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# detect_types_from_relative_path はpath中のproject type signalを照合して検出済みsetへ追加します。
 def detect_types_from_relative_path(relative_path: str, detected: set[str]) -> None:
     low = relative_path.lower()
     for project_type, words in TYPE_SIGNALS.items():
@@ -42,17 +42,17 @@ def detect_types_from_relative_path(relative_path: str, detected: set[str]) -> N
             detected.add(project_type)
 
 
-# available_external_tools はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# available_external_tools はPATH上で実行可能なoptional backend名だけを返します。
 def available_external_tools() -> set[str]:
     return {name for name in EXTERNAL_CANDIDATES if shutil.which(name)}
 
 
-# item はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# item はtool path・phase・availability・推薦理由を1つのrowにまとめます。
 def item(path: str, reason: str, phase: str = 'orient', activation: str = 'always', availability: str = 'ready') -> dict[str, str]:
     return {'tool_path': path, 'phase': phase, 'activation': activation, 'availability': availability, 'reason': reason}
 
 
-# _availability はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _availability は外部backendの導入状態を考慮してtoolの利用状態を決めます。
 def _availability(path: str, external: set[str]) -> str:
     if path == 'common/small/text-search':
         return 'external_backend_ready' if 'rg' in external else 'portable_fallback_ready'
@@ -65,7 +65,7 @@ def _availability(path: str, external: set[str]) -> str:
     return 'ready'
 
 
-# _dedupe_and_sort はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _dedupe_and_sort は指定fieldで重複rowを除き、phase順に安定して並べます。
 def _dedupe_and_sort(rows, key):
     out, seen = [], set()
     for row in rows:
@@ -76,7 +76,7 @@ def _dedupe_and_sort(rows, key):
     return sorted(out, key=lambda row: PHASE_ORDER.get(row.get('phase', 'orient'), 99))
 
 
-# recommend はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# recommend はrepo規模・言語・task contextに応じて常時/条件付きtoolを選びます。
 def recommend(size, languages, project_types, docs, tests, has_git, external_tools=None):
     external = set(external_tools or ())
     recommended = [
@@ -139,7 +139,7 @@ def recommend(size, languages, project_types, docs, tests, has_git, external_too
     return (_dedupe_and_sort(recommended, 'tool_path'), _dedupe_and_sort(conditional, 'tool_path'), _dedupe_and_sort(groups, 'tool_group_path'), _dedupe_and_sort(conditional_groups, 'tool_group_path'))
 
 
-# apply_task_context はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# apply_task_context はgoal・task file・変更pathから推薦toolを絞り、選定理由を加えます。
 def apply_task_context(recommended, conditional, *, goal: str, task_file: str | None, changed_files: list[str], validation_intent: str):
     if not (goal or task_file or changed_files or validation_intent != 'unknown'):
         return recommended, conditional, {'applied': False}
@@ -221,7 +221,7 @@ def build_selection(root: Path, *, goal: str = '', task_file: str | None = None,
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はtaskとproject rootを受け、条件に合うtool候補を順位付きJSONで返す。
 def main():
     parser = argparse.ArgumentParser(description='Select an ordered Context Reducer routing plan as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')

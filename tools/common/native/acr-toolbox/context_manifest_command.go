@@ -41,7 +41,7 @@ func emitContextManifestJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// contextManifestPriority はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// contextManifestPriority はパス・役割・変更状態を使ってcontext候補の優先度を決めます。
 func contextManifestPriority(path string) string {
     clean := filepath.ToSlash(path)
     name := filepath.Base(clean)

@@ -11,7 +11,7 @@ SCRIPT = Path(__file__).parents[1] / 'script' / 'text_search.py'
 
 
 class TextSearchTests(unittest.TestCase):
-    # run_tool はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # run_tool はCLI subprocessを実行し、exit codeとJSON payloadを各検索testへ返します。
     def run_tool(self, *args: str) -> tuple[int, dict]:
         result = subprocess.run(
             [sys.executable, str(SCRIPT), *args],
@@ -21,7 +21,7 @@ class TextSearchTests(unittest.TestCase):
         )
         return result.returncode, json.loads(result.stdout)
 
-    # test_portable_search_is_json_and_prunes_dependency_dirs は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_portable_search_is_json_and_prunes_dependency_dirs はJSON出力を保ちdependency directoryを探索しないことを確認します。
     def test_portable_search_is_json_and_prunes_dependency_dirs(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -39,7 +39,7 @@ class TextSearchTests(unittest.TestCase):
             self.assertEqual(payload['matches'], [{'path': 'src/a.txt', 'line': 2, 'text': 'needle here'}])
             self.assertFalse(payload['matches_truncated'])
 
-    # test_limit_reports_real_truncation_and_context_is_structured は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_limit_reports_real_truncation_and_context_is_structured は追加matchがある時だけ省略を示しcontext行を構造化することを確認します。
     def test_limit_reports_real_truncation_and_context_is_structured(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -56,7 +56,7 @@ class TextSearchTests(unittest.TestCase):
             self.assertEqual(match['before'], [{'line': 1, 'text': 'before'}])
             self.assertEqual(match['after'], [{'line': 3, 'text': 'after'}])
 
-    # test_invalid_regex_and_missing_root_are_not_empty_success は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_invalid_regex_and_missing_root_are_not_empty_success は入力failureを0件正常結果にしないことを確認します。
     def test_invalid_regex_and_missing_root_are_not_empty_success(self):
         with tempfile.TemporaryDirectory() as tmp:
             code, payload = self.run_tool('(', tmp, '--backend', 'portable')

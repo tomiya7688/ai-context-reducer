@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-# _git_failure_line はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _git_failure_line はGit error kindをcontext packの短い説明行へ変換します。
 def _git_failure_line(error_kind: object, query_name: str) -> str:
     if error_kind == 'git_unavailable':
         return '- Git unavailable\n'

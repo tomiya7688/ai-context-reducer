@@ -40,7 +40,7 @@ type policySuppression struct {
   Reason string `json:"reason"`
 }
 
-// policyGlobRegex はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// policyGlobRegex はpolicyのglob記法をパス照合用の正規表現へ変換します。
 func policyGlobRegex(pattern string) (*regexp.Regexp,error) {
   p:=filepath.ToSlash(pattern)
   var b strings.Builder
@@ -62,7 +62,7 @@ func policyGlobRegex(pattern string) (*regexp.Regexp,error) {
   return regexp.Compile(b.String())
 }
 
-// policyPathMatches はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// policyPathMatches は相対パスをglob patternへ照合し、除外対象かを判定します。
 func policyPathMatches(path string, patterns []string) bool {
   if len(patterns)==0{return true}
   path=filepath.ToSlash(path)
@@ -72,7 +72,7 @@ func policyPathMatches(path string, patterns []string) bool {
   return false
 }
 
-// policySuppressionReason はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// policySuppressionReason はfile内の抑制指定を探し、適用理由を返します。
 func policySuppressionReason(line, ruleID string)(string,bool,bool){
   marker:="acr-ignore "+ruleID
   i:=strings.Index(line,marker)
@@ -85,7 +85,7 @@ func policySuppressionReason(line, ruleID string)(string,bool,bool){
   return "",true,false
 }
 
-// policyRuleMatcher はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// policyRuleMatcher はrule種別に応じた一致判定関数を組み立てます。
 func policyRuleMatcher(rule policyRule)(func(string)bool,error){
   mode:=rule.Mode;if mode==""{mode="literal"}
   pattern:=rule.Forbid;if pattern==""{pattern=rule.Require}

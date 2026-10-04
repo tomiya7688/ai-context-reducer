@@ -27,7 +27,7 @@ func emitPolicyIndexJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// discoverNativePolicyFiles はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// discoverNativePolicyFiles はpolicy対象の文書を探索し、読取・walk errorを集計します。
 func discoverNativePolicyFiles(inputs []string) policyDiscovery {
     result := policyDiscovery{Files: []string{}, MissingInputs: []string{}, UnsupportedInputs: []string{}}
     seen := map[string]bool{}

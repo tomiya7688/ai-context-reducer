@@ -55,7 +55,7 @@ def build_index(root: Path, max_documents: int, max_headings_per_document: int) 
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はMarkdown headingを索引化し、文書上限と未返却候補をJSONで示します。
 def main():
     ap = argparse.ArgumentParser(description='Build a compact Markdown heading index as self-describing JSON.')
     ap.add_argument('root', nargs='?', default='.')

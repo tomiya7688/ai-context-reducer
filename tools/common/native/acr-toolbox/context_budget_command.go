@@ -23,7 +23,7 @@ type contextBudgetRow struct {
     Bytes           int64  `json:"bytes"`
 }
 
-// contextEstimate はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// contextEstimate はファイルの文字量からtoken数を推定し、推定値であることも返します。
 func contextEstimate(file fileInfo, mode string) (contextBudgetRow, bool) {
     size := file.Size
     estimateBasis := size

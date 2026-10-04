@@ -33,7 +33,7 @@ func parseSelectorTaskArgs(args []string) selectorTaskOptions {
     return out
 }
 
-// selectorApplyTaskContext はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// selectorApplyTaskContext はtask記述の語を候補metadataへ照合し、関連度を加算します。
 func selectorApplyTaskContext(recommended, conditional []map[string]any, options selectorTaskOptions) ([]map[string]any, []map[string]any, map[string]any) {
     applied := strings.TrimSpace(options.Goal) != "" || options.TaskFile != "" || len(options.ChangedFiles) > 0 || options.ValidationIntent != "unknown"
     if !applied {
