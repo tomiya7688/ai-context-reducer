@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -41,12 +42,20 @@ func mediumExtensions(language string) map[string]bool {
 	return map[string]bool{}
 }
 
-// collectMediumFiles はignore directoryを除外し、相対path順で対象sourceを列挙する。
+// collectMediumFiles はignore directoryを除外し、対象fileとnested walk error数を返します。
 func collectMediumFiles(root, language string) ([]string, int, error) {
+	return collectMediumFilesWithWalker(root, language, filepath.WalkDir)
+}
+
+// collectMediumFilesWithWalker は候補fileとnested walk error数を分けて返します。
+func collectMediumFilesWithWalker(root, language string, walk func(string, fs.WalkDirFunc) error) ([]string, int, error) {
 	files := []string{}
 	walkErrors := 0
-	err := filepath.WalkDir(root, func(path string, d os.DirEntry, walkErr error) error {
+	err := walk(root, func(path string, d os.DirEntry, walkErr error) error {
 		if walkErr != nil {
+			if path == root {
+				return walkErr
+			}
 			walkErrors++
 			return nil
 		}
@@ -278,7 +287,12 @@ func boolInt(value bool) int {
 
 // buildDependencyResult はlanguage固有の既存Medium JSON contractを組み立てる。
 func buildDependencyResult(root, language, tool string) (map[string]any, error) {
-	files, walkErrors, err := collectMediumFiles(root, language)
+	return buildDependencyResultWithWalker(root, language, tool, filepath.WalkDir)
+}
+
+// buildDependencyResultWithWalker は注入された走査結果をdependency map completenessへ反映します。
+func buildDependencyResultWithWalker(root, language, tool string, walk func(string, fs.WalkDirFunc) error) (map[string]any, error) {
+	files, walkErrors, err := collectMediumFilesWithWalker(root, language, walk)
 	if err != nil {
 		return nil, err
 	}
@@ -394,7 +408,7 @@ func cmdLanguageMediumRun(args []string) int {
 	toolsByLang := map[string]string{"python": "python-import-map", "csharp": "csharp-project-map", "go": "go-import-map", "c": "c-include-map", "cpp": "cpp-include-map", "gdscript": "gdscript-dependency-map"}
 	order := []string{"python", "csharp", "go", "c", "cpp", "gdscript"}
 	results := []map[string]any{}
-	failures := 0
+	statuses := []string{}
 	for _, lang := range order {
 		if !detected[lang] {
 			continue
@@ -403,30 +417,38 @@ func cmdLanguageMediumRun(args []string) int {
 		payload, buildErr := buildDependencyResult(absRoot, lang, tool)
 		if buildErr != nil {
 			results = append(results, map[string]any{"tool_path": tool, "status": "failed", "error": boundedErr([]byte(buildErr.Error()))})
-			failures++
+			statuses = append(statuses, "failed")
 			continue
 		}
 		data, marshalErr := json.MarshalIndent(payload, "", "  ")
 		if marshalErr != nil {
 			results = append(results, map[string]any{"tool_path": tool, "status": "failed", "error": marshalErr.Error()})
-			failures++
+			statuses = append(statuses, "failed")
 			continue
 		}
 		name := strings.ReplaceAll(strings.ReplaceAll("tools/"+lang+"/medium/"+tool, "/", "_"), "-", "_") + ".json"
 		output := filepath.Join(outDir, name)
 		if writeErr := writeCommandOutput(output, append(data, '\n')); writeErr != nil {
 			results = append(results, map[string]any{"tool_path": tool, "status": "write_failed", "error": writeErr.Error()})
-			failures++
+			statuses = append(statuses, "write_failed")
 			continue
 		}
 		backend := "acr-toolbox-native-fallback"
-		results = append(results, map[string]any{"tool_path": tool, "status": "ok", "backend": backend, "output_path": output, "approximate": lang == "python" || lang == "c" || lang == "cpp" || lang == "gdscript"})
+		analyzerStatus, ok := payload["status"].(string)
+		if !ok || analyzerStatus == "" {
+			analyzerStatus = "ok"
+		}
+		row := map[string]any{"tool_path": tool, "status": analyzerStatus, "backend": backend, "output_path": output, "approximate": lang == "python" || lang == "c" || lang == "cpp" || lang == "gdscript"}
+		for _, key := range []string{"parse_error_count", "read_error_count", "walk_error_count"} {
+			if count, exists := payload[key]; exists {
+				row[key] = count
+			}
+		}
+		results = append(results, row)
+		statuses = append(statuses, analyzerStatus)
 	}
-	status := "ok"
-	if failures > 0 {
-		status = "ok_with_failures"
-	}
-	selectorWriteJSON(map[string]any{"tool": "language-medium-run", "status": status, "project_root": absRoot, "output_directory": outDir, "results": results, "failure_count": failures})
+	status, failures, skips, warnings := summarizeLanguageStatuses(statuses, walked.WalkErrorCount)
+	selectorWriteJSON(map[string]any{"tool": "language-medium-run", "status": status, "project_root": absRoot, "output_directory": outDir, "results": results, "failure_count": failures, "skip_count": skips, "warning_count": warnings + walked.WalkErrorCount, "walk_error_count": walked.WalkErrorCount})
 	if failures > 0 {
 		return 1
 	}
