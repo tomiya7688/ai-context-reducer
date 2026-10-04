@@ -7,12 +7,12 @@ from messenger import iter_text_files
 from processing import estimate_accurate, estimate_fast, summarize
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit は候補fileのtoken estimate・priority・budget超過を利用者向けに出力します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は候補fileのtoken estimateとpriorityを集計し、budget内の読込案を出力します。
 def main():
     parser = argparse.ArgumentParser(description='Estimate how much agent context candidate text would consume.')
     parser.add_argument('root', nargs='?', default='.')

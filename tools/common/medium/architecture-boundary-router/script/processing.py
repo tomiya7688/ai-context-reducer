@@ -9,7 +9,7 @@ def match_any(path: str, patterns: list[str]) -> bool:
     return any(fnmatch.fnmatch(normalized, pattern) for pattern in patterns)
 
 
-# classify はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# classify はdependency edgeを境界規則へ照合し、許可・違反・unknownを判定します。
 def classify(path: str, profile: dict[str, object]) -> dict[str, object]:
     layer = None
     role = None

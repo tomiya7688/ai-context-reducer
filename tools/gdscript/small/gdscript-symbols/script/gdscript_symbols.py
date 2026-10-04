@@ -15,7 +15,7 @@ PATTERNS = [
 ]
 
 
-# 1ファイルのsymbolだけを解析し、read/parse失敗を空symbol一覧と区別して返す。
+# GDScriptのclass・func宣言を行位置付きで拾い、読み取り失敗と分けて返します。
 def scan(path: Path):
     try:
         lines = path.read_text(encoding='utf-8', errors='ignore').splitlines()
@@ -31,7 +31,7 @@ def scan(path: Path):
     return {'file': str(path), 'status': 'ok', 'symbols': symbols}
 
 
-# symbol解析結果とwarningを集約し、不完全なscanをclean扱いしない結果を作る。
+# GDScript fileの宣言とwarningをまとめ、skipやread errorをpartial statusへ反映します。
 def build_result(paths):
     files, unsupported = [], []
     for raw in paths:
@@ -60,7 +60,7 @@ def build_result(paths):
     }
 
 
-# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はGDScript rootと出力先を確認し、宣言一覧・warning・scan状態を返します。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('paths', nargs='+')

@@ -28,7 +28,7 @@ def diff_hint(old,new):
         if x!=y:return {'first_changed_line':i+1,'before':x[:160],'after':y[:160],'old_line_count':len(a),'new_line_count':len(b)}
     return {'old_line_count':len(a),'new_line_count':len(b)}
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はtemplateのlist・check・materialize操作を検証し、driftや生成結果を報告します。
 def main():
     ap=argparse.ArgumentParser(description='Deterministic canonical template generator.')
     ap.add_argument('--template',required=True);ap.add_argument('--vars',required=True);ap.add_argument('--out',required=True)

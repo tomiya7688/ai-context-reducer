@@ -14,7 +14,7 @@ spec.loader.exec_module(module)
 
 
 class DocIndexTests(unittest.TestCase):
-    # test_build_index_reports_heading_truncation は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_build_index_reports_heading_truncation はheading上限を超える候補がある場合だけ省略flagが立つことを確認します。
     def test_build_index_reports_heading_truncation(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -27,7 +27,7 @@ class DocIndexTests(unittest.TestCase):
             self.assertEqual(len(result['documents'][0]['headings']), 2)
             self.assertTrue(result['documents'][0]['headings_truncated'])
 
-    # test_build_index_reports_document_limit は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_build_index_reports_document_limit は文書上限と実際に返した文書数を別々に示すことを確認します。
     def test_build_index_reports_document_limit(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

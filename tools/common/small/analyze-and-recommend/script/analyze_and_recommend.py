@@ -22,7 +22,7 @@ TYPE_SIGNALS = {
 EXTERNAL = ['rg','fd','ast-grep','sg','ctags','scip','tree-sitter','scc','git-sizer']
 
 
-# walk は対象scopeを調べ、routingに必要な情報だけを集める。
+# walk は除外規則に沿ってproject fileを列挙し、analysis用の基本構造を作ります。
 def walk(root):
     for current, dirs, names in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
@@ -31,7 +31,7 @@ def walk(root):
             yield current_path / name
 
 
-# git_result はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# git_result はGit commandのstdout・stderr・exit codeを保ち、失敗を空結果と分けます。
 def git_result(root, *args):
     try:
         result = subprocess.run(['git','-C',str(root),*args], text=True, capture_output=True, check=False)
@@ -145,7 +145,7 @@ def analyze(root: Path) -> dict[str, object]:
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はproject構造を分析し、次に使うtool候補と推奨理由を返します。
 def main():
     ap = argparse.ArgumentParser(description='Analyze repository/runtime facts, then hand off ordered tool routing to tool-selector.')
     ap.add_argument('root', nargs='?', default='.')

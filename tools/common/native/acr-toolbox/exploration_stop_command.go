@@ -18,7 +18,7 @@ var explorationChecks = map[string][]string{
 
 var explorationRequired = []string{"goal", "required", "acceptance", "source", "tests"}
 
-// evaluateExplorationStop はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// evaluateExplorationStop は探索の進捗と残件数から停止・継続の判断材料を作ります。
 func evaluateExplorationStop(text string) map[string]any {
     lowered := strings.ToLower(text)
     checks := map[string]bool{}

@@ -27,7 +27,7 @@ LANG = {
 ERROR_PATH_LIMIT = 20
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit はrepositoryのfile・language集計をJSONまたはcompact textで表示します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
@@ -57,7 +57,7 @@ def build_portable_stats(root: Path, max_file_bytes: int) -> dict[str, object]:
     binary_like_file_count = 0
     recognized_files_seen = 0
 
-    # walk_error は対象scopeを調べ、routingに必要な情報だけを集める。
+    # walk_error は到達できなかったdirectoryを数え、走査の欠落pathを保存します。
     def walk_error(error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1
@@ -152,7 +152,7 @@ def parse_scc_stats(payload: object) -> dict[str, object]:
     }
 
 
-# run_scc はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_scc は依存edgeから循環componentを求め、repository構造のcycle指標を返します。
 def run_scc(root: Path) -> tuple[dict[str, object] | None, str | None, str]:
     executable = shutil.which('scc')
     if not executable:
@@ -217,7 +217,7 @@ def build_stats(root: Path, max_file_bytes: int, backend: str = 'portable') -> d
     return build_portable_stats(root, max_file_bytes)
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は除外・上限設定を適用してrepositoryを集計し、統計JSONを返します。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Compact repository language/line statistics as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')

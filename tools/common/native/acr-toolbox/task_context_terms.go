@@ -2,12 +2,12 @@ package main
 
 import "strings"
 
-// contextASCIIWordByte はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// contextASCIIWordByte はASCIIの英数字とunderscoreを語の一部として判定します。
 func contextASCIIWordByte(value byte) bool {
     return value == '_' || value >= 'a' && value <= 'z' || value >= '0' && value <= '9'
 }
 
-// contextTermPresent はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// contextTermPresent はASCII語境界を守ってtermを探し、部分文字列の誤一致を防ぎます。
 func contextTermPresent(text, term string) bool {
     if term == "" {
         return false

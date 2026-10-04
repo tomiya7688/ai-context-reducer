@@ -20,7 +20,7 @@ def suppression(line,rid):
     if tail.startswith(':') and tail[1:].strip(): return tail[1:].strip(),True
     return '',True
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は選択されたscopeへpolicy rulesを適用し、違反と走査状態を返します。
 def main():
     ap=argparse.ArgumentParser(description='Lightweight path-scoped policy checker.')
     ap.add_argument('root',nargs='?',default='.')

@@ -19,7 +19,7 @@ IGNORE = {
 ERROR_PATH_LIMIT = 20
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit は見つかったpathとscan/truncation状態をJSONまたは短い一覧で出力します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
@@ -51,7 +51,7 @@ def portable_find(
     stats: dict[str, object] = {'walk_error_count': 0, 'walk_error_paths': []}
     wanted = max_results + 1 if max_results > 0 else 0
 
-    # walk_error は対象scopeを調べ、routingに必要な情報だけを集める。
+    # walk_error はOSが列挙できなかったpathを記録し、結果の完全性判定に渡します。
     def walk_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -161,7 +161,7 @@ def fd_find(
     return results, False, None
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はpatternとrootを検証し、候補path・省略・walk errorを出力します。
 def main() -> int:
     parser = argparse.ArgumentParser(
         description='Find paths and return compact self-describing JSON. Uses fd when compatible and available.'

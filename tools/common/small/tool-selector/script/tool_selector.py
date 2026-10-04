@@ -25,7 +25,7 @@ EXTERNAL_CANDIDATES = ('rg', 'fd', 'ast-grep', 'sg', 'ctags', 'scip', 'tree-sitt
 PHASE_ORDER = {'orient': 0, 'search': 1, 'scope': 2, 'inspect': 3, 'validate': 4, 'stop': 5}
 
 
-# iter_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# iter_files はtool metadataを読む対象fileを除外directoryを避けながら返します。
 def iter_files(root: Path):
     for current, dirs, names in os.walk(root):
         dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
@@ -221,7 +221,7 @@ def build_selection(root: Path, *, goal: str = '', task_file: str | None = None,
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はtaskとproject rootを受け、条件に合うtool候補を順位付きJSONで返す。
 def main():
     parser = argparse.ArgumentParser(description='Select an ordered Context Reducer routing plan as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')

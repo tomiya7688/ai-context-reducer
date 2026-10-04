@@ -6,7 +6,7 @@ import (
     "testing"
 )
 
-// TestValidationPlanAvoidsUISubstringFalsePositive は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestValidationPlanAvoidsUISubstringFalsePositive はUIを含む無関係な単語をtest要件と誤判定しないことを確認します。
 func TestValidationPlanAvoidsUISubstringFalsePositive(t *testing.T) {
     result := classifyValidationPath("build/core.py")
     for _, value := range result {
@@ -25,7 +25,7 @@ func TestValidationPlanAvoidsUISubstringFalsePositive(t *testing.T) {
     }
 }
 
-// TestValidationPlanCompoundParserTerm は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestValidationPlanCompoundParserTerm は複合parser語から必要なvalidation actionを選べることを確認します。
 func TestValidationPlanCompoundParserTerm(t *testing.T) {
     result := classifyValidationPath("tools/parser_rules.py")
     found := false
@@ -39,7 +39,7 @@ func TestValidationPlanCompoundParserTerm(t *testing.T) {
     }
 }
 
-// TestChangeRouterTestCandidateAvoidsSubstringFalsePositive は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestChangeRouterTestCandidateAvoidsSubstringFalsePositive はtestを含む別語のpathを候補扱いしないことを確認します。
 func TestChangeRouterTestCandidateAvoidsSubstringFalsePositive(t *testing.T) {
     if changeRouterIsTestCandidate("latest.py", nil) || changeRouterIsTestCandidate("contest.py", nil) {
         t.Fatal("substring test false positive")
@@ -52,7 +52,7 @@ func TestChangeRouterTestCandidateAvoidsSubstringFalsePositive(t *testing.T) {
     }
 }
 
-// TestChangeRouterIndexTruncationRequiresAdditionalCandidate は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestChangeRouterIndexTruncationRequiresAdditionalCandidate は上限件数ちょうどではindexをtruncatedにしないことを確認します。
 func TestChangeRouterIndexTruncationRequiresAdditionalCandidate(t *testing.T) {
     root := t.TempDir()
     testsDir := filepath.Join(root, "tests")
@@ -81,7 +81,7 @@ func TestChangeRouterIndexTruncationRequiresAdditionalCandidate(t *testing.T) {
     }
 }
 
-// TestChangeRouterCLIExplicitChangedIsSelfDescribing は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestChangeRouterCLIExplicitChangedIsSelfDescribing は明示変更pathが出力内で識別可能なことを確認します。
 func TestChangeRouterCLIExplicitChangedIsSelfDescribing(t *testing.T) {
     root := t.TempDir()
     if err := os.MkdirAll(filepath.Join(root, "tests"), 0o755); err != nil {

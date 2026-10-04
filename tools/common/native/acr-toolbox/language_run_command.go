@@ -17,7 +17,7 @@ type languageRunResult struct {
     Error string `json:"error,omitempty"`
 }
 
-// boundedErr はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// boundedErr はanalyzerの診断文をstdout JSONのサイズ上限内に収めます。
 func boundedErr(data []byte) string {
     s := strings.TrimSpace(string(data))
     if len(s) > 1200 { return s[:1200] }

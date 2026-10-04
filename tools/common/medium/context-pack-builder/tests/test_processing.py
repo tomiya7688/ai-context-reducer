@@ -10,7 +10,7 @@ from processing import render_context_pack
 
 
 class RenderContextPackTests(unittest.TestCase):
-    # test_clean_state_is_not_reported_as_unavailable は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_clean_state_is_not_reported_as_unavailable はGitのclean結果をunavailableと誤分類しないことを確認します。
     def test_clean_state_is_not_reported_as_unavailable(self):
         text = render_context_pack(
             {'goal': 'g', 'required': '', 'acceptance': '', 'deferred': ''},
@@ -30,7 +30,7 @@ class RenderContextPackTests(unittest.TestCase):
         self.assertIn('clean', text)
         self.assertNotIn('Git unavailable', text)
 
-    # test_git_unavailable_is_explicit は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_git_unavailable_is_explicit はGitが使えない理由をpack結果へ明示することを確認します。
     def test_git_unavailable_is_explicit(self):
         text = render_context_pack(
             {'goal': 'g', 'required': '', 'acceptance': '', 'deferred': ''},
@@ -50,7 +50,7 @@ class RenderContextPackTests(unittest.TestCase):
         self.assertNotIn('- clean', text)
         self.assertNotIn('none detected', text)
 
-    # test_git_query_failure_is_not_clean_state は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_git_query_failure_is_not_clean_state は失敗したGit queryをclean stateとして扱わないことを確認します。
     def test_git_query_failure_is_not_clean_state(self):
         text = render_context_pack(
             {'goal': 'g', 'required': '', 'acceptance': '', 'deferred': ''},
@@ -70,7 +70,7 @@ class RenderContextPackTests(unittest.TestCase):
         self.assertIn('git status query failed', text)
         self.assertNotIn('- clean', text)
 
-    # test_truncation_is_explicit は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_truncation_is_explicit はbudgetによる省略をpack出力のstatusへ残すことを確認します。
     def test_truncation_is_explicit(self):
         text = render_context_pack(
             {'goal': 'g', 'required': '', 'acceptance': '', 'deferred': ''},
@@ -88,7 +88,7 @@ class RenderContextPackTests(unittest.TestCase):
 
         self.assertGreaterEqual(text.count('truncated'), 2)
 
-    # test_negative_limit_is_normalized_to_zero は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_negative_limit_is_normalized_to_zero は負のlimitをzero扱いにして異常な切詰めを避けることを確認します。
     def test_negative_limit_is_normalized_to_zero(self):
         class FakeResult(dict):
             pass

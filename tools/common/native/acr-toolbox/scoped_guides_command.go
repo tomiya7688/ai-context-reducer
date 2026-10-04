@@ -8,9 +8,9 @@ import (
 )
 
 type scopedGuideNameList []string
-// String はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// String はscoped guide path flagの値をコンマ区切りで表示します。
 func (s *scopedGuideNameList) String() string { return strings.Join(*s,",") }
-// Set はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// Set はコンマ区切りのguide path flagを個別pathへ分解して追加します。
 func (s *scopedGuideNameList) Set(v string) error { *s=append(*s,v); return nil }
 
 // cmdScopedGuides は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。

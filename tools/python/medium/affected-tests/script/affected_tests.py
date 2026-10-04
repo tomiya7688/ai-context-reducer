@@ -76,7 +76,7 @@ def dependency_consumers(changed, dependency_map):
     return uniq(consumers)
 
 
-# dependency mapのtruncation/errorを完全性signalへ変換し、安全側fallback判断に使う。
+# dependency mapの省略・parse errorをimpact不確実性に反映し、広いtest探索を促します。
 def dependency_state(dependency_map, used):
     if not used:
         return {'used': False}
@@ -168,7 +168,7 @@ def emit(value):
     print(json.dumps(value, ensure_ascii=False, indent=2))
 
 
-# CLI入力を検証し、通常結果と失敗状態を同じ機械可読契約で返す。
+# main は変更path・依存map・Git stateを照合し、関連test候補とrouting statusを返します。
 def main():
     parser = argparse.ArgumentParser(description='Lightweight affected-test selector')
     parser.add_argument('--root', default='.')

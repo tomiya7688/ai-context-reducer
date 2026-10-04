@@ -7,12 +7,12 @@ from messenger import discover_policy_files, read_lines
 from processing import policy_findings
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit はpolicy rule候補とscan failure情報をindex CLIのJSONへ変換します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はpolicy設定と対象fileを索引化し、scan不完全性を含めて出力します。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Index likely policy/rule lines as compact self-describing JSON.')
     parser.add_argument('paths', nargs='+')

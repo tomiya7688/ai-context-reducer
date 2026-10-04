@@ -20,7 +20,7 @@ def scan(root):
         if p.is_file() and p.suffix.lower() in LANG: found.add(LANG[p.suffix.lower()])
     return found
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は指定rootの対応analyzerを実行し、各結果のpartial・failure statusを伝えます。
 def main():
     ap=argparse.ArgumentParser(description='Run available shallow language analyzers and write full results to files.')
     ap.add_argument('root',nargs='?',default='.')

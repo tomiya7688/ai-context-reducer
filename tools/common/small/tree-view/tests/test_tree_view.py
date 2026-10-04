@@ -14,7 +14,7 @@ spec.loader.exec_module(module)
 
 
 class TreeViewTests(unittest.TestCase):
-    # test_build_tree_is_bounded は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_build_tree_is_bounded はdepth・entry上限がtree出力に適用されることを確認します。
     def test_build_tree_is_bounded(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -28,7 +28,7 @@ class TreeViewTests(unittest.TestCase):
             self.assertEqual(result['entries_scanned'], 2)
             self.assertTrue(result['entries_truncated'])
 
-    # test_build_tree_marks_entry_kind は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_build_tree_marks_entry_kind はfileとdirectoryが別のentry kindで返ることを確認します。
     def test_build_tree_marks_entry_kind(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

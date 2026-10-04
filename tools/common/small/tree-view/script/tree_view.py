@@ -51,7 +51,7 @@ def build_tree(root: Path, max_depth: int, max_entries: int) -> dict[str, object
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はroot・深さ・件数の指定を受け、tree-viewのJSONと終了statusを出力する。
 def main():
     ap = argparse.ArgumentParser(description='Portable bounded repository tree as self-describing JSON.')
     ap.add_argument('root', nargs='?', default='.')

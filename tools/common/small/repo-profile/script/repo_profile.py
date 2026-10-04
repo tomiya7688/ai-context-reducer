@@ -24,12 +24,12 @@ LANG = {
 ERROR_PATH_LIMIT = 20
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit はproject type・重要file・Git hotspotをprofile JSONへ整えて出力します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# walk は対象scopeを調べ、routingに必要な情報だけを集める。
+# walk は除外規則を適用し、profileを作るsource・config pathを集めます。
 def walk(root: Path, max_files: int) -> tuple[list[Path], bool, dict[str, object]]:
     max_files = max(0, max_files)
     files: list[Path] = []
@@ -102,7 +102,7 @@ def parse_scc_payload(payload: object) -> tuple[dict[str, int], list[dict[str, o
     return counts, metrics
 
 
-# run_scc はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_scc はmodule dependencyの循環群を計算し、profileへcycle情報を追加します。
 def run_scc(root: Path) -> tuple[dict[str, int] | None, list[dict[str, object]] | None, str | None]:
     executable = shutil.which('scc')
     if not executable:
@@ -205,7 +205,7 @@ def build_profile(
     return result
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はproject構造とGit変更傾向をまとめ、profileとhotspotを出力します。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Create a compact self-describing repository profile.')
     parser.add_argument('root', nargs='?', default='.')

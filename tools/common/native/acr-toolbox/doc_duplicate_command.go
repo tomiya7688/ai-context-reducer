@@ -25,7 +25,7 @@ func emitDocDuplicateJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// discoverNativeDocuments はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// discoverNativeDocuments は対象rootからMarkdown文書を列挙し、走査失敗を集計します。
 func discoverNativeDocuments(root string) nativeDocumentDiscovery {
     result := nativeDocumentDiscovery{Paths: []string{}}
     _ = filepath.WalkDir(root, func(path string, entry fs.DirEntry, visitErr error) error {

@@ -240,7 +240,7 @@ func dependencyConsumers(changed []string, deps depMap) []string {
     return uniq(consumers)
 }
 
-// dependency mapのtruncation/errorを完全性signalへ変換し、安全側fallback判断に使う。
+// dependency mapの省略・read errorをimpact uncertaintyへ反映し、狭すぎるtest routingを防ぎます。
 func dependencyState(deps depMap, used bool) dependencyMapState {
     if !used {
         return dependencyMapState{Used: false}

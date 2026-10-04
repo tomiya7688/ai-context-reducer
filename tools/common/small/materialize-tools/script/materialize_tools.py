@@ -218,7 +218,7 @@ def execute(source: Path, out: Path, apply: bool, overwrite: bool) -> dict:
     return result
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は選択・dry-run・apply optionを処理し、生成manifestと競合statusを返します。
 def main():
     parser = argparse.ArgumentParser(description='Safely materialize usable portable tool variants as self-describing JSON.')
     parser.add_argument('source', nargs='?', default='.')

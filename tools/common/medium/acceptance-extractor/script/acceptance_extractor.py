@@ -12,7 +12,7 @@ HEADINGS = {
 }
 
 
-# term_present はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# term_present は見出し語を語境界で照合し、部分一致によるsection誤選択を防ぎます。
 def term_present(text: str, term: str) -> bool:
     if any(ord(char) > 127 for char in term):
         return term in text
@@ -48,7 +48,7 @@ def extract_sections(lines: list[str], limit: int) -> tuple[dict[str, list[str]]
     return sections, truncated
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はMarkdownから受入条件sectionを抽出し、追跡可能な項目一覧を返します。
 def main():
     parser = argparse.ArgumentParser(description='Extract Goal/Required/Acceptance/Deferred sections from markdown as self-describing JSON.')
     parser.add_argument('file')

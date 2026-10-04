@@ -18,7 +18,7 @@ def run_git(*args: str) -> tuple[bool, str, str]:
     return result.returncode == 0, result.stdout.strip(), error_kind
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はGit diffを取得してchange summaryへ圧縮し、query failureを区別します。
 def main():
     parser = argparse.ArgumentParser(description='Return compact Git diff evidence as self-describing JSON.')
     parser.add_argument('--base', default='HEAD~1')

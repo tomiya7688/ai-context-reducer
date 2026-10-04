@@ -61,7 +61,7 @@ def plan(info):
     return {'keep': keep, 'fallback': fallback, 'notes': notes}
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はprojectの言語・外部tool要件を集め、installを伴わない環境planを返します。
 def main():
     parser = argparse.ArgumentParser(description='Plan portable ai-context-reducer tool implementations for this environment.')
     parser.add_argument('root', nargs='?', default='.')

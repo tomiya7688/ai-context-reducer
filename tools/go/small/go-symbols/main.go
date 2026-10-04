@@ -75,7 +75,7 @@ func scan(path string) fileSymbols {
     return fileSymbols{File: normalized, Status: "ok", Symbols: rows}
 }
 
-// file/directoriesを解析対象へ展開し、missingやunsupported inputを別signalとして保持する。
+// Go入力pathから対象fileを列挙し、missing rootや非Go fileをparse結果と分けます。
 func collect(paths []string) ([]fileSymbols, []unsupportedInput, error) {
     files := []string{}
     unsupported := []unsupportedInput{}
@@ -131,7 +131,7 @@ func collect(paths []string) ([]fileSymbols, []unsupportedInput, error) {
     return rows, unsupported, nil
 }
 
-// symbol解析結果とwarningを集約し、不完全なscanをclean扱いしない結果を作る。
+// Go fileのparse結果とwarningを統合し、未完了の走査をok statusへ丸めません。
 func buildResult(paths []string) (symbolsResult, error) {
     rows, unsupported, err := collect(paths)
     if err != nil {

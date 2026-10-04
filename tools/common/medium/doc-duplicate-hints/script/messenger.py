@@ -15,7 +15,7 @@ def iter_documents(root: Path, scan_stats: dict[str, int] | None = None):
     stats = scan_stats if scan_stats is not None else {'walk_error_count': 0}
     stats.setdefault('walk_error_count', 0)
 
-    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# on_walk_error は文書scan中に列挙できないdirectoryとfailure countを残します。
     def on_walk_error(_error: OSError) -> None:
         stats['walk_error_count'] += 1
 
@@ -28,7 +28,7 @@ def iter_documents(root: Path, scan_stats: dict[str, int] | None = None):
                 yield path
 
 
-# read_lines は必要な入力だけを読み込み、後段が扱いやすい形へ整える。
+# read_lines は類似比較に使うheadingと本文行を読み、文字code位置を保持します。
 def read_lines(path: Path) -> list[str] | None:
     try:
         return path.read_text(encoding='utf-8', errors='ignore').splitlines()

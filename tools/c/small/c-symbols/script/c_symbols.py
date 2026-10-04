@@ -29,7 +29,7 @@ def scan(path: Path):
     return {'file': str(path), 'status': 'ok', 'symbols': symbols}
 
 
-# symbol解析結果とwarningを集約し、不完全なscanをclean扱いしない結果を作る。
+# C declarationとread warningをまとめ、parseできなかったfileをclean結果と分けます。
 def build_result(paths):
     files, unsupported = [], []
     for raw in paths:
@@ -58,7 +58,7 @@ def build_result(paths):
     }
 
 
-# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はC source rootから宣言symbolを集め、artifact pathとscan warningを返します。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('paths', nargs='+')

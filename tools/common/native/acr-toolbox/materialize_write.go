@@ -7,7 +7,7 @@ import (
     "path/filepath"
 )
 
-// atomicNativeCopy はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// atomicNativeCopy は一時fileへcopyしてから置換し、途中失敗で既存fileを壊しません。
 func atomicNativeCopy(source, destination string) error {
     if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
         return err
@@ -46,7 +46,7 @@ func atomicNativeCopy(source, destination string) error {
     return replaceMaterializedFile(temporaryName, destination)
 }
 
-// atomicNativeJSON はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// atomicNativeJSON はJSONを一時fileに書いてrenameし、manifest更新を原子的に行います。
 func atomicNativeJSON(path string, payload any) error {
     if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
         return err

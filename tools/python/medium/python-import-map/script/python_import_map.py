@@ -31,7 +31,7 @@ def file_imports(path: Path):
     return {'status': 'ok', 'imports': sorted(imports)}
 
 
-# 依存物・生成物を避けながら解析対象sourceを決定論的に列挙する。
+# Python package rootから生成物・dependency directoryを除き、import解析対象を整列します。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -44,7 +44,7 @@ def source_files(root: Path):
     return found
 
 
-# 全体scanの完全性と依存edgeを自己説明的なgraph結果へ集約する。
+# import edge・file数・解析warningをimport-mapの出力契約へまとめます。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -82,7 +82,7 @@ def build_result(root: Path, limit: int):
     }
 
 
-# CLI入力を検証し、通常結果と失敗状態を同じ機械可読契約で返す。
+# main はPython import rootを解析し、module edge・省略・scan failureを返します。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')

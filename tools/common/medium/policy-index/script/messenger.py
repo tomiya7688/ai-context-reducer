@@ -36,7 +36,7 @@ def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list
         seen.add(key)
         files.append(path)
 
-    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# on_walk_error はpolicy文書を列挙できなかったpathを検出結果に記録します。
     def on_walk_error(_error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1
@@ -66,7 +66,7 @@ def discover_policy_files(paths: list[str]) -> tuple[list[Path], list[str], list
     return files, missing, unsupported, walk_error_count
 
 
-# read_lines は必要な入力だけを読み込み、後段が扱いやすい形へ整える。
+# read_lines はpolicy候補のheading判定に必要な行だけを読み、line番号も保ちます。
 def read_lines(path: Path) -> list[str] | None:
     try:
         return path.read_text(encoding='utf-8', errors='ignore').splitlines()

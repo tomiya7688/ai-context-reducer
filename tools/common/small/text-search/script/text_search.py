@@ -20,7 +20,7 @@ DEFAULT_IGNORE = {
 ERROR_PATH_LIMIT = 20
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit はmatch・truncation・walk errorを検索CLIのJSON fieldへまとめます。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
@@ -47,9 +47,9 @@ def relative_path(root: Path, path: Path) -> str:
         return path.as_posix()
 
 
-# iter_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# iter_files は指定root以下から除外・size条件を満たす検索対象fileを列挙します。
 def iter_files(root: Path, globs: list[str], excludes: list[str], max_bytes: int, stats: dict[str, object]):
-    # walk_error は対象scopeを調べ、routingに必要な情報だけを集める。
+    # walk_error は検索中に読めなかったdirectoryとpathを統計へ記録します。
     def walk_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -237,7 +237,7 @@ def ripgrep_search(
     return matches, False, None
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は検索語・対象・backendを検証し、bounded match結果とstatusを出力する。
 def main() -> int:
     parser = argparse.ArgumentParser(
         description='Search text and return compact self-describing JSON. Uses ripgrep when compatible and available.'

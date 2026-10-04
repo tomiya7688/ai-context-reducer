@@ -22,7 +22,7 @@ def first_available(names):
     return ''
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はlanguage setupに必要なruntimeを検出し、未導入環境をplanとして報告します。
 def main():
     languages = {}
     for name, commands in LANGS.items():

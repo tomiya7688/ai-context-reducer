@@ -10,7 +10,7 @@ spec.loader.exec_module(module)
 
 
 class FileRoleMapTests(unittest.TestCase):
-    # test_role_classification は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_role_classification はfile pathの規則から期待roleが割り当てられることを確認します。
     def test_role_classification(self):
         self.assertEqual(module.role(Path('src/main.py')), 'source')
         self.assertEqual(module.role(Path('tests/test_main.py')), 'tests')
@@ -18,7 +18,7 @@ class FileRoleMapTests(unittest.TestCase):
         self.assertEqual(module.role(Path('docs/guide.md')), 'documentation')
         self.assertEqual(module.role(Path('config/app.toml')), 'configuration')
 
-    # test_build_role_map_limits_examples は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_build_role_map_limits_examples はroleごとに返すexample件数がlimitを超えないことを確認します。
     def test_build_role_map_limits_examples(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)

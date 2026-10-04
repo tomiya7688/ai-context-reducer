@@ -48,7 +48,7 @@ def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]]
     truncated = False
     walk_error_count = 0
 
-    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# on_walk_error はtest indexの列挙失敗を記録し、候補mapをcomplete扱いしないようにします。
     def on_walk_error(_error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1

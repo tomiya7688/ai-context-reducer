@@ -6,7 +6,7 @@ import (
     "testing"
 )
 
-// TestNativeDocDuplicateDetectionIsDeterministic は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestNativeDocDuplicateDetectionIsDeterministic は同じ文書集合から同じ順序の重複候補が返ることを確認します。
 func TestNativeDocDuplicateDetectionIsDeterministic(t *testing.T) {
     text := "This line is deliberately long enough to be considered duplicate content."
     groups := collectNativeDocumentDuplicates([]docDuplicateDocument{
@@ -21,7 +21,7 @@ func TestNativeDocDuplicateDetectionIsDeterministic(t *testing.T) {
     }
 }
 
-// TestNativeDocDuplicateCLIZeroLimitsAreUnlimited は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestNativeDocDuplicateCLIZeroLimitsAreUnlimited はlimit zeroで候補を途中省略しないことを確認します。
 func TestNativeDocDuplicateCLIZeroLimitsAreUnlimited(t *testing.T) {
     root := t.TempDir()
     text := "This repeated documentation line is intentionally longer than fifty characters.\n"
@@ -61,7 +61,7 @@ func TestNativeDocDuplicateCLIZeroLimitsAreUnlimited(t *testing.T) {
     }
 }
 
-// TestNativeDocDuplicateMissingRootIsError は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestNativeDocDuplicateMissingRootIsError は存在しないrootを空の成功結果にしないことを確認します。
 func TestNativeDocDuplicateMissingRootIsError(t *testing.T) {
     root := filepath.Join(t.TempDir(), "missing")
     code, payload := captureJSONCommand(t, func() int {

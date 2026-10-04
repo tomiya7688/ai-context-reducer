@@ -45,7 +45,7 @@ def candidate_paths(root: Path, per_role_limit: int) -> tuple[dict[str, list[str
     return hits, truncated, document_files_scanned
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はroleとrootを検証し、正本候補のpathとscan状態をJSONで返します。
 def main():
     parser = argparse.ArgumentParser(description='Find filename-based source-of-truth candidates as self-describing JSON.')
     parser.add_argument('root', nargs='?', default='.')

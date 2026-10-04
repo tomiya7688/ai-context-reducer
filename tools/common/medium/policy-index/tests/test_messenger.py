@@ -10,7 +10,7 @@ from messenger import discover_policy_files
 
 
 class PolicyDiscoveryTests(unittest.TestCase):
-    # test_discovery_dedupes_overlapping_inputs_and_ignores_dependencies は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_discovery_dedupes_overlapping_inputs_and_ignores_dependencies は入力重複を除きdependency subtreeを除外することを確認します。
     def test_discovery_dedupes_overlapping_inputs_and_ignores_dependencies(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -28,7 +28,7 @@ class PolicyDiscoveryTests(unittest.TestCase):
             self.assertEqual([], unsupported)
             self.assertEqual(0, errors)
 
-    # test_missing_and_unsupported_inputs_are_distinct は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_missing_and_unsupported_inputs_are_distinct はmissing pathと未対応fileを別statusで示すことを確認します。
     def test_missing_and_unsupported_inputs_are_distinct(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
