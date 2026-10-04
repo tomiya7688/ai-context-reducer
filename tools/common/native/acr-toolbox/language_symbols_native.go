@@ -3,6 +3,7 @@ package main
 import (
     "bufio"
     "encoding/json"
+    "io/fs"
     "os"
     "path/filepath"
     "regexp"
@@ -30,6 +31,8 @@ type nativeSymbolResult struct {
     SymbolCount int `json:"symbol_count"`
     ParseErrorCount int `json:"parse_error_count"`
     ReadErrorCount int `json:"read_error_count"`
+    WalkErrorCount int `json:"walk_error_count"`
+    WalkErrorPaths []string `json:"walk_error_paths,omitempty"`
     UnsupportedInputCount int `json:"unsupported_input_count"`
     UnsupportedInputs []map[string]string `json:"unsupported_inputs"`
     Approximate bool `json:"approximate"`
@@ -83,12 +86,19 @@ var nativePatterns = map[string][]symbolPattern{
     },
 }
 
-// collectNativeLanguageFiles は対応言語のsource fileを列挙し、walk failureを記録します。
-func collectNativeLanguageFiles(root, language string) ([]string, error) {
+// collectNativeLanguageFilesWithWalker はfile候補とnested walk failureを別々に収集します。
+func collectNativeLanguageFilesWithWalker(root, language string, walk func(string, fs.WalkDirFunc) error) ([]string, []string, error) {
     exts := nativeSymbolExtensions[language]
     files := []string{}
-    err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
-        if err != nil { return nil }
+    walkErrorPaths := []string{}
+    err := walk(root, func(path string, d os.DirEntry, err error) error {
+        if err != nil {
+            if path == root { return err }
+            relative, relErr := filepath.Rel(root, path)
+            if relErr != nil { relative = path }
+            walkErrorPaths = append(walkErrorPaths, filepath.ToSlash(relative))
+            return nil
+        }
         if d.IsDir() {
             if path != root && ignoreDirs[strings.ToLower(d.Name())] { return filepath.SkipDir }
             return nil
@@ -97,7 +107,8 @@ func collectNativeLanguageFiles(root, language string) ([]string, error) {
         return nil
     })
     sort.Strings(files)
-    return files, err
+    sort.Strings(walkErrorPaths)
+    return files, walkErrorPaths, err
 }
 
 // scanNativeSymbols は各source fileのsymbolを抽出し、warningと未完了状態を集約します。
@@ -126,11 +137,17 @@ func scanNativeSymbols(path, language string) nativeSymbolFile {
 
 // buildNativeSymbolResult は解析結果を後段で再利用できる構造へ組み立てます。
 func buildNativeSymbolResult(root, language, tool string) (nativeSymbolResult,error) {
-    files,err:=collectNativeLanguageFiles(root,language)
+    return buildNativeSymbolResultWithWalker(root, language, tool, filepath.WalkDir)
+}
+
+// buildNativeSymbolResultWithWalker は注入された走査結果からanalyzer completenessを組み立てます。
+func buildNativeSymbolResultWithWalker(root, language, tool string, walk func(string, fs.WalkDirFunc) error) (nativeSymbolResult,error) {
+    files,walkErrorPaths,err:=collectNativeLanguageFilesWithWalker(root,language,walk)
     if err!=nil { return nativeSymbolResult{},err }
     out:=nativeSymbolResult{
         Tool:tool,Status:"ok",Language:language,Files:[]nativeSymbolFile{},
         UnsupportedInputs:[]map[string]string{},Approximate:true,
+        WalkErrorCount:len(walkErrorPaths),WalkErrorPaths:walkErrorPaths,
     }
     for _,p:=range files {
         row:=scanNativeSymbols(p,language)
@@ -139,20 +156,25 @@ func buildNativeSymbolResult(root, language, tool string) (nativeSymbolResult,er
         if row.Status=="read_failed" { out.ReadErrorCount++ }
     }
     out.FileCount=len(out.Files)
-    if out.ReadErrorCount>0 { out.Status="ok_with_warnings" }
+    if out.ReadErrorCount>0 || out.WalkErrorCount>0 { out.Status="ok_with_warnings" }
     return out,nil
 }
 
 // writeNativeSymbols は内部結果を安定した利用者向け出力へ変換します。
 func writeNativeSymbols(root, language, tool, outDir string) languageRunResult {
+    return writeNativeSymbolsWithWalker(root, language, tool, outDir, filepath.WalkDir)
+}
+
+// writeNativeSymbolsWithWalker はanalyzer payloadと同じstatusをlanguage-run rowへ伝えます。
+func writeNativeSymbolsWithWalker(root, language, tool, outDir string, walk func(string, fs.WalkDirFunc) error) languageRunResult {
     r:=languageRunResult{ToolPath:tool,Backend:"acr-toolbox-native-symbols"}
-    payload,err:=buildNativeSymbolResult(root,language,filepath.Base(tool))
+    payload,err:=buildNativeSymbolResultWithWalker(root,language,filepath.Base(tool),walk)
     if err!=nil { r.Status="failed"; r.Error=boundedErr([]byte(err.Error())); return r }
     data,err:=json.MarshalIndent(payload,"","  ")
     if err!=nil { r.Status="failed"; r.Error=err.Error(); return r }
     name:=strings.ReplaceAll(strings.ReplaceAll(tool,"/","_"),"-","_")+".json"
     output:=filepath.Join(outDir,name)
     if err:=writeCommandOutput(output,append(data,'\n')); err!=nil { r.Status="write_failed"; r.Error=err.Error(); return r }
-    r.Status="ok"; r.OutputPath=output
+    r.Status=payload.Status; r.ReadErrorCount=payload.ReadErrorCount; r.WalkErrorCount=payload.WalkErrorCount; r.OutputPath=output
     return r
 }

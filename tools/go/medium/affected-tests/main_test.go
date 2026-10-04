@@ -93,3 +93,15 @@ func TestUnavailableParseCheckForcesBroaderFallback(t *testing.T) {
 		t.Fatalf("missing parse-check reason: %#v", state.Reasons)
 	}
 }
+
+// TestDependencyWalkErrorForcesBroaderFallback は走査警告を不確実なimpactとして扱います。
+func TestDependencyWalkErrorForcesBroaderFallback(t *testing.T) {
+    deps := depMap{WalkErrorCount: 1}
+    got := analyze([]string{"src/parser/lexer.go"}, config{}, deps, true)
+    if got.Status != "ok_with_warnings" || !got.ImpactUncertain || got.Fallback != "broader-or-full" {
+        t.Fatalf("walk error did not reach test impact: %#v", got)
+    }
+    if len(got.DependencyMap.Reasons) != 1 || got.DependencyMap.Reasons[0] != "walk_error_count=1" {
+        t.Fatalf("missing walk error reason: %#v", got.DependencyMap.Reasons)
+    }
+}

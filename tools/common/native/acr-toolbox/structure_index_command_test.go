@@ -73,6 +73,7 @@ func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
       "files":[{"file":"broken.go","status":"parse_failed","symbols":[]}],
       "parse_error_count":1,
       "read_error_count":0,
+      "walk_error_count":3,
       "unsupported_input_count":2
     }`), 0o644); err != nil { t.Fatal(err) }
 
@@ -81,7 +82,7 @@ func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
     if len(index.InputErrors) != 1 {
         t.Fatalf("expected one analyzer warning, got %#v", index.InputErrors)
     }
-    want := symbols + ": analyzer warnings parse_error_count=1 unsupported_input_count=2"
+    want := symbols + ": analyzer warnings parse_error_count=1 walk_error_count=3 unsupported_input_count=2"
     if index.InputErrors[0] != want {
         t.Fatalf("unexpected analyzer warning: %q want %q", index.InputErrors[0], want)
     }
@@ -100,6 +101,7 @@ func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
       "edges":[],
       "parse_error_count":1,
       "read_error_count":2,
+      "walk_error_count":3,
       "scan_truncated":false
     }`), 0o644); err != nil { t.Fatal(err) }
 
@@ -108,7 +110,7 @@ func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
     if len(index.InputErrors) != 1 {
         t.Fatalf("expected one graph warning, got %#v", index.InputErrors)
     }
-    want := graph + ": analyzer warnings parse_error_count=1 read_error_count=2"
+    want := graph + ": analyzer warnings parse_error_count=1 read_error_count=2 walk_error_count=3"
     if index.InputErrors[0] != want {
         t.Fatalf("unexpected graph warning: %q want %q", index.InputErrors[0], want)
     }

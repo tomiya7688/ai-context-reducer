@@ -15,6 +15,33 @@ type languageRunResult struct {
     Backend string `json:"backend,omitempty"`
     OutputPath string `json:"output_path,omitempty"`
     Error string `json:"error,omitempty"`
+    ReadErrorCount int `json:"read_error_count,omitempty"`
+    WalkErrorCount int `json:"walk_error_count,omitempty"`
+}
+
+// summarizeLanguageStatuses はanalyzerとrouting scanの警告を上位statusへ集約します。
+func summarizeLanguageStatuses(statuses []string, scanWalkErrors int) (string, int, int, int) {
+    failed, skipped, warnings := 0, 0, 0
+    for _, status := range statuses {
+        switch status {
+        case "failed", "write_failed":
+            failed++
+        case "skipped":
+            skipped++
+        case "ok":
+        default:
+            warnings++
+        }
+    }
+    resultStatus := "ok"
+    if failed > 0 {
+        resultStatus = "ok_with_failures"
+    } else if warnings > 0 || scanWalkErrors > 0 {
+        resultStatus = "ok_with_warnings"
+    } else if skipped > 0 {
+        resultStatus = "ok_with_skips"
+    }
+    return resultStatus, failed, skipped, warnings
 }
 
 // boundedErr はanalyzerの診断文をstdout JSONのサイズ上限内に収めます。
@@ -86,15 +113,12 @@ func cmdLanguageRun(args []string) int {
     for _,lang:=range order {
         if detected[lang] { results=append(results,runLanguageTool(small[lang],absRoot,outDir)) }
     }
-    status:="ok"; failed:=0; skipped:=0
-    for _,r:=range results {
-        if r.Status=="failed"||r.Status=="write_failed" { failed++ }
-        if r.Status=="skipped" { skipped++ }
-    }
-    if failed>0 { status="ok_with_failures" } else if skipped>0 { status="ok_with_skips" }
+    statuses:=make([]string,0,len(results))
+    for _,r:=range results { statuses=append(statuses,r.Status) }
+    status,failed,skipped,warnings:=summarizeLanguageStatuses(statuses,walked.WalkErrorCount)
     enc:=json.NewEncoder(os.Stdout); enc.SetIndent("","  "); _=enc.Encode(map[string]any{
         "tool":"language-run","status":status,"project_root":absRoot,"output_directory":outDir,
-        "results":results,"failure_count":failed,"skip_count":skipped,
+        "results":results,"failure_count":failed,"skip_count":skipped,"warning_count":warnings+walked.WalkErrorCount,"walk_error_count":walked.WalkErrorCount,
         "backend_policy":"all bundled Small symbol analyzers use acr-toolbox native fallback; language SDKs are not required",
         "note":"full analyzer outputs are written to files; stdout stays compact",
     })

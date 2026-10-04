@@ -1,6 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
+	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -90,6 +94,71 @@ func TestGoImportParseFailureIsReported(t *testing.T) {
 	}
 	if result["parse_error_count"] != 1 || result["status"] != "ok_with_warnings" {
 		t.Fatalf("parse failure was lost: %#v", result)
+	}
+}
+
+// TestMediumDependencyWalkWarningIsRetained はnested walk errorをanalyzer payloadへ残す。
+func TestMediumDependencyWalkWarningIsRetained(t *testing.T) {
+	root := t.TempDir()
+	writeFixture(t, root, "a.go", "package demo\nimport \"fmt\"\n")
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	file := filepath.Join(root, entries[0].Name())
+	walk := func(root string, visit fs.WalkDirFunc) error {
+		if err := visit(filepath.Join(root, "restricted"), nil, errors.New("permission denied")); err != nil {
+			return err
+		}
+		return visit(file, entries[0], nil)
+	}
+	result, err := buildDependencyResultWithWalker(root, "go", "go-import-map", walk)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result["status"] != "ok_with_warnings" || result["walk_error_count"] != 1 {
+		t.Fatalf("nested walk error was lost: %#v", result)
+	}
+}
+
+// TestLanguageMediumRunPropagatesAnalyzerWarnings はanalyzer partial statusをresult rowとtop-levelへ伝える。
+func TestLanguageMediumRunPropagatesAnalyzerWarnings(t *testing.T) {
+	root := t.TempDir()
+	writeFixture(t, root, "broken.go", "package demo\nimport (\n\"fmt\"\n")
+	readPipe, writePipe, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	previousStdout := os.Stdout
+	os.Stdout = writePipe
+	code := cmdLanguageMediumRun([]string{"--out", filepath.Join(root, "out"), root})
+	os.Stdout = previousStdout
+	if err := writePipe.Close(); err != nil {
+		t.Fatal(err)
+	}
+	output, err := io.ReadAll(readPipe)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := readPipe.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if code != 0 {
+		t.Fatalf("warning result should remain a successful command, exit=%d output=%s", code, output)
+	}
+	var result struct {
+		Status       string           `json:"status"`
+		WarningCount int              `json:"warning_count"`
+		Results      []map[string]any `json:"results"`
+	}
+	if err := json.Unmarshal(output, &result); err != nil {
+		t.Fatalf("decode output: %v: %s", err, output)
+	}
+	if result.Status != "ok_with_warnings" || result.WarningCount != 1 {
+		t.Fatalf("top-level result hid analyzer warning: %#v", result)
+	}
+	if len(result.Results) != 1 || result.Results[0]["status"] != "ok_with_warnings" || result.Results[0]["parse_error_count"] != float64(1) {
+		t.Fatalf("result row hid analyzer warning: %#v", result.Results)
 	}
 }
 
