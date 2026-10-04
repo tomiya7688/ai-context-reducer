@@ -48,7 +48,7 @@ GUI
 
 ## Local security boundary
 
-HTTP serverは既定で `127.0.0.1:0` にだけbindします。CLI実行APIは起動ごとのrandom session tokenを要求し、他originからの単純POSTではCLIを起動しません。
+HTTP serverは既定で `127.0.0.1:0` にbindし、`--listen` も `localhost` またはIPv4 / IPv6 loopback addressだけを受け付けます。wildcardや外部interfaceのaddressは拒否します。CLI実行APIは起動ごとのrandom session tokenを要求し、他originからの単純POSTではCLIを起動しません。
 
 ## Development
 
