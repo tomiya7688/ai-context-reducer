@@ -16,6 +16,7 @@ SCRIPTS={
 def scan(root):
     found=set()
     walk_error_paths=[]
+    # on_walk_error はos.walkの読み取り不能pathをscan warningとして記録する。
     def on_walk_error(error):
         path=getattr(error,'filename',None) or str(root)
         try: path=Path(path).relative_to(root).as_posix()
