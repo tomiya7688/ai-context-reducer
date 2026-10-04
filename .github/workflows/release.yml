@@ -180,6 +180,10 @@ jobs:
           set -euo pipefail
           bash release/scripts/acceptance.sh "$BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance"
           bash release/scripts/acr_hub_loopback_smoke.sh "$BUNDLE" "$GUI_HUB_BIN" "$RUNNER_TEMP/acr-hub-smoke-bundle"
+      - name: Verify Windows setup.bat exit propagation
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./release/scripts/test_setup_bat.ps1
       - name: Package tar distribution
         if: matrix.archive == 'tar'
         shell: bash
