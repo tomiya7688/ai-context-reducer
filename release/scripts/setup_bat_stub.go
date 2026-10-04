@@ -8,6 +8,13 @@ import (
 )
 
 func main() {
+	if len(os.Args) == 2 && (strings.EqualFold(os.Args[1], "py") || strings.EqualFold(os.Args[1], "python")) {
+		if strings.EqualFold(os.Args[1], "python") {
+			os.Exit(0)
+		}
+		os.Exit(1)
+	}
+
 	command := ""
 	if len(os.Args) > 1 {
 		command = os.Args[1]
