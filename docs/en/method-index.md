@@ -34,6 +34,12 @@ A task routing guide can say: “For a settings change, check the settings docum
 | [Context Exclusion](context-exclusion.md) | Leave generated output, logs, external libraries, and caches out of the normal reading set | Derived files and external code do not get mixed into the initial material when the task does not use them |
 | [Source Structure Index](source-structure-index.md) | Search functions, types, and dependencies in a form that can be queried | You can inspect relevant definitions and callers instead of reading a large source file from beginning to end |
 
+### Record decisions before implementation
+
+| Method | What to do | Why it reduces reading |
+|---|---|---|
+| [Set Design and Completion Criteria First](design-and-completion-criteria.md) | Record the goal, scope, conditions to preserve, and completion criteria before implementation | Implementers do not need to reread past conversations or broad documentation to infer the design intent |
+
 ### Decide when to stop and what to verify
 
 | Method | What to do | Why it reduces reading |
@@ -55,6 +61,7 @@ A task routing guide can say: “For a settings change, check the settings docum
 ## Choose by the problem
 
 - Unsure where to look each time: [Task Routing](task-routing.md), [Change Routing Map](change-routing-map.md)
+- Unsure what should change or how to tell when it is complete: [Set Design and Completion Criteria First](design-and-completion-criteria.md)
 - Unsure which parts of a large source file are relevant: [Context Priority](context-priority.md), [Source Structure Index](source-structure-index.md)
 - Continuing to investigate after enough evidence is available: [Exploration Control](exploration-control.md), [Evidence Budget](evidence-budget.md)
 - Searching for tests from scratch after each change: [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md)

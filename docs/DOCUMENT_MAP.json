@@ -203,6 +203,12 @@
       "english_status": "translated"
     },
     {
+      "id": "design-and-completion-criteria",
+      "japanese": "docs/jp/設計と完了条件を先に決める.md",
+      "english": "docs/en/design-and-completion-criteria.md",
+      "english_status": "translated"
+    },
+    {
       "id": "method-index",
       "japanese": "docs/jp/手法一覧.md",
       "english": "docs/en/method-index.md",
