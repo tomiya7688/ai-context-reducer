@@ -27,13 +27,13 @@ Reference: https://github.com/tomiya7688/ai-context-reducer
 Start by reading only these three references:
 - the ai-context-reducer README
 - docs/en/adoption-priority.md
-- templates/AI_CONTEXT.md
+- templates/AI_CONTEXT.md (a content template; the target AI tool may not load this filename automatically)
 
 For the target project, begin with the root structure, README, existing AI instructions, documentation headings, tests, and build or distribution configuration. Do not read every source file, document, or Issue from the beginning.
 
-First identify what people repeatedly have to search for and which existing instructions are missing or out of date. Reuse existing AGENTS.md, CLAUDE.md, README, or docs when they can serve the purpose.
+First identify what people repeatedly have to search for and which existing instructions are missing or out of date. Check which instruction filenames and Skills features the active AI tool supports. Reuse existing AGENTS.md, CLAUDE.md, README, or docs only when that tool can use them.
 
-For a small project, stop after a short AI entry point and basic rules if those are sufficient. Add a table, index, or automation only when it reduces a repeated task in this project, and add methods incrementally. Do not add every method merely because it is part of the standard set.
+For a small project, stop after a short AI entry point and basic rules if those are sufficient. If the tool supports Skills and a workflow is repeated, consider putting its trigger, steps, checks, and completion report in a Skill instead of lengthening instructions loaded for every task. Test that the Skill is selected or can be invoked explicitly. If Skills are unsupported, keep the workflow in a short guide and give the AI its path. Add a table, index, or automation only when it reduces a repeated task in this project, and add methods incrementally. Do not add every method merely because it is part of the standard set.
 
 After updating the guides, confirm that a reader can reach the relevant source code, tests, and authoritative specification from them. Check documentation links and any validation guidance you add. State uncertain information as unverified instead of presenting it as fact.
 
