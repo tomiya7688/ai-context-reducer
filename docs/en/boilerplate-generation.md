@@ -1,150 +1,54 @@
-# Boilerplate Generation / Canonical Templates
+# Create Repeated Text and Files from a Template
 
-> Japanese Source of Truth: [定型文と定型ファイルを生成する](../jp/定型文と定型ファイルを生成する.md)
+> Japanese source of truth: [定型文と定型ファイルを生成する](../jp/定型文と定型ファイルを生成する.md)
 
-For text, notices, license guidance, headers, configuration fragments, and other artifacts whose content is mostly repeated, prefer generating them from a canonical template and a small set of variables instead of asking an AI to regenerate and compare the full text every time.
+For text or configuration files with a mostly repeated structure, keep the shared parts in a template and fill in only the values that change for each task. This avoids having an AI recreate the whole text every time and reduces missing fields or unintended edits.
 
-Generate repeated text and settings from an authoritative template and the values allowed to change. This separates editing project-specific values from recreating the same text.
+## Example: Create a release notice
 
-## Purpose
+Suppose every release notice includes a product name, version, date, and list of changes. If the headings and order stay the same, keep that structure in a template:
 
-```text
-canonical template
-  + project-specific variables
-  ↓
-generated artifact
-  ↓
-AI inspects only variables / diff / validation result
+```markdown
+# {{product}} {{version}}
+
+Released: {{date}}
+
+## Changes
+{{changes}}
 ```
 
-Having an AI rewrite boilerplate in full on every task consumes context and increases the chance of wording drift, missing fields, and unintended edits.
+For a new notice, provide the product name, version, date, and changes for that release. There is no need to compare every old notice or recreate the same headings. A person still checks that the change list and release date are correct.
 
-## Canonical source
+## Separate the template from its inputs
 
-Keep a template / policy / clause set as the original source, separate from the generated artifact.
-
-Examples:
-
-- license template
-- copyright notice
-- attribution block
-- generated README section
-- release notice
-- configuration header
-- standard disclaimer
-
-Do not make the generated artifact the Source of Truth. Preserve a path back to the template and input values.
-
-## Variable-first context
-
-When possible, pass only the parts that can change instead of the full generated text.
-
-Example:
+Put wording, headings, and settings that stay the same in the template. Keep task-specific values—such as a name, version, date, or target—in the inputs. Duplicating the shared part into separate files makes it easy for fixes to get out of sync, so maintain one source for the repeated content.
 
 ```text
-Template: character-license-v1
-Name: Example Character
-Version: 1.2
-Repository: owner/repo
-Credit required: no
-Redistribution: allowed with conditions
+template + current input values -> generated text or file
 ```
 
-If the template itself has not changed, the generated full text normally does not need to enter AI context.
+The generated text or file is the deliverable. If the shared wording needs to change, edit the template and regenerate the outputs that need updating instead of editing a generated copy. This keeps the next result in the same format.
 
-## Versioned template
+## Create and check the result
 
-For legal, policy, or public text where meaning changes matter, make the template version explicit.
+1. Confirm that the same format is used repeatedly.
+2. Separate the parts that stay the same from the values that change each time.
+3. Create the text or file from the template and current inputs.
+4. Check that required values are present and no replacement marker remains.
+5. Have a person review the result when its correctness or approval matters.
 
-At generation time, it is useful to track at least:
+A successful generation does not prove that the content is correct. Check that required fields are filled, the values are right, and expected sections are present. For license or contract text, a generator only reuses approved wording; it does not determine legal validity or suitability for an individual case.
 
-- template identifier
-- template version
-- input variables
-- output path
-- generated / checked status
+For public or policy text where meaning matters, keep enough information to identify the template version and inputs used. A simple internal note may not need version tracking.
 
-When useful, keep a hash or commit reference so the exact source can be identified.
+## When it helps
 
-## Generated artifact validation
+This works well for notices, release information, shared headers, and configuration files that reuse the same content. After checking the template once, a person can focus on the changing values and generated diff instead of writing and comparing the entire text every time.
 
-A successful generation command does not by itself prove that the output is correct.
+It is not a good fit for one-off free-form writing or content whose structure changes for every task. If creating and maintaining a template takes more work than repeating the content, write it normally.
 
-Depending on the use case, check at least:
+## Use a generator when needed
 
-- required variables are not empty
-- no placeholder remains unresolved
-- expected sections exist
-- output encoding / line ending
-- generated artifact matches the current template
+A small script may be enough to replace input values. If the project already uses a template manager and needs to update previously created projects when a template changes, reuse that existing system. This method does not require a particular tool.
 
-The generator cannot by itself guarantee legal validity or project suitability. Treat it as a mechanism for consistently expanding an already approved template.
-
-## Context reduction rule
-
-During normal work, do not make the AI read generated boilerplate in full.
-
-Start with:
-
-```text
-current template version
-+ changed variables
-+ generated diff / validation result
-```
-
-Read the full template or generated output only when the template itself changes, a legal/contractual judgment is required, or the generated diff looks abnormal.
-
-## Possible common tool
-
-A common generator may live under `tools/<tool-name>/script/`.
-
-Example:
-
-```text
-tools/boilerplate-generator/script/
-```
-
-Possible capabilities:
-
-- template listing
-- variables file / CLI input
-- preview / dry-run
-- output generation
-- unresolved-placeholder check
-- template version / source metadata
-- generated diff
-- check-only mode
-
-Even for license generation, the tool should select and expand an approved template rather than invent legal terms.
-
-## Reuse existing tools
-
-**Copier** is one strong external option. It can generate project scaffolds from Jinja2-based templates and variables, and it also focuses on lifecycle management for updating existing projects after the template evolves. This makes it useful when canonical templates require long-term maintenance rather than one-time generation.
-
-If a simple initial scaffold is enough, an existing generator such as Cookiecutter may work. When an existing tool can provide `template + variables -> generated artifact`, there is no need to add a custom generator.
-
-Project skeletons, CI configuration, shared README sections, and configuration sets can often be delegated to such tools while AI Context Reducer focuses on the context rule: inspect template version, changed inputs, and validation instead of reading generated output in full.
-
-## Standard recommendations
-
-- separate boilerplate into canonical template + variables
-- do not make generated artifacts the Source of Truth
-- prefer changed variables / generated diff over full generated text in AI context
-- keep template version and source traceable
-- move mechanically checkable conditions such as placeholders / required sections into the generator
-- do not make the generator responsible for legal validity itself
-- prefer reuse of a mature template generator when it is sufficient
-- if a common generator is added, avoid making a particular license or external repository a mandatory dependency
-
-## Repository-local portable generator
-
-For simple replacement, a portable fallback is available.
-
-```text
-acr-toolbox template --template templates/foo --vars vars.json --out generated/foo --template-id foo --template-version 1
-python tools/common/medium/template/script/template.py --template templates/foo --vars vars.json --out generated/foo
-```
-
-It supports `{{name}}` placeholders, file / directory templates, required variables, unresolved-placeholder checks, dry-run, check-only, compact diff hints, template id/version, and variables SHA-256. Generation also records metadata in a sidecar or output directory.
-
-If Copier / Cookiecutter is already available, the tool may report that availability, but it does not auto-install those tools or reimplement a fully compatible engine.
+Commands, replacement rules, and checks for this repository's simple generator are in the [template README](../../tools/common/medium/template/README.md).
