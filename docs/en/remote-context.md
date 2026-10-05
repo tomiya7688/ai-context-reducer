@@ -1,90 +1,32 @@
-# Remote Context / Remote Delta First
+# Check Changes from the Shared Repository First
 
 > Japanese Source of Truth: [リモートとの差分を先に確認する](../jp/リモートとの差分を先に確認する.md)
 
-When multiple AIs, chats, or developers update the same repository, the local state at the beginning of a task may no longer be current.
+When several people or AIs update the same repository, the shared code may change after you create your local copy. Check only the changes since your last review before starting work. This can reveal updates that affect your task without rereading every file that has not changed.
 
-Instead of rereading the entire repository before implementation, first obtain a small summary of the delta from the remote.
+## Example: someone else changed the shared repository
 
-## Basic flow
-
-```text
-local HEAD
-   +
-remote HEAD
-   +
-merge base
-   ↓
-remote commits
-changed files
-diff stat
-bounded diff excerpt
-   ↓
-read only changes relevant to the current task
-```
-
-Start with the change summary and list of affected files. Then identify the changes related to the task and read the necessary parts.
-
-First inspect a compact remote context containing items such as:
-
-- local / remote identifiers
-- ahead / behind state
-- remote commit subjects
-- changed file names / status
-- diff stat
-- a bounded diff excerpt
-
-Expand to a full diff or target files only when this is insufficient.
-
-## Bounded diff
-
-Put an explicit limit on the diff excerpt.
-
-The purpose is not a complete review. It is to understand cheaply where changes occurred and whether they affect the current task.
-
-Make truncation explicit and keep a path back to the original diff when more evidence is needed.
-
-## Safe update
-
-If automation updates the local repository from the remote, avoid destructive automatic conflict handling.
-
-Recommended rules:
-
-- do not auto-update a dirty worktree
-- do not auto-update when local commits have not reached the remote
-- allow fast-forward only
-- return conflicts / divergence to a human or explicit decision
-
-Do not mutate repository state merely to reduce context.
-
-## Read changed files selectively
-
-Even after reviewing the remote context, you do not need to read every changed file.
-
-Prioritize changed files relevant to the current task and add only the direct dependencies that are needed.
+Suppose you are about to change CSV loading while someone else updates date conversion and its tests. Checking the changes from the shared repository first shows the changed filenames and a summary, which reveals that date conversion may be relevant. Read those implementation and test changes to understand their effect on your work. You do not need to reread unchanged screens or unrelated features.
 
 ```text
-remote delta
-  -> relevant changed files
-  -> direct dependencies
-  -> full diff / additional docs only when needed
+compare the shared repository with the last reviewed state
+  -> inspect the list and summary of changed files
+  -> read changes related to the current task
+  -> open related source files if the effect is unclear
 ```
 
-## Standardization level
+## What to inspect first
 
-### Standard recommendation
+After retrieving new changes from the shared repository, start with a summary. It can include short descriptions of updates, changed filenames, the amount of change, and short excerpts when needed. A diff is a view of lines added or removed between versions.
 
-- make it possible to detect remote divergence at task start
-- use a compact remote summary before a full diff
-- keep diff excerpts bounded
-- restrict automated updates to fast-forward
-- stop on dirty or diverged state
+If the summary makes the effect clear, read the related changes and their direct dependencies. If the reason or result is unclear, expand the investigation to the full target file, design documents, or tests. Do not make a final decision from a short summary alone.
 
-### Optional implementations
+If a diff excerpt is shortened, state which parts were omitted and keep a way to inspect the original diff. A short display is a starting point for locating changes, not a complete review.
 
-- a helper that runs `git fetch`
-- automatic display of remote commits / changed files / stat / excerpt
-- a safe fast-forward option
-- automatic insertion of remote context into a Context Pack
+## Keep inspection separate from applying changes
 
-Git, GitHub, a specific OS, or a specific AI is not a required part of the method.
+Inspecting changes in the shared repository and applying them to your local copy are separate actions. To review a diff, use a method that does not overwrite work in progress. If an automated update finds unsaved local changes or a mismatch with the shared repository, stop and return the decision to a person.
+
+## When to use this method
+
+This helps when several people or AIs update a shared repository and changes may arrive since the last review. There is no need to add a diff mechanism for a short solo task when you know the shared repository has not changed. If a change summary does not reveal the effect, inspect the related files and required checks.
