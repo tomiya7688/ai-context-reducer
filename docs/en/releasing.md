@@ -20,6 +20,16 @@ Passing all these checks means the current automated process has verified the so
 
 The GUI Hub check is a limited startup check. It does not test every screen and action or a complete Full Bundle archive resolved from its manifest. The current workflow does not create a Full Bundle archive for publication; it checks startup using the normal bundle and GUI Hub. Do not infer unperformed checks from a successful run.
 
+## Ask an AI to verify a release
+
+Give the AI this guide and the paths to the release manifest, workflow, and acceptance checks, and name the target version or commit. Ask it to follow the procedure and report verified and unverified areas separately. A verification request does not authorize publishing: tell the AI not to create, push, or publish a tag unless you explicitly request those actions.
+
+```text
+Target: [version or commit]
+Verify it using this release guide. Use RELEASE_MANIFEST.json, release.yml, and acceptance.sh as the sources of truth, and list the checks before running them.
+Report commands and results, the distribution artifacts verified, and checks not run. Do not create, push, or publish a tag.
+```
+
 ## Publish
 
 After candidate checks pass, a person reviews the package contents and known bugs, then creates and pushes a release tag. The automated checks run again on the exact commit named by that tag. GitHub publishes the verified files as a Release only after all required checks pass. Publishing through a manual workflow run also requires the matching tag to exist and publishing to be explicitly selected.

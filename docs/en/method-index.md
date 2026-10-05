@@ -36,6 +36,14 @@ For one task, say which guide to use, what it should return first, and how far i
 
 At completion, ask for the files consulted, checks run and their results, and anything not verified. Compare this report with the visible work log and diff. If read history is unavailable, a report alone cannot prove the actual context size. Check instead that the guide led to the right original sources and that necessary tests were not skipped. Compare token counts before and after only when the tool measures them.
 
+Include the selected guide's path, the current task, what the AI should return first, and the required checks. For example, for a settings change, provide the task-routing guide and ask the AI to list the settings explanation, loading code, and tests as candidates, inspect the original files, make the change, and report the related test results. Attaching the guide or naming its path tells the AI which method to follow.
+
+```text
+Task: [describe the work]
+Use [the selected method guide]. First list the candidate sources and why they apply, then inspect those original sources and do the work.
+Run checks required by the completion criteria and report references, results, and anything not verified.
+```
+
 ## Methods
 
 ### Avoid rediscovering information for each task
