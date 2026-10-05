@@ -71,4 +71,4 @@ For optional helpers to automate this approach, see the [method-to-tool map](too
 
 ## Optional tools and terminology
 
-Use [affected-tests for Python](../../tools/python/medium/affected-tests/README.md), [affected-tests for Go](../../tools/go/medium/affected-tests/README.md), or [source-structure-index](../../tools/common/large/source-structure-index/README.md) to find candidates if helpful. This method is called **Change Impact Routing** or affected test selection.
+If useful, [affected-tests for Python](../../tools/python/medium/affected-tests/README.md) and [affected-tests for Go](../../tools/go/medium/affected-tests/README.md) find tests that may relate to changed code. [source-structure-index](../../tools/common/large/source-structure-index/README.md) returns leads about definitions and callers. Verify candidates in the actual code and tests. This method is called **Change Impact Routing** or affected test selection.

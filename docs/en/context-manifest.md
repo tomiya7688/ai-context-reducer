@@ -72,4 +72,4 @@ For a one-time task, attach this guide or name its path in the request. For recu
 
 ## Optional tools and terminology
 
-Use [context-manifest](../../tools/common/large/context-manifest/README.md) to build a catalog if useful; a manual list works too. This method is called a **Context Manifest** or reference catalog.
+If useful, [context-manifest](../../tools/common/large/context-manifest/README.md) builds a reference catalog with file roles and priorities. Treat rankings as leads and open the needed original sources to verify them. A manual list works too. This method is called a **Context Manifest** or reference catalog.

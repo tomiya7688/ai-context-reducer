@@ -70,4 +70,4 @@ tests/csv/               関連テスト        入力例と期待結果
 
 ## 補助ツール・用語
 
-必要なら[context-manifest](../../tools/common/large/context-manifest/README.md)で目録を作れます。手作業でも実践できます。この方法は **Context Manifest（参照先の目録）** と呼ばれます。
+必要なら[context-manifest](../../tools/common/large/context-manifest/README.md)がファイルの役割や優先度を付けた参照先の目録を作ります。候補の順位は手掛かりとして使い、必要な原典を開いて確認します。手作業でも実践できます。この方法は **Context Manifest（参照先の目録）** と呼ばれます。

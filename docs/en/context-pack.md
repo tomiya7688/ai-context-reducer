@@ -59,4 +59,4 @@ The AI may not load a task note automatically. For a one-time task, attach the f
 
 ## Optional tools and terminology
 
-Use [context-pack-builder](../../tools/common/medium/context-pack-builder/README.md) to draft a pack if helpful. A per-task note of goals, references, and completion criteria is called a **Context Pack**.
+If useful, [context-pack-builder](../../tools/common/medium/context-pack-builder/README.md) drafts a task note with goals, references, and completion criteria from task materials. Check the draft against its source. A per-task note of these items is called a **Context Pack**.

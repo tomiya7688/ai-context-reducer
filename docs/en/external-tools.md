@@ -46,14 +46,10 @@ Analysis results are pointers to original sources. Check the formal specificatio
 
 This repository also has helpers for searching, finding files, inspecting code structure, and summarizing repository statistics. Their supported tools, commands, configuration, and output formats belong in their individual READMEs. The method works without a particular tool, using available commands or manual search.
 
-- [source-structure-index](../../tools/common/large/source-structure-index/README.md)
-- [affected-tests (Python)](../../tools/python/medium/affected-tests/README.md)
-- [affected-tests (Go)](../../tools/go/medium/affected-tests/README.md)
-
 ## Example request to the AI
 
 > Choose an available search or analysis tool that fits the task. First report what it searched, whether results were truncated, and only relevant candidates with reasons. Open candidate source files and tests to verify them; do not paste the full output or index.
 
 ## Optional tools and terminology
 
-See the [method-to-tool map](tool-method-map.md) and each tool README for implementations by purpose. Using a tool to find candidates and then checking original sources is called **tool-assisted search** or bounded output.
+Choose optional helpers by purpose from the [method-to-tool map](tool-method-map.md). For example, a structure index finds function and dependency candidates, while affected-test search suggests tests related to a change. These tools suggest candidates; verify results in the original sources and tests. This is called **tool-assisted search** or bounded output.

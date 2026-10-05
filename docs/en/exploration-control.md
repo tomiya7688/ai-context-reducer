@@ -42,4 +42,4 @@ If it is unclear which evidence is needed in the first place, see [Decide What E
 
 ## Optional tools and terminology
 
-Optional [exploration-stop-check](../../tools/common/medium/exploration-stop-check/README.md) checks a task note. This method is called **Exploration Stop** or a stop condition.
+If useful, [exploration-stop-check](../../tools/common/medium/exploration-stop-check/README.md) checks whether a task note has the minimum information needed to begin. Its check is heuristic, so verify missing details against the request and original sources. This method is called **Exploration Stop** or a stop condition.

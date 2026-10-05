@@ -28,4 +28,4 @@ Do not exclude a potentially affected area just to keep the reading scope small.
 
 ## Optional tools and terminology
 
-Optional [architecture-boundary-router](../../tools/common/medium/architecture-boundary-router/README.md) suggests boundary candidates. This method is called **Architecture Boundary Routing**.
+If useful, [architecture-boundary-router](../../tools/common/medium/architecture-boundary-router/README.md) uses existing architecture information to suggest boundaries and files to inspect first. It does not judge architectural conformance or determine ownership; verify candidates in project guidance and source. This method is called **Architecture Boundary Routing**.

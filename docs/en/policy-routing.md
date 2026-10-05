@@ -28,4 +28,4 @@ There is no need to automate every rule. Add a new check only when the rule is w
 
 ## Optional tools and terminology
 
-Use [policy-index](../../tools/common/medium/policy-index/README.md) to find clauses and [policy-check](../../tools/common/medium/policy-check/README.md) for supported automated checks. This method is called **Policy Routing**.
+If useful, [policy-index](../../tools/common/medium/policy-index/README.md) finds candidate clauses and their source locations. [policy-check](../../tools/common/medium/policy-check/README.md) checks files against rules that can be expressed mechanically. This method is called **Policy Routing**.
