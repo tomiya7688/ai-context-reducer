@@ -4,7 +4,7 @@
 
 This document defines a standard policy for preventing an AI from continuously widening repository exploration "just in case."
 
-The important point is to define not only how exploration starts, but also when it must stop once the necessary information is available.
+Define both when to start investigating and when to stop once the required information is available. A stop condition prevents searches that only repeat an already established conclusion.
 
 ## 1. Search first, read second
 

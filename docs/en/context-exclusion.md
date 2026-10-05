@@ -4,7 +4,7 @@
 
 This document defines Context Exclusion: keeping generated output, logs, vendor content, caches, history, and similar material that is normally unnecessary for the current task out of the AI's normal context so it can focus on authoritative sources.
 
-The important distinction is that **normally excluding something from context is different from deleting it from the repository or adding it to ignore configuration**.
+Leaving a file out of the material normally read by an AI is a separate operation from deleting it from the repository or adding it to ignore configuration. This guide covers what the AI reads by default for a task.
 
 > Find exclusion candidates first, then confirm Source of Truth status, task relevance, and validation use before excluding them from normal context.
 
@@ -207,7 +207,7 @@ package / release / export validation
   -> compact result
 ~~~
 
-The important point is not to promote the artifact into the Source of Truth.
+Using a generated artifact for validation does not change the original source; the generator and its inputs remain authoritative.
 
 - generator / config / source remain authoritative
 - generated artifact is evidence that directly checks Acceptance

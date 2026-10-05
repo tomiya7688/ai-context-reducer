@@ -165,7 +165,7 @@ Keep the agent-visible manifest bounded.
 - make truncation explicit
 - expand only when more candidates are needed
 
-A tool may scan the whole repository internally. The important constraint is on agent-visible output.
+A tool may scan the whole repository internally; limit the output shown to the AI to the references needed for the task.
 
 ~~~text
 internal scan may be broad

@@ -4,9 +4,7 @@
 
 This document defines how to prioritize what to inspect when there are many context candidates, and how to use hotspot signals such as size / churn / concentration.
 
-The most important rule is:
-
-> **Do not read a file merely because it is large, frequently changed, or a hotspot. Relevance to the current task comes first.**
+> **Choose files by their relevance to the current task. Size, change frequency, and hotspot status alone are not reasons to read a file.**
 
 A hotspot is a signal for choosing a routing method or deciding whether deeper investigation is worthwhile. It is not a decision that a file must be read.
 

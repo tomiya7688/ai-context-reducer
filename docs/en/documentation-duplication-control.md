@@ -128,7 +128,7 @@ A good pointer includes short context.
 When changing API compatibility, check the versioning section of docs/api-contract.md.
 ~~~
 
-Do not remove so much meaning that navigation cost increases.
+Removing too much context makes readers reopen the source documents and increases lookup work. Keep enough explanation to identify the source and the meaning needed for the current task.
 
 Decision criterion:
 

@@ -4,7 +4,7 @@
 
 Validation Routing selects only the validation methods required by the change.
 
-The key is to make the required evidence explicit for each kind of change and begin with the smallest sufficient validation.
+List the evidence required for each kind of change, then start with the smallest check that can provide it. This keeps unrelated validation out of the task while showing what the chosen checks establish.
 
 ## Purpose
 

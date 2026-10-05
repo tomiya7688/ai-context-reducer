@@ -4,7 +4,7 @@
 
 This document defines a standard approach for reaching the necessary source areas through structured analysis results before reading full source files.
 
-The important idea is not a particular implementation. Reuse structural information such as symbols / ownership / dependencies as an index so that the agent reads only the necessary original sources.
+Reuse an index of functions, types, ownership, and dependencies so the AI can inspect the original definitions and callers it needs. Build the index with an analyzer or search method already suitable for the project.
 
 ## 1. Source Structure Index
 

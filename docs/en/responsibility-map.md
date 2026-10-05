@@ -4,7 +4,7 @@
 
 This document defines a standard approach for using a short responsibility map to understand what files own before reading all source, while moving mechanically decidable policy rules into compact checker output.
 
-The key is to separate the responsibility index from machine-checkable policy and create a short path to implementation candidates relevant to the current task.
+A responsibility map helps locate files and modules related to the current task. Put machine-checkable rules in a checker so readers can consult ownership information and check results separately.
 
 ## 1. Responsibility Map
 

@@ -23,7 +23,7 @@ bounded diff excerpt
 read only changes relevant to the current task
 ```
 
-The important point is not to begin with a full diff or the full contents of every changed file.
+Start with the change summary and list of affected files. Then identify the changes related to the task and read the necessary parts.
 
 First inspect a compact remote context containing items such as:
 
