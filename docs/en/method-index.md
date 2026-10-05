@@ -31,7 +31,7 @@ A task routing guide can say: “For a settings change, check the settings docum
 | Method | What to do | Why it reduces reading |
 |---|---|---|
 | [Context Priority](context-priority.md) | Choose candidates by relevance to the task; narrow large files when needed | Unrelated files are not read just because they are large, and relevant files can be inspected at the needed level of detail |
-| [Context Exclusion](context-exclusion.md) | Leave generated output, logs, external libraries, and caches out of the normal reading set | Derived files and external code do not get mixed into the initial material when the task does not use them |
+| [Context Exclusion](context-exclusion.md) | Record which generated output or caches to skip by default and when to read them | You do not need to repeat the same exclusions for every task, and relevant code and tests are easier to find |
 | [Source Structure Index](source-structure-index.md) | Search functions, types, and dependencies in a form that can be queried | You can inspect relevant definitions and callers instead of reading a large source file from beginning to end |
 
 ### Record decisions before implementation
