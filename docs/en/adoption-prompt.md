@@ -1,86 +1,51 @@
-# Adoption Prompt
+# Ask an AI to Improve How It Finds Project Information
 
-> Japanese Source of Truth: [導入依頼文](../jp/導入依頼文.md)
+> Japanese source of truth: [導入依頼文](../jp/導入依頼文.md)
 
-This document is an entry point for asking Codex, Claude Code, ChatGPT, or a similar agent to adopt `ai-context-reducer` while keeping the initial context small.
+Use this prompt when asking an AI to inspect a project and improve its guides so people do not repeatedly search for or reread the same information. It does not ask the AI to install every ai-context-reducer method or tool. The AI first inspects a small set of entry points, identifies real recurring effort, and adds only a guide that addresses it.
 
-For detailed adoption criteria, see [Adaptive Adoption](adoption-priority.md).
+## Example: A small repository and a multi-app project
 
-## Recommended prompt
+In a small project where the settings code and its tests are easy to find, a short note about where to start and which test to run may be enough. A code index or dedicated tool could take more time to maintain than the investigation it saves.
 
-```text
-Adopt the following ai-context-reducer approach in this project:
-https://github.com/tomiya7688/ai-context-reducer
+In a large project with Desktop and Web apps, people may have to rediscover the settings screen, storage code, and tests for each settings change. A table that maps change types to places to check, or separate instructions for each app, may help. Asking the AI to identify what is repeatedly being searched for first means it can add only the guide that reduces that work, without loading unrelated documents or instructions for another app.
 
-Do not install everything by default.
-First read only the ai-context-reducer README, docs/en/adoption-priority.md, and templates/AI_CONTEXT.md as entry points, then begin with a shallow inspection of the target project.
+## How to use the prompt
 
-Briefly classify the target project by size, documentation volume, issue volume, concurrent AI/remote editing, GUI/interactive behavior, nondeterminism, generated artifacts, policy volume, and similar signals. Then choose only the methods with high expected value.
+1. Open the target project and give the AI the prompt below.
+2. The AI checks the specified entry points, the project overview, existing guides, tests, and build information.
+3. It identifies information that people repeatedly have to find, then updates an existing guide or adds one small method.
+4. It confirms that the guide leads to the relevant code and tests, and explains why it did not add other methods.
 
-Required core:
-- a small AI entry point / AI_CONTEXT
-- Search first, read second
-- stop exploration when Goal / Required / Acceptance are known
-- identify the Source of Truth
-- do not mix unrelated refactors into the current task
-- targeted validation and explicit Unverified areas
-
-Add other methods only when the conditions in adoption-priority.md apply.
-Do not unconditionally read the whole repository, all documentation, or all Issues.
-Preserve and reuse existing AGENTS.md / CLAUDE.md / README / docs structures when appropriate.
-
-After adoption, report only:
-- Adopted
-- Skipped
-- Why
-```
-
-## Expected adoption flow for an AI
+## Copyable prompt
 
 ```text
-1. Read only the three ai-context-reducer entry files
-2. Shallow-inspect the target repository
-3. Classify project signals
-4. Adopt A Core
-5. Add only high-value B / C methods
-6. Verify that the AI entry point leads to source / tests / source of truth
-7. Report Adopted / Skipped / Why
+Improve this project so people do not have to repeat the same searches or reread the same information for each task. Adopt only the parts of the ai-context-reducer approach that this project needs.
+
+Reference: https://github.com/tomiya7688/ai-context-reducer
+
+Start by reading only these three references:
+- the ai-context-reducer README
+- docs/en/adoption-priority.md
+- templates/AI_CONTEXT.md
+
+For the target project, begin with the root structure, README, existing AI instructions, documentation headings, tests, and build or distribution configuration. Do not read every source file, document, or Issue from the beginning.
+
+First identify what people repeatedly have to search for and which existing instructions are missing or out of date. Reuse existing AGENTS.md, CLAUDE.md, README, or docs when they can serve the purpose.
+
+For a small project, stop after a short AI entry point and basic rules if those are sufficient. Add a table, index, or automation only when it reduces a repeated task in this project, and add methods incrementally. Do not add every method merely because it is part of the standard set.
+
+After updating the guides, confirm that a reader can reach the relevant source code, tests, and authoritative specification from them. Check documentation links and any validation guidance you add. State uncertain information as unverified instead of presenting it as fact.
+
+Report:
+- Guides added or changed, and why
+- Methods not adopted, and why
+- Tests or checks performed
+- Remaining unknowns
 ```
 
-Initial inspection of the target repository should begin with the root structure, README, existing AI instructions, documentation names/headings, tests, and build/package metadata.
+## Review the result
 
-## For a small project
+Judge the result by whether a person can follow the guide to the relevant code and tests, not by how many documents the AI read. A small project may need only one concise project-wide entry point. In a large project, tables and indexes must be updated when code or responsibilities move, or they will send people searching again.
 
-For a small repository, it is acceptable to stop after adding an `AI_CONTEXT.md` equivalent and the core rules.
-
-Do not add Task Routing, Source Structure Index, Responsibility Map, or dedicated tools merely because they are part of the standard set.
-
-## For a large project
-
-If reaching the target area repeatedly requires broad exploration, add Responsibility Map, Task / Change Routing, Current State, Source Structure Index, split Context Pack, and similar methods incrementally.
-
-If multiple AIs, chats, or developers update the same remote, prioritize Remote Delta First regardless of repository size.
-
-## Do not
-
-- read the entire target repository before adoption
-- read every file in ai-context-reducer
-- copy an entire design document into `AI_CONTEXT.md`
-- create a large number of AI-only documents
-- force large-repository mechanisms onto a small repository
-- reorganize the existing documentation structure without a reason
-- add automation whose benefit cannot be explained
-
-## Success criteria
-
-After adoption, the AI should be able to determine quickly:
-
-- what the current task is trying to achieve
-- where to read first
-- what normally should not be read
-- where the Source of Truth is
-- which source / tests form the current working set
-- when to stop exploration
-- what must be validated to finish
-
-The goal is to reach this state with the smallest useful setup for the target project.
+For more detail on choosing methods, see [Adoption Priority](adoption-priority.md). Remove any prompt instructions that do not apply to the project's size or recurring problems.
