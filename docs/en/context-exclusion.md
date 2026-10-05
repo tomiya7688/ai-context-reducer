@@ -1,21 +1,39 @@
-# Decide What Not to Read by Default
+# Decide Which Files to Skip by Default
 
 > Japanese Source of Truth: [ふだん読まないファイルを決める](../jp/通常は読まないものを決める.md)
 
-For everyday changes, keep generated output, logs, copies of external libraries, and temporary files out of the AI's initial reading when they are unlikely to help with the task. This keeps implementation details and tests from being buried under unrelated material and reduces what must be read each time. This only sets the AI's normal reading scope; it does not delete files or change Git ignore settings.
+This method keeps files unrelated to a task out of the places an AI checks first. For example, leaving out build output that can be recreated from source and old logs helps the AI find the code and tests it needs. Pair every exclusion with a reason and a note about when the files should be read.
 
-## Example: fixing a calculation bug
+## Decide what to leave out
 
-For an incorrect result, start with the calculation code, its relevant tests, and the specification. Unless they matter to the task, do not read an executable from an old build, unrelated logs, copied external libraries, or temporary caches. The AI can focus on the implementation and tests instead of searching through a large amount of unrelated material.
+Do not decide by file or folder name alone. Check:
 
-When diagnosing a failed build, read the relevant error lines. When checking a release package, inspect the package itself. A generated file should be read when it becomes the task's target or necessary verification evidence; include only what is needed.
+1. Will this file help make or verify a decision for the current task?
+2. If not, can the same information be found in source code, configuration, or another location?
 
-## Read these only when needed
+For a routine feature change, you might leave out files under `build/` or `dist/` that can be regenerated from source, recreatable caches, and old logs unrelated to the task. Copies of external libraries can also be left out of the initial candidates when the task does not involve changing or investigating them.
 
-Generated output is produced from other code or documents. Usually, begin with the source or code that creates it, but inspect the output when the result itself is under review. Read logs around the relevant failure or behavior. Inspect copied external libraries when changing them, investigating a security issue, or checking a license. Read a temporary cache when investigating a problem with clearing or rebuilding it.
+Tests, configuration, specifications, input data, and dependency lists may be needed depending on the task. Do not exclude them permanently just because a name contains `generated`, `vendor`, or `lock`. If you do not know how a file is used, leave it available until you can decide whether it is needed.
 
-## Take care when excluding files
+## Tell the AI what to skip
 
-Names such as `build`, `generated`, and `vendor` are not enough to decide that files can be skipped. A project may treat generated code as official input or need test data and release files to verify a task. Check whether a file is needed as an original source or verification material for the current task. If uncertain, leave it available as a candidate.
+Write the decision in the project guide that the AI reads when starting work. If the project already has an `AGENTS.md`, `CLAUDE.md`, `AI_CONTEXT.md`, or similar guide, add the rule there instead of creating a duplicate. For a project that uses one specific AI tool, use the instruction file that tool reads.
 
-Telling the AI not to read a file by default is different from deleting it or changing `.gitignore`. Do not change files or repository settings based only on this guide. In a small project, a short note in the AI guide such as "Normally skip build output and caches" is enough.
+For example, state the normal scope, the paths to skip, and the exceptions:
+
+```text
+For routine code investigation, leave build/, dist/, and .cache/ out of the initial file search.
+If the task changes or investigates these outputs, or checks a build or release package, read only the files needed for that task.
+```
+
+This saves you from repeating the same exclusion in every task. However, a note in a guide does not restrict file access. If the AI must be unable to read those paths, configure file exclusions or access controls in the AI tool or editor, if it provides them. Check whether a setting only hides paths from search and indexing or also blocks direct file access; the behavior depends on the tool.
+
+An exclusion passed to a search command affects only that command's results. `.gitignore` tells Git which files not to track; it does not prevent an AI or search tool from reading them. You do not need to delete files or change Git settings for this method.
+
+## When an excluded file becomes relevant
+
+When investigating a failed build, read the log lines related to that failure. When checking a release package, inspect the package contents. Fixing a generated-file problem may require checking both the source that creates the file and the generated result.
+
+If an excluded path becomes part of the task, temporarily remove it from the guide or tool exclusion, or explicitly ask the AI to read the needed files. Restore the normal exclusion after the check. The rule sets initial search candidates; it is not a reason to ignore evidence needed for the task.
+
+For a small project, one short paragraph in the AI guide is enough. Add file exclusions in the AI tool only when there are many paths and you keep having to specify them by hand.
