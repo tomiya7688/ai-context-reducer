@@ -57,7 +57,9 @@ Do not make a change based on a list or summary alone. Return to the original ma
 
 ## When to use it, and when not to
 
-Lists and short procedures help when work requires finding a target across many files or repeating the same checks. For a small change with an obvious target, read the relevant files directly instead of adding a formal list or dedicated system.
+For a one-time change whose file and test are clear from the request, read them directly; there is no need to create an index or dedicated guide. If the same kind of task repeatedly requires searching several features for its target, review recent tasks and record the locations or steps that had to be rediscovered.
+
+Use this criterion: the search and rereading time saved across recurring tasks should exceed the time needed to create and update the list or procedure. After adopting it, check that similar tasks reach the original sources sooner without skipping required tests. See [Adoption Priority](adoption-priority.md) for a worked comparison.
 
 ## Keep the work accurate
 

@@ -73,6 +73,12 @@ Do not judge size by file count alone. Consider whether the work target is easy 
 
 Add a method when the investigation time it repeatedly saves is greater than the time needed to adopt and maintain it. Keep accuracy and required checks, then decide from whether it actually reduced reading or search time.
 
+### Example comparison
+
+Suppose the same kind of task takes 12 minutes to locate its target and happens eight times a month. That is about 96 minutes of searching. If an entry guide takes 30 minutes to create and 10 minutes each month to update, and reduces each search to 3 minutes, the monthly work becomes about 34 minutes; even after maintenance, the guide is worthwhile. For a one-time task that takes 12 minutes to investigate, spending 30 minutes on a dedicated index is not worthwhile.
+
+These numbers illustrate the comparison; they are not universal thresholds. Use the actual frequency and search time from recent work, and include the effort needed to keep the method current.
+
 ## Example request to the AI
 
 > Identify one investigation step repeated in recent tasks and choose one method from the table to reduce it. Compare what the user would create, how the AI would receive it, the work it saves, and its setup and maintenance cost. Prefer using an existing system when it is sufficient.
