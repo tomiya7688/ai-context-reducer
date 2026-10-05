@@ -1,0 +1,68 @@
+name: バグ報告
+description: コード、ツール、CI、配布物の不具合を報告します
+title: "[bug] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 問題
+      description: 何が壊れているか、何が誤った結果になるかを書いてください。
+      placeholder: 例: 入力取得に失敗しているのに status=ok になる
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 再現方法
+      description: 再現に必要な入力、コマンド、条件をできるだけ具体的に書いてください。
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待する動作
+      description: 正しい状態ではどうなるべきかを書いてください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 現在の動作
+      description: 実際の出力、status、exit code、生成物などを書いてください。
+
+  - type: textarea
+    id: affected
+    attributes:
+      label: 影響範囲
+      description: 分かる範囲で、影響するcommand、script、platform、文書などを書いてください。
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      description: 正しさへの影響を基準に選んでください。
+      options:
+        - P1 - 誤判定・データ破損・安全性など正しさに関わる
+        - P2 - 通常利用に支障がある
+        - P3 - 軽微またはRelease前に直せばよい
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 完了条件
+      description: 何を確認できれば修正完了かを書いてください。
+      placeholder: |
+        - [ ] 正常系が期待値になる
+        - [ ] 失敗系を空成功と混同しない
+        - [ ] 回帰testを追加する
+    validations:
+      required: true
