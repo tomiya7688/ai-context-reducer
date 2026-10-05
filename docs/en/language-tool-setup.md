@@ -2,24 +2,24 @@
 
 > Japanese Source of Truth: [言語に合った解析方法を選ぶ](../jp/言語別ツールの選び方.md)
 
-Code-analysis tools differ in what they can tell you, depending on the language and development environment. Start with tools already available to locate files and functions. Use deeper checks for dependencies or builds only when the task requires them. This helps reach relevant code without loading every file or installing development software at the outset.
+Choose analysis depth based on the question. An analyzer may inspect a wide area, but if you give the AI only the needed locations or diagnostics, it does not need to read every source file or full log. Context is reduced by using results to find candidates and passing only the relevant originals, not simply by running an analyzer.
 
 ## Example: changing CSV import in a large application
 
-Suppose you are investigating a CSV import bug in an application written in Python and Go. Begin with a lightweight analysis to find the files and functions that handle CSV and their nearby names. Once you find the relevant code and tests, there is no need to read every other feature's source.
+Suppose you are changing CSV import in an application written in Python and Go. If you do not know where to start, first locate candidate files and functions. Add relationship analysis or build checks only when you need to know the impact or whether the project builds.
 
-If the change may affect several features, inspect references between files or packages. If you also need to know whether the project builds or has type and dependency errors, use the compiler or development kit used by the project. Do not present something as verified when the lightweight analysis cannot establish it.
+## Choose the depth based on what you need to know
 
-## Choose how deeply to analyze
+| What you need to know | Analysis or check | What to give the AI, and why it reduces reading |
+| --- | --- | --- |
+| Candidate files or functions | Lightweight file and symbol search | Give the candidate locations so the AI does not have to search every file. Check the implementation and tests in their original files. |
+| Callers or affected areas | Cross-file references or dependency analysis | Give related locations and test candidates so the AI does not have to read all source files to find relationships. Read the selected originals; candidates alone do not prove behavior. |
+| Types, build, or runtime result | The project's compiler, development kit, or runtime | Give pass/fail and relevant diagnostics so the AI can investigate without receiving the full log. |
 
-A lightweight scan can locate files and functions, and may work without the language's runtime. It is a guide to where to read. It does not prove how the program runs or whether types and builds are correct.
-
-Deeper analysis can inspect references between files and project settings. Checking actual build conditions or runtime behavior may require a compiler, development kit, or runtime for that language. For example, Python needs an environment to run the program, and building C# projects may require the .NET SDK. Requirements vary with the check being performed.
+A lightweight scan may work without a runtime, but it only points to locations; it cannot confirm behavior, types, or a successful build. Running Python or building C# may require a Python environment or the .NET SDK. Deeper analysis is not always better. Stop when you have the needed evidence, and do not pass every result to the AI.
 
 ## Use the environment already available
 
-First check which languages the project uses and which development tools are already available. If a required tool is missing, use the analysis and search that are available, and state which checks could not be performed. Do not automatically install a runtime or development kit solely for this investigation.
-
-Inspect only the useful parts of analysis results. Once you find the relevant area, read its implementation and tests. Small projects with an obvious target and test do not need a separate analysis process. Reserve heavier analysis and broad indexes for large projects where you need to investigate wider impact.
+First check which languages and development tools are already available. If the environment is insufficient, use the available searches and analyses, and state which checks could not be performed. Do not automatically install a runtime or development kit solely for this investigation. If a small project has an obvious target and test, inspect the originals directly. Passing every result or the full log does not reduce what the AI reads.
 
 For commands, output locations, and the exact behavior of each analysis stage in this repository, see the [`language-setup`](../../tools/common/small/language-setup/README.md), [`language-run`](../../tools/common/small/language-run/README.md), and [`acr-toolbox`](../../tools/common/native/acr-toolbox/README.md) guides.

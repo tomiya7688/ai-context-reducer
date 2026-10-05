@@ -33,6 +33,7 @@ A task routing guide can say: “For a settings change, check the settings docum
 | [Context Priority](context-priority.md) | Start with the changed behavior, its specification, and its tests; include consumers when changing an external format | You can skip unrelated features and start with the material needed to implement and check the change |
 | [Context Exclusion](context-exclusion.md) | Record which generated output or caches to skip by default and when to read them | You do not need to repeat the same exclusions for every task, and relevant code and tests are easier to find |
 | [Source Structure Index](source-structure-index.md) | Search functions, types, and dependencies in a form that can be queried | You can inspect relevant definitions and callers instead of reading a large source file from beginning to end |
+| [Language-specific Analysis](language-tool-setup.md) | Choose the needed depth: locate code, inspect relationships, or verify a build or run | The AI receives relevant candidates and diagnostics instead of every source file and full log |
 
 ### Record decisions before implementation
 
@@ -63,6 +64,7 @@ A task routing guide can say: “For a settings change, check the settings docum
 - Unsure where to look each time: [Task Routing](task-routing.md), [Change Routing Map](change-routing-map.md)
 - Unsure what should change or how to tell when it is complete: [Set Design and Completion Criteria First](design-and-completion-criteria.md)
 - Unsure which parts of a large source file are relevant: [Context Priority](context-priority.md), [Source Structure Index](source-structure-index.md)
+- Unsure how deeply to analyze or what check is needed: [Language-specific Analysis](language-tool-setup.md)
 - Continuing to investigate after enough evidence is available: [Exploration Control](exploration-control.md), [Evidence Budget](evidence-budget.md)
 - Searching for tests from scratch after each change: [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md)
 - Rereading long rules or duplicate explanations: [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md)
