@@ -2,6 +2,8 @@
 
 AIへ渡す情報量を減らすための前処理・routing・validation補助ツール群です。
 
+各ツールがどの作業方法を補助するか、また使わなくてよい場合は、[手法とツールの対応表（日本語）](../docs/jp/ツールとの対応.md)または[英語版](../docs/en/tool-method-map.md)を参照してください。手法の説明が原典であり、ツールはすべて任意です。
+
 ## Entry
 
 ```text
@@ -138,34 +140,11 @@ csharp/c/cpp/gdscript
 profiles       optional project-type / routing input
 ```
 
-## Main routing tools
+## Related methods
 
-```text
-Repository facts          -> analyze-and-recommend / acr-toolbox analyze
-Language tool selection   -> language-setup / acr-toolbox language-setup
-Shallow language analysis -> language-run / acr-toolbox language-run
-Medium dependency routing -> acr-toolbox language-medium-run
-Large backend planning    -> acr-toolbox language-large-plan
-Scoped instructions       -> scoped-guides / acr-toolbox scoped-guides
-Ordered tool routing      -> tool-selector / acr-toolbox select
-Search-first              -> search / find / structural-search / tree / doc-index / slice
-Exploration stop          -> acceptance-extractor / exploration-stop-check
-Remote delta              -> remote-delta / compact-diff
-Responsibility            -> responsibility-candidates
-Change routing            -> change-router
-Architecture boundaries   -> Architecture Boundary Routing -> architecture-boundary-router (optional)
-Affected tests            -> affected-tests
-Policy routing            -> policy-index / policy-check / acr-toolbox policy-check
-Documentation duplication -> Documentation Duplication Control -> doc-duplicate-hints (hints)
-Context exclusion          -> Context Exclusion -> ignore-candidates (candidates)
-Canonical templates       -> template / acr-toolbox template
-Validation                -> validation-plan / Syntax Health Validation -> syntax-health (when available) / compact-log
-Context pack              -> context-pack-builder
-Source structure          -> language-specific symbols / dependency / graph tools -> source-structure-index
-Context manifest          -> Context Manifest -> context-manifest (optional)
-Context priority          -> Context Priority / Hotspot -> context-budget / hotspot-report (signals)
-Git history health        -> git-history-health
-```
+The method guides explain what to do and when. This README and each tool README explain implementation details. Keep the complete method-to-tool correspondence in the [method and tool map](../docs/jp/ツールとの対応.md) rather than maintaining a second routing list here.
+
+The main command groups are repository inspection, search and slicing, language analysis, task and validation routing, context preparation, and template generation. See the command index below or the native toolbox guide for available commands.
 
 `tool-selector` は候補を `orient -> search -> scope -> inspect -> validate -> stop` の順で返します。各entryは `phase / activation / availability / reason` を持ち、external backendが必要なtoolは利用可能性もrouting時点で反映します。
 
@@ -173,17 +152,17 @@ Git history health        -> git-history-health
 
 `source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
 
-`context-manifest` は [`Context Manifest`](../docs/jp/参照先の目録.md) の補助実装です。手法のSource of Truthはdocs側にあり、repository-wide file listやtool固有priorityを手法そのものにはしません。agentへ渡すmanifestはpointer中心かつboundedにし、現在taskとの関連でworking setを選びます。
+`context-manifest` は、候補ファイルの場所を目録にまとめる実装です。repository-wideの全file listやtool固有のpriorityを、作業対象の判断に使うものではありません。
 
-`context-budget` / `hotspot-report` は [`Context Priority / Hotspot`](../docs/jp/読む候補の優先度を付ける.md) の補助signalです。size / cost / depth等はtask relevanceの代わりではなく、高精度routingやsliceが必要な場所を判断する材料として使います。hotspot上位を自動的に読む対象にはしません。
+`context-budget` / `hotspot-report` は、候補の大きさや推定costなどを簡潔に示します。これらの値は作業との関連性を判定せず、上位候補を自動的に読む対象にするものでもありません。
 
-`doc-duplicate-hints` は [`Documentation Duplication Control`](../docs/jp/文書の重複を管理する.md) のhint実装です。重複候補を絞るだけで、どちらがSource of Truthか、intentional duplicationか、削除可能かは決定しません。自動削除・自動統合には使いません。
+`doc-duplicate-hints` は、似た説明がある箇所を候補として示すだけです。どれが原典か、意図した繰り返しか、削除できるかは判断せず、自動削除・統合もしません。
 
-`ignore-candidates` は [`Context Exclusion`](../docs/jp/通常は読まないものを決める.md) の候補提示実装です。generated / logs / vendor / caches等を通常contextから外す候補を示すだけで、Source of Truth判定や `.gitignore` 等への適用は行いません。validationで必要なartifactはtask-specific evidenceとして別扱いします。
+`ignore-candidates` は、通常は読まなくてよい可能性があるpathを候補として示すだけです。原典かどうかの判断や `.gitignore` の変更は行いません。検証に必要な生成物は作業に応じて扱います。
 
-`syntax-health` は [`Syntax Health Validation`](../docs/jp/構文チェックを軽い検証に使う.md) の補助実装です。利用可能なparserの結果をcheap evidenceへ圧縮するだけで、syntax successをsemantic correctnessやtask completionとはみなしません。parser / grammarを自動installせず、必要なtargeted tests / compiler / runtime validationへroutingします。
+`syntax-health` は、利用可能な解析器の結果を簡潔に示します。構文確認の成功を、動作の正しさや作業完了とはみなしません。解析器や文法定義を自動で導入するものでもありません。
 
-`architecture-boundary-router` は [`Architecture Boundary Routing`](../docs/jp/既存の設計境界で読む範囲を絞る.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
+`architecture-boundary-router` は、対象projectが用意した担当範囲や接続関係の情報から、調査を始める候補を示します。特定の設計方式への適合は検査しません。
 
 UPD Commanderを含む外部設計手法は、tools内部の責務分離や実装構造の参考にできますが、ai-context-reducerの機能要件・適合条件・標準architectureにはしません。
 

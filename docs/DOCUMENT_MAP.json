@@ -191,6 +191,12 @@
       "english_status": "translated"
     },
     {
+      "id": "tool-method-map",
+      "japanese": "docs/jp/ツールとの対応.md",
+      "english": "docs/en/tool-method-map.md",
+      "english_status": "translated"
+    },
+    {
       "id": "validation-routing",
       "japanese": "docs/jp/変更内容に応じて検証を選ぶ.md",
       "english": "docs/en/validation-routing.md",

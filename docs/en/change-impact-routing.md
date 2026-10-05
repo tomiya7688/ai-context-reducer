@@ -63,12 +63,4 @@ This approach helps when test suites are large or slow, the repository contains 
 
 For a small project where all tests finish quickly, running them all is simpler than maintaining a test map or impact-analysis system. Update a map when code or tests move.
 
-## Helper tools
-
-This repository has Python and Go tools that suggest tests from changed files, along with a tool that follows consumers using existing structure information. Their commands, configuration formats, and output fields are documented in their own READMEs.
-
-- [Python affected-tests](../../tools/python/medium/affected-tests/README.md)
-- [Go affected-tests](../../tools/go/medium/affected-tests/README.md)
-- [source-structure-index](../../tools/common/large/source-structure-index/README.md)
-
-If the project already tracks dependencies or build targets, reuse that information. Helper tools find candidates; they do not replace checking those candidates against current code and tests or expanding the scope when the result is uncertain.
+For optional helpers to automate this approach, see the [method-to-tool map](tool-method-map.md). Tools are not required; you can use dependency or build information already available in the project, or search manually. Whichever method you use, check candidates against current code and tests, and expand the scope when the impact is uncertain.
