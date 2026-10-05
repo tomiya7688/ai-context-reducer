@@ -1,6 +1,6 @@
 # Choose Validation Scope from the Change's Impact
 
-> Japanese source of truth: [変更の影響範囲から検証対象を絞る](../jp/変更の影響範囲から検証対象を絞る.md)
+> Japanese source of truth: [変更の影響範囲から検証対象を絞る](../jp/変更の影響から検証範囲を選ぶ.md)
 
 Use the changed code and the places that depend on it to choose which tests to run first. This avoids having to inspect every unrelated test for every change. Narrowing the scope is not a reason to skip necessary checks: expand to broader tests when a change has wide impact or its impact cannot be established.
 

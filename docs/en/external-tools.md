@@ -1,6 +1,6 @@
 # Use External Tools to Reduce Investigation
 
-> Japanese source of truth: [外部ツールの使い方](../jp/外部ツールの使い方.md)
+> Japanese source of truth: [外部ツールの使い方](../jp/外部ツールを使って調査を短くする.md)
 
 External tools are existing programs that handle recurring work such as searching or inspecting code structure. If a suitable tool is already available, consider using it before building a simpler version of the same feature. The AI can read only the relevant results instead of the full search output, reducing unrelated material in its context.
 

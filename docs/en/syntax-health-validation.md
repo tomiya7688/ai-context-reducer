@@ -1,6 +1,6 @@
 # Use Syntax Checks as an Initial Check
 
-> Japanese Source of Truth: [構文チェックを最初の確認に使う](../jp/構文チェックを軽い検証に使う.md)
+> Japanese Source of Truth: [構文チェックを最初の確認に使う](../jp/構文チェックを最初の確認に使う.md)
 
 A syntax check verifies that code follows the writing rules of its programming language. Run it after a change to catch simple mistakes, such as a missing bracket or punctuation mark. You only need to inspect the reported problems, so the AI does not need to read a list of every healthy file or the full parser output.
 

@@ -1,6 +1,6 @@
 # Verify and Publish a Release
 
-> Japanese Source of Truth: [リリースを確認して公開する](../jp/リリース手順.md)
+> Japanese Source of Truth: [リリースを確認して公開する](../jp/リリースを確認して公開する.md)
 
 A release is the set of files that users download and run. Passing source tests alone does not prove that the package contains everything users need or works after extraction. Verify the code, the packages for each environment, and the compressed archives before publishing.
 

@@ -80,7 +80,7 @@ monorepo / multi-app等でsubsystem固有ルールがある場合。
 - local guideにはそのscope固有のbuild / test / architecture / ownership等の差分だけを書く。
 - 特定の `AGENTS.md` / `CLAUDE.md` 等のファイル名へ依存しない。
 
-詳細: `docs/jp/場所ごとの指示.md`
+詳細: `docs/jp/場所ごとに作業ルールを分ける.md`
 
 ## Current State
 READMEだけでは現在の能力・制約・未実装を把握しにくい場合。

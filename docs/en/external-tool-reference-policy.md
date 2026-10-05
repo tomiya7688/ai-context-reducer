@@ -1,6 +1,6 @@
 # Checks for Recommending an External Tool
 
-> Japanese source of truth: [外部ツール掲載基準](../jp/外部ツール掲載基準.md)
+> Japanese source of truth: [外部ツール掲載基準](../jp/外部ツールを紹介するときの確認基準.md)
 
 Use this policy when ai-context-reducer names or links to a specific external tool. Even a brief mention can sound like an endorsement. Check its cost, commercial-use terms, attribution requirements, and ease of adoption first. If it does not meet the criteria, explain the general method without naming a product.
 

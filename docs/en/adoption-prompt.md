@@ -1,6 +1,6 @@
 # Ask an AI to Improve How It Finds Project Information
 
-> Japanese source of truth: [導入依頼文](../jp/導入依頼文.md)
+> Japanese source of truth: [導入依頼文](../jp/AIに読み方の仕組みを整えてもらう.md)
 
 Use this prompt when asking an AI to inspect a project and improve its guides so people do not repeatedly search for or reread the same information. It does not ask the AI to install every ai-context-reducer method or tool. The AI first inspects a small set of entry points, identifies real recurring effort, and adds only a guide that addresses it.
 

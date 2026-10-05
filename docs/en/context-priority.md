@@ -1,6 +1,6 @@
 # Read the Files Needed for the Change First
 
-> Japanese Source of Truth: [変更に必要なファイルから読む](../jp/読む候補の優先度を付ける.md)
+> Japanese Source of Truth: [変更に必要なファイルから読む](../jp/変更に必要なファイルから読む.md)
 
 Start with the files needed to implement the request and check the result. A file is relevant when it contains the behavior being changed, the rule that defines that behavior, or a test that checks it. If the change affects an external format or calling convention, include the code that uses it.
 

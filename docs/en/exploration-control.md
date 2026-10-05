@@ -1,6 +1,6 @@
 # Decide When to Stop Exploring
 
-> Japanese Source of Truth: [調査を止める条件を決める](../jp/探索を止める条件を決める.md)
+> Japanese Source of Truth: [調査を止める条件を決める](../jp/調査を止める条件を決める.md)
 
 When asked to investigate a problem, an AI may keep reading related files "just in case" even after it has enough information to proceed. Decide in advance what facts are needed to start or finish the task. Once those facts are confirmed, move on to the next step.
 

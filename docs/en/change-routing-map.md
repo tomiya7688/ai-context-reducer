@@ -1,6 +1,6 @@
 # Find References by Change Type
 
-> Japanese source of truth: [変更内容ごとの案内表](../jp/変更内容ごとの案内表.md)
+> Japanese source of truth: [変更内容ごとの案内表](../jp/変更内容から確認先を選ぶ.md)
 
 This guide is a table that connects each kind of change to the code to read first, the tests to run first, and any documentation to consult when needed. For example, when fixing settings that do not persist, use the table to find the likely screen, storage code, and tests instead of searching the whole repository each time. A clear starting point means less time reading unrelated features.
 

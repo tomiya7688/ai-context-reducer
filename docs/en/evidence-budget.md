@@ -1,6 +1,6 @@
 # Decide What You Need to Check First
 
-> Japanese Source of Truth: [必要な確認を先に決める](../jp/確認する根拠の量を決める.md)
+> Japanese Source of Truth: [必要な確認を先に決める](../jp/必要な確認を先に決める.md)
 
 Before investigating, decide which facts are essential to the decision at hand. Once you know what is needed, you can look for missing information instead of reading every document that might be related. For deciding when to stop after checking those facts, see [Decide When to Stop Exploring](exploration-control.md).
 

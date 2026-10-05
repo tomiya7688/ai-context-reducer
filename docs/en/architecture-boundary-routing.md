@@ -1,6 +1,6 @@
 # Choose What to Read from Existing Responsibilities
 
-> Japanese Source of Truth: [既存の担当分けから読む場所を決める](../jp/既存の設計境界で読む範囲を絞る.md)
+> Japanese Source of Truth: [既存の担当分けから読む場所を決める](../jp/既存の担当分けから読む場所を決める.md)
 
 Large software projects often divide work among areas such as the user interface, data import, and storage. Use an existing description of those responsibilities to choose where to begin investigating. This helps you reach relevant information without rereading the structure of the entire project each time.
 

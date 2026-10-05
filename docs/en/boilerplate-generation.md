@@ -1,6 +1,6 @@
 # Create Repeated Text and Files from a Template
 
-> Japanese source of truth: [定型文と定型ファイルを生成する](../jp/定型文と定型ファイルを生成する.md)
+> Japanese source of truth: [定型文と定型ファイルを生成する](../jp/決まった文章やファイルをひな型から作る.md)
 
 For text or configuration files with a mostly repeated structure, keep the shared parts in a template and fill in only the values that change for each task. This avoids having an AI recreate the whole text every time and reduces missing fields or unintended edits.
 

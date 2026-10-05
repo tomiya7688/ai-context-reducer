@@ -1,6 +1,6 @@
 # Decide Which Files to Skip by Default
 
-> Japanese Source of Truth: [ふだん読まないファイルを決める](../jp/通常は読まないものを決める.md)
+> Japanese Source of Truth: [ふだん読まないファイルを決める](../jp/ふだん読まないファイルを決める.md)
 
 This method keeps files unrelated to a task out of the places an AI checks first. For example, leaving out build output that can be recreated from source and old logs helps the AI find the code and tests it needs. Pair every exclusion with a reason and a note about when the files should be read.
 

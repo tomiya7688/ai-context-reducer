@@ -2,7 +2,7 @@
 
 AIへ渡す情報量を減らすための前処理・routing・validation補助ツール群です。
 
-各ツールがどの作業方法を補助するか、また使わなくてよい場合は、[手法とツールの対応表（日本語）](../docs/jp/ツールとの対応.md)または[英語版](../docs/en/tool-method-map.md)を参照してください。手法の説明が原典であり、ツールはすべて任意です。
+各ツールがどの作業方法を補助するか、また使わなくてよい場合は、[手法とツールの対応表（日本語）](../docs/jp/手法と補助ツールの対応表.md)または[英語版](../docs/en/tool-method-map.md)を参照してください。手法の説明が原典であり、ツールはすべて任意です。
 
 ## Entry
 
@@ -142,9 +142,9 @@ profiles       optional project-type / routing input
 
 ## Related methods
 
-The method guides explain what to do and when. This README and each tool README explain implementation details. Keep the complete method-to-tool correspondence in the [method and tool map](../docs/jp/ツールとの対応.md) rather than maintaining a second routing list here.
+The method guides explain what to do and when. This README and each tool README explain implementation details. Keep the complete method-to-tool correspondence in the [method and tool map](../docs/jp/手法と補助ツールの対応表.md) rather than maintaining a second routing list here.
 
-When you want to avoid asking users to install another runtime or SDK, start with [追加インストールを減らしてツールを使う](../docs/jp/追加インストールを減らすツール運用.md) ([English](../docs/en/portable-tools.md)). It explains how to choose among an already available runtime, a prebuilt native tool, and an available fallback. [language-setup](common/small/language-setup/README.md) reports which analyzers are usable without installing missing dependencies; [materialize-tools](common/small/materialize-tools/README.md) copies selected portable tools into a destination without installing a runtime. [tool-selector](common/small/tool-selector/README.md) also marks tools whose required backend is unavailable.
+When you want to avoid asking users to install another runtime or SDK, start with [追加インストールを減らしてツールを使う](../docs/jp/追加インストールを減らしてツールを使う.md) ([English](../docs/en/portable-tools.md)). It explains how to choose among an already available runtime, a prebuilt native tool, and an available fallback. [language-setup](common/small/language-setup/README.md) reports which analyzers are usable without installing missing dependencies; [materialize-tools](common/small/materialize-tools/README.md) copies selected portable tools into a destination without installing a runtime. [tool-selector](common/small/tool-selector/README.md) also marks tools whose required backend is unavailable.
 
 The main command groups are repository inspection, search and slicing, language analysis, task and validation routing, context preparation, and template generation. See the command index below or the native toolbox guide for available commands.
 
@@ -170,7 +170,7 @@ UPD Commanderを含む外部設計手法は、tools内部の責務分離や実�
 
 ## External integration boundaries
 
-External programs are optional dependencies. This table records which functions the repository reuses, what portable fallback it provides, and which advanced implementations it intentionally delegates. It is a maintenance reference for `tools/`, not a list of product recommendations; see [External Tool Reference Policy](../docs/jp/外部ツール掲載基準.md) before adding a product link to public method documentation.
+External programs are optional dependencies. This table records which functions the repository reuses, what portable fallback it provides, and which advanced implementations it intentionally delegates. It is a maintenance reference for `tools/`, not a list of product recommendations; see [External Tool Reference Policy](../docs/jp/外部ツールを紹介するときの確認基準.md) before adding a product link to public method documentation.
 
 | Capability | External example | Repository-local fallback | Delegated / unsupported |
 |---|---|---|---|
@@ -196,7 +196,7 @@ Use an available high-quality external backend when it is justified; otherwise u
 - external toolが既にある場合は高品質backendとして使ってよい
 - toolの維持コストがagent-context削減効果を上回るなら追加しない
 
-詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/jp/追加インストールを減らすツール運用.md` を参照してください。
+詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/jp/追加インストールを減らしてツールを使う.md` を参照してください。
 
 
 ## Language portability

@@ -1,6 +1,6 @@
 # Working Note (Context Pack)
 
-> Japanese source of truth: [作業用メモ](../jp/作業用メモ.md)
+> Japanese source of truth: [作業用メモ](../jp/作業用メモ（Context%20Pack）.md)
 
 A Context Pack is a **short note that gives someone starting the current task its goal, target, constraints, and completion criteria**. It collects the information and links needed now, so the person doing the work does not have to reread a long conversation, Issue, or repository from the beginning.
 
