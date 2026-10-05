@@ -2,162 +2,51 @@
 
 > Japanese Source of Truth: [コンテキスト削減の基本](../jp/コンテキスト削減の基本.md)
 
-Even when context reduction for AI appears complex, most methods are one of the following three ideas, or a combination of them.
+When you ask an AI to do work, you provide instructions and may also provide source code, design notes, or test results. The information the AI reads for that task is its **context**.
 
-> 1. Perform static analysis outside the AI when possible  
-> 2. Package repeated operations  
-> 3. Let the AI read only a subset
+Context reduction means keeping the information needed for the task while leaving out material that is unlikely to help. In a large project, finding the relevant files can take time. Sending the whole project for every task also buries useful details among unrelated material and makes the AI spend more effort deciding what to read.
 
-Once these three principles are clear, individual tools and routing methods do not need to be treated as unrelated advanced techniques.
+## Example: improve an error message for a configuration file
 
-## 1. Perform static analysis outside the AI
+Suppose you want the application to explain why it could not load a configuration file. If you give the AI the whole project, it has to search through screens, configuration loading, logging, tests, and many other files to find the change.
 
-There is no need to make an AI read all source code and infer information that can be determined mechanically.
-
-When possible, collect information such as the following before it enters AI context:
-
-- symbols / functions / types
-- imports / dependencies
-- file structure
-- syntax / parser health
-- changed files / changed symbols
-- source/test relationships
-- package / module relationships
-
-Pass only the analysis results needed for the current task.
+First make a list of files or functions, and use it to narrow the search to the configuration loader and the tests that cover it. Give the AI pointers to those locations and the relevant sections. During the change, have it check the original source and tests.
 
 ```text
-source
-  -> static analysis
-  -> compact structure / candidates
-  -> AI inspects only what is needed
+change request
+  -> find the related implementation and tests
+  -> read the relevant source code
+  -> make and verify the change
 ```
 
-Static analysis is not meant to understand the implementation instead of the AI. Its purpose is to remove information that can be determined mechanically **before the AI reads the source**.
+This lets work begin without loading the entire project first. A list or pointer helps locate what to read; implementation decisions and verification still rely on the original source and tests.
 
-## 2. Package repeated operations
+## Three ways to choose the information
 
-When an AI repeatedly has to reason through the same exploration, verification, and decision sequence, the sequence itself consumes context and reasoning effort.
+### 1. Find mechanical facts before asking the AI to read
 
-Package repeated work into a script, tool, workflow, or compact procedure.
+File names, function names, imports, and syntax errors can be collected in a consistent way by programs. Use those results to narrow the candidates before asking the AI to build such lists by reading large amounts of source code.
 
-Examples:
+For example, finding tests related to changed files first can avoid reading every unrelated test. Mechanical analysis narrows the candidates; the AI still reads the implementation to understand the change and make design decisions.
 
-```text
-search
-  -> scope
-  -> inspect
-  -> validate
-  -> stop
-```
+### 2. Package steps that are repeated
 
-```text
-changed files
-  -> related source
-  -> matching tests
-  -> required validation
-```
+If the same work follows the same order—find changed code, find related tests, choose the required checks—put the steps in a short guide or script. The AI can use the results and move on without rethinking the sequence each time.
 
-The operation does not need to be complex. If the same sequence is repeated often, it may be worth packaging.
+There is no need to automate a one-time task or add a system whose setup and upkeep cost more than the repeated work it saves. Package a routine when the recurring effort is greater than the cost of maintaining it.
 
-Do not add excessive complexity merely for automation.
+### 3. Read only the relevant parts
 
-```text
-expected repeated context saving
-    > adoption + maintenance cost
-```
+After locating the target, read the implementation, instructions, documentation, and tests that matter to the current decision. When using a short list or summary, keep a clear pointer to the file or record it came from.
 
-Package repeated work only while this condition holds.
+Do not make a change based on a list or summary alone. Return to the original material to verify the relevant details. Leaving out necessary evidence reduces the amount of context but weakens the decision.
 
-## 3. Let the AI read only a subset
+## When to use it, and when not to
 
-The most direct way to reduce context is not to make the AI read everything.
+Lists and short procedures help when work requires finding a target across many files or repeating the same checks. For a small change with an obvious target, read the relevant files directly instead of adding a formal list or dedicated system.
 
-Narrow the target first, then read only the required source / docs / tests / diff.
+## Keep the work accurate
 
-Useful mechanisms include:
+Correctly checking the necessary information matters more than minimizing what the AI reads. If the search stopped early or some files could not be read, state which parts were covered. Do not present a limited scan as though the entire project had been checked.
 
-- search
-- routing
-- index
-- manifest
-- scoped instructions
-- changed-symbol information
-- responsibility map
-- compact diff
-- summary / pointer
-
-Do not turn summaries or indexes into replacements for the Source of Truth.
-
-```text
-pointer / summary / index
-  -> locate the required area
-  -> return to the original source
-```
-
-Reading only a subset and losing evidence are different things.
-
-## Most methods combine the three principles
-
-Most methods in this repository can be decomposed into these principles.
-
-| Method | Static analysis | Package operations | Read only a subset |
-|---|---:|---:|---:|
-| Source Structure Index | ✓ |  | ✓ |
-| Change / Test Impact Routing | ✓ | ✓ | ✓ |
-| Change Routing Map |  | ✓ | ✓ |
-| Responsibility Map |  | ✓ | ✓ |
-| Hierarchical Context |  |  | ✓ |
-| Remote Delta First | ✓ | ✓ | ✓ |
-| Context Manifest / Context Pack |  | ✓ | ✓ |
-| Policy Check | ✓ | ✓ | ✓ |
-| Boilerplate Generation |  | ✓ |  |
-| Syntax Health Validation | ✓ | ✓ |  |
-
-More check marks do not mean a method is more advanced. They show which type of unnecessary reading, exploration, or repeated reasoning is being reduced.
-
-## Tools are optional implementations of the principles
-
-This repository includes several portable tools, but the tools themselves are not the goal.
-
-```text
-context reduction principle
-  -> choose methods needed by the project
-  -> automate only repeated parts with tools
-```
-
-If the same principle can be satisfied without a tool, that is valid.
-
-Conversely, a tool is counterproductive as a context reducer if it causes the AI to:
-
-- receive full output unchanged
-- run unnecessary analysis every time
-- read large tool instructions on every task
-- rely on summaries that no longer point back to original sources
-
-## First question when adopting something new
-
-When evaluating a new mechanism or external tool, first ask:
-
-```text
-What does this reduce?
-
-1. mechanical analysis the AI was inferring
-2. repeated operations the AI was performing every time
-3. unnecessary scope the AI was reading
-```
-
-If it fits none of these, reconsider whether it materially reduces context.
-
-## Priority
-
-Do not sacrifice correctness when applying the three principles.
-
-```text
-correctness
-  > speed of reaching the work target
-  > amount of context reduction
-  > amount of automation
-```
-
-The objective is not to minimize reading at all costs. The objective is to reach the necessary information accurately with less context.
+The [method index](method-index.md) describes the available methods and when they apply. Each method document explains its own adoption steps and suitable use cases.
