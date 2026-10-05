@@ -40,6 +40,8 @@ type policySuppression struct {
   Reason string `json:"reason"`
 }
 
+var walkPolicyDir = filepath.WalkDir
+
 // policyGlobRegex はpolicyのglob記法をパス照合用の正規表現へ変換します。
 func policyGlobRegex(pattern string) (*regexp.Regexp,error) {
   p:=filepath.ToSlash(pattern)
@@ -112,13 +114,17 @@ func cmdPolicyCheck(args []string) int {
   }
   root:=".";if fs.NArg()>0{root=fs.Arg(0)}
   absRoot,err:=filepath.Abs(root);if err!=nil{return 2}
+  rootInfo,statErr:=os.Stat(absRoot)
+  if os.IsNotExist(statErr){selectorWriteJSON(map[string]any{"tool":"policy-check","status":"input_missing","root_path":absRoot,"walk_error_count":0,"walk_error_paths":[]string{}});return 2}
+  if statErr!=nil{selectorWriteJSON(map[string]any{"tool":"policy-check","status":"input_unavailable","root_path":absRoot,"error":boundedErr([]byte(statErr.Error())),"walk_error_count":0,"walk_error_paths":[]string{}});return 2}
+  if !rootInfo.IsDir(){selectorWriteJSON(map[string]any{"tool":"policy-check","status":"input_not_directory","root_path":absRoot,"walk_error_count":0,"walk_error_paths":[]string{}});return 2}
   data,err:=os.ReadFile(*rulesPath)
   if err!=nil{selectorWriteJSON(map[string]any{"tool":"policy-check","status":"rules_unavailable","rules_path":*rulesPath,"error":boundedErr([]byte(err.Error()))});return 2}
   var cfg policyRuleConfig
   if err:=json.Unmarshal(data,&cfg);err!=nil{selectorWriteJSON(map[string]any{"tool":"policy-check","status":"rules_invalid","rules_path":*rulesPath,"error":boundedErr([]byte(err.Error()))});return 2}
 
   findings:=[]policyCheckFinding{}; suppressions:=[]policySuppression{}; invalidSuppressions:=[]map[string]any{}; unsupported:=[]map[string]any{}
-  filesScanned:=0; readErrors:=[]string{}; ruleErrors:=[]map[string]any{}
+  filesScanned:=0; readErrors:=[]string{}; walkErrors:=map[string]bool{}; ruleErrors:=[]map[string]any{}
   rulesChecked:=0
   for _,rule:=range cfg.Rules{
     if rule.ID==""|| (rule.Forbid==""&&rule.Require==""){
@@ -144,10 +150,13 @@ func cmdPolicyCheck(args []string) int {
       continue
     }
     rulesChecked++
-    _=filepath.WalkDir(absRoot,func(path string,d os.DirEntry,walkErr error)error{
-      if walkErr!=nil{return nil}
+    walkErr:=walkPolicyDir(absRoot,func(path string,d os.DirEntry,walkErr error)error{
+      if walkErr!=nil{
+        rel,e:=filepath.Rel(absRoot,path);if e!=nil{rel=path};walkErrors[filepath.ToSlash(rel)]=true
+        return nil
+      }
       if d.IsDir(){if path!=absRoot&&ignoreDirs[strings.ToLower(d.Name())]{return filepath.SkipDir};return nil}
-      rel,e:=filepath.Rel(absRoot,path);if e!=nil{return nil};rel=filepath.ToSlash(rel)
+      rel,e:=filepath.Rel(absRoot,path);if e!=nil{walkErrors[path]=true;return nil};rel=filepath.ToSlash(rel)
       if !policyPathMatches(rel,rule.Paths)||policyPathMatches(rel,rule.Exclude)&&len(rule.Exclude)>0{return nil}
       h,e:=os.Open(path);if e!=nil{readErrors=append(readErrors,rel);return nil};defer h.Close()
       filesScanned++
@@ -176,6 +185,7 @@ func cmdPolicyCheck(args []string) int {
       }
       return nil
     })
+    if walkErr!=nil{rel,e:=filepath.Rel(absRoot,absRoot);if e!=nil{rel=absRoot};walkErrors[filepath.ToSlash(rel)]=true}
   }
   sort.Slice(findings,func(i,j int)bool{if findings[i].Path==findings[j].Path{return findings[i].Line<findings[j].Line};return findings[i].Path<findings[j].Path})
   total:=len(findings);truncated:=false
@@ -183,7 +193,8 @@ func cmdPolicyCheck(args []string) int {
   for _,f:=range findings{if f.Severity=="error"{errors++}else{warnings++}}
   if *maxFindings>0&&len(findings)>*maxFindings{findings=findings[:*maxFindings];truncated=true}
   status:="ok"
-  if len(ruleErrors)>0||len(readErrors)>0{status="partial"}
+  walkErrorPaths:=make([]string,0,len(walkErrors));for path:=range walkErrors{walkErrorPaths=append(walkErrorPaths,path)};sort.Strings(walkErrorPaths)
+  if len(ruleErrors)>0||len(readErrors)>0||len(walkErrorPaths)>0{status="partial"}
   if errors>0{status="violations"}
   selectorWriteJSON(map[string]any{
     "tool":"policy-check","status":status,"root_path":absRoot,"rules_path":*rulesPath,
@@ -192,8 +203,9 @@ func cmdPolicyCheck(args []string) int {
     "findings":findings,"findings_truncated":truncated,
     "suppressions":suppressions,"invalid_suppressions":invalidSuppressions,
     "unsupported_rules":unsupported,"rule_errors":ruleErrors,"read_error_paths":uniqueSorted(readErrors),
+    "walk_error_count":len(walkErrorPaths),"walk_error_paths":walkErrorPaths,
   })
   if errors>0{return 1}
-  if len(ruleErrors)>0{return 2}
+  if len(ruleErrors)>0||len(readErrors)>0||len(walkErrorPaths)>0{return 2}
   return 0
 }
