@@ -42,6 +42,19 @@ When multiple people or AIs update the same project, check for changes made by o
 
 The [method index](method-index.md) explains specific methods and when to use them. [Adoption priority](adoption-priority.md) gives guidance on where to start.
 
+## Tell the AI which method and checks to use
+
+For a one-time task, attach the relevant guide or give its path in the request, along with the task and completion criteria. For recurring work, link the guide from project instructions the AI actually loads. Merely placing a file in the repository does not ensure the AI will read it, so check the behavior in the tool you use.
+
+```text
+Task: [describe the work]
+Follow this guide. First list the code, specification, and tests to inspect, with reasons.
+Check the original sources before making changes, then run checks that match the completion criteria.
+Report the files consulted, check results, and anything not verified.
+```
+
+Asking the AI to narrow candidates through the guide and then check original sources avoids giving it the entire repository just to find an entry point. More detailed requests appear in the [method index](method-index.md) and each method guide.
+
 ## Optional tools and terminology
 
 Start with existing search and project instructions. If repeated work remains, choose an optional helper from the [method and tool map](tool-method-map.md). Selecting information before giving it to an AI may be called **Context Engineering**; choosing which references to follow is often called **Context Routing**.

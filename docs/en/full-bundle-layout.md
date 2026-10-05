@@ -74,6 +74,16 @@ inspect basic project information
 
 Opening the GUI does not start long-running analysis, use an external SDK or compiler, or write files. The GUI's Analyze action does not run every tool at once.
 
+## Ask an AI to change or verify the bundle
+
+For a Full Bundle change, give the AI this document and the path to [`FULL_BUNDLE_MANIFEST.json`](../../release/FULL_BUNDLE_MANIFEST.json), and state how the normal bundle must remain compatible. Ask it to list the affected files and distribution checks first, then compare the manifest with the actual files. Source inspection alone does not verify a completed archive.
+
+```text
+Change or verify the Full Bundle: [describe the task]
+Use this document and FULL_BUNDLE_MANIFEST.json as references. Preserve the normal CLI names, arguments, and output.
+First list the relevant files and checks with reasons. At completion, report the distribution artifacts actually checked, results, and anything not verified.
+```
+
 ## Compatibility and distribution checks
 
 Adding the Full Bundle preserves the normal CLI names, subcommands, arguments, exit codes, and machine-readable output. The normal bundle remains a separate distribution, and helper files found only in the Full Bundle are not required by it.
