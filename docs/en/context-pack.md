@@ -1,104 +1,52 @@
-# Context Pack
+# Working Note (Context Pack)
 
-> Japanese Source of Truth: [作業用メモ](../jp/作業用メモ.md)
+> Japanese source of truth: [作業用メモ](../jp/作業用メモ.md)
 
-A Context Pack is a temporary packet containing only the information an AI needs to perform the current task.
+A Context Pack is a **short note that gives someone starting the current task its goal, target, constraints, and completion criteria**. It collects the information and links needed now, so the person doing the work does not have to reread a long conversation, Issue, or repository from the beginning.
 
-It is not a fixed large document. Rebuild it from the original sources using only the parts required for the task.
+## Example: Fixing CSV date conversion
 
-## Minimal structure
+An Issue that says only “CSV dates are shifted; fix it” leaves the person doing the work to find the parser, existing tests, supported date format, and allowed scope. A short note can provide the relevant details:
 
-```text
-Task
-Out of Scope
-Working Set
-Required Constraints
-Routed References
-Validation
-Change Summary
-Exploration Status
+```markdown
+# Current task
+- Goal: Keep YYYY-MM-DD dates from shifting to the previous day when read from CSV
+- Target: `src/csv/date_parser.py` and its related tests
+- Constraints: Preserve existing CSV formats and the public API
+- Completion: Add a test that reproduces the bug and pass the related tests
+- Read first: The reproduction in this Issue and `src/csv/README.md`
+- Out of scope: Redesigning CSV handling or adding time-zone support
 ```
 
-See `../../templates/CONTEXT_PACK.md` for the standard template.
+The person can begin with the relevant parser and tests. Revisit the full conversation or Issue only if the listed references do not settle a required condition. If the target or completion criteria are unknown, record that they are unknown and check the original source instead of guessing.
 
-## Highest-priority task fields
+## What to include
 
-Start by establishing:
+Keep only the fields needed for this task.
 
-- Goal
-- Required
-- Acceptance
+| Field | What to record | Example |
+| --- | --- | --- |
+| Goal | The state the change should achieve | Read dates without shifting them to the previous day |
+| Target | Files, behavior, or tests to inspect first | The date parser and related tests |
+| Constraints | Compatibility or scope that must be preserved | Keep the public API and existing CSV formats |
+| Completion | A result or check that decides when the work is done | The reproduction and related tests pass |
+| References | Entry points to authoritative sources | The Issue reproduction and feature README |
+| Out of scope | Work that should not expand into this task | Adding time-zone support |
 
-If the target source / tests and Out of Scope are also known, they can be used as exploration-stop conditions.
+Not every task needs every field. For a small change, the goal, target, and completion criteria may be enough. State constraints explicitly when compatibility, safety, or another boundary matters.
 
-## Working Set
+## Relationship to original sources
 
-When possible, narrow not only to changed files but to changed symbols.
+A Context Pack is a guide for the current task, not a place to store specifications or project history. Keep the basis for decisions in the Issue, formal design docs, source code, tests, or other authoritative sources. The pack points to those sources and records the conditions selected for this task. Duplicating a specification in both places can make them disagree, so put lasting explanations in their authoritative source.
 
-The normal read order is:
+Do not carry a temporary pack forward by appending new work after the task ends. Record decisions that remain relevant and unfinished work in an Issue or formal document. If a pack grows, remove information that is not needed to judge completion before adding more.
 
-```text
-target source
-  -> matching tests
-  -> direct dependencies
-  -> detailed docs only if needed
-```
+## When to use one
 
-## Validation
+A Context Pack helps when work spans several files or references, resumes across conversations, or has targets or completion criteria that are not clear from the request alone. For a one-file change with an obvious target and result, the instruction itself may be sufficient; a separate note would add little.
 
-You do not need to fill every possible validation field.
+## Template
 
-Choose the smallest sufficient evidence for the change type, and explicitly list anything not checked under `Unverified areas`.
+Keep only the fields that apply. Do not guess to fill blanks or add every field mechanically.
 
-Do not treat `0 tests`, an empty scan, or a check that only found out-of-scope items as success evidence.
-
-## Optional Extensions
-
-Add these only when needed:
-
-- Current State reference
-- Remote Delta
-- Policy Context / active exception
-- Relevant Architecture
-- headless / deterministic / visual validation
-- disposable workspace
-- structured runtime observation
-- artifact validation
-- performance measurement
-- Source Excerpts
-
-Project-specific fields may be added as long as they do not obscure the Core.
-
-## Split Packet
-
-If the packet becomes long, do not force everything into one file. Split it into small, reproducible components.
-
-```text
-task.md
-files.txt
-symbols.txt
-constraints.md
-diff.patch
-```
-
-The names and locations are not standardized.
-
-## Not a Source of Truth
-
-A Context Pack is a working snapshot.
-
-Persist long-lived design decisions, specifications, and unfinished work in the official docs, Issues, source, tests, or other authoritative locations.
-
-Do not keep appending generations of old Context Packs or repeatedly summarize them until they drift away from the original sources.
-
-## Decision principle
-
-If a Context Pack becomes large, first ask what can be removed rather than what else should be added.
-
-```text
-needed for the current task?
-  yes -> keep
-  no  -> omit / reference only
-```
-
-Preserve correctness while including only the information needed for the current decision.
+- [Context Pack template](../../templates/CONTEXT_PACK.md)
