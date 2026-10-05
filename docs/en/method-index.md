@@ -60,4 +60,4 @@ A task routing guide can say: “For a settings change, check the settings docum
 - Searching for tests from scratch after each change: [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md)
 - Rereading long rules or duplicate explanations: [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md)
 
-See [Adoption Priority](adoption-priority.md) to decide what to adopt first. Commands and configuration examples belong in each method's guide.
+See [Adoption Priority](adoption-priority.md) to decide what to adopt first. Every method can be used without a dedicated tool. If you want to automate recurring work, see the optional [method-to-tool map](tool-method-map.md). Commands and configuration formats belong in each tool's README.
