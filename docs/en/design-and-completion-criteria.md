@@ -54,3 +54,11 @@ Keep usability and design judgments for human review when a machine cannot asses
 This is useful when work will be handed to someone else, when changing user-facing behavior or compatibility, or when the scope and completion criteria can easily become unclear. For an obvious one-line fix, a separate design note is unnecessary; record the goal and test in the Issue.
 
 No special tool is needed. Include the note in the request, or put it in an Issue or short work note and tell the AI where to find it.
+
+## Example request to the AI
+
+> Before implementation, read the goal, scope, constraints, and completion criteria below. For each criterion, name the code and check needed. Raise unclear or conflicting criteria before coding. At completion, report the result for each criterion.
+
+## Optional tools and terminology
+
+No dedicated tool is needed; record the note in the request, an Issue, or a [Context Pack](context-pack.md). Agreeing on goals and acceptance criteria first is called **Acceptance Criteria** or design-first planning.

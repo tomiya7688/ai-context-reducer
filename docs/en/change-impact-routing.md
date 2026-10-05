@@ -64,3 +64,11 @@ This approach helps when test suites are large or slow, the repository contains 
 For a small project where all tests finish quickly, running them all is simpler than maintaining a test map or impact-analysis system. Update a map when code or tests move.
 
 For optional helpers to automate this approach, see the [method-to-tool map](tool-method-map.md). Tools are not required; you can use dependency or build information already available in the project, or search manually. Whichever method you use, check candidates against current code and tests, and expand the scope when the impact is uncertain.
+
+## Example request to the AI
+
+> Find direct consumers and test candidates from the changed files. First report paths, reasons, and confidence. Run the candidate tests, and broaden the scope if a check fails or a dependency cannot be traced. Report results and anything not verified.
+
+## Optional tools and terminology
+
+Use [affected-tests for Python](../../tools/python/medium/affected-tests/README.md), [affected-tests for Go](../../tools/go/medium/affected-tests/README.md), or [source-structure-index](../../tools/common/large/source-structure-index/README.md) to find candidates if helpful. This method is called **Change Impact Routing** or affected test selection.

@@ -49,3 +49,7 @@ Report:
 Judge the result by whether a person can follow the guide to the relevant code and tests, not by how many documents the AI read. A small project may need only one concise project-wide entry point. In a large project, tables and indexes must be updated when code or responsibilities move, or they will send people searching again.
 
 For more detail on choosing methods, see [Adoption Priority](adoption-priority.md). Remove any prompt instructions that do not apply to the project's size or recurring problems.
+
+## Optional tools and terminology
+
+This prompt needs no dedicated tool. After selecting a method, consult the [method-to-tool map](tool-method-map.md) for optional helpers. Preparing project instructions an AI can use is sometimes called **Context Engineering** or context setup.

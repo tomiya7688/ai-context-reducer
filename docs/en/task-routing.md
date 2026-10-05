@@ -31,3 +31,13 @@ When code or tests move, update the guide in the same change. If a row is out of
 ## When it helps
 
 This guide fits projects with several features or documents where recurring task types lead to different starting points. In a small project with only a few kinds of work and obvious source and tests, a short note in an existing guide is enough; a separate table may not be useful.
+
+## Example request to the AI
+
+For a one-time task, name this map in the request. For recurring use, link it from project instructions the AI actually reads.
+
+> Choose the row matching this task and list the documentation, code, and tests to inspect first, with their paths and reasons. If the request or current code differs from the map's assumptions, check the discrepancy and add the needed candidates.
+
+## Optional tools and terminology
+
+Optional [change-router](../../tools/common/medium/change-router/README.md) suggests references from changed files. This method is called **Task Routing**.

@@ -25,3 +25,11 @@ Similar wording does not always mean two explanations serve the same purpose. An
 ## Check the result
 
 After moving the detailed explanation, confirm that each remaining note points to the right place, each link works, and the original documents still have the overview or warning their readers need. Automatically deleting or merging text based only on similarity can remove information needed by a different audience. Use duplicate-finding tools to locate passages for review; decide what to keep by checking each document's purpose.
+
+## Example request to the AI
+
+> Compare the audience and purpose of each duplicate candidate. Recommend one source for detailed guidance and the short summary and link to keep elsewhere. Do not delete by similarity alone; check the links and the information each document still needs after the change.
+
+## Optional tools and terminology
+
+Use [doc-duplicate-hints](../../tools/common/medium/doc-duplicate-hints/README.md) to find similar passages. Keeping one authoritative source is called **Documentation Duplication Control** or a single source of truth.

@@ -17,3 +17,11 @@ First decide how much checking the task needs, then choose from the available op
 Use an external tool if it is already available. If it is not, check whether a built-in or simpler option is sufficient. If no available method can verify a requirement, record it as unverified. Discuss installation only when an additional environment is truly necessary.
 
 For this repository's tool-selection behavior, commands, file placement, and overwrite rules, see the [`language-setup`](../../tools/common/small/language-setup/README.md), [`materialize-tools`](../../tools/common/small/materialize-tools/README.md), and [`acr-toolbox`](../../tools/common/native/acr-toolbox/README.md) guides.
+
+## Example request to the AI
+
+> First check which search, analysis, and runtime tools are already available. Choose an option that needs no additional installation. Mark unverifiable requirements as unverified and report only available options and checks that could not be run.
+
+## Optional tools and terminology
+
+[language-setup](../../tools/common/small/language-setup/README.md) checks available analysis; [materialize-tools](../../tools/common/small/materialize-tools/README.md) places portable tools. This approach is called **Portable Tooling** or a no-install fallback. Avoiding installation alone does not reduce context; context is reduced only when the AI receives the needed results instead of irrelevant material.

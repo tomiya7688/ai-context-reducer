@@ -50,3 +50,13 @@ A Context Pack helps when work spans several files or references, resumes across
 Keep only the fields that apply. Do not guess to fill blanks or add every field mechanically.
 
 - [Context Pack template](../../templates/CONTEXT_PACK.md)
+
+## Example request to the AI
+
+The AI may not load a task note automatically. For a one-time task, attach the file or name its path in the request. For recurring use, verify the AI tool's actual instruction-loading settings.
+
+> Follow the attached Context Pack's goal, constraints, and completion criteria. Ask about anything its references do not resolve instead of guessing. At the end, report the result for each completion criterion and anything not verified.
+
+## Optional tools and terminology
+
+Use [context-pack-builder](../../tools/common/medium/context-pack-builder/README.md) to draft a pack if helpful. A per-task note of goals, references, and completion criteria is called a **Context Pack**.

@@ -21,3 +21,11 @@ Read additional sections when the change turns out to affect another feature or 
 Use an existing automated check when it can decide a rule reliably. Treat its result as evidence only for the items it checks. Inspect failures and rules the check cannot evaluate by reviewing the relevant code and tests.
 
 There is no need to automate every rule. Add a new check only when the rule is worth checking repeatedly and can be evaluated without unreliable guesses.
+
+## Example request to the AI
+
+> Find the mandatory rules that apply to this change in their original source, and show only the relevant clauses and evidence. For machine-checkable rules, report what the check covers and its result. For rules needing human judgment, inspect the relevant code or tests.
+
+## Optional tools and terminology
+
+Use [policy-index](../../tools/common/medium/policy-index/README.md) to find clauses and [policy-check](../../tools/common/medium/policy-check/README.md) for supported automated checks. This method is called **Policy Routing**.

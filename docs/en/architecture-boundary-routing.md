@@ -21,3 +21,11 @@ If the change alters an agreement between areas, such as the interface between t
 If the project has no description of its responsibilities, do not invent a structure. Find the target with ordinary search or an existing code index. Do the same when the guide is stale, the change does not fit its categories, or it fails to narrow the search.
 
 Do not exclude a potentially affected area just to keep the reading scope small. If you discover a dependency or impact, read what is needed to check that connection. In a small project where the target and its tests are obvious, there is no need to create a separate responsibility guide.
+
+## Example request to the AI
+
+> Use existing component responsibilities to select the owner of this change and its direct tests. If the change crosses a boundary, identify the contract and implementation on both sides. Do not invent a new component split without evidence.
+
+## Optional tools and terminology
+
+Optional [architecture-boundary-router](../../tools/common/medium/architecture-boundary-router/README.md) suggests boundary candidates. This method is called **Architecture Boundary Routing**.

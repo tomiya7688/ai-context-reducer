@@ -71,3 +71,11 @@ For a small change with obvious target tests, those tests plus the project's nor
 
 - What syntax checks can and cannot establish: [Use Syntax Checks as a Lightweight Validation](syntax-health-validation.md)
 - How to keep generated files and temporary data out of routine investigation: [Decide What Not to Read](context-exclusion.md)
+
+## Example request to the AI
+
+> Choose checks for each completion criterion and run only the checks needed for this change. Report what each check covers, its command and result, any expanded checks after a failure, and checks not run.
+
+## Optional tools and terminology
+
+Use [validation-plan](../../tools/common/medium/validation-plan/README.md) to suggest checks. Selecting checks based on the change is called **Validation Routing** or targeted validation.

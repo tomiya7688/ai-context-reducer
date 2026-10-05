@@ -38,6 +38,21 @@ The main content is documentation and templates for guiding work and narrowing t
 
 Start with the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and work procedures. Pick one recurring problem and begin with a method that addresses it. After adoption, check whether it is easier to reach the needed code and tests, and whether any necessary checks were missed.
 
+## Tell the AI to use a method
+
+For one task, attach the selected method guide or name its path in the request, then adapt its example to your task. For recurring work, put a link and its scope in project instructions the AI actually reads. Which files load automatically depends on the AI tool, so check its settings.
+
+For example, to narrow the files and tests for a settings change, ask:
+
+```text
+The goal is to show why loading a setting failed.
+First list candidate locations for the settings loader and its related test, with paths and reasons.
+Check the selected original code and test, then make the needed change and run the test.
+At the end, report files read, checks run and results, and anything not verified.
+```
+
+The benefit is that unrelated files are not sent to the AI, reducing that input. Compare reported files, commands, and results with the diff or visible work log. If the environment has no read history or token measurement, do not claim a measured reduction; check that investigation was narrowed without omitting the required code or tests.
+
 ## Downloads
 
 Helper tool releases are available from [GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases). See [Releasing](docs/en/releasing.md) for supported environments, archive contents, and verification. You can also use the documentation ideas without installing any tools.

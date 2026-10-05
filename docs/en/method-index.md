@@ -2,13 +2,19 @@
 
 > Japanese Source of Truth: [手法一覧](../jp/手法一覧.md)
 
-This index collects ways to reduce the time spent finding information and the amount of documentation and code given to an AI. Start with the problem you encounter during work, then open the matching method. You do not need to choose by method name.
+This index helps project users choose a method for avoiding repeated searches. The user prepares a guide, list, or check that fits the problem, then tells the AI where it is and how to use it. An AI does not necessarily read project documents automatically. For recurring use, confirm that the guide is registered in an instruction file or setting the AI tool actually loads.
 
 ## Example: searching the repository for every settings change
 
 Suppose each small settings change makes you search for which explanation, code, and tests to inspect.
 
-A task routing guide can say: “For a settings change, check the settings documentation, the loading code, and the settings tests.” The next task can start with those three places. Once the affected behavior is clear, unrelated screens and features do not need to be read. The method reduces the amount of searching and reading in places unrelated to the task. If the guide is out of date or the change has effects beyond its assumptions, expand the investigation.
+A task routing guide can say: “For a settings change, check the settings documentation, the loading code, and the settings tests.” In the next request, tell the AI where the map is, have it select those three candidates, and ask it to check the original code and tests. This avoids giving it the whole repository just to find an entry point. Expand the scope if the map is stale or the change affects more than expected.
+
+## Tell the AI to use the method, then check the result
+
+For one task, say which guide to use, what it should return first, and how far it should check. For recurring work, put the guide link and its scope in project instructions that the AI actually reads. Whether folder-specific instructions load automatically depends on the AI tool's settings.
+
+At completion, ask for the files consulted, checks run and their results, and anything not verified. Compare this report with the visible work log and diff. If read history is unavailable, a report alone cannot prove the actual context size. Check instead that the guide led to the right original sources and that necessary tests were not skipped. Compare token counts before and after only when the tool measures them.
 
 ## Methods
 
@@ -69,4 +75,4 @@ A task routing guide can say: “For a settings change, check the settings docum
 - Searching for tests from scratch after each change: [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md)
 - Rereading long rules or duplicate explanations: [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md)
 
-See [Adoption Priority](adoption-priority.md) to decide what to adopt first. Every method can be used without a dedicated tool. If you want to automate recurring work, see the optional [method-to-tool map](tool-method-map.md). Commands and configuration formats belong in each tool's README.
+See [Adoption Priority](adoption-priority.md) to decide what to adopt first. Every method works without a dedicated tool. Only if you want to automate repeated searches or steps, choose an optional helper from the [method-to-tool map](tool-method-map.md) and check its README for instructions. These practices may be called context routing or context engineering, but first decide what the user prepares and what the AI receives.
