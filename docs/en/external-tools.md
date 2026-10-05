@@ -1,100 +1,51 @@
-# External Tools
+# Use External Tools to Reduce Investigation
 
-> Japanese Source of Truth: [外部ツールの使い方](../jp/外部ツールの使い方.md)
+> Japanese source of truth: [外部ツールの使い方](../jp/外部ツールの使い方.md)
 
-`ai-context-reducer` does not reimplement work unnecessarily when an existing high-quality external tool can provide it.
+External tools are existing programs that handle recurring work such as searching or inspecting code structure. If a suitable tool is already available, consider using it before building a simpler version of the same feature. The AI can read only the relevant results instead of the full search output, reducing unrelated material in its context.
 
-The goal is not to increase the number of tools. The goal is to reduce how much information the AI must read. When a suitable external tool is already available, it may be preferred over a simpler repository-local analysis.
+## Example: Investigating CSV date handling
 
-## Recommended tools
+For a small change, searching for `date` or a function name may be enough to find the CSV conversion code. If a search tool is already available, there is no need to build another search program.
 
-| Tool | Main use | Good fit | Role in ai-context-reducer |
-|---|---|---|---|
-| `ripgrep (rg)` | fast text search | almost every repo | optional backend for `text-search` |
-| `fd` | fast file discovery | repositories with many files | optional backend for `path-find` |
-| `ast-grep` | AST structural search / outline | medium-large, multi-language | backend for `structural-search` / Source Structure Index input |
-| `Universal Ctags` | multi-language symbol index | medium-large, multi-language | existing symbol backend for `source-structure-index` |
-| `SCIP` | semantic code-intelligence index | repositories already able to produce a semantic index | symbol/dependency backend for `source-structure-index` |
-| `Tree-sitter` | syntax-tree generation | when building precise analysis | common parser foundation; avoid low-quality reimplementation |
-| `scc` | LOC / language / complexity overview | repository analysis before adoption | optional aggregate backend for `repo-profile` / `repo-stats` |
-| `git-sizer` | Git history / repository size health | very large or long-lived repositories | machine output compressed into findings by `git-history-health` |
+In a large repository, a recurring task such as “find every use of this function and its tests” may benefit from an existing symbol index or dependency analyzer. Use its results to select relevant files and tests, then verify those sources directly. The AI does not need to read a huge search result or the full index; it can move from candidate discovery to the actual task sooner.
 
-## Choosing tools
+## Choose a tool
 
-### Almost every project
+First decide what you need to find accurately and quickly. Examples by purpose:
 
-For Search-first / Read-second, begin with `text-search` and `path-find`.
+| Need | Examples | How to use the result |
+| --- | --- | --- |
+| Find text or a setting | Full-text search such as `rg` | Read matching lines and nearby context |
+| Find files by name or path | File search such as `fd` | Select paths that match the task |
+| Find functions, types, or syntax patterns | `ast-grep`, Universal Ctags | Open candidate definitions and usages |
+| Find dependencies between files or features | Existing structure index or project dependency data | Check consumers and related tests |
+| Summarize lines, languages, or Git history size | Tools such as `scc` or `git-sizer` | Inspect relevant findings rather than every detail |
 
-```text
-text-search -> reuse rg if available -> otherwise portable fallback
-path-find   -> reuse fd if available -> otherwise portable fallback
-```
+These names are examples. Prefer a search, index, analyzer, or build tool that the project already uses if it meets the need. Do not install a tool just to discover tools; weigh its adoption, updates, and CI maintenance against the benefit.
 
-The caller does not need to learn each external backend's output format. Both tools normalize results to the same self-describing JSON contract and use `backend` only to state which implementation actually ran.
+## Reuse an existing tool
 
-If an external tool is simply absent, use the portable backend normally. Report fallback information only when a backend was found on PATH but failed during execution.
+Check that the tool handles the relevant language or file format accurately, is maintained, and can run in the project environment. If the project already manages builds or dependencies, avoid duplicating the same analysis elsewhere. A mature index or analyzer may find consumers that a simple custom script would miss.
 
-### Medium to large codebases
+A tool helps find candidates, but check that its results match the current source and tests. If its index is stale, its scan was cut short, or it does not support the target language, do not conclude from its output alone that there is no other impact. Supplement the search or inspect a broader area.
 
-When symbol lookup is common, prefer Universal Ctags. When syntax-shaped search is needed, consider `ast-grep`.
+## When not to add one
 
-`source-structure-index` can import existing Universal Ctags JSON Lines through `--ctags-json` or run an already-installed Universal Ctags through `--ctags-source`. Do not pass the full tag output to the AI; normalize it to file / symbol / scope ownership and reuse it through `query` / `expand`.
+Do not add an external tool when ordinary search finds the target in a small repository, the task is one-off and setup is substantial, or adoption would require a new runtime or ongoing maintenance. Use a command-line or IDE feature already available if it is sufficient.
 
-When a SCIP index exists, import it through `--scip` / `--scip-json` into the same common IR. Because SCIP can include cross-file dependencies, it may provide higher-precision evidence for `affected` routing than Ctags alone.
+Do not install missing tools automatically. If a change to the environment or CI is needed, the people responsible should first check usage conditions, installation, and licensing. Before recommending a specific product for the project, also check the [External Tool Reference Policy](external-tool-reference-policy.md).
 
-Use `ast-grep` as a high-quality backend for `structural-search`, and its outline JSON may also be used as Source Structure Index input.
+## Keep results small and useful
 
-Keep regex/stdlib-based tools as dependency-free fallbacks. Do not auto-install external tools.
+When output is large, show only the matches, summaries, or warnings needed for the current question. Make clear which tool ran, what it searched, and whether results were truncated. Do not stop internal analysis required for correctness just to reduce the amount of output.
 
-### When building custom analysis
+Analysis results are pointers to original sources. Check the formal specification for requirements and current code or tests for behavior. If tool output conflicts with its sources, investigate the source of the mismatch instead of trusting a stale index or an incorrect candidate.
 
-For accurate multi-language analysis, Tree-sitter is a candidate foundation.
+## Implementations in this repository
 
-Do not add large parser runtimes or many grammars merely to adopt the method in a small repository. Reuse an existing parser/indexer when available and avoid duplicating another multi-language parser inside Context Reducer.
+This repository also has helpers for searching, finding files, inspecting code structure, and summarizing repository statistics. Their supported tools, commands, configuration, and output formats belong in their individual READMEs. The method works without a particular tool, using available commands or manual search.
 
-### Repository size and language statistics
-
-`repo-profile` uses a portable scan to collect total file count, size class, and top-level directories. When `scc` is available, it can add language LOC/complexity as supplementary information.
-
-`repo-stats` / `acr-toolbox stats` focuses on language/line statistics. Reuse scc aggregate JSON when available and do not send per-file details into AI context. If scc is absent, use the portable Python/Go implementation.
-
-This avoids making the agent learn scc-specific JSON or read large raw output.
-
-### Very large repositories / long Git history
-
-Use `repo-profile` / `repo-stats` for current source volume and language composition. Treat Git history and large objects as a separate concern through `git-history-health`.
-
-```text
-git-history-health -> git-sizer --json -> return only findings with concern >= threshold
-```
-
-`git-history-health` does not send raw git-sizer JSON to the AI. It compresses it to `metric / value / level_of_concern` plus the necessary description/object path. Saved git-sizer JSON can be normalized through `--json-input`.
-
-If `git-sizer` is absent, do not build a low-quality Git object-graph analyzer or auto-install it. Return `external_backend_unavailable`.
-
-For large repositories, keep "current source volume" and "Git history weight" as separate dimensions.
-
-### Repositories with many policies
-
-Move mechanically decidable policy into the repository's standard lint/checker and pass only success results or compact findings to the AI.
-
-Keep semantic ownership and design-responsibility rules that are difficult to automate as targeted review.
-
-## External tool detection
-
-`tools/common/small/external-tool-probe/script/external_tool_probe.py` can report whether representative tools are on PATH.
-
-```text
-python tools/common/small/external-tool-probe/script/external_tool_probe.py
-```
-
-Do not install missing tools automatically. Adopt them only after considering the target environment, CI, and developer policy.
-
-## Principles
-
-- do not use an external tool when adopting it creates too much burden
-- prefer existing repository-standard tools
-- do not leak raw external-backend output to callers; normalize it to a stable compact contract
-- keep external tool output bounded / compact
-- treat analysis results as an index to original sources, not as the Source of Truth
-- when a high-quality external index/parser can be reused, do not build another implementation of the same analyzer
+- [source-structure-index](../../tools/common/large/source-structure-index/README.md)
+- [affected-tests (Python)](../../tools/python/medium/affected-tests/README.md)
+- [affected-tests (Go)](../../tools/go/medium/affected-tests/README.md)
