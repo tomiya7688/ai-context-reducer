@@ -1,123 +1,56 @@
-# Change Routing Map
+# Find References by Change Type
 
-> Japanese Source of Truth: [変更内容ごとの案内表](../jp/変更内容ごとの案内表.md)
+> Japanese source of truth: [変更内容ごとの案内表](../jp/変更内容ごとの案内表.md)
 
-Keep a table that lets you go directly from the kind of change to the implementation to read first, the validation to run first, and the detailed documentation to consult only when needed.
+This guide is a table that connects each kind of change to the code to read first, the tests to run first, and any documentation to consult when needed. For example, when fixing settings that do not persist, use the table to find the likely screen, storage code, and tests instead of searching the whole repository each time. A clear starting point means less time reading unrelated features.
 
-Reuse existing responsibility boundaries, dependency direction, and source/test relationships to find the areas related to a change. This avoids searching the whole repository for the same relationships each time.
+## Example: Settings revert after restart
 
-## Purpose
+For a report that “settings return to their old values after restart,” storage is a better place to start than the display code. A table might look like this:
 
-Do not make the AI rediscover which files and tests matter by exploring the whole repository each time. Use the change category to determine the initial working set mechanically or semi-mechanically.
+| Change type | Read this code first | Run these tests first | Read these docs if needed |
+| --- | --- | --- | --- |
+| Save or load settings | `src/settings/storage.py` | `tests/settings/test_storage.py` | `docs/settings-format.md` |
+| Display or operate a screen | `src/settings/view/` | `tests/settings/test_view.py` | `docs/settings-screen.md` |
+| API response fields | `src/api/` and its consumers | API and consumer contract tests | `docs/api.md` |
 
-Example:
+For a settings persistence bug, start with the storage code and its tests. Read the format guide only if the change affects the settings format. For a display-only change, there is no need to begin with detailed storage or API documentation.
 
-```text
-Change area | Main implementation | Tests to run first | Docs if needed
-Startup/UI  | src/app/*           | test_app_*         | docs/ui.md
-Persistence | src/data/*          | test_save_*        | docs/data.md
-AI logic    | src/ai/*            | test_ai_*          | docs/ai.md
-```
+## Build the table
 
-## Source + Test routing
+Use change types that match work people actually request. A broad row such as “API change” should say which API and consumers it covers. Each row should point to specific starting code and tests.
 
-Task Routing applies not only to documents but also to implementation and validation.
-
-Recommended order:
+A simple table can start with three columns:
 
 ```text
-Task type / changed area
-  -> target source
-  -> matching targeted tests
-  -> direct dependencies
-  -> detailed docs only if needed
-  -> full test suite before completion when appropriate
+Change type       Read this code first       Run these tests first
+Save settings     src/settings/storage.py   tests/settings/test_storage.py
+Display screen    src/settings/view/        tests/settings/test_view.py
 ```
 
-For a small change, run targeted tests first, then proceed to the project's standard completion validation if there are no problems.
+Add documentation references only when they help make implementation decisions. Point to the document instead of copying its specification into the table.
 
-## Architecture-defined routing
+## Use the table
 
-If the architecture itself defines responsibilities and formal dependency paths, reuse those boundaries as input to the Change Routing Map.
+1. Identify the behavior that the request asks to change.
+2. Find the closest change type and check its starting code and tests.
+3. If the change reaches beyond what the row describes, add direct consumers and related contract tests.
+4. If no row fits, search normally and update the table once the right references are known.
 
-For example, if an existing architecture clearly defines ownership and communication boundaries such as UI / Process / Data, Application / Domain / Infrastructure, or frontend / backend / storage, the change type can select only the relevant responsibilities first.
+The table is a starting point; it does not guarantee that the listed files are always sufficient. Expand the investigation and tests if code movement, a shared API, or a settings-format change reveals broader impact. If the current code disagrees with the table, check the code and tests, then correct the outdated row.
 
-```text
-UI display change
-  -> UI responsibility
-  -> inspect backend/data only if the contract changes
+## Reuse the existing design
 
-Data persistence change
-  -> storage/data responsibility
-  -> UI normally out of scope
+If the project already defines areas such as screens, storage, and communication, use those boundaries in the table. There is no need to rename or recreate existing design boundaries. Once responsibilities are clear, connect each change type to its likely starting code and tests.
 
-Inter-layer message change
-  -> sender boundary
-  -> message contract
-  -> receiver boundary
-```
+Changes involving large data transformations or distribution packages may need additional procedures or checks. Explain those in their own guides instead of crowding every detail into this table.
 
-This does not standardize a particular layer structure. The point is to reuse responsibilities, dependency direction, and boundaries that the project already defines in order to reduce exploration.
+## When it helps—and when it does not
 
-## Start large documents with heading search
+This table helps when people repeatedly look up the same locations for settings or API changes, similar features exist in multiple apps, or the project is large enough that ownership is unclear. Once common references are mapped, future work can start from its change type.
 
-If README / SPEC / design documents are large, do not read them from the beginning by default. Search headings or keywords first, then read the relevant section.
+For a small project where the changed file and its test are obvious, a table is unnecessary. Writing the references directly in the request is simpler than maintaining categories no one uses.
 
-```text
-search headings / keywords
-  -> relevant section
-  -> surrounding section only if needed
-```
+## Keep it current
 
-## Baseline invariants
-
-If there are known behaviors, compatibility conditions, or performance properties that a change must not break, keep them as short invariants in the AI entry point.
-
-Do not duplicate the full specification. Keep only the invariants needed for change decisions.
-
-## Sensitive / generated data routing
-
-Exclude measured logs, evaluation output, save data, backups, and reference data from normal implementation-change context.
-
-Read them only when needed, and let the project identify areas that must not be modified without explicit instruction.
-
-## Reproducible transformations
-
-For changes involving large amounts of data or mechanical transformation, prefer a rerunnable transformation over bulk manual editing.
-
-When possible, provide:
-
-- dry-run
-- an explicit target scope
-- before/after validation
-- processing that is safe to rerun
-
-This reduces the need for an AI to read and rewrite large data directly.
-
-## Validation trust
-
-Prefer exit codes, explicit pass/fail results, and required measured conditions over raw test counts or log volume.
-
-For performance-related changes, when appropriate, compare under equivalent conditions such as the same seed, fixed timestep, or identical input and verify that the expected behavior trend is preserved.
-
-## Final report
-
-A completion report should summarize the following instead of reproducing a long work history:
-
-- changed files
-- compatibility / behavior impact
-- validation performed
-- unverified areas
-
-When something remains unverified, it is acceptable to state it explicitly and hand it off instead of broadening exploration just to fill the gap.
-
-## Standard recommendations
-
-- route directly from change category to source / tests / docs
-- reuse existing architectural responsibilities, dependency direction, and boundaries as routing sources
-- search headings before reading large documents in full
-- keep important invariants short at the entry point
-- exclude measured output, saves, backups, and similar data from normal context
-- prefer rerunnable transformations with dry-run for bulk changes
-- use targeted tests first, then standard completion validation
-- compress final reporting to changed files / impact / validation / unverified
+Update the relevant row in the same change when code or tests move or responsibilities change. A stale row can send someone to the wrong place, erasing the time the guide was meant to save. Keep the table small enough to maintain.
