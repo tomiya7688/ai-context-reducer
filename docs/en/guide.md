@@ -1,172 +1,43 @@
-# AI Context Reducer - Basic Guide
+# Basic Guide
 
 > Japanese Source of Truth: [基本方針](../jp/基本方針.md)
 
-## 1. Purpose
+This repository describes ways to choose the information an AI needs for software development work. As a project grows, it is more efficient to locate the parts related to a request before reading them than to reread everything for every task.
 
-`ai-context-reducer` collects ideas and methods that help an AI reach the required information through a short path instead of rereading an entire repository on every task.
+The goal is not simply to make the AI read less. It is to reach the necessary information quickly and complete the work accurately by checking the original material.
 
-Priority:
+## Example: fix an input field
 
-```text
-correctness > speed of reaching the work target > context reduction > amount of automation
-```
+Suppose an input field lets users submit an empty value. The relevant areas are the code that receives the value, the screen, the behavior after submission, and the tests for that behavior. There is no need to read unrelated screens or features in the project.
 
-## 2. Core principles
-
-### Search first, read second
-
-Use search, indexes, changed files, and task metadata to narrow candidates before reading original sources.
-
-### Summaries are indexes
-
-Summaries, Current State, Context Packs, and structure indexes are not replacements for the Source of Truth. Return to source / tests / docs / diff when needed.
-
-### Exploration-stop conditions
-
-Stop broad exploration when the following are known at an implementation-ready level:
-
-- Goal
-- Required constraints
-- Acceptance
-- Working set
-
-Resume exploration only when a concrete unknown appears during implementation or validation.
-
-### Do not mix unrelated work
-
-Do not mix unrelated refactors, legacy cleanup, or future work into the current task.
-
-## 3. Responsibilities of information sources
+First clarify the request and how completion will be checked. Then use a file list or search results to narrow the candidates, and read the relevant implementation and tests. After making the change, choose a check suited to the input field and report any areas that could not be verified.
 
 ```text
-README -> human-facing overview
-AI_CONTEXT / agent guide -> AI routing / index
-Current State -> current capabilities and constraints
-Detailed docs -> contracts / specification
-Issues / tasks -> requirements / priority
-Source / tests -> implementation / executable truth
-Generated artifacts -> consulted only when needed
+confirm the request and completion criteria
+  -> find the related implementation and tests
+  -> read and change the original code
+  -> verify with a check suited to the change
+  -> report any unverified areas
 ```
 
-Avoid copying the same details into multiple locations.
+A candidate list or short description helps locate where to read. When judging what code does or whether a change is safe, return to the original code and tests instead of relying on the list alone.
 
-## 4. Minimal core
+## Keep different kinds of information separate
 
-The following applies to almost every project:
+Record project-wide rules, the project structure, and the current request with its completion criteria in the places meant for them. Copying the same instructions into every request makes them longer and risks leaving outdated details behind.
 
-- a small AI entry point
-- Search first, read second
-- Source of Truth
-- exploration-stop conditions
-- targeted validation
-- explicit Unverified areas
-- normally exclude generated output / logs / broad history
+Keep detailed specifications in the document or implementation that owns them instead of repeating them in overview pages. Link short summaries and lists back to the original explanation.
 
-For a small repository, this may be enough.
+## Match verification to the change
 
-## 5. Add only when needed
+Choose checks based on what changed. Run related tests for a calculation change, check the screen when changing its behavior, and inspect the actual package when changing a release artifact.
 
-Possible additions include:
+State the scope of each check. Do not report “no issues” if a command did not inspect the target or if some areas could not be scanned.
 
-- Current State
-- Task Routing
-- Change Routing Map
-- Responsibility Map
-- Remote Delta First
-- Source Structure Index
-- changed-symbol routing
-- Validation Routing
-- Policy Routing / compact checker
-- headless-first validation
-- disposable validation workspace
-- deterministic seam
-- artifact validation
-- Boilerplate Generation
+## Add only the structure that helps
 
-See [Adaptive Adoption](adoption-priority.md) for adoption priority and project fit.
+A small project may need only a short procedure and search. Add a list or automation when the project has grown and the same searches or checks are repeated. Avoid systems whose setup and maintenance take more effort than the repeated work they save.
 
-## 6. Context Pack
+When multiple people or AIs update the same project, check for changes made by others during your work. This helps avoid conflicts and prevents missing recent changes.
 
-A Context Pack is a temporary packet for the current task.
-
-Minimal structure:
-
-```text
-Task
-Out of Scope
-Working Set
-Required Constraints
-Routed References
-Validation
-Change Summary
-Exploration Status
-```
-
-If it becomes long, split it into small files. Do not make the Context Pack itself a long-lived Source of Truth.
-
-## 7. Validation
-
-Choose evidence based on the change type.
-
-```text
-change type -> smallest sufficient validation -> evidence validity check
-```
-
-Examples:
-
-- pure logic -> targeted tests
-- GUI / editor -> headless checks + visual confirmation when required
-- random / time dependent -> fixed input / deterministic seam
-- packaged app -> artifact smoke
-- export / conversion -> disposable workspace
-- rule-heavy code -> compact policy checker
-
-A successful command that did not actually inspect a target, such as `0 tests` or an empty scan, is not valid evidence.
-
-## 8. Large repositories
-
-When reaching the target area repeatedly requires broad exploration, prioritize Responsibility Map, Task / Change Routing, and Current State.
-
-Add Source Structure Index, changed-symbol routing, and split Context Pack only when the repository is large enough to justify them.
-
-When multiple AIs, chats, or people update the same remote, prioritize Remote Delta First regardless of repository size.
-
-## 9. AI-driven adoption
-
-```text
-README + adoption-priority + AI_CONTEXT template
-        ↓
-target repo shallow inspection
-        ↓
-project signals classification
-        ↓
-adopt Core
-        ↓
-add only high-value Optional methods
-        ↓
-report Adopted / Skipped / Why
-```
-
-Do not start by reading all source, all docs, or all Issues.
-
-## 10. Avoid
-
-- continuous whole-repository scanning
-- one huge AI-specific document
-- generations of summaries of summaries
-- large numbers of AI-only files
-- excessive routing/index structures in a small repository
-- automation whose value cannot be explained
-- unrelated refactors
-- guessing to fill unverified areas
-
-## 11. Adoption rule
-
-Add a method only when:
-
-```text
-expected repeated context saving > adoption + maintenance cost
-```
-
-`ai-context-reducer` itself should keep the Core small and allow Optional methods to be added conditionally.
+The [method index](method-index.md) explains specific methods and when to use them. [Adoption priority](adoption-priority.md) gives guidance on where to start.
