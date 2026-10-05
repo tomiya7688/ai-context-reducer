@@ -35,3 +35,11 @@ Do not present unknowns as verified. If information needed to decide completion 
 This approach helps when an investigation could spread across many files and it is unclear how much to read. A small change with an obvious target and verification method does not need a written stop condition.
 
 If it is unclear which evidence is needed in the first place, see [Decide What Evidence to Collect](evidence-budget.md).
+
+## Example request to the AI
+
+> Before investigating, restate the completion and stop conditions. Stop when the required evidence is available; investigate further only if a check fails, sources conflict, or a new affected area appears. Report what is verified and what is not.
+
+## Optional tools and terminology
+
+Optional [exploration-stop-check](../../tools/common/medium/exploration-stop-check/README.md) checks a task note. This method is called **Exploration Stop** or a stop condition.

@@ -32,3 +32,11 @@ High performance alone is not a reason to include a product in a method guide. T
 ## Keep technical boundaries elsewhere
 
 The criteria for recommending a tool are separate from which external functions ai-context-reducer uses, what it provides as a fallback, and what it does not implement. Record those technical boundaries in the external-integration section of [tools/README.md](../../tools/README.md). Put commands, configuration formats, and output fields in each tool's README.
+
+## Example request to check a reference
+
+> Check only official pricing, usage terms, license, and installation guidance to decide whether this tool can be referenced for the stated use. Pair each conclusion with its source link. Mark unclear conditions as unknown instead of guessing. Check development use separately from redistribution.
+
+## Optional tools and terminology
+
+No special checker is needed. Treat the product's official pages as source material and compare each condition with the proposed example. This review is called **external tool reference screening**.

@@ -24,3 +24,13 @@ You do not need to read a large candidate file from beginning to end. Search for
 If a test fails, also inspect the failing behavior and the code that creates its input. If you find another program that consumes the CSV format, inspect that code too. If the specification and implementation disagree, find the source that determines which one is correct. Expand the candidate list only to understand a newly discovered effect or its cause.
 
 For an obvious small change with a known target and check, there is no need to plan a separate reading order. Use this method when there are many candidate files and it is unclear which ones are needed to implement or verify the change.
+
+## Example request to the AI
+
+For a one-off task, attach this guide or name its path, then ask the AI to follow this order:
+
+> Choose reading candidates from the requested behavior, its specification, and its tests. First list the paths and reasons. Include consumers if a format or API is affected. Check the selected original sources, then report files read and verification results.
+
+## Optional tools and terminology
+
+Use [context-budget](../../tools/common/large/context-budget/README.md) or [hotspot-report](../../tools/common/large/hotspot-report/README.md) to see candidate sizes if useful. Size does not determine relevance. This method is called **Context Priority**.

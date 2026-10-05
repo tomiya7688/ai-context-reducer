@@ -41,3 +41,7 @@ A small project may need only a short procedure and search. Add a list or automa
 When multiple people or AIs update the same project, check for changes made by others during your work. This helps avoid conflicts and prevents missing recent changes.
 
 The [method index](method-index.md) explains specific methods and when to use them. [Adoption priority](adoption-priority.md) gives guidance on where to start.
+
+## Optional tools and terminology
+
+Start with existing search and project instructions. If repeated work remains, choose an optional helper from the [method and tool map](tool-method-map.md). Selecting information before giving it to an AI may be called **Context Engineering**; choosing which references to follow is often called **Context Routing**.

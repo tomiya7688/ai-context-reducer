@@ -23,3 +23,11 @@ A lightweight scan may work without a runtime, but it only points to locations; 
 First check which languages and development tools are already available. If the environment is insufficient, use the available searches and analyses, and state which checks could not be performed. Do not automatically install a runtime or development kit solely for this investigation. If a small project has an obvious target and test, inspect the originals directly. Passing every result or the full log does not reduce what the AI reads.
 
 For commands, output locations, and the exact behavior of each analysis stage in this repository, see the [`language-setup`](../../tools/common/small/language-setup/README.md), [`language-run`](../../tools/common/small/language-run/README.md), and [`acr-toolbox`](../../tools/common/native/acr-toolbox/README.md) guides.
+
+## Example request to the AI
+
+> Choose the analysis depth that answers this task and return only relevant candidates. Verify selected code and tests in their original files; do not pass every result or the full log. State which checks could not be run.
+
+## Optional tools and terminology
+
+Use [language-setup](../../tools/common/small/language-setup/README.md) to check available analysis and [language-run](../../tools/common/small/language-run/README.md) when a deeper check is needed. Terms: **lightweight search / dependency analysis / language-specific analysis**.

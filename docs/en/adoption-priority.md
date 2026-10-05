@@ -72,3 +72,11 @@ Do not judge size by file count alone. Consider whether the work target is easy 
 ## Decision rule
 
 Add a method when the investigation time it repeatedly saves is greater than the time needed to adopt and maintain it. Keep accuracy and required checks, then decide from whether it actually reduced reading or search time.
+
+## Example request to the AI
+
+> Identify one investigation step repeated in recent tasks and choose one method from the table to reduce it. Compare what the user would create, how the AI would receive it, the work it saves, and its setup and maintenance cost. Prefer using an existing system when it is sufficient.
+
+## Optional tools and terminology
+
+Use the [Method Index](method-index.md) to choose a method and the [method-to-tool map](tool-method-map.md) to find optional helpers. This process is called **Method Adoption** or method selection.

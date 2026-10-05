@@ -52,3 +52,11 @@ It is not a good fit for one-off free-form writing or content whose structure ch
 A small script may be enough to replace input values. If the project already uses a template manager and needs to update previously created projects when a template changes, reuse that existing system. This method does not require a particular tool.
 
 Commands, replacement rules, and checks for this repository's simple generator are in the [template README](../../tools/common/medium/template/README.md).
+
+## Example request to the AI
+
+> Generate the artifact using only the specified canonical template and the values for this task. Do not infer the format by rereading old outputs. After generating it, report required fields, unresolved placeholders, and the diff from the supplied values.
+
+## Optional tools and terminology
+
+Use [template](../../tools/common/medium/template/README.md) to automate simple replacement if helpful. This method is called **Template Generation** or boilerplate generation.

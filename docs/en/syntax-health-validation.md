@@ -21,3 +21,11 @@ Correct syntax does not prove that a called function exists, types match, calcul
 Run the syntax check on changed code. If it reports a problem, inspect and fix the reported file and nearby lines. If it reports none, record that result and continue with the tests, compilation, or other checks the change requires. If the checker is unavailable or does not support the target language or version, do not treat that as a pass. State the limitation and use an existing verification method. There is no need to install a checker solely for this step.
 
 For a small change where the normal compiler or tests run quickly, use those directly instead of adding a separate syntax-only step. A syntax check is an early signal, not a completion decision.
+
+## Example request to the AI
+
+> Run a syntax check only on changed files and report problem lines and errors. Do not treat a pass as behavior verification; also run tests or a build that checks the completion criteria. Show the commands and results.
+
+## Optional tools and terminology
+
+Use [syntax-health](../../tools/common/small/syntax-health/README.md) when a compatible parser is already available. This check is called a **Syntax Health Check** or syntax check.

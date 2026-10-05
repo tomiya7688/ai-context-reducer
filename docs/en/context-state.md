@@ -28,3 +28,13 @@ There is no need to list every feature or every open Issue. Details that do not 
 If the summary conflicts with the implementation or tests, do not treat it as current fact; check the discrepancy. When a change affects the summary, update the relevant statement and its reference. Mark unverified information as unverified instead of presenting it as established.
 
 The summary does not replace detailed specifications, change history, priorities, or task-specific completion criteria. Consult their original documents or Issues when the task requires them.
+
+## Example request to the AI
+
+Attach the summary to a one-time request or link it from project instructions the AI actually reads. Check the AI tool's settings to confirm automatic loading.
+
+> Read the current-state summary first and use only statements relevant to this task. Check the linked original source when judging detailed requirements or behavior. If the summary differs from its source, report the discrepancy.
+
+## Optional tools and terminology
+
+No dedicated tool is required; a short maintained note or README is enough. A compact record of current capabilities and constraints may be called a **Context State** or project snapshot.

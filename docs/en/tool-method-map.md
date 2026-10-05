@@ -41,3 +41,13 @@ All tools in this map are optional. Commands, inputs, outputs, and operating con
 | [Reduce additional installations](portable-tools.md) | [materialize-tools](../../tools/common/small/materialize-tools/README.md), language-setup | No |
 
 This map lists representative helpers in this repository. For guidance on choosing external tools, see [External Tool Reference Policy](external-tool-reference-policy.md). For all commands and distribution details, see [tools/README.md](../../tools/README.md).
+
+## How to use this map
+
+First choose a method from the user's problem and decide what result is needed. Use the table to find an optional helper, read its README, and run it only if it is available. Give the AI relevant candidates rather than the full output, then verify selected code and tests. Having a tool does not by itself reduce context.
+
+> I need to investigate [task]. If an available helper supports the method, run it and show only relevant candidates with reasons. Check the selected original sources and tests, then report results and anything not verified.
+
+## Terminology
+
+“Helper tool” means optional mechanical assistance. The person selects the method and references; the tool narrows candidates and the AI checks the selected sources. This can be called **tool-assisted Context Routing**.

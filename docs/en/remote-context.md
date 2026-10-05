@@ -30,3 +30,11 @@ Inspecting changes in the shared repository and applying them to your local copy
 ## When to use this method
 
 This helps when several people or AIs update a shared repository and changes may arrive since the last review. There is no need to add a diff mechanism for a short solo task when you know the shared repository has not changed. If a change summary does not reveal the effect, inspect the related files and required checks.
+
+## Example request to the AI
+
+> First inspect files changed on the shared remote since the known base, and show only diffs relevant to this task with reasons. Keep reviewing separate from applying changes; ask me before applying anything. At the end, report the diffs reviewed and anything not verified.
+
+## Optional tools and terminology
+
+Optional [remote-delta](../../tools/common/medium/remote-delta/README.md) summarizes changes. This method is called **Remote Delta** or delta-first review.

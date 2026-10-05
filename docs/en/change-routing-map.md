@@ -54,3 +54,11 @@ For a small project where the changed file and its test are obvious, a table is 
 ## Keep it current
 
 Update the relevant row in the same change when code or tests move or responsibilities change. A stale row can send someone to the wrong place, erasing the time the guide was meant to save. Keep the table small enough to maintain.
+
+## Example request to the AI
+
+> Use the row matching this change to select the first code, tests, and any needed specification. Give the paths and reasons. If the current implementation differs from the table, verify the correct location instead of following the stale row, and propose an update.
+
+## Optional tools and terminology
+
+Use [change-router](../../tools/common/medium/change-router/README.md) to suggest references from changed files. This method is called a **Change Routing Map**.

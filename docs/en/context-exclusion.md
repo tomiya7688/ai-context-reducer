@@ -37,3 +37,11 @@ When investigating a failed build, read the log lines related to that failure. W
 If an excluded path becomes part of the task, temporarily remove it from the guide or tool exclusion, or explicitly ask the AI to read the needed files. Restore the normal exclusion after the check. The rule sets initial search candidates; it is not a reason to ignore evidence needed for the task.
 
 For a small project, one short paragraph in the AI guide is enough. Add file exclusions in the AI tool only when there are many paths and you keep having to specify them by hand.
+
+## Example request to the AI
+
+> Check which exclusion rules and exceptions apply to this task. Name the skipped paths and why, and make sure required logs, generated artifacts, or tests are not excluded. Distinguish hiding search results from blocking direct file access.
+
+## Optional tools and terminology
+
+[ignore-candidates](../../tools/common/medium/ignore-candidates/README.md) only suggests paths to review. The policy for excluding initial reading candidates is called **Context Exclusion** or ignore rules.

@@ -23,3 +23,11 @@ Once you have enough to decide, history, neighboring feature guides, and broad d
 This is not a limit on the number of searches or words. Further investigation is necessary when a change affects a shared feature, sources disagree, a check fails, or an unknown could cause data loss or expose information. Do not mark something as verified if you could not check it; record it as unknown.
 
 Small, obvious changes do not need a written checklist or a tracking note. Write down the required checks only when it is hard to tell how far the investigation should go.
+
+## Example request to the AI
+
+> Before deciding, list the questions this task must answer and the minimum evidence needed for each. Check the original sources and tests that answer them. Search further only for unresolved questions, and distinguish verified from unverified results.
+
+## Optional tools and terminology
+
+Use [acceptance-extractor](../../tools/common/medium/acceptance-extractor/README.md) to extract questions or completion criteria if useful. The practice of setting needed evidence in advance is called an **Evidence Budget**.

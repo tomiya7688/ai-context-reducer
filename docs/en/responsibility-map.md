@@ -27,3 +27,13 @@ A responsibility map is not a detailed specification. Once you find candidates r
 When a change adds, moves, splits, or combines a major responsibility, update the map in the same change. A stale map points to the wrong files; if it cannot be maintained, do not rely on it to identify current ownership and check the source instead.
 
 In a small project where a few files and tests make their roles clear, a dedicated map is unnecessary; a short entry in an existing AI guide or design document is enough. Do not add a map when keeping it up to date would take more time than it saves in repeated investigation.
+
+## Example request to the AI
+
+Attach the map to the task or link it from instructions the AI actually reads. For a one-off request, say:
+
+> Select the files and tests related to this change from the responsibility map. Check that the map matches the implementation, give the candidate paths and evidence, and inspect original sources only where ownership is unclear.
+
+## Optional tools and terminology
+
+Use [responsibility-candidates](../../tools/common/medium/responsibility-candidates/README.md) to draft a path list if useful, but verify responsibilities in original sources. This list is called a **Responsibility Map**.

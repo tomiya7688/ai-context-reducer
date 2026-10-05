@@ -62,4 +62,14 @@ For a one-off change with named files, or a task with only a few obvious candida
 
 Update a location and its description when files move or their roles change. An obsolete entry can send someone looking for a file that no longer exists. Keep the list small enough that a person or process can maintain it.
 
-This repository also has a helper tool for building catalogs, but using it is optional. Its output and ranking are leads for finding candidates; the task itself determines which sources are relevant.
+This repository also has an optional helper tool for building catalogs. Its output and ranking are leads for finding candidates; the task itself determines which sources are relevant.
+
+## Example request to the AI
+
+For a one-time task, attach this guide or name its path in the request. For recurring work, link it from project instructions the AI actually reads and check whether automatic loading is configured.
+
+> Select only the specification, code, and test locations relevant to this change from the catalog. First give the paths and reasons, then open and check those original sources. At the end, report the files consulted and tests run.
+
+## Optional tools and terminology
+
+Use [context-manifest](../../tools/common/large/context-manifest/README.md) to build a catalog if useful; a manual list works too. This method is called a **Context Manifest** or reference catalog.
