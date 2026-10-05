@@ -19,7 +19,7 @@ If all four are clear and the tool directly illustrates the method, link to the 
 
 “Free to use” and “usable commercially” are separate conditions. A free plan may restrict company use, and open-source software may still have conditions for particular uses or redistribution. Check official terms and the license against the use being described.
 
-Using a tool during development is also different from including the tool itself in a distribution. If a tool runs only during a build, check the conditions for development use. If the tool is shipped to users, check redistribution terms and license notices. Licenses such as MIT, BSD, and Apache-2.0 may require retaining notices when the software is redistributed.
+Using a tool during development is also different from including the tool itself in a distribution. If a tool runs only during a build, check the conditions for development use. If the tool is shipped to users, check redistribution terms and license notices. A license that allows free use may still require copyright or license notices when the software is redistributed.
 
 This document does not make a legal determination for every user or distribution. If the conditions are unclear, do not guess; omit the linked recommendation.
 
