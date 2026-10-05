@@ -2,6 +2,7 @@ package main
 
 import (
     "bufio"
+    "flag"
     "fmt"
     "io"
     "os"
@@ -27,17 +28,24 @@ func readLines(path string) ([]string, error) {
 
 // cmdSlice は対象サブコマンドの引数解析・境界I/O・compact出力を統括します。
 func cmdSlice(args []string) int {
-    if len(args) < 2 {
-        fmt.Fprintln(os.Stderr, "usage: acr-toolbox slice PATTERN FILE [FILE...]")
+    flags := flag.NewFlagSet("slice", flag.ContinueOnError)
+    maxMatches := flags.Int("max-matches", 20, "maximum matches to return; 0 or a negative value means unlimited")
+    flags.SetOutput(os.Stderr)
+    if err := flags.Parse(args); err != nil {
         return 2
     }
-    rx, err := regexp.Compile("(?i)" + args[0])
+    if flags.NArg() < 2 {
+        fmt.Fprintln(os.Stderr, "usage: acr-toolbox slice [--max-matches N] PATTERN FILE [FILE...]")
+        return 2
+    }
+    positional := flags.Args()
+    rx, err := regexp.Compile("(?i)" + positional[0])
     if err != nil {
         fmt.Fprintln(os.Stderr, err)
         return 2
     }
     shown := 0
-    for _, name := range args[1:] {
+    for _, name := range positional[1:] {
         lines, err := readLines(name)
         if err != nil {
             continue
@@ -45,6 +53,10 @@ func cmdSlice(args []string) int {
         for i, line := range lines {
             if !rx.MatchString(line) {
                 continue
+            }
+            if *maxMatches > 0 && shown >= *maxMatches {
+                fmt.Println("[truncated: max matches reached]")
+                return 0
             }
             start := i - 3
             if start < 0 {
@@ -59,10 +71,6 @@ func cmdSlice(args []string) int {
                 fmt.Printf("%6d: %s\n", n+1, lines[n])
             }
             shown++
-            if shown >= 20 {
-                fmt.Println("[truncated: max matches reached]")
-                return 0
-            }
         }
     }
     return 0
