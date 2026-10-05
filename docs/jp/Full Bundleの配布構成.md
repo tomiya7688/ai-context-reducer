@@ -1,18 +1,23 @@
-# Full Bundle 配布設計
+# Full Bundleの配布構成
 
-この文書は v1.1.0 で追加する Full Bundle の配布契約を定義します。
+この文書は、通常版とFull Bundleの違いと、Full Bundleに含めるものを説明します。配布物の追加や更新時に、利用者が実行に必要な環境を別途調べて組み立てずに済むよう、含有物と動作の境界を定めています。
 
-Full Bundle は通常版を置き換えるものではありません。通常版は軽量なCLI配布として維持し、Full Bundle はその内容をそのまま含んだ上で、GUI Hub、Python fallback、言語固有tool、setup script、profiles、templates、利用者向けdocsを追加する上位集合とします。
+## 例: CLIだけ使うか、画面からも使うか
 
-配布内容の機械可読な Source of Truth は release/FULL_BUNDLE_MANIFEST.json です。
+`acr-toolbox`をコマンドから使う人には、軽量な通常版で足ります。GUI Hubや言語別の補助ツール、テンプレートもまとめて使いたい人にはFull Bundleを選べます。Full Bundleは通常版の機能を保ち、追加のファイルを同じ配布物に収めたものです。
 
-## 1. 通常版との関係
+Full Bundleに含まれるツールは、すべてが自動で動くわけではありません。画面から浅い情報を調べて利用候補を示し、重い解析やファイルを書き換える処理は、利用者が実行を選んだ後に動かします。この境界により、展開しただけで時間のかかる処理や環境変更が始まることを防ぎます。
 
-通常版の配布契約は引き続き release/RELEASE_MANIFEST.json が Source of Truth です。
+## 通常版との違い
 
-Full Bundle のrootには、通常版と同じ次のfileを同じ名前で置きます。
+| 配布物 | 主な内容 | 向いている使い方 |
+|---|---|---|
+| 通常版 | `acr-toolbox`と共通の補助CLI | コマンドから必要な機能を使う |
+| Full Bundle | 通常版と同じCLIに、GUI Hub、言語別ツール、Python版の代替実装、セットアップ用スクリプト、プロファイル、テンプレート、利用者向け文書を追加 | GUIや複数の補助機能をまとめて使う |
 
-~~~text
+Full Bundleのルートには、通常版と同じファイル名で次のCLIと文書を置きます。通常版で使っていたコマンドや機械出力は、Full Bundleでも同じように使えます。
+
+```text
 acr-toolbox(.exe)
 go-symbols(.exe)
 go-import-map(.exe)
@@ -22,153 +27,53 @@ README.md
 TOOLS_README.md
 LICENSE
 RELEASE_MANIFEST.json
-~~~
+```
 
-そのため、通常版で使えていたCLI commandをFull Bundleでも同じように実行できます。Windowsでは実行fileに .exe suffixを付けます。
+Full Bundle固有の構成は[`FULL_BUNDLE_MANIFEST.json`](../../release/FULL_BUNDLE_MANIFEST.json)で管理します。GUIや代替実装の情報を通常版の一覧へ混ぜないため、通常版だけを使う利用者にも余分な依存関係を要求しません。
 
-Full Bundleだけに必要な情報は FULL_BUNDLE_MANIFEST.json へ分離し、通常版manifestへGUIやfallbackの一覧を混ぜません。
+## Full Bundleに含めるもの
 
-## 2. directory layout
+- **ビルド済みCLI:** 対応する各OS向けに実行形式で同梱します。利用者がGoの開発環境を用意したり、ソースからビルドしたりする必要はありません。
+- **GUI Hub:** 既存のCLIを画面から呼び出し、結果を表示します。GUI専用の解析処理を別に持たず、CLIの出力と動作を共通の根拠にします。
+- **Python版の代替実装:** native版を使えない場合など、明示して使うために同梱します。通常のGUIとCLIの利用にはPythonを要求しません。代替実装を実行する場合だけ、環境に既にあるPythonを使います。
+- **セットアップ・解析スクリプト:** `setup.sh` / `setup.bat` と `analyze.sh` / `analyze.bat` をルートに置きます。スクリプトは同梱CLIを優先し、分析処理そのものは重複実装しません。
+- **プロファイルとテンプレート:** プロジェクトの種類に応じた任意の補助情報や、AI向け案内のひな形を含みます。プロファイルは必須ではありません。
+- **利用者向け文書:** 日本語の原文書を`docs/jp/`、その英訳を`docs/en/`に置きます。リリース内部記録やテスト用ファイルは含めません。
 
-最終的なv1.1.0 Full Bundleは次のlayoutを標準とします。
+配布物の中身は次の構成です。
 
-~~~text
+```text
 ai-context-reducer-full-v1.1.0-<platform>/
-├─ acr-toolbox(.exe)
-├─ go-symbols(.exe)
-├─ go-import-map(.exe)
-├─ go-package-graph(.exe)
-├─ affected-tests(.exe)
-├─ README.md
-├─ TOOLS_README.md
-├─ LICENSE
+├─ acr-toolbox(.exe) と共通CLI
+├─ README.md / TOOLS_README.md / LICENSE
 ├─ RELEASE_MANIFEST.json
 ├─ FULL_BUNDLE_MANIFEST.json
-├─ setup.sh
-├─ setup.bat
-├─ analyze.sh
-├─ analyze.bat
-├─ gui/
-│  └─ acr-hub(.exe)
-├─ fallback/
-│  └─ python/
-│     ├─ common/
-│     └─ languages/
-│        ├─ python/
-│        ├─ c/
-│        ├─ cpp/
-│        ├─ csharp/
-│        └─ gdscript/
+├─ setup.sh / setup.bat / analyze.sh / analyze.bat
+├─ gui/acr-hub(.exe)
+├─ fallback/python/
+│  ├─ common/
+│  └─ languages/ (python / c / cpp / csharp / gdscript)
 ├─ profiles/
 ├─ templates/
-└─ docs/
-   ├─ jp/
-   └─ en/
-~~~
+└─ docs/ (jp / en)
+```
 
-GUI実装内部のasset配置は #25 / #26 で決めて構いません。ただし利用者が起動するplatform固有entrypointは gui/acr-hub(.exe) とし、追加runtimeを利用者へ要求しない配布物にします。
+## 追加インストールと自動実行
 
-## 3. Go製tool
+Full Bundleは、Go、Python、.NET、C/C++の開発環境や外部ツールを勝手にインストールしません。既に利用できる外部解析器があれば使うことがあります。見つからない場合は、同梱のCLIや利用可能な代替手段へ戻ります。
 
-Full Bundleに含めるGo製toolは、各platformでbuild済みbinaryだけです。
+含まれている機能は、次のように段階を分けて使います。
 
-- acr-toolbox
-- go-symbols
-- go-import-map
-- go-package-graph
-- affected-tests
+```text
+プロジェクトの基本情報を調べる
+  -> 使えそうな機能を表示する
+  -> 利用者が実行を選ぶ
+```
 
-Full Bundleへ *.go / go.mod / go.sum / build script / Go unit test source / Go build cache は含めません。利用者へ go build を要求しません。
+実行時間の長い解析、外部SDKやコンパイラーを使う処理、ファイルへ書き込む処理は、画面を開いただけでは実行しません。GUIの「分析」も全ツールを一括で動かす操作ではありません。
 
-Go toolchainが無い環境でも、対応platformのFull Bundleに含まれるCLIとGUIを利用できることをrelease conditionとします。
+## 互換性と配布確認
 
-## 4. Python fallback
+Full Bundleの追加後も、通常版のCLI名、サブコマンド、引数、終了コード、機械向け出力形式を維持します。通常版は別配布物として引き続き提供し、Full Bundleだけの補助ファイルを通常版の必須条件にしません。
 
-Python実装はfallback / 参照実装として同梱します。
-
-~~~text
-tools/common/...   -> fallback/python/common/...
-tools/python/...   -> fallback/python/languages/python/...
-tools/c/...        -> fallback/python/languages/c/...
-tools/cpp/...      -> fallback/python/languages/cpp/...
-tools/csharp/...   -> fallback/python/languages/csharp/...
-tools/gdscript/... -> fallback/python/languages/gdscript/...
-~~~
-
-runtimeに必要な script/*.py と互換entrypoint / 必要なconfigだけを含めます。tests、cache、開発用build fileは配布しません。
-
-Pythonが無いことはFull Bundleの通常利用を妨げません。GUIとnative CLIはPythonなしで動作させます。Python fallbackを明示利用する場合だけ、対象環境に既に存在するPythonを利用し、Full Bundle自身がPythonやpackageをinstallしません。
-
-## 5. setup / analyze entrypoint
-
-Full Bundle rootに setup.sh / setup.bat / analyze.sh / analyze.bat を置きます。これらはFull Bundle内のprebuilt acr-toolboxを第一候補にします。
-
-wrapperはbundle内native binaryの解決、引数透過、nativeが本当に利用不能な場合のoptional Python fallbackだけを担当し、分析ロジックを重複実装しません。
-
-## 6. GUI Hub
-
-GUI Hubは既存CLIのfrontendです。
-
-~~~text
-GUI action
-  -> existing CLI
-  -> existing JSON contract
-  -> GUI presentation
-~~~
-
-GUI専用の分析ロジックをFull Bundle contractには追加しません。CLI単体利用、stdout / stderr / exit code、既存JSON contractを維持します。
-
-Large / heavy解析やSDK / runtime / external toolのinstallはGUIからも自動実行しません。backend実装は `tools/gui/acr-hub/backend` に置き、bundle rootの既存CLIを直接起動します。stdout JSONは再構築せず、GUI用の実行状態だけを別に分類します。
-
-画面は同じ `tools/gui/acr-hub` moduleへ #26 で追加し、ワンクリック分析導線は #27 で実装します。
-
-## 7. profiles / templates
-
-profiles/ はproject typeやarchitecture routing用の補助入力を置く場所です。profileは必須にしません。templates/ はAI入口やContext Pack等のcanonical templateを配布します。
-
-repository側に新しい配布対象profile / templateを追加する場合は、Full Bundle manifestを同じchange setで更新します。
-
-## 8. docs
-
-Full Bundleの利用者向けdocsは最終的に docs/jp/ と docs/en/ へ配置します。docs/jp/ を日本語Source of Truth、docs/en/ を翻訳として扱う方針は #28-#31 で具体化します。
-
-repository内部のrelease validation記録やtest fixtureまで無条件に同梱しません。
-
-## 9. 外部runtime / SDK / tool
-
-Full Bundleは全部入りですが、すべての外部dependencyを同梱する意味ではありません。
-
-Go toolchain、Python runtime、dotnet SDK、C/C++ compiler、Godot、SCIP indexer、Universal Ctags、ast-grep、rg / fd / scc等を勝手にinstallしません。
-
-既に利用可能なら高精度backendとして使い、存在しない場合はportable native pathまたは利用可能なfallbackへ戻ります。
-
-## 10. 自動実行境界
-
-Full Bundleに含まれていることと、自動実行してよいことは別です。自動実行してよいのはcheap / shallowな既存経路だけです。
-
-~~~text
-project facts
-  -> recommendation
-  -> user selects Run
-~~~
-
-Medium / Large / heavy解析、外部compiler / SDKを使う処理、書込みを伴う処理は既存の安全境界を維持します。GUIのAnalyzeも全tool一括実行にはしません。
-
-## 11. manifestの役割
-
-release/FULL_BUNDLE_MANIFEST.json は supported platform、通常版との互換関係、build済みnative binary、GUI entrypoint、setup wrapper、Python fallbackのsource -> bundle path、profiles / templates、docs tree、禁止配布内容、runtime / auto-install / heavy execution policyを定義します。
-
-tree inclusion ruleはbuild時に展開し、release CIでは最終archiveの実file一覧と照合します。この照合自体は #32-#34 で実装します。
-
-## 12. compatibility rule
-
-Full Bundleの追加で既存CLIを壊しません。
-
-- rootの5 binary名を維持する
-- subcommand / argument / exit codeを維持する
-- machine outputは tools/JSON_CONTRACT.md を維持する
-- Full Bundle専用GUIをCLIのSource of Truthにしない
-- 通常版を継続して別archiveとして配布できる
-- Full Bundleにしかない補助fileを通常版へ必須化しない
-
-v1.1.0でCLI contract変更が必要になった場合は、Full Bundle追加の副作用として行わず別の明示Issueで扱います。
+配布対象の一覧はマニフェストから展開し、完成したアーカイブの内容と照合します。これにより、設計上含めると決めたファイルが配布物に入っているか確認できます。各OSでの実行確認は[リリース手順](リリース手順.md)に記載します。

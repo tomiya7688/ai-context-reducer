@@ -2,19 +2,24 @@
 
 > Japanese Source of Truth: [Full Bundleの配布構成](../jp/Full%20Bundleの配布構成.md)
 
-This document defines the distribution contract for the Full Bundle added in v1.1.0.
+This document explains how the normal bundle differs from the Full Bundle and what the Full Bundle contains. It defines the included files and runtime boundaries so users do not have to assemble the required environment themselves when obtaining or updating the distribution.
 
-The Full Bundle does not replace the normal bundle. The normal bundle remains a lightweight CLI distribution. The Full Bundle is a superset that preserves the normal contents and adds the GUI Hub, Python fallbacks, language-specific tools, setup scripts, profiles, templates, and user-facing documentation.
+## Example: use the CLI or the graphical interface
 
-The machine-readable Source of Truth for its contents is `release/FULL_BUNDLE_MANIFEST.json`.
+The lightweight normal bundle is enough for someone who uses `acr-toolbox` from a command line. The Full Bundle is for someone who also wants the GUI Hub, language-specific helper tools, and templates in the same download. It preserves the normal bundle's functions and adds the other files to the same distribution.
 
-## 1. Relationship with the normal bundle
+The tools in the Full Bundle do not all run automatically. The GUI inspects basic project information and suggests available functions. Long-running analysis and actions that write files run only after the user chooses to start them. This prevents opening the bundle from immediately starting expensive work or changing the environment.
 
-`release/RELEASE_MANIFEST.json` remains the Source of Truth for the normal bundle.
+## Difference from the normal bundle
 
-The Full Bundle root keeps the same normal-bundle files with the same names:
+| Distribution | Main contents | Suitable use |
+|---|---|---|
+| Normal bundle | `acr-toolbox` and common helper CLIs | Use needed functions from the command line |
+| Full Bundle | The same normal CLI, plus the GUI Hub, language tools, Python implementations as alternatives, setup scripts, profiles, templates, and user documentation | Use the GUI or several helper functions from one package |
 
-~~~text
+The Full Bundle root keeps these CLI files and documents under the same names as the normal bundle. Commands and machine-readable output that worked in the normal bundle work the same way in the Full Bundle.
+
+```text
 acr-toolbox(.exe)
 go-symbols(.exe)
 go-import-map(.exe)
@@ -24,175 +29,53 @@ README.md
 TOOLS_README.md
 LICENSE
 RELEASE_MANIFEST.json
-~~~
+```
 
-Therefore, CLI commands that work in the normal bundle work the same way from the Full Bundle. Windows executable files use the `.exe` suffix.
+The [`FULL_BUNDLE_MANIFEST.json`](../../release/FULL_BUNDLE_MANIFEST.json) tracks the Full-Bundle-only contents. Keeping the GUI and alternative implementations out of the normal bundle's inventory avoids adding requirements for people who use only the normal bundle.
 
-Full-Bundle-specific information lives in `FULL_BUNDLE_MANIFEST.json`; do not mix GUI/fallback inventory into the normal-bundle manifest.
+## What the Full Bundle contains
 
-## 2. Directory layout
+- **Built CLI tools:** Each supported operating system receives executable files. Users do not need a Go development environment or have to build from source.
+- **GUI Hub:** Calls existing CLI commands and presents their results. It does not have a separate GUI-only analysis implementation; the CLI output and behavior remain the common source.
+- **Python implementations as alternatives:** Included for explicit use, such as when a native tool cannot be used. Normal GUI and CLI use does not require Python. Only running an alternative implementation uses Python already present in the environment.
+- **Setup and analysis scripts:** `setup.sh` / `setup.bat` and `analyze.sh` / `analyze.bat` live at the root. They prefer the included CLI and do not duplicate the analysis logic.
+- **Profiles and templates:** Optional material for project types and templates for AI entry guides. Profiles are not required.
+- **User documentation:** Japanese source documents live in `docs/jp/` and English translations in `docs/en/`. Internal release records and test files are not included.
 
-The target v1.1.0 Full Bundle layout is:
+The package uses this layout:
 
-~~~text
+```text
 ai-context-reducer-full-v1.1.0-<platform>/
-├─ acr-toolbox(.exe)
-├─ go-symbols(.exe)
-├─ go-import-map(.exe)
-├─ go-package-graph(.exe)
-├─ affected-tests(.exe)
-├─ README.md
-├─ TOOLS_README.md
-├─ LICENSE
+├─ acr-toolbox(.exe) and common CLIs
+├─ README.md / TOOLS_README.md / LICENSE
 ├─ RELEASE_MANIFEST.json
 ├─ FULL_BUNDLE_MANIFEST.json
-├─ setup.sh
-├─ setup.bat
-├─ analyze.sh
-├─ analyze.bat
-├─ gui/
-│  └─ acr-hub(.exe)
-├─ fallback/
-│  └─ python/
-│     ├─ common/
-│     └─ languages/
-│        ├─ python/
-│        ├─ c/
-│        ├─ cpp/
-│        ├─ csharp/
-│        └─ gdscript/
+├─ setup.sh / setup.bat / analyze.sh / analyze.bat
+├─ gui/acr-hub(.exe)
+├─ fallback/python/
+│  ├─ common/
+│  └─ languages/ (python / c / cpp / csharp / gdscript)
 ├─ profiles/
 ├─ templates/
-└─ docs/
-   ├─ jp/
-   └─ en/
-~~~
+└─ docs/ (jp / en)
+```
 
-Internal GUI asset layout may be decided by the GUI implementation, but the platform-specific entry point exposed to users is `gui/acr-hub(.exe)`, distributed without requiring an additional runtime.
+## Additional installation and automatic execution
 
-## 3. Go tools
+The Full Bundle does not automatically install Go, Python, .NET, C/C++ development tools, or external tools. It may use an external analyzer that is already available. If none is available, it returns to an included CLI or another available option.
 
-Go tools in the Full Bundle are distributed only as binaries built for the target platform:
+Included functions are used in stages:
 
-- `acr-toolbox`
-- `go-symbols`
-- `go-import-map`
-- `go-package-graph`
-- `affected-tests`
+```text
+inspect basic project information
+  -> show available functions
+  -> user chooses what to run
+```
 
-Do not include `*.go`, `go.mod`, `go.sum`, build scripts, Go unit-test source, or the Go build cache.
+Opening the GUI does not start long-running analysis, use an external SDK or compiler, or write files. The GUI's Analyze action does not run every tool at once.
 
-Users must not be required to run `go build`. A release condition is that the CLI and GUI included for the platform can be used even when no Go toolchain is installed.
+## Compatibility and distribution checks
 
-## 4. Python fallback
+Adding the Full Bundle preserves the normal CLI names, subcommands, arguments, exit codes, and machine-readable output. The normal bundle remains a separate distribution, and helper files found only in the Full Bundle are not required by it.
 
-Python implementations are bundled as fallbacks / reference implementations.
-
-~~~text
-tools/common/...   -> fallback/python/common/...
-tools/python/...   -> fallback/python/languages/python/...
-tools/c/...        -> fallback/python/languages/c/...
-tools/cpp/...      -> fallback/python/languages/cpp/...
-tools/csharp/...   -> fallback/python/languages/csharp/...
-tools/gdscript/... -> fallback/python/languages/gdscript/...
-~~~
-
-Include runtime-relevant `script/*.py`, compatibility entry points, and required configuration only. Do not distribute tests, caches, or development build files as fallback content.
-
-Python must not be required for normal Full Bundle use. The GUI and native CLI work without Python. Only users who explicitly use a Python fallback rely on an already-installed Python runtime; the Full Bundle does not install Python or packages itself.
-
-## 5. setup / analyze entry points
-
-Place `setup.sh`, `setup.bat`, `analyze.sh`, and `analyze.bat` at the Full Bundle root. They prefer the prebuilt `acr-toolbox` included in the bundle.
-
-Wrappers only resolve the native binary, pass arguments through, and optionally use a Python fallback when native execution is genuinely unavailable. They do not duplicate analysis logic.
-
-## 6. GUI Hub
-
-The GUI Hub is a frontend to existing CLI commands.
-
-~~~text
-GUI action
-  -> existing CLI
-  -> existing JSON contract
-  -> GUI presentation
-~~~
-
-Do not add GUI-specific analysis logic to the Full Bundle contract. CLI standalone use, stdout / stderr / exit codes, and the existing JSON contract remain authoritative.
-
-The GUI also does not automatically run Large / heavy analysis or install SDKs / runtimes / external tools. The backend lives in `tools/gui/acr-hub/backend` and directly invokes the existing CLI from the bundle root. It preserves stdout JSON and separately classifies only GUI execution state.
-
-The screen and one-click analysis flow live in the same `tools/gui/acr-hub` module.
-
-## 7. profiles / templates
-
-`profiles/` contains optional input such as project-type or architecture-routing profiles. Profiles are not mandatory.
-
-`templates/` contains canonical templates such as the AI entry point and Context Pack.
-
-When a new profile or template becomes part of the distribution, update the Full Bundle manifest in the same change set.
-
-## 8. Documentation
-
-User-facing documentation is distributed under:
-
-~~~text
-docs/jp/
-docs/en/
-~~~
-
-`docs/jp/` is the Japanese Source of Truth and `docs/en/` contains translations.
-
-Do not unconditionally bundle internal release-validation records or test fixtures.
-
-## 9. External runtimes / SDKs / tools
-
-"Full Bundle" does not mean bundling every external dependency.
-
-Do not automatically install the Go toolchain, Python runtime, dotnet SDK, C/C++ compiler, Godot, SCIP indexer, Universal Ctags, ast-grep, rg / fd / scc, or similar tools.
-
-When an external backend already exists, it may be used for higher-precision analysis. Otherwise, return to a portable native path or an available fallback.
-
-## 10. Automatic-execution boundary
-
-Being included in the Full Bundle does not imply a tool may run automatically.
-
-Only existing cheap / shallow paths may run automatically.
-
-~~~text
-project facts
-  -> recommendation
-  -> user selects Run
-~~~
-
-Medium / Large / heavy analysis, external compiler / SDK work, and operations that write files retain their existing safety boundaries. GUI Analyze is not a "run every tool" action.
-
-## 11. Role of the manifest
-
-`release/FULL_BUNDLE_MANIFEST.json` defines:
-
-- supported platforms
-- compatibility relationship with the normal bundle
-- prebuilt native binaries
-- GUI entry point
-- setup wrappers
-- Python fallback source -> bundle paths
-- profiles / templates
-- documentation trees
-- excluded distribution content
-- runtime / auto-install / heavy-execution policy
-
-Tree inclusion rules are expanded during bundle construction, and release CI compares the final archive contents against the resolved manifest.
-
-## 12. Compatibility rules
-
-Adding the Full Bundle must not break the existing CLI.
-
-- preserve the five root binary names
-- preserve subcommands / arguments / exit codes
-- preserve `tools/JSON_CONTRACT.md` for machine output
-- do not make the Full-Bundle GUI the Source of Truth for CLI behavior
-- continue distributing the normal bundle separately
-- do not make Full-Bundle-only helper files mandatory for the normal bundle
-
-If v1.1.0 requires a CLI contract change, handle it in an explicit separate Issue rather than as an incidental effect of the Full Bundle.
+The distribution file list is expanded from the manifest and compared with the completed archive. This verifies that the delivered files match the declared package. Execution checks for each operating system are described in [Releasing](releasing.md).
