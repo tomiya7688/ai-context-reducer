@@ -2,180 +2,48 @@
 
 日本語 | [English](README.en.md)
 
-AI / Codex / Claude Code を使った開発で、AIに必要以上の情報を読ませず、必要な設計・実装情報へ正確にたどり着くための考え方と手法をまとめたリポジトリです。
+## AIに必要な情報だけを渡して、作業を進める
 
-中心にあるのは手法と文書です。繰り返し作業や機械的に処理できる部分をAIのコンテキスト外へ出すために、補助的なportable toolも提供します。主要なCommon機能は `acr-toolbox` 単体バイナリで利用できます。
+たとえば、設定ファイルのエラー表示を直すとき、プロジェクト全体をAIに渡すと、画面やログなど関係のないコードまで読んで変更場所を探すことになります。先に設定を読み込む処理と関連テストの場所を調べ、必要な部分をAIに渡せば、探す時間と読む量を減らせます。
 
-## まず理解する3原則
+AIに指示と一緒に渡す説明・ソースコード・テスト結果などを、ここでは「コンテキスト」と呼びます。このリポジトリは、必要な根拠を保ちながら、作業と関係の薄い情報を減らす方法をまとめています。
 
-コンテキスト削減の基本は次の3つです。
+## 情報を絞る三つの方法
 
-1. 静的解析できるものは静的解析する
-2. よく使う操作をまとめる
-3. 一部だけ読ませる
+### 1. 機械で分かることは、先に機械で調べる
 
-個別の手法やtoolは、ほとんどがこの3つのどれか、または組み合わせです。詳細は [`docs/jp/コンテキスト削減の基本.md`](docs/jp/コンテキスト削減の基本.md) を参照してください。
+ファイル名、関数名、読み込んでいる別ファイルなどを検索や解析で調べ、変更に関係しそうな候補を絞ります。AIに大量のコードを読ませて一覧を作らせる手間を減らし、判断に必要な実装へ早く進めます。設計上の意味は、候補を絞った後に元のコードを読んで確認します。
 
-## 目標
+### 2. 繰り返す手順をまとめる
 
-> AI に大量の情報を読ませて必要情報を探させるのではなく、必要情報を先に選別・ルーティングしてから AI へ渡す。
+毎回同じ順番で変更箇所とテストを探すなら、短い案内や補助ツールに手順をまとめます。作業のたびに探し方を考え直す必要がなくなります。一度きりの作業や、仕組みを保つ手間の方が大きい場合は作りません。
 
-さらに、必要情報が揃ったら探索を続けません。
+### 3. 関係する部分だけ読む
 
-> Goal / Required / Acceptance / working set が十分なら、追加探索を止める。
+変更場所を見つけたら、その実装、説明、テストのうち今回必要な部分を読みます。全部を読まずに済みますが、必要な根拠まで省かないよう、判断や確認では元の資料に戻ります。
 
-優先順位は次です。
+三つの方法の詳しい説明は[コンテキスト削減の基本](docs/jp/コンテキスト削減の基本.md)にあります。
 
-```text
-正確性
-  > 作業対象への到達速度
-  > コンテキスト削減量
-  > 自動化の多さ
-```
+## このリポジトリにあるもの
 
-要約は原典の代替ではなく索引として扱い、必要なら source / tests / docs / diff へ戻れる状態を維持します。
+中心は、作業の案内や情報の絞り方を説明する文書とテンプレートです。検索・一覧作成・確認手順の一部を補助するツールもありますが、どのツールもすべてのプロジェクトに必要というわけではありません。
 
-## リリースとダウンロード
+- 作業の困りごとから手法を探す: [手法一覧](docs/jp/手法一覧.md)
+- プロジェクトに何を取り入れるか決める: [導入優先度](docs/jp/導入優先度.md)
+- AIに既存プロジェクトを見てもらう依頼文: [導入依頼文](docs/jp/導入依頼文.md)
+- AIに最初に読ませる案内のひな形: [AI_CONTEXT.md](templates/AI_CONTEXT.md)
+- 補助ツールの説明: [tools/README.md](tools/README.md)
 
-公開済みarchiveは [GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases) から取得できます。
+## 既存プロジェクトで試す
 
-現在のv1.0.x Portable Distributionでは次の6環境向けarchiveを配布します。v1.0.1はv1.0.0と同じbundle構成・CLI / JSON contractを維持するパッチ版です。
+まず[導入依頼文](docs/jp/導入依頼文.md)を使って、既存の案内や作業手順を確認します。繰り返し起きている困りごとを一つ選び、対応する方法だけを試します。AIにすべての手法や文書を一度に追加させる必要はありません。導入後、必要なコードとテストへ進みやすくなったか、確認不足が生じていないかを確かめます。
 
-- Windows x64 / arm64
-- Linux x64 / arm64
-- macOS x64 / arm64
+## ダウンロード
 
-各archiveには次を含みます。
+補助ツールの配布物は[GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases)から取得できます。対応環境、配布物の内容、確認方法は[リリース手順](docs/jp/リリース手順.md)にあります。ツールを使わず、文書の考え方だけを取り入れることもできます。
 
-- `acr-toolbox`
-- `go-symbols`
-- `go-import-map`
-- `go-package-graph`
-- `affected-tests`
-- `README.md`
-- `TOOLS_README.md`
-- `LICENSE`
-- `RELEASE_MANIFEST.json`
+## 文書について
 
-Releaseには6archive共通の `SHA256SUMS` も添付します。
+日本語文書は[`docs/jp/`](docs/jp/)にあり、英語版は[`docs/en/`](docs/en/)にあります。個別の手法についてREADMEで詳しく繰り返さず、各説明は[手法一覧](docs/jp/手法一覧.md)からたどれるようにしています。
 
-配布前にGitHub Actions上で、6環境すべてについて **実際に配布するbinaryをnative buildし、そのbinaryでE2Eを実行してからarchive化し、さらにarchiveを再展開して内容を検査** します。source上のunit testだけではRelease gateを通しません。
-
-```text
-acr-toolbox version
-acr-toolbox analyze <project-root>
-acr-toolbox select <project-root>
-```
-
-`acr-toolbox version` はrelease version / commit / OS / architectureをJSONで返します。
-
-v1.1.0では軽量な通常版を維持したまま、別archiveとしてGUI Hub付きFull Bundleを追加します。Full Bundleは通常版CLI contractを維持するsupersetで、利用者にGo toolchainの追加導入を要求しません。構成は [`docs/jp/Full Bundleの配布構成.md`](docs/jp/Full%20Bundleの配布構成.md)、Release手順は [`docs/jp/リリース手順.md`](docs/jp/リリース手順.md) を参照してください。
-
-## Codex / Claude Code へ導入させる
-
-最初に読ませる入口は基本的に次の4つだけです。
-
-1. この `README.md`
-2. [`docs/jp/コンテキスト削減の基本.md`](docs/jp/コンテキスト削減の基本.md)
-3. [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md)
-4. [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
-
-その上で対象repoを shallow inspection し、**全部ではなく効果が高い手法だけ**導入させます。
-
-そのまま使える依頼文は [`docs/jp/導入依頼文.md`](docs/jp/導入依頼文.md) にあります。
-
-## 最小コア
-
-ほぼ全プロジェクトで有効な Core は小さく保ちます。
-
-- 小さい `AI_CONTEXT.md` または同等のAI入口
-- Search first, read second
-- Goal / Required / Acceptance が揃ったら探索停止
-- Source of Truth の明示
-- unrelated refactor を現在タスクへ混ぜない
-- targeted validation
-- 未確認領域を `Unverified` として明示
-- logs / generated artifacts / history を通常コンテキストから除外
-
-小規模repoではここまでで終了して構いません。
-
-## 困りごとから手法を探す
-
-手法名を覚える必要はありません。困っていることに近い入口から候補を探し、対象プロジェクトに必要なものだけ選びます。
-
-- 困りごとに合う手法と詳しい説明: [`docs/jp/手法一覧.md`](docs/jp/手法一覧.md)
-- プロジェクトの規模や特徴に応じた導入判断: [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md)
-
-## 標準フロー
-
-```text
-AI_CONTEXT / existing agent guide
-        ↓
-shallow inspection
-        ↓
-project signals を分類
-        ↓
-current task: Goal / Required / Acceptance
-        ↓
-Search / Index / Routing
-        ↓
-必要十分なら探索停止
-        ↓
-target source / symbols / matching tests
-        ↓
-implementation
-        ↓
-smallest sufficient validation
-        ↓
-compact result + Unverified areas
-```
-
-remote競合があり得る場合は、実装前に compact remote delta を挟みます。
-
-## 文書
-
-日本語文書は [`docs/jp/`](docs/jp/) をSource of Truthとします。英語版は [`docs/en/`](docs/en/) に翻訳として配置し、日英対応は [`docs/DOCUMENT_MAP.json`](docs/DOCUMENT_MAP.json) で管理します。英語入口は [`README.en.md`](README.en.md) です。
-
-導入時に全部読む必要はありません。
-
-- **手法一覧**: [`docs/jp/手法一覧.md`](docs/jp/手法一覧.md) — 各手法を一言で確認し、必要な詳細文書へ移動する目次
-- 基本原則: [`docs/jp/コンテキスト削減の基本.md`](docs/jp/コンテキスト削減の基本.md)
-- 導入判断: [`docs/jp/導入優先度.md`](docs/jp/導入優先度.md)
-- 導入プロンプト: [`docs/jp/導入依頼文.md`](docs/jp/導入依頼文.md)
-- 基本方針: [`docs/jp/基本方針.md`](docs/jp/基本方針.md)
-- 外部ツール掲載基準: [`docs/jp/外部ツール掲載基準.md`](docs/jp/外部ツール掲載基準.md)
-- Release / completion gate: [`docs/jp/リリース手順.md`](docs/jp/リリース手順.md)
-- AI入口テンプレート: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
-- Task用テンプレート: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
-
-個別手法の詳細リンクはREADMEへ列挙せず、[`docs/jp/手法一覧.md`](docs/jp/手法一覧.md) にまとめます。
-
-## 外部プロジェクトとの関係
-
-外部リポジトリや既存プロジェクトの実装から有効な考え方を学ぶことはありますが、AI Context Reducer の標準は特定の参考プロジェクトへ依存しません。
-
-- 有効な手法だけ一般化して取り込む
-- 外部repoを必須依存にしない
-- 特定CLI・ファイル形式・ディレクトリ構成を標準化しない
-- 同じ原則を別実装でも満たせるようにする
-
-外部ツールへ具体的にリンクする場合は、原則として **無料 / 商用利用可能 / 通常利用時のクレジット明示不要 / ポータブルまたは導入容易** の4条件をすべて満たすものだけに限定します。詳細は [`docs/jp/外部ツール掲載基準.md`](docs/jp/外部ツール掲載基準.md) を参照してください。
-
-## 導入しすぎない
-
-このプロジェクトの方針そのものがコンテキスト肥大化を起こしてはいけません。
-
-```text
-expected repeated context saving
-    > adoption + maintenance cost
-```
-
-を満たさない仕組みは追加しません。
-
-小さいrepoには小さい仕組み、大きいrepoには必要なrouting/indexを追加する、という適応型の導入を標準とします。
-
-## License
-
-このリポジトリの内容は、文書・設計・テンプレート・スクリプト・ユーティリティ・ツール類を含め、すべて [MIT License](LICENSE) で提供します。
-
-このリポジトリからリンク・参照している外部プロジェクトや外部コンテンツについては、それぞれの配布元で定められたライセンスに従ってください。
+このリポジトリの内容は[MIT License](LICENSE)で提供します。外部プロジェクトや外部コンテンツは、それぞれの配布元のライセンスに従います。
