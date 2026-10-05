@@ -4,7 +4,7 @@
 
 This document describes how to avoid feeding the full policy set to an AI on every task by selecting only rules relevant to the current work according to strength, scope, and checking method.
 
-The key is to separate explanatory material, mandatory rules, recommendations, exception records, and machine-checkable rules so that the current task can retrieve only what it needs.
+Separate explanatory material, mandatory rules, recommendations, exception records, and machine-checkable rules. The current task can then start with the relevant requirements and check results instead of rereading every rule.
 
 ## 1. Separate explanatory and normative documents
 

@@ -36,7 +36,7 @@ The main content is documentation and templates for guiding work and narrowing t
 
 ## Try it in an existing project
 
-Start with the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and work procedures. Pick one recurring problem and try only the method that addresses it. You do not need to ask an AI to add every method or document at once. After adoption, check whether it is easier to reach the needed code and tests, and whether any necessary checks were missed.
+Start with the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and work procedures. Pick one recurring problem and begin with a method that addresses it. After adoption, check whether it is easier to reach the needed code and tests, and whether any necessary checks were missed.
 
 ## Downloads
 

@@ -4,7 +4,7 @@
 
 Keep a table that lets you go directly from the kind of change to the implementation to read first, the validation to run first, and the detailed documentation to consult only when needed.
 
-The important idea is to reuse existing responsibility boundaries, dependency direction, and source/test relationships as routing sources instead of rediscovering related areas across the whole repository on every change.
+Reuse existing responsibility boundaries, dependency direction, and source/test relationships to find the areas related to a change. This avoids searching the whole repository for the same relationships each time.
 
 ## Purpose
 

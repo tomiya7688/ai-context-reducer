@@ -4,7 +4,7 @@
 
 For text, notices, license guidance, headers, configuration fragments, and other artifacts whose content is mostly repeated, prefer generating them from a canonical template and a small set of variables instead of asking an AI to regenerate and compare the full text every time.
 
-The key is to separate the stable source template from the values that are allowed to change.
+Generate repeated text and settings from an authoritative template and the values allowed to change. This separates editing project-specific values from recreating the same text.
 
 ## Purpose
 
@@ -121,7 +121,7 @@ Even for license generation, the tool should select and expand an approved templ
 
 **Copier** is one strong external option. It can generate project scaffolds from Jinja2-based templates and variables, and it also focuses on lifecycle management for updating existing projects after the template evolves. This makes it useful when canonical templates require long-term maintenance rather than one-time generation.
 
-If simple initial scaffolding is sufficient, Cookiecutter or another mature template generator may be enough. The important point is not the product name: if an existing tool can adequately implement `template + variables -> generated artifact`, do not create a custom generator.
+If a simple initial scaffold is enough, an existing generator such as Cookiecutter may work. When an existing tool can provide `template + variables -> generated artifact`, there is no need to add a custom generator.
 
 Project skeletons, CI configuration, shared README sections, and configuration sets can often be delegated to such tools while AI Context Reducer focuses on the context rule: inspect template version, changed inputs, and validation instead of reading generated output in full.
 

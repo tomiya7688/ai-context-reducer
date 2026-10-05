@@ -4,7 +4,7 @@
 
 This method reuses responsibility boundaries, layers, components, and formal communication paths that already exist in the target project as routing information for narrowing the AI's initial reading scope.
 
-The important point is that it does **not** infer a new architecture or judge whether the project conforms to a particular architecture. Use it only when existing design information is trustworthy.
+When existing design information is trustworthy, use responsibilities and communication paths to choose where to begin. If the project has no such information, there is no need to infer a structure just to create this guide.
 
 ## 1. Purpose
 
