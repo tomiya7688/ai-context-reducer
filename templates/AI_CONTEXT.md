@@ -79,6 +79,7 @@ monorepo / multi-app等でsubsystem固有ルールがある場合。
 - rootの共通ルールをlocal guideへ複製しない。
 - local guideにはそのscope固有のbuild / test / architecture / ownership等の差分だけを書く。
 - 特定の `AGENTS.md` / `CLAUDE.md` 等のファイル名へ依存しない。
+- 対応AIのSkillsを使う場合、繰り返す作業手順はSkillへ置き、ここへ複製しない。使う条件と呼び出し方法は実作業で確かめる。
 
 詳細: `docs/jp/場所ごとに作業ルールを分ける.md`
 

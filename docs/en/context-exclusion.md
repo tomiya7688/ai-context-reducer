@@ -17,7 +17,7 @@ Tests, configuration, specifications, input data, and dependency lists may be ne
 
 ## Tell the AI what to skip
 
-Write the decision in the project guide that the AI reads when starting work. If the project already has an `AGENTS.md`, `CLAUDE.md`, `AI_CONTEXT.md`, or similar guide, add the rule there instead of creating a duplicate. For a project that uses one specific AI tool, use the instruction file that tool reads.
+Write the decision in an instruction file the active AI tool actually reads. If the project already has an `AGENTS.md`, `CLAUDE.md`, `AI_CONTEXT.md`, or similar guide, confirm the tool reads it before adding the rule; do not create a duplicate. Put exclusions that apply to every task in the root guide. If an exclusion belongs only to a repeated workflow, use that workflow’s Skill when supported. File names, locations, and automatic loading vary by tool; see [Hierarchical Context](hierarchical-context.md) for how to check them.
 
 For example, state the normal scope, the paths to skip, and the exceptions:
 
