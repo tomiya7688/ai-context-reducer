@@ -46,6 +46,8 @@ This map lists representative helpers in this repository. For guidance on choosi
 
 First choose a method from the user's problem and decide what result is needed. Use the table to find an optional helper, read its README, and run it only if it is available. Give the AI relevant candidates rather than the full output, then verify selected code and tests. Having a tool does not by itself reduce context.
 
+For example, a small change with an obvious target and test needs only existing search and tests; adding a helper is unnecessary. If a large repository repeatedly requires tracing the same dependencies or tests, try a tool that lists candidates and compare the total time through source verification to see whether it helps.
+
 > I need to investigate [task]. If an available helper supports the method, run it and show only relevant candidates with reasons. Check the selected original sources and tests, then report results and anything not verified.
 
 ## Terminology

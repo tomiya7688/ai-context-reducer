@@ -29,6 +29,12 @@ If the summary conflicts with the implementation or tests, do not treat it as cu
 
 The summary does not replace detailed specifications, change history, priorities, or task-specific completion criteria. Consult their original documents or Issues when the task requires them.
 
+## When to create one, and when not to
+
+A short state summary helps when several tasks repeatedly require someone to rediscover what the project supports and its known limits. For example, an entry saying “CSV import supports UTF-8; dates do not use time zones; Excel is unsupported” lets the AI move to the relevant feature and specification without rereading every old Issue.
+
+Do not create a separate summary for a one-time task if the current README already states the capabilities and limits. If the feature changes too often to keep the summary current, link directly to the current specification or tests instead.
+
 ## Example request to the AI
 
 Attach the summary to a one-time request or link it from project instructions the AI actually reads. Check the AI tool's settings to confirm automatic loading.
