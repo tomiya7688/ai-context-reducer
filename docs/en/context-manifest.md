@@ -1,264 +1,65 @@
-# Context Manifest
+# Reference Catalog (Context Manifest)
 
-> Japanese Source of Truth: [参照先の目録](../jp/参照先の目録.md)
+> Japanese source of truth: [参照先の目録](../jp/参照先の目録.md)
 
-This method keeps a small pointer-based inventory before collecting full candidate information for an AI, then uses that inventory to choose the current task's working set.
+A reference catalog is a **list of where to find commonly used documentation, code, and tests, and what each location is for**. It does not copy or summarize their contents. It makes it easier to find what exists and where to look.
 
-A Context Manifest is neither a specification nor a collection of summaries. It is a routing index for reaching the necessary original sources with little context.
+For example, when asked to fix CSV date conversion, a developer could search the entire repository for `csv` or `date` and compare every result. A catalog can point to the format guide, import code, and related tests instead. The developer opens only the original sources relevant to this task, reducing the amount of unrelated code and outdated material read first.
 
-## 1. What is a Context Manifest?
+## Example: Investigating CSV date conversion
 
-A Context Manifest lists source / tests / docs / tasks / policies that may become relevant to current or future work, focusing on pointers rather than content.
+A catalog might record:
 
-A minimal entry can contain:
+| Location | Role | Use it to check |
+| --- | --- | --- |
+| `docs/csv-format.md` | CSV format guide | Date-column format and compatibility |
+| `src/csv/importer.py` | Import implementation | Where strings are converted to dates |
+| `tests/csv/test_importer.py` | Import tests | Existing inputs and expected results |
 
-~~~text
-pointer
-role / reason
-scope
-optional priority or status
-~~~
+For a report that “CSV dates are shifted,” these three locations are likely starting points. The catalog does not decide the cause. Check the supported format in the guide, the conversion in the code, and current expectations in the tests. There is no need to open unrelated screens or documents for other formats first.
 
-Example:
+## What to record
 
-~~~text
-docs/storage.md        specification      save format
-src/storage/           implementation     persistence
-tests/test_storage.py  validation         persistence
-issue #123             current task       save migration
-~~~
+The location and its purpose are enough. Do not put file contents or detailed requirements for a particular task in the catalog.
 
-Do not copy file contents or long summaries into the manifest.
+```text
+Location                 Role             Use
+docs/csv-format.md       Format guide     Column format and compatibility
+src/csv/importer.py      Import code      Convert strings to values
+tests/csv/               Related tests    Inputs and expected results
+```
 
-## 2. Purpose
+You can create a short list by hand or build it from the existing directory structure or a search tool. The goal is not to account for every file; it is to make recurring references easy to find. If the list becomes hard to scan, split it by feature or show only entries related to the current task.
 
-In a large repository, an AI may otherwise read README files, documentation listings, source trees, test trees, and Issues broadly just to discover what exists.
+## How to use it
 
-A Context Manifest replaces that exploration with a short list of pointers.
+1. Confirm the goal of the task.
+2. Pick likely documentation, code, and test locations from the catalog.
+3. Open those original sources and check what this task needs.
+4. Skip candidates that do not apply. If the catalog is missing a useful location, find it through a normal search and update the catalog when appropriate.
 
-~~~text
-Task
-  -> Context Manifest
-  -> relevant pointers only
-  -> selected working set
-  -> original source / tests / docs
-~~~
+An entry in the catalog does not mean you must read it every time. If a bug fix does not change the supported format, the relevant format guidance may already be clear. If the catalog lacks a source needed for the task, search normally and add the new reference.
 
-The manifest is not intended to contain enough information to complete implementation decisions by itself. Its role ends at deciding **what should be read**.
+## How it differs from other documents
 
-## 3. Keep it pointer-first
+| Document | Role |
+| --- | --- |
+| README / AI guide | Introduces the project and shows where to start |
+| Current State | Describes available capabilities and known constraints |
+| Reference catalog | Shows where recurring documentation, code, and tests live |
+| [Working note](context-pack.md) | Records the sources selected and completion criteria for this task |
+| Original source | Holds the specification, implementation, test, or other evidence |
 
-Store only the minimum information needed to select a working set.
+The catalog lists candidate locations; the working note selects what this task will actually use. To confirm a specification or actual behavior, read the linked original source, not the catalog description. If a catalog entry disagrees with its source, follow the source.
 
-Recommended:
+## When a catalog helps—and when it does not
 
-- path / URL / Issue ID or another pointer
-- role of the information
-- applicable scope
-- short task-relevance or priority hint
-- routing-relevant state such as generated / stale / unavailable
+A catalog helps when the same feature is investigated repeatedly, people keep searching for the same starting points, or its code, specification, and tests are spread across the repository. Gathering these locations once saves repeated discovery work.
 
-Normally do not include:
+For a one-off change with named files, or a task with only a few obvious candidates, creating a catalog takes more effort than writing the references in the request. Create one when the repeated search it avoids costs more than creating and maintaining the list.
 
-- source contents
-- test contents
-- document contents
-- long summaries
-- detailed design explanation
-- full diff / full log
-- copies of constraints already owned by an original source
+## Keep it current
 
-When a decision requires the content, follow the pointer back to the original source.
+Update a location and its description when files move or their roles change. An obsolete entry can send someone looking for a file that no longer exists. Keep the list small enough that a person or process can maintain it.
 
-## 4. Do not replace the Source of Truth
-
-A Context Manifest is derived information.
-
-~~~text
-Source of Truth
-  -> source / tests / formal docs / Issue / policy
-
-Context Manifest
-  -> pointer / routing hint
-~~~
-
-When the manifest conflicts with the original source, the original source wins.
-
-Do not store long-lived specification changes, design decisions, or unfinished requirements only in the manifest. Update the authoritative source and regenerate or minimally update the manifest.
-
-## 5. Relationship with AI_CONTEXT / Current State / Context Pack
-
-Separate responsibilities so similar documents do not duplicate the same information.
-
-### AI_CONTEXT
-
-AI_CONTEXT contains relatively stable **entry points, read order, important constraints, and routing policy** for the repository.
-
-~~~text
-AI_CONTEXT
-  -> where to start / stable routing rules
-~~~
-
-Do not fill it with large candidate-file lists for every task.
-
-### Current State
-
-[Current State](context-state.md) briefly describes **what is currently true**: major available capabilities, constraints, and unimplemented items.
-
-~~~text
-Current State
-  -> what is currently true
-~~~
-
-It is not a file inventory or a task working-set list.
-
-### Context Manifest
-
-A Context Manifest uses pointers to show **what original sources can be selected**.
-
-~~~text
-Context Manifest
-  -> what can be selected
-~~~
-
-It comes before working-set selection and does not duplicate the content.
-
-### Context Pack
-
-[Context Pack](context-pack.md) is the temporary packet containing **the information and completion conditions actually selected for the current task**.
-
-~~~text
-Context Pack
-  -> what this task actually needs
-~~~
-
-The relationship is:
-
-~~~text
-AI_CONTEXT
-  -> stable entry / routing
-
-Current State
-  -> current capability / constraints
-
-Context Manifest (optional)
-  -> bounded candidate pointers
-
-Context Pack
-  -> selected task working set
-
-Original sources
-  -> final evidence / implementation truth
-~~~
-
-Do not maintain the same content in both the Manifest and Context Pack. The Manifest contains candidates; the Context Pack contains what this task actually selected.
-
-## 6. Bounded context
-
-A repository-wide giant file list defeats the purpose of a manifest.
-
-Keep the agent-visible manifest bounded.
-
-- filter by task relevance first
-- return only entries needed for the relevant role / scope
-- cap returned entries
-- make truncation explicit
-- expand only when more candidates are needed
-
-A tool may scan the whole repository internally; limit the output shown to the AI to the references needed for the task.
-
-~~~text
-internal scan may be broad
-agent-visible manifest should be bounded
-~~~
-
-Do not treat size or file type alone as proof that something must be read. Prioritize relevance to the current task.
-
-## 7. Working-set selection
-
-Even when a manifest is used, the final working set is chosen from the task.
-
-~~~text
-Goal / Required / Acceptance
-  -> manifest candidates
-  -> target source
-  -> matching tests
-  -> direct dependencies
-  -> detailed docs only if needed
-~~~
-
-A manifest entry is not by itself a reason to read the file.
-
-When many candidates remain, narrow them further with Task Routing / Change Routing / Responsibility Map / Source Structure Index or similar methods.
-
-## 8. Updates and staleness
-
-A manifest can become older than its original sources.
-
-- regenerate it when needed if generation is available
-- keep manual manifests small
-- update pointers when source moves or responsibilities change
-- stop using an entry for routing once it is known to be stale
-- do not keep appending new summaries to an old manifest
-
-Do not use a manifest as long-term history storage.
-
-## 9. When not to create one
-
-A Context Manifest is often unnecessary when:
-
-- target source / tests / docs are already explicit in the request
-- the repository is small and candidate discovery is trivial
-- the change is local to only a few files
-- the task is one-off and has little reuse value
-- manifest creation costs more than passing direct pointers
-- AI_CONTEXT / Responsibility Map / Change Routing Map already narrows the target sufficiently
-
-For example, "fix this function in this file and update its test" does not need a repository-wide manifest.
-
-Use the method when:
-
-~~~text
-expected repeated routing saving
-    > manifest creation + maintenance cost
-~~~
-
-## 10. Representation
-
-The format is not fixed.
-
-- Markdown
-- JSON
-- line-oriented text
-- database / IDE index
-- generated temporary artifact
-- existing repository metadata
-
-Any representation is valid if it remains pointer-first, bounded, original-source-first, and task-relevance-first.
-
-## 11. Optional implementation
-
-This repository includes `tools/common/large/context-manifest`.
-
-It scans repository files and turns them into bounded JSON containing file path / size / coarse priority.
-
-The tool's priority rules and JSON schema are not the Context Manifest method itself.
-
-- a manual pointer list is valid
-- a project-specific index is valid
-- P0..P4 are routing hints, not absolute importance
-- when task relevance is known, task-specific routing takes priority
-- tool output does not replace original sources
-
-## 12. Standard recommendations
-
-- treat a Context Manifest as a pointer inventory to original sources
-- do not duplicate full content or long summaries
-- keep only the minimum metadata required for working-set selection
-- keep agent-visible output bounded
-- do not replace the Source of Truth
-- separate its role from AI_CONTEXT / Current State / Context Pack
-- do not read something merely because it appears in the manifest
-- do not keep using stale manifests
-- skip dedicated manifests for small repositories or obvious tasks
-- do not make a particular tool or JSON format part of the method
+This repository also has a helper tool for building catalogs, but using it is optional. Its output and ranking are leads for finding candidates; the task itself determines which sources are relevant.
