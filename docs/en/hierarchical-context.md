@@ -1,6 +1,6 @@
 # Put Instructions Near the Work They Govern
 
-> Japanese source of truth: [場所ごとの指示](../jp/場所ごとの指示.md)
+> Japanese source of truth: [場所ごとの指示](../jp/場所ごとに作業ルールを分ける.md)
 
 In a large repository, keep rules shared by the whole project separate from procedures needed by one application. Once you know which file you will change, read the repository-wide guide and the guides that apply to the folder containing that file.
 

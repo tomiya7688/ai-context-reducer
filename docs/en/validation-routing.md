@@ -1,6 +1,6 @@
 # Choose Checks That Match the Change
 
-> Japanese source of truth: [変更内容に応じて検証を選ぶ](../jp/変更内容に応じて検証を選ぶ.md)
+> Japanese source of truth: [変更内容に応じて検証を選ぶ](../jp/変更に合わせて確認方法を選ぶ.md)
 
 To decide whether a change works, use a check that can verify the property you care about. A test can check a calculation, for example, but passing tests alone cannot show that a screen is laid out correctly. Decide what must be verified, then avoid spending time on unrelated checks and logs.
 

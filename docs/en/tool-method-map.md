@@ -1,6 +1,6 @@
 # Map of Methods to Optional Tools
 
-> Japanese Source of Truth: [手法と補助ツールの対応表](../jp/ツールとの対応.md)
+> Japanese Source of Truth: [手法と補助ツールの対応表](../jp/手法と補助ツールの対応表.md)
 
 Every method can be used without a dedicated tool. If you want to automate a recurring task, use this map to find a helper for the purpose. Read the method first; if manual steps or tools already available in your project are sufficient, you do not need to add another tool.
 

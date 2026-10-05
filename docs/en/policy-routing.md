@@ -1,6 +1,6 @@
 # Check the Rules That Apply to This Change
 
-> Japanese Source of Truth: [今回の変更に関係する規則を確認する](../jp/規則の確認先を絞る.md)
+> Japanese Source of Truth: [今回の変更に関係する規則を確認する](../jp/今回の変更に関係する規則を確認する.md)
 
 When development rules are extensive, first find the rules that apply to the current change. Checking the relevant sections and any existing automated checks means you do not have to reread unrelated design or style guidance for every task.
 

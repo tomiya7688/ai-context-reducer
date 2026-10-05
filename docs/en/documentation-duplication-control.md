@@ -1,6 +1,6 @@
 # Keep Repeated Explanations in One Place
 
-> Japanese Source of Truth: [文書の同じ説明を一か所にまとめる](../jp/文書の重複を管理する.md)
+> Japanese Source of Truth: [文書の同じ説明を一か所にまとめる](../jp/文書の同じ説明を一か所にまとめる.md)
 
 When the same instructions appear in the README, setup guide, and AI guidance, readers have more to read and updates can leave the copies out of sync. Put the detailed explanation in one document. In the others, keep a short, purpose-specific note and a link. Readers can then open only what they need, and it is clear where to make updates.
 

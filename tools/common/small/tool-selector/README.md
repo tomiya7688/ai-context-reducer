@@ -2,7 +2,7 @@
 
 Context Reducer tool群の **ordered routing Source of Truth** です。
 
-利用可能なportable fallbackや、未導入の外部backendに依存するtoolを区別します。何をもって追加installを避け、いつ不足を未確認として残すかは[追加インストールを減らしてツールを使う](../../../../docs/jp/追加インストールを減らすツール運用.md)（[English](../../../../docs/en/portable-tools.md)）を参照してください。このselectorはtoolを選ぶだけで、runtimeやbackendをinstallしません。
+利用可能なportable fallbackや、未導入の外部backendに依存するtoolを区別します。何をもって追加installを避け、いつ不足を未確認として残すかは[追加インストールを減らしてツールを使う](../../../../docs/jp/追加インストールを減らしてツールを使う.md)（[English](../../../../docs/en/portable-tools.md)）を参照してください。このselectorはtoolを選ぶだけで、runtimeやbackendをinstallしません。
 
 repository factsから、候補toolを単に列挙するのではなく次の順に並べます。
 

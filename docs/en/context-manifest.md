@@ -1,6 +1,6 @@
 # Reference Catalog (Context Manifest)
 
-> Japanese source of truth: [参照先の目録](../jp/参照先の目録.md)
+> Japanese source of truth: [参照先の目録](../jp/参照先の目録（Context%20Manifest）.md)
 
 A reference catalog is a **list of where to find commonly used documentation, code, and tests, and what each location is for**. It does not copy or summarize their contents. It makes it easier to find what exists and where to look.
 

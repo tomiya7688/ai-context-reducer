@@ -1,6 +1,6 @@
 # context-manifest
 
-Repository filesをagent向けpriority manifestへ圧縮します。manifestはrouting hintであり、原典ファイルの代替ではありません。手法そのものは [`docs/jp/参照先の目録.md`](../../../../docs/jp/参照先の目録.md) を参照してください。
+Repository filesをagent向けpriority manifestへ圧縮します。manifestはrouting hintであり、原典ファイルの代替ではありません。手法そのものは [`docs/jp/参照先の目録（Context%20Manifest）.md`](../../../../docs/jp/参照先の目録（Context%20Manifest）.md) を参照してください。
 
 ## Usage
 

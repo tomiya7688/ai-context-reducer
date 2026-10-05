@@ -1,6 +1,6 @@
 # Use Tools with Fewer Additional Installs
 
-> Japanese Source of Truth: [追加インストールを減らしてツールを使う](../jp/追加インストールを減らすツール運用.md)
+> Japanese Source of Truth: [追加インストールを減らしてツールを使う](../jp/追加インストールを減らしてツールを使う.md)
 
 Do not require users to install a new language environment or development kit just to use a helper tool. Choose from tools that are already available or distributed ready to use, and consider another environment only when those tools cannot perform the necessary check. This avoids preparing a large runtime or researching setup instructions for every task.
 

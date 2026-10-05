@@ -2,7 +2,7 @@
 
 対象repositoryで実際に使われている言語と、現在の環境で利用可能なruntime/compilerを突き合わせ、利用可能なlanguage-specific toolだけを選びます。
 
-追加のruntimeやSDKを利用者へ求めないための判断基準は[追加インストールを減らしてツールを使う](../../../../docs/jp/追加インストールを減らすツール運用.md)（[English](../../../../docs/en/portable-tools.md)）を参照してください。このtoolは環境を調べて利用候補を出すだけで、不足するruntimeやcompilerをinstallしません。
+追加のruntimeやSDKを利用者へ求めないための判断基準は[追加インストールを減らしてツールを使う](../../../../docs/jp/追加インストールを減らしてツールを使う.md)（[English](../../../../docs/en/portable-tools.md)）を参照してください。このtoolは環境を調べて利用候補を出すだけで、不足するruntimeやcompilerをinstallしません。
 
 ```text
 acr-toolbox language-setup .

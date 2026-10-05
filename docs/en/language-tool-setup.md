@@ -1,6 +1,6 @@
 # Choose an Analysis Method for the Language
 
-> Japanese Source of Truth: [言語に合った解析方法を選ぶ](../jp/言語別ツールの選び方.md)
+> Japanese Source of Truth: [言語に合った解析方法を選ぶ](../jp/言語に合った解析方法を選ぶ.md)
 
 Choose analysis depth based on the question. An analyzer may inspect a wide area, but if you give the AI only the needed locations or diagnostics, it does not need to read every source file or full log. Context is reduced by using results to find candidates and passing only the relevant originals, not simply by running an analyzer.
 

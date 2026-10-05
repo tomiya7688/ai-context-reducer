@@ -1,6 +1,6 @@
 # context-budget
 
-Candidate textがagent contextへ入った場合のコストをcompactに見積もります。これは [`Context Priority / Hotspot`](../../../../docs/jp/読む候補の優先度を付ける.md) の補助signalであり、costが高い候補を不要と判定するtoolではありません。
+Candidate textがagent contextへ入った場合のコストをcompactに見積もります。これは [`Context Priority / Hotspot`](../../../../docs/jp/変更に必要なファイルから読む.md) の補助signalであり、costが高い候補を不要と判定するtoolではありません。
 
 出力は自己説明的JSONです。tokenizer exact countではなく、routing用の概算であることを `token_estimate.approximate=true` として明示します。
 
