@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse,fnmatch,json,re,sys
+import argparse,fnmatch,json,os,re,stat,sys
 from pathlib import Path
 
 IGNORE={'.git','.hg','.svn','.venv','venv','node_modules','bin','obj','build','dist','__pycache__','.godot','.idea','.vs','vendor'}
@@ -20,19 +20,45 @@ def suppression(line,rid):
     if tail.startswith(':') and tail[1:].strip(): return tail[1:].strip(),True
     return '',True
 
+# walk_files は走査できたfileと列挙時の失敗を分けて返す。
+def walk_files(root):
+    files=[];errors=[]
+    # onerror はos.walkが列挙を続けられないpathを記録する。
+    def onerror(error):
+        path=Path(error.filename or root)
+        try: path=path.relative_to(root)
+        except ValueError: pass
+        errors.append(path.as_posix())
+    for current,dirs,names in os.walk(root,topdown=True,onerror=onerror):
+        dirs[:]=[name for name in dirs if name.lower() not in IGNORE]
+        for name in names:
+            path=Path(current)/name
+            try:
+                if path.is_file():files.append(path)
+            except OSError:
+                errors.append(path.relative_to(root).as_posix())
+    return files,sorted(set(errors))
+
 # main は選択されたscopeへpolicy rulesを適用し、違反と走査状態を返します。
-def main():
+def main(argv=None):
     ap=argparse.ArgumentParser(description='Lightweight path-scoped policy checker.')
     ap.add_argument('root',nargs='?',default='.')
     ap.add_argument('--rules',required=True)
     ap.add_argument('--max-findings',type=int,default=100)
-    a=ap.parse_args()
+    a=ap.parse_args(argv)
     root=Path(a.root).resolve()
+    try: root_info=root.stat()
+    except FileNotFoundError:
+        print(json.dumps({'tool':'policy-check','status':'input_missing','root_path':str(root),'walk_error_count':0,'walk_error_paths':[]},ensure_ascii=False,indent=2));return 2
+    except OSError as e:
+        print(json.dumps({'tool':'policy-check','status':'input_unavailable','root_path':str(root),'error':str(e),'walk_error_count':0,'walk_error_paths':[]},ensure_ascii=False,indent=2));return 2
+    if not stat.S_ISDIR(root_info.st_mode):
+        print(json.dumps({'tool':'policy-check','status':'input_not_directory','root_path':str(root),'walk_error_count':0,'walk_error_paths':[]},ensure_ascii=False,indent=2));return 2
     try: cfg=json.loads(Path(a.rules).read_text(encoding='utf-8'))
     except Exception as e:
         print(json.dumps({'tool':'policy-check','status':'rules_unavailable','rules_path':a.rules,'error':str(e)},indent=2));return 2
     findings=[];supp=[];bad_supp=[];unsupported=[];rule_errors=[];read_errors=[];files_scanned=0;checked=0
-    files=[p for p in root.rglob('*') if p.is_file() and not any(part.lower() in IGNORE for part in p.parts)]
+    files,walk_errors=walk_files(root)
     for rule in cfg.get('rules',[]):
         rid=rule.get('id',''); forbid=rule.get('forbid',''); require=rule.get('require','')
         sev=rule.get('severity','error');mode=rule.get('mode','literal')
@@ -74,7 +100,7 @@ def main():
     total=len(findings);limit=max(0,a.max_findings);truncated=bool(limit and total>limit)
     errors=sum(x['severity']=='error' for x in findings);warnings=sum(x['severity']=='warning' for x in findings)
     if truncated:findings=findings[:limit]
-    status='violations' if errors else 'partial' if rule_errors or read_errors else 'ok'
-    print(json.dumps({'tool':'policy-check','status':status,'root_path':str(root),'rules_path':a.rules,'rules_total':len(cfg.get('rules',[])),'rules_checked':checked,'files_scanned':files_scanned,'finding_count_total':total,'error_count':errors,'warning_count':warnings,'findings':findings,'findings_truncated':truncated,'suppressions':supp,'invalid_suppressions':bad_supp,'unsupported_rules':unsupported,'rule_errors':rule_errors,'read_error_paths':sorted(set(read_errors))},ensure_ascii=False,indent=2))
-    return 1 if errors else 2 if rule_errors else 0
+    status='violations' if errors else 'partial' if rule_errors or read_errors or walk_errors else 'ok'
+    print(json.dumps({'tool':'policy-check','status':status,'root_path':str(root),'rules_path':a.rules,'rules_total':len(cfg.get('rules',[])),'rules_checked':checked,'files_scanned':files_scanned,'finding_count_total':total,'error_count':errors,'warning_count':warnings,'findings':findings,'findings_truncated':truncated,'suppressions':supp,'invalid_suppressions':bad_supp,'unsupported_rules':unsupported,'rule_errors':rule_errors,'read_error_paths':sorted(set(read_errors)),'walk_error_count':len(walk_errors),'walk_error_paths':walk_errors},ensure_ascii=False,indent=2))
+    return 1 if errors else 2 if rule_errors or read_errors or walk_errors else 0
 if __name__=='__main__':sys.exit(main())
