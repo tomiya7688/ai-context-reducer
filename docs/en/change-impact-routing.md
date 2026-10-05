@@ -1,315 +1,74 @@
-# Change Impact / Test Impact Routing
+# Choose Validation Scope from the Change's Impact
 
-> Japanese Source of Truth: [変更の影響範囲から検証対象を絞る](../jp/変更の影響範囲から検証対象を絞る.md)
+> Japanese source of truth: [変更の影響範囲から検証対象を絞る](../jp/変更の影響範囲から検証対象を絞る.md)
 
-This method narrows the required validation scope from changed files / symbols / packages.
+Use the changed code and the places that depend on it to choose which tests to run first. This avoids having to inspect every unrelated test for every change. Narrowing the scope is not a reason to skip necessary checks: expand to broader tests when a change has wide impact or its impact cannot be established.
 
-> The goal is not to minimize the test count itself. Avoid the full suite and huge logs only while preserving all validation that is needed.
+## Example: Fixing CSV date parsing
 
-Treat existing ideas such as Test Impact Analysis / affected-test selection as lightweight routing that does not depend on a particular CI or coverage product.
-
-## Basic flow
+Suppose you change `src/csv/date_parser.py`, which converts date strings from CSV. Running only the parser's test could miss a problem when it is used by the CSV importer. If the changed file and its existing test mapping are clear, start with:
 
 ```text
-changed files / symbols
-        ↓
-responsibility / dependency / ownership information
-        ↓
-likely affected tests
-        ↓
-smallest sufficient validation
-        ↓
-impact uncertainty / shared contract check
-        ↓
-broader / full validation when needed
+Changed:       src/csv/date_parser.py
+Run first:     tests/csv/test_date_parser.py
+Also check:    tests/csv/test_importer.py
 ```
 
-While `Validation Routing` selects the evidence type from the nature of the change, this method decides **which test scope that evidence should cover**.
+If the change also affects the shared CSV format or a public API, add tests for its consumers and compatibility. If you cannot tell which features use the parser or cannot trace its dependencies completely, expand to the CSV feature's broader test suite. Passing a small test does not prove that wider effects were checked.
 
-## Level 1: Static / Explicit Mapping
+## Find candidate tests
 
-This is the lowest-cost level.
+Start by finding how the changed file or feature maps to tests. Use an existing guide, directory structure, or test naming convention when the relationship is clear. If the project already has a way to show code or package dependencies, add tests for the changed code's consumers and the features that use those consumers.
 
-Example:
+Existing test coverage data can help identify which tests previously executed changed lines. It does not prove that unexecuted paths or indirect effects are unaffected. Do not use coverage as the sole basis for choosing tests.
 
-```text
-src/parser/*      -> tests/parser/*
-src/save/*        -> tests/save/*
-apps/editor/*     -> tests/editor/*
-package metadata  -> build + artifact smoke
-```
+Check an existing map or dependency information against authoritative documentation and current code if it may be stale or incomplete. Search or inspect the code to find missing tests. If the relationship remains uncertain, expand the test scope rather than concluding that there is no impact.
 
-Use source/test naming conventions, directory structure, and existing routing tables.
+## How far to expand
 
-For a small to medium repository, this may be sufficient.
+| Change | Additional checks |
+| --- | --- |
+| Implementation inside one feature | Regression tests for that feature and direct consumers |
+| Shared library or component used by several features | Related tests including consumers; expand to the whole feature when needed |
+| Public API, settings format, or data format | Tests for producers and consumers, plus compatibility checks |
+| Build, dependencies, or distribution settings | Check the built distribution in addition to tests |
+| Dependencies or test mappings are unknown | The related feature's full tests or an even broader suite |
 
-### Candidate inputs
+For public contracts, shared components, or widely used authentication and storage code, include the tests for their users. Do the same when code generation or runtime loading makes it impossible to trace all affected locations statically. If broader checks cannot be run, state what remains unverified in the completion report.
 
-- source ↔ test naming convention
-- Change Routing Map
-- Responsibility Map
-- package / module ownership
-- explicit test command table
+Describe confidence in plain terms: “a test is mapped directly to the changed file,” “consumers were inferred from dependencies,” or “dynamic behavior makes the impact unclear.” A numeric score is unnecessary. In the last case, run broader tests or say what remains unverified.
 
-## Level 2: Dependency / Symbol Based
+## When a test fails
 
-When static mapping is ambiguous, use import / call / dependency / public contract information.
+After a selected test fails, inspect the failure and the change, then expand to directly related consumer tests, feature-wide tests, and the full suite as needed. Do not ignore a failure unless you have established that it is unrelated.
 
-Example:
+A passing initial test is not enough when the change affects shared code, a public contract, or a distribution, or when the impact is unclear. A local change with an explicit target and test mapping does not need a full-suite run by habit. In either case, check that the tests actually cover the change.
 
-```text
-changed symbol
-  -> direct consumers
-  -> tests covering those consumers
-```
+## Record the result
 
-Do not require a huge complete call graph. Reuse an existing Source Structure Index or language-standard tool when it is sufficient.
-
-In this repository, `source-structure-index affected` provides a lightweight fallback that derives the module/package containing a changed file and its transitive dependents from indexed `contains_file` / `depends_on` relationships. The Python and native Go versions use the same `acr-source-structure-index-v1`.
-
-### Bounded output / complete internal closure
-
-Do not stop internal traversal early in a way that creates false negatives.
-
-- Compute the complete internal dependency closure
-- Bound only the affected modules returned to the agent
-- Treat results beyond the return limit as broad impact
-- Fall back to broader validation when the index is truncated, a changed file is outside the index, or ownership is unknown
-
-The agent context is bounded; internal analysis required for correctness is not.
-
-## Level 3: Coverage-assisted
-
-When trustworthy coverage data already exists, it may be used as a supporting signal.
-
-```text
-changed line / symbol
-  -> tests that previously executed it
-  -> targeted test candidates
-```
-
-Coverage shows only paths that were executed. It does not guarantee unmeasured paths or indirect impact.
-
-Therefore:
-
-- Do not use coverage as the only decision source
-- Preserve a broader fallback for public contract / shared core changes
-- Do not force adoption when collecting coverage is itself expensive
-
-A dedicated CI SaaS or custom coverage engine is not required.
-
-## Fallback rules
-
-False negatives are the most dangerous failure in impact analysis.
-
-For the following changes, do not default to completing with targeted tests alone.
-
-### Shared / Core
-
-- common library
-- shared utility
-- cross-package abstraction
-- central parser / serializer
-- cross-cutting infrastructure such as authentication / persistence
-
-→ subsystem-wide or broader tests
-
-### Public Contract / Schema
-
-- public API
-- DTO / schema
-- config format
-- protocol / wire format
-- plugin interface
-
-→ producer + consumer tests, and integration / compatibility tests when needed
-
-### Build / Package / Distribution
-
-- dependency metadata
-- build scripts
-- packaging config
-- generated manifest
-
-→ artifact-level validation in addition to source tests
-
-### Unknown Dependency
-
-- dependency relationships are unavailable
-- dynamic import / reflection / code generation is significant
-- test mapping confidence is low
-
-→ subsystem/full tests or explicit `Unverified`
-
-## When using confidence
-
-A precise numeric score is unnecessary.
-
-Example:
-
-```text
-high:
-  direct file-to-test mapping exists
-
-medium:
-  candidates inferred from dependency relationships
-
-low:
-  dynamic behavior is significant and impact is unclear
-```
-
-Use broader validation for `low`.
-
-## file -> test example
-
-```text
-changed:
-  src/data/save.py
-
-route:
-  tests/data/test_save.py
-  tests/data/test_load_roundtrip.py
-```
-
-If `src/data/schema.py` also changed, expand to broader data tests that include schema consumers.
-
-## symbol -> test example
-
-```text
-changed:
-  Parser.parse_config
-
-route:
-  symbol references
-    -> ConfigLoader
-    -> ProjectLoader
-
-likely tests:
-  test_parser.py
-  test_config_loader.py
-  test_project_loader.py
-```
-
-If reference exploration becomes too large, switch to the package test suite.
-
-## package -> test example
-
-```text
-changed:
-  packages/core/*
-
-route:
-  core unit tests
-  direct downstream integration tests
-```
-
-If core changes a public API, expand to the downstream package as a whole or conformance tests.
-
-## Validation escalation
-
-When the first targeted validation fails, do not immediately expand to an unrelated full suite. Expand according to the failure cause.
-
-```text
-targeted failure
-  -> direct dependency tests
-  -> subsystem tests
-  -> full suite if impact is broad / unclear
-```
-
-Conversely, even when targeted tests pass, do not skip broader validation when a fallback condition applies.
-
-## External tool examples
-
-For projects that already have a build graph / dependency graph, using an existing tool is preferable to building another impact analyzer.
-
-- **Nx / `nx affected`**: calculates changed projects and dependents from Git differences and a project graph, then can run test / build / lint only for affected projects.
-- **Pants / `--changed-since` + `--changed-dependents`**: can include direct / transitive dependents of Git-based changed targets when running tests and similar actions.
-
-When these are already adopted, use their project graph / target graph as the Source of Truth and avoid implementing the same dependency analysis twice. Preserve the broader fallbacks in this document for cases such as dynamic dependencies or public contract changes where the graph alone is insufficient.
-
-## Repository-local fallback
-
-For repositories that do not adopt an external build-graph tool, this repository provides two lightweight fallback stages.
-
-### file -> likely tests
-
-- Python: `tools/python/medium/affected-tests/script/affected_tests.py`
-- Go: `tools/go/medium/affected-tests/`
-
-Supported scope:
-
-- Git changed files / explicit changed files
-- explicit source↔test mapping
-- test candidates from naming conventions
-- broader fallback from broad-impact patterns
-- confidence / fallback reason
-- direct-consumer assistance using `python-import-map` / `go-import-map` compatible JSON
-
-### changed file -> dependent modules/packages
-
-When a reusable structure index exists:
-
-```text
-source-structure-index affected
-acr-toolbox structure-index affected
-```
-
-Supported scope:
-
-- changed file -> containing module/package
-- reverse `depends_on` traversal
-- transitive dependents
-- complete internal closure + bounded agent output
-- broader fallback for index/truncation/mapping uncertainty
-
-This is not a complete replacement for a high-precision project graph. Prefer Nx / Pants or similar tools when already available.
-
-## Relationship to context reduction
-
-The goal is not only test execution time.
-
-- Do not send unnecessary test logs to the AI
-- Keep failure candidates narrow
-- Do not mix unrelated flaky tests into the current task
-- Make the reason for a full-suite run explicit
-
-On success, keep a short record of what and how many things were validated rather than the full logs.
-
-## Signals that favor adoption
-
-- test suite is large / slow
-- monorepo / multiple packages
-- source-to-test relationships are reasonably stable
-- the full suite runs for every small change
-- CI logs are large and consume AI context
-- changed-symbol routing or dependency information already exists
-
-## When adoption is unnecessary
-
-- the test suite is small enough that a full run is cheap
-- source-to-test relationships are simple and obvious
-- impact-mapping maintenance cost exceeds the reduction benefit
-
-A small repository does not need a dedicated impact analyzer.
-
-## Minimal completion report
+Record the checked scope and outcome briefly. A short reason for adding or omitting broader tests is more useful than a large log.
 
 ```text
 Validation:
-- targeted: tests/save (18 passed)
-- broader: data package tests (42 passed; schema changed)
-- artifact: not required
-- unverified: none
+- Targeted: date parser and CSV importer tests (18 passed)
+- Broader: CSV feature tests (42 passed; shared format changed)
+- Unverified: none
 ```
 
-A one-line explanation of why broader validation was added or omitted is sufficient.
+Choosing tests is separate from choosing the type of validation. For checks beyond tests, such as a visual check or a built distribution, see [Choose Validation by Change Type](validation-routing.md).
 
-## Principle
+## When this helps
 
-```text
-correctness / false-negative avoidance
-    > minimal test count
-    > log reduction
-```
+This approach helps when test suites are large or slow, the repository contains multiple applications or packages, or every small change triggers an investigation of the whole test suite. Following a change to its relevant tests also reduces the unrelated results and logs that need to be read.
 
-When impact scope is uncertain, prefer the safer fallback over a higher reduction rate.
+For a small project where all tests finish quickly, running them all is simpler than maintaining a test map or impact-analysis system. Update a map when code or tests move.
+
+## Helper tools
+
+This repository has Python and Go tools that suggest tests from changed files, along with a tool that follows consumers using existing structure information. Their commands, configuration formats, and output fields are documented in their own READMEs.
+
+- [Python affected-tests](../../tools/python/medium/affected-tests/README.md)
+- [Go affected-tests](../../tools/go/medium/affected-tests/README.md)
+- [source-structure-index](../../tools/common/large/source-structure-index/README.md)
+
+If the project already tracks dependencies or build targets, reuse that information. Helper tools find candidates; they do not replace checking those candidates against current code and tests or expanding the scope when the result is uncertain.
