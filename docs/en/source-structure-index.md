@@ -43,7 +43,7 @@ An index helps when people repeatedly search large files for the same functions,
 
 An index only shows relationships the analyzer can detect. It may omit dynamic calls or generated code, and it may be out of date. Check the original code before changing it, and run the broader checks needed for changes to shared code or public specifications. Do not decide impact or safety from index results alone.
 
-This repository's [source-structure-index](../../tools/common/large/source-structure-index/README.md) indexes where functions and types are defined, their callers and dependencies, then returns candidates related to a name or changed file. See its README for details. The same method can use a different index or search tool.
+Treat index results as leads for investigation. Verify candidate definitions and callers in the original source, and use code and tests to make change decisions. The same workflow works with another index or search method.
 
 ## Example request to the AI
 
@@ -51,4 +51,4 @@ This repository's [source-structure-index](../../tools/common/large/source-struc
 
 ## Optional tools and terminology
 
-Use [source-structure-index](../../tools/common/large/source-structure-index/README.md) or an existing language analyzer. Terms: **Source Structure Index** / symbol index.
+The [source-structure-index](../../tools/common/large/source-structure-index/README.md) indexes function and type definitions, callers, and dependencies, then returns candidates related to a name or changed file. It can also reuse results from available language analyzers. Terms: **Source Structure Index** / symbol index.

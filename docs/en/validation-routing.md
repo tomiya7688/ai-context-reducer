@@ -78,4 +78,4 @@ For a small change with obvious target tests, those tests plus the project's nor
 
 ## Optional tools and terminology
 
-Use [validation-plan](../../tools/common/medium/validation-plan/README.md) to suggest checks. Selecting checks based on the change is called **Validation Routing** or targeted validation.
+If useful, [validation-plan](../../tools/common/medium/validation-plan/README.md) suggests initial checks from changed file paths. Choose among them using project-specific test instructions and completion criteria. Selecting checks based on the change is called **Validation Routing** or targeted validation.

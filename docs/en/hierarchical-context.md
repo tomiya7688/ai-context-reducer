@@ -102,7 +102,7 @@ For a small repository where one short root guide leads directly to the relevant
 3. Make it clear which guides apply to a target file.
 4. Try one real task and confirm that the applicable guides explain its constraints and checks.
 
-Helper tools can determine which guides apply to a path. For installation and command details, see the [scoped-guides README](../../tools/common/small/scoped-guides/README.md). The method itself also works by following the guides manually.
+You can also follow the folder path and check applicable guides manually.
 
 ## Example request to the AI
 
@@ -110,4 +110,4 @@ Helper tools can determine which guides apply to a path. For installation and co
 
 ## Optional tools and terminology
 
-Use [scoped-guides](../../tools/common/small/scoped-guides/README.md) to find applicable instructions. Layering guidance by folder is called **Hierarchical Context** or scoped instructions.
+If useful, [scoped-guides](../../tools/common/small/scoped-guides/README.md) finds candidate guides in the target file's parent folders and lists only their paths and reasons. Layering guidance by folder is called **Hierarchical Context** or scoped instructions.

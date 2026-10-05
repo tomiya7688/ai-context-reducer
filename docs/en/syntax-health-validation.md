@@ -28,4 +28,4 @@ For a small change where the normal compiler or tests run quickly, use those dir
 
 ## Optional tools and terminology
 
-Use [syntax-health](../../tools/common/small/syntax-health/README.md) when a compatible parser is already available. This check is called a **Syntax Health Check** or syntax check.
+When a compatible parser is available, [syntax-health](../../tools/common/small/syntax-health/README.md) parses files and reports candidate syntax errors. It does not verify runtime behavior. This check is called a **Syntax Health Check** or syntax check.

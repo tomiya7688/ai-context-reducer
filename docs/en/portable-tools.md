@@ -16,7 +16,7 @@ First decide how much checking the task needs, then choose from the available op
 
 Use an external tool if it is already available. If it is not, check whether a built-in or simpler option is sufficient. If no available method can verify a requirement, record it as unverified. Discuss installation only when an additional environment is truly necessary.
 
-For this repository's tool-selection behavior, commands, file placement, and overwrite rules, see the [`language-setup`](../../tools/common/small/language-setup/README.md), [`materialize-tools`](../../tools/common/small/materialize-tools/README.md), and [`acr-toolbox`](../../tools/common/native/acr-toolbox/README.md) guides.
+If the available environment cannot perform a necessary check, record what is missing before considering another option. Explain the reason and any setup the user would need before requiring an additional environment.
 
 ## Example request to the AI
 
@@ -24,4 +24,4 @@ For this repository's tool-selection behavior, commands, file placement, and ove
 
 ## Optional tools and terminology
 
-[language-setup](../../tools/common/small/language-setup/README.md) checks available analysis; [materialize-tools](../../tools/common/small/materialize-tools/README.md) places portable tools. This approach is called **Portable Tooling** or a no-install fallback. Avoiding installation alone does not reduce context; context is reduced only when the AI receives the needed results instead of irrelevant material.
+If useful, [language-setup](../../tools/common/small/language-setup/README.md) checks project languages and available analysis environments. [materialize-tools](../../tools/common/small/materialize-tools/README.md) places distributed portable tools in the expected location. This approach is called **Portable Tooling** or a no-install fallback. Avoiding installation alone does not reduce context; context is reduced only when the AI receives the needed results instead of irrelevant material.

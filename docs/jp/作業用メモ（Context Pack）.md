@@ -57,4 +57,4 @@ Context Pack は今回の作業のための案内メモで、仕様や履歴の�
 
 ## 補助ツール・用語
 
-必要なら[context-pack-builder](../../tools/common/medium/context-pack-builder/README.md)で草案を作れます。目的・参照先・完了条件を作業ごとにまとめる方法は **Context Pack（作業用メモ）** と呼ばれます。
+必要なら[context-pack-builder](../../tools/common/medium/context-pack-builder/README.md)が依頼資料から、目的・参照先・完了条件をまとめた作業メモの草案を作ります。内容は原典と照らして確認してください。作業ごとに必要事項をまとめる方法は **Context Pack（作業用メモ）** と呼ばれます。

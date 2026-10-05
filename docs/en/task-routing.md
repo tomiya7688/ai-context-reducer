@@ -40,4 +40,4 @@ For a one-time task, name this map in the request. For recurring use, link it fr
 
 ## Optional tools and terminology
 
-Optional [change-router](../../tools/common/medium/change-router/README.md) suggests references from changed files. This method is called **Task Routing**.
+If useful, [change-router](../../tools/common/medium/change-router/README.md) suggests tests and documents to inspect from changed file paths. Check its candidates against project guides and source. This method is called **Task Routing**.

@@ -30,4 +30,4 @@ Small, obvious changes do not need a written checklist or a tracking note. Write
 
 ## Optional tools and terminology
 
-Use [acceptance-extractor](../../tools/common/medium/acceptance-extractor/README.md) to extract questions or completion criteria if useful. The practice of setting needed evidence in advance is called an **Evidence Budget**.
+If useful, [acceptance-extractor](../../tools/common/medium/acceptance-extractor/README.md) extracts goals, requirements, and completion criteria from a task note. Check for omissions against the original request. Setting needed evidence in advance is called an **Evidence Budget**.

@@ -33,4 +33,4 @@ For a one-off task, attach this guide or name its path, then ask the AI to follo
 
 ## Optional tools and terminology
 
-Use [context-budget](../../tools/common/large/context-budget/README.md) or [hotspot-report](../../tools/common/large/hotspot-report/README.md) to see candidate sizes if useful. Size does not determine relevance. This method is called **Context Priority**.
+If useful, [context-budget](../../tools/common/large/context-budget/README.md) estimates candidate sizes, while [hotspot-report](../../tools/common/large/hotspot-report/README.md) lists large or deeply structured files. Both provide leads only; size does not determine relevance. This method is called **Context Priority**.

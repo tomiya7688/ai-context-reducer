@@ -61,4 +61,4 @@ Update the relevant row in the same change when code or tests move or responsibi
 
 ## Optional tools and terminology
 
-Use [change-router](../../tools/common/medium/change-router/README.md) to suggest references from changed files. This method is called a **Change Routing Map**.
+If useful, [change-router](../../tools/common/medium/change-router/README.md) suggests tests and documents to inspect first from changed file paths. This method is called a **Change Routing Map**.
