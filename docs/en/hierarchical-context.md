@@ -1,202 +1,66 @@
-# Hierarchical Context / Scoped AI Instructions
+# Put Instructions Near the Work They Govern
 
-> Japanese Source of Truth: [場所ごとの指示](../jp/場所ごとの指示.md)
+> Japanese source of truth: [場所ごとの指示](../jp/場所ごとの指示.md)
 
-In a large repository, monorepo, or multi-application project, do not put every AI-facing rule in one root document.
+In a large repository, keep rules shared by the whole project separate from procedures needed by one application. Once you know which file you will change, read the repository-wide guide and the guides that apply to the folder containing that file.
 
-> Put shared rules at the root, local rules near the relevant subtree, and read only the additional instructions closest to the current work.
+## Example: Changing a Desktop app setting
 
-This is not a specification for a particular AI product or filename. It is the general principle of **progressive disclosure / nearest relevant instruction**.
-
-## Purpose
-
-Keep the root AI entry point small while still providing accurate access to subsystem-specific build / test / architecture / ownership information.
-
-```text
-repository-wide guide
-        ↓
-current task / target subtree
-        ↓
-nearest relevant local guide
-        ↓
-target source / tests / docs
-```
-
-The goal is to avoid loading rules for unrelated subsystems on every task.
-
-## Responsibilities by scope
-
-### Root / Repository-wide
-
-At the root, keep only information that generally applies across the repository.
-
-- repository purpose
-- Source of Truth
-- shared safety / compatibility rules
-- repository-wide routing entry points
-- policy for locating local guides
-- minimal validation principles shared by the repository
-
-Do not collect subsystem-specific build commands, local design rules, or individual fixtures at the root.
-
-### Subsystem / Local
-
-Near a subsystem, keep only information required inside that subtree.
-
-- package / app-specific build and test commands
-- local architecture constraints
-- local ownership / responsibility map
-- subsystem-specific Source of Truth
-- handling of generated files
-- local validation / smoke tests
-- compatibility constraints
-
-Do not copy the parent document. Record only the **difference**.
-
-### Current Task
-
-In an Issue, Context Pack, or other task artifact, keep only Goal / Required / Acceptance needed for that change. Do not copy long-lived subsystem policy into the task.
-
-## Nearest Relevant Instruction
-
-After the work target is known, inspect only the nearest instructions that apply to the current path / subsystem.
+Suppose you are changing the settings screen in a project that contains both a Desktop app and a Web app. They have different build and test procedures.
 
 ```text
 repo/
-  AI_CONTEXT.md
-  apps/
-    editor/
-      LOCAL_GUIDE.md
-      src/
-    server/
-      LOCAL_GUIDE.md
-      src/
-```
-
-When changing `apps/editor/src/...`, read the shared root rules and the editor subtree guide. Do not read the server guide.
-
-A local guide may be named `AGENTS.md`, `CLAUDE.md`, or any project-specific name. If the agent natively resolves hierarchical instructions, use that capability. Otherwise, follow explicit routing from the root index.
-
-## Precedence
-
-This standard does not define exact instruction precedence for a particular agent.
-
-- local guides must not silently override repository-wide invariants
-- local guides add conditions specific to their scope
-- explicit task requirements define Acceptance for the current work
-- when instructions conflict, return to the Source of Truth rather than guessing
-
-When an agent has its own precedence rules, follow that agent's specification.
-
-## Avoid duplication
-
-Bad:
-
-```text
-root guide: 300 lines
-editor guide: copy root 300 lines + 20 lines
-server guide: copy root 300 lines + 15 lines
-```
-
-Recommended:
-
-```text
-root guide: 50 shared lines
-editor guide: 20 editor-specific lines
-server guide: 15 server-specific lines
-```
-
-Copying the same rule across scopes causes update drift, contradictions, and unnecessary context growth.
-
-## Relationship with Task Routing / Policy Routing
-
-- **Task Routing**: identifies where to read
-- **Policy Routing**: identifies which policies are Required / Recommended / Advisory
-- **Hierarchical Context**: decides where instructions live and which scopes need to be read
-
-Keep these roles separate. Do not turn every local guide into another large routing table.
-
-## Signals that it is useful
-
-- monorepo
-- multiple apps / packages / plugins
-- different build / test procedures per subsystem
-- different design rules per subsystem
-- root AI guide is becoming large
-- unrelated local rules are repeatedly loaded into AI context
-
-## When not to adopt it
-
-For a small repository where a short root AI entry point is enough to reach the main source / tests / docs without confusion, no hierarchical structure is needed.
-
-Do not create local guides mechanically in every directory.
-
-```text
-expected repeated context saving
-    > adoption + maintenance cost
-```
-
-Add only scopes that satisfy this condition.
-
-## Monorepo example
-
-```text
-repo/
-  AI_CONTEXT.md
-  docs/
-    architecture.md
+  AI_CONTEXT.md                 # rules shared by the repository
   apps/
     desktop/
-      AI_CONTEXT.local.md
-      src/
-      tests/
+      AI_CONTEXT.local.md       # build and test steps for Desktop
+      src/settings/              # file being changed
     web/
-      AI_CONTEXT.local.md
+      AI_CONTEXT.local.md       # build and test steps for Web
       src/
-      tests/
-  packages/
-    core/
-      AI_CONTEXT.local.md
-      src/
-      tests/
 ```
 
-Keep only Source of Truth, shared compatibility rules, task routing, and local-guide discovery policy at the root. Put subsystem-specific build, test, smoke, and architecture constraints in the local guide.
+When changing a file under `apps/desktop/src/settings/`, read the repository-wide `AI_CONTEXT.md` and the Desktop guide at `apps/desktop/AI_CONTEXT.local.md`. The Web guide does not apply to this file, so there is no need to read its procedures.
 
-## Minimal adoption example
+For example, the repository-wide guide might say to preserve the saved data format. The Desktop guide might name the command for launching the app and the location of settings-screen tests. Keeping a Web-only build command out of the shared guide means Desktop contributors do not load a procedure unrelated to their task.
 
-When useful, add only this kind of rule to the root AI entry point:
+## Where instructions belong
+
+Put conditions that apply to every part of the repository, along with guidance on finding local instructions, in the root guide. Put an app's build steps or local design constraints in that app's folder. You do not need a guide in every folder; add one only where a distinct rule is repeatedly needed.
+
+In the example, the Desktop guide adds only Desktop-specific conditions instead of copying the full repository guide. When shared guidance changes, this avoids having to update the same text in several places.
+
+## Find the guides that apply to a file
+
+For a task, follow the folder path to the target file and check the guides along the way.
 
 ```text
-## Local Instructions
-Read a local AI guide only when one exists in the target subtree.
-Do not copy parent instructions into a local guide; record only scope-specific differences.
+repo/AI_CONTEXT.md
+  └─ apps/desktop/AI_CONTEXT.local.md
+       └─ apps/desktop/src/settings/config.py
 ```
 
-If a routing map already lists local guides, use it instead of creating another duplicate list.
+For `apps/desktop/src/settings/config.py`, the root guide and the guide in `apps/desktop/` apply. The guide in the neighboring `apps/web/` folder does not. If `apps/desktop/src/settings/` has its own guide, check it for additional rules that apply only to that folder.
 
-## External tool examples
+If an agent cannot load folder-specific guides automatically, the root guide can tell the reader to check guides along the path to the target file. File names and automatic discovery rules vary by tool; check the project's setup instead of assuming defaults.
 
-Hierarchical-instruction features in coding agents are valid implementation examples, but pricing and usage conditions vary by product. Any concrete external product link in this document must satisfy [External Tool Reference Policy](external-tool-reference-policy.md).
+## When instructions conflict
 
-The standard currently remains independent of any specific agent, so no product-specific external-tool links are included.
+The root guide describes repository-wide conditions; a guide in a lower folder adds conditions for that part of the project. For example, if the root guide says to preserve the saved data format, the Desktop guide must not silently cancel that rule. A task request states the current goal and completion criteria, but it does not silently remove long-lived rules.
 
-## Completion conditions
+Instruction precedence can vary between agents and repository policies. If two instructions conflict, do not invent an order and choose one. Check the relevant specification or authoritative source. If the conflict still cannot be resolved, make it explicit before implementation.
 
-- the root AI guide focuses on repository-wide information
-- subsystem-specific information is near the scope that needs it
-- unrelated local guides do not need to be read for the current task
-- parent policies are not repeatedly copied
-- the Source of Truth for each local guide is clear
-- the standard does not depend on a particular agent or filename
+## When this helps
 
-## Portable scoped guide resolver
+This approach helps when apps have different build or test steps, the same rules are reread for each task, or the root guide is growing too long. A contributor can read the instructions for the target folder without loading procedures for unrelated apps.
 
-When an agent cannot resolve hierarchical instructions automatically, a repository-local fallback can be used.
+For a small repository where one short root guide leads directly to the relevant code and tests, local guides are unnecessary. Do not create empty guides for every folder or copy the same rules into multiple guides. Start with the locations that repeatedly need distinct instructions.
 
-```text
-acr-toolbox scoped-guides path/to/target .
-python tools/common/small/scoped-guides/script/scoped_guides.py path/to/target .
-```
+## Introducing folder-specific instructions
 
-The resolver returns only guide candidates on ancestor paths between the repository root and the target. It returns compact JSON with path / scope / reason rather than full guide contents or agent-specific precedence. Candidate filenames can be changed with `--name`.
+1. Identify the rules shared by the repository and put them in the root guide.
+2. Put app-specific procedures and conditions in that app's folder.
+3. Make it clear which guides apply to a target file.
+4. Try one real task and confirm that the applicable guides explain its constraints and checks.
+
+Helper tools can determine which guides apply to a path. For installation and command details, see the [scoped-guides README](../../tools/common/small/scoped-guides/README.md). The method itself also works by following the guides manually.
