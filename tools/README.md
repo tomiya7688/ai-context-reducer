@@ -144,6 +144,8 @@ profiles       optional project-type / routing input
 
 The method guides explain what to do and when. This README and each tool README explain implementation details. Keep the complete method-to-tool correspondence in the [method and tool map](../docs/jp/ツールとの対応.md) rather than maintaining a second routing list here.
 
+When you want to avoid asking users to install another runtime or SDK, start with [追加インストールを減らしてツールを使う](../docs/jp/追加インストールを減らすツール運用.md) ([English](../docs/en/portable-tools.md)). It explains how to choose among an already available runtime, a prebuilt native tool, and an available fallback. [language-setup](common/small/language-setup/README.md) reports which analyzers are usable without installing missing dependencies; [materialize-tools](common/small/materialize-tools/README.md) copies selected portable tools into a destination without installing a runtime. [tool-selector](common/small/tool-selector/README.md) also marks tools whose required backend is unavailable.
+
 The main command groups are repository inspection, search and slicing, language analysis, task and validation routing, context preparation, and template generation. See the command index below or the native toolbox guide for available commands.
 
 `tool-selector` は候補を `orient -> search -> scope -> inspect -> validate -> stop` の順で返します。各entryは `phase / activation / availability / reason` を持ち、external backendが必要なtoolは利用可能性もrouting時点で反映します。
