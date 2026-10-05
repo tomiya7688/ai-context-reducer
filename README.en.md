@@ -8,6 +8,16 @@ For example, when fixing an error message for a settings file, giving an AI the 
 
 Instructions, explanations, source code, and test results provided to an AI for a task are called its **context** here. This repository describes ways to keep the evidence needed for a task while reducing information that is unlikely to help.
 
+## Where to start
+
+Choose the path that matches your goal. You do not need to read every document.
+
+1. **Learn the methods**: Read [Context Reduction Basics](docs/en/context-reduction-basics.md) for the overview, then choose one relevant guide from the [Method Index](docs/en/method-index.md). For a first code change, start with [Context Priority](docs/en/context-priority.md).
+2. **Apply them to your project**: Use [Adoption Priority](docs/en/adoption-priority.md) to choose a recurring problem, then use the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and procedures. Link only the methods you decide to reuse from [AI_CONTEXT.md](templates/AI_CONTEXT.md), if useful.
+3. **Use a helper tool**: Choose a method first, then follow the [method-to-tool map](docs/en/tool-method-map.md) to a tool guide only if automation would help. Tools are optional.
+
+To use a method, attach its guide to the request or tell the AI its path. It may not load the guide automatically; for recurring use, register it in instructions or settings that your AI tool actually reads.
+
 ## Three ways to narrow the information
 
 ### 1. Use a program to find mechanical facts first
@@ -36,7 +46,7 @@ The main content is documentation and templates for guiding work and narrowing t
 
 ## Try it in an existing project
 
-Start with the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and work procedures. Pick one recurring problem and begin with a method that addresses it. After adoption, check whether it is easier to reach the needed code and tests, and whether any necessary checks were missed.
+Start with [Adoption Priority](docs/en/adoption-priority.md) to pick one recurring problem, then use the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and work procedures. After adoption, check whether it is easier to reach the needed code and tests, and whether any necessary checks were missed.
 
 ## Tell the AI to use a method
 
