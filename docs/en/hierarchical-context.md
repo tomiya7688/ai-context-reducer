@@ -10,17 +10,17 @@ Suppose you are changing the settings screen in a project that contains both a D
 
 ```text
 repo/
-  AI_CONTEXT.md                 # rules shared by the repository
+  AGENTS.md                     # shared rules and pointers
   apps/
     desktop/
-      AI_CONTEXT.local.md       # build and test steps for Desktop
+      AGENTS.md                 # Desktop-specific build and test steps
       src/settings/              # file being changed
     web/
-      AI_CONTEXT.local.md       # build and test steps for Web
+      AGENTS.md                 # Web-specific build and test steps
       src/
 ```
 
-When changing a file under `apps/desktop/src/settings/`, read the repository-wide `AI_CONTEXT.md` and the Desktop guide at `apps/desktop/AI_CONTEXT.local.md`. The Web guide does not apply to this file, so there is no need to read its procedures.
+When changing a file under `apps/desktop/src/settings/`, read the repository-wide `AGENTS.md` and the Desktop guide at `apps/desktop/AGENTS.md`. The Web guide does not apply to this file, so there is no need to read its procedures.
 
 For example, the repository-wide guide might say to preserve the saved data format. The Desktop guide might name the command for launching the app and the location of settings-screen tests. Keeping a Web-only build command out of the shared guide means Desktop contributors do not load a procedure unrelated to their task.
 
@@ -30,13 +30,52 @@ Put conditions that apply to every part of the repository, along with guidance o
 
 In the example, the Desktop guide adds only Desktop-specific conditions instead of copying the full repository guide. When shared guidance changes, this avoids having to update the same text in several places.
 
+## Start with a short AGENTS.md
+
+If your AI tool reads `AGENTS.md`, begin with one at the repository root. Keep only rules that apply to every task and pointers to the next guide. `AGENTS.md` is not a universal file that every AI tool loads automatically. Check which file names the active tool recognizes and whether it reads files in nested folders. If the project already has a recognized guide such as `CLAUDE.md`, update it instead of adding a duplicate.
+
+A small root file might contain:
+
+```markdown
+# AGENTS.md
+- Before editing, identify the behavior, specification, and matching tests.
+- For changes under `apps/desktop/`, also read that folder's AGENTS.md.
+- Follow links to the original specification and command details when relevant.
+```
+
+Keep command catalogs, design explanations, and notes for every feature out of the root guide. Link to them under a clear condition, so the next file to open is still obvious.
+
+## Use Skills for repeated task workflows
+
+If the AI tool supports Skills, use one for a repeated workflow such as changing an API or preparing a release. Keep rules needed for every task in the root `AGENTS.md`; put in each Skill when to use it, the inspection order, checks to run, and what to report at completion. Skill formats, locations, and invocation differ by tool, so follow the active tool's conventions.
+
+A Skill should state when to use it and what steps to follow. Use the format required by the AI tool.
+
+```markdown
+# api-change-review
+Use when: changing API inputs, outputs, or compatibility
+1. Find the endpoint and its consumers.
+2. Check contract tests and run tests for the change.
+3. Report inspected paths, results, and consumers not verified.
+```
+
+If the Skill is not selected automatically, say “Use the api-change-review Skill” in the request. If the AI tool has no Skills feature, put the same steps in a short Markdown guide and give the AI its path.
+
+## Keep guidance small and make sure it works
+
+- Start with one recurring task. Do not add a guide just because the format exists.
+- Write each rule as **when to use it → what to open or do → how to check the result**. Replace vague rules such as “be careful” with a concrete action, or remove them.
+- Put shared rules at the root, folder-specific steps in a nested guide, and task workflows in Skills. Link to detailed sources instead of copying the same explanation.
+- Try one real task. Check that the AI selects the expected guide or Skill and reaches the needed code and tests. If the tool shows loaded files, inspect that record; otherwise compare the reported paths, actual diff, and check results with the instructions. A claim that a file loaded is not proof by itself.
+- Update paths and commands when the code or tests move. Remove rules that are unused, duplicated, or no longer true.
+
 ## Find the guides that apply to a file
 
 For a task, follow the folder path to the target file and check the guides along the way.
 
 ```text
-repo/AI_CONTEXT.md
-  └─ apps/desktop/AI_CONTEXT.local.md
+repo/AGENTS.md
+  └─ apps/desktop/AGENTS.md
        └─ apps/desktop/src/settings/config.py
 ```
 

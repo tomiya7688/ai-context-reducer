@@ -4,7 +4,6 @@
 
 This index helps project users choose a method for avoiding repeated searches. The user prepares a guide, list, or check that fits the problem, then tells the AI where it is and how to use it. An AI does not necessarily read project documents automatically. For recurring use, confirm that the guide is registered in an instruction file or setting the AI tool actually loads.
 
-
 ## Choose a guide for your problem
 
 Choose the row closest to your current problem, then read one linked guide. You do not need to read every entry in order.
@@ -50,7 +49,7 @@ At completion, ask for the files consulted, checks run and their results, and an
 | [Change Routing Map](change-routing-map.md) | Map change types such as settings or API changes to places to inspect | You can follow the likely effects from what changed |
 | [Architecture Boundary Routing](architecture-boundary-routing.md) | Start from component responsibilities and communication paths already defined in the project | You do not need to read unrelated code to find the boundary of the affected feature |
 | [Responsibility Map](responsibility-map.md) | Record what each file or module is responsible for | You do not need to open source files and guess their role from their names |
-| [Hierarchical Context](hierarchical-context.md) | Put instructions needed in one location beside that location | You do not need to read detailed instructions for unrelated parts of the repository |
+| [Hierarchical Context](hierarchical-context.md) | Keep root AGENTS.md short, put folder-specific rules nearby, and use Skills for task workflows when supported | Shared rules stay brief; location- or task-specific steps are loaded only when needed |
 | [Remote Delta First](remote-context.md) | First inspect what changed remotely since the last known state | You can avoid rereading files that have not changed |
 
 ### Retrieve only the relevant parts of large material
@@ -85,6 +84,5 @@ At completion, ask for the files consulted, checks run and their results, and an
 | [Policy Routing](policy-routing.md) | Separate rules a machine can check from rules that need human judgment | You can inspect machine results and the relevant rules instead of reading every rule description |
 | [Documentation Duplication Control](documentation-duplication-control.md) | Keep details in one authoritative document and link to it from other documents | You spend less time comparing duplicate explanations and checking whether they disagree |
 | [Boilerplate Generation](boilerplate-generation.md) | Generate standard content such as license notices from canonical data | You do not need to reread examples and instructions to recreate text in the same format |
-
 
 See [Adoption Priority](adoption-priority.md) to decide what to adopt first. Every method works without a dedicated tool. Only if you want to automate repeated searches or steps, choose an optional helper from the [method-to-tool map](tool-method-map.md) and check its README for instructions. These practices may be called context routing or context engineering, but first decide what the user prepares and what the AI receives.

@@ -33,7 +33,7 @@ For many projects, a small guide is enough. It should point to:
 - The checks needed after a change
 - A way to report areas that have not been checked
 
-If the project already has a guide such as `AGENTS.md`, improve it instead of adding a second guide with the same role. Link to detailed rules and specifications rather than copying them. [Basic Policy](guide.md) and [Context Reduction Basics](context-reduction-basics.md) explain how to use an entry point and narrow the material to read.
+If the project already has a guide such as `AGENTS.md`, improve it instead of adding a second guide with the same role. When the AI tool supports Skills, put repeated task workflows there rather than loading every procedure for every task. Link to detailed rules and specifications rather than copying them. [Basic Policy](guide.md) and [Context Reduction Basics](context-reduction-basics.md) explain how to use an entry point and narrow the material to read.
 
 ### 3. Choose one method that matches the problem
 
