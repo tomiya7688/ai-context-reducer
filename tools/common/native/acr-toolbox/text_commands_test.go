@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// captureSliceOutput はslice subcommandのstdoutを捕捉して終了codeとともに返します。
 func captureSliceOutput(t *testing.T, args ...string) (int, string) {
 	t.Helper()
 	previous := os.Stdout
