@@ -187,6 +187,25 @@ Git history health        -> git-history-health
 
 UPD Commanderを含む外部設計手法は、tools内部の責務分離や実装構造の参考にできますが、ai-context-reducerの機能要件・適合条件・標準architectureにはしません。
 
+## External integration boundaries
+
+External programs are optional dependencies. This table records which functions the repository reuses, what portable fallback it provides, and which advanced implementations it intentionally delegates. It is a maintenance reference for `tools/`, not a list of product recommendations; see [External Tool Reference Policy](../docs/jp/外部ツール掲載基準.md) before adding a product link to public method documentation.
+
+| Capability | External example | Repository-local fallback | Delegated / unsupported |
+|---|---|---|---|
+| Fast text search | ripgrep | `acr-toolbox search` | full ripgrep-compatible CLI / all optimizations |
+| File discovery | fd | `acr-toolbox find` | full fd-compatible filters / UX |
+| Syntax / structural search | ast-grep | `structural-search` (Python AST fallback) | multi-language AST rule engine / rewrite engine |
+| Affected test routing | Nx / Pants | `affected-tests`, `structure-index affected` | full build-graph / coverage engine |
+| Scoped AI instructions | agent-native scoped instructions | `scoped-guides` | reproduction of agent-specific precedence |
+| Policy checking | ast-grep / Semgrep, etc. | `policy-check` | AST / dataflow / taint / semantic rule engine |
+| Canonical templates | Copier / Cookiecutter | `template` | Jinja2 compatibility / Copier update algorithm |
+| Source / semantic index | SCIP / Universal Ctags | `structure-index` adapters + portable language analyzers | full SCIP compiler / indexer reimplementation |
+| Syntax health | Tree-sitter | existing Tree-sitter integration when available | automatic grammar / runtime installation |
+| Git repository health | git-sizer | `git-history-health` adapter / fallback routing | full Git object analyzer reimplementation |
+
+Use an available high-quality external backend when it is justified; otherwise use the repository fallback. If a task needs a delegated feature, report that dependency or limitation rather than silently treating an approximate fallback as equivalent.
+
 ## Core rules
 
 - full source / logs / docsをagentへ再出力しない
