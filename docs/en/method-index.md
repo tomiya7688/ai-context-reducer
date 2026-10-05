@@ -4,6 +4,27 @@
 
 This index helps project users choose a method for avoiding repeated searches. The user prepares a guide, list, or check that fits the problem, then tells the AI where it is and how to use it. An AI does not necessarily read project documents automatically. For recurring use, confirm that the guide is registered in an instruction file or setting the AI tool actually loads.
 
+
+## Choose a guide for your problem
+
+Choose the row closest to your current problem, then read one linked guide. You do not need to read every entry in order.
+
+- Unsure where to look each time: [Task Routing](task-routing.md), [Change Routing Map](change-routing-map.md)
+- Unsure what should change or how to tell when it is complete: [Set Design and Completion Criteria First](design-and-completion-criteria.md)
+- Unsure which parts of a large source file are relevant: [Context Priority](context-priority.md), [Source Structure Index](source-structure-index.md)
+- Unsure how deeply to analyze or what check is needed: [Language-specific Analysis](language-tool-setup.md)
+- Continuing to investigate after enough evidence is available: [Exploration Control](exploration-control.md), [Evidence Budget](evidence-budget.md)
+- Searching for tests from scratch after each change: [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md)
+- Rereading long rules or duplicate explanations: [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md)
+
+### For your first code change
+
+Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
+
+### To adopt methods in your project
+
+Read [Adoption Priority](adoption-priority.md) and choose a method for a recurring problem.
+
 ## Example: searching the repository for every settings change
 
 Suppose each small settings change makes you search for which explanation, code, and tests to inspect.
@@ -65,14 +86,5 @@ At completion, ask for the files consulted, checks run and their results, and an
 | [Documentation Duplication Control](documentation-duplication-control.md) | Keep details in one authoritative document and link to it from other documents | You spend less time comparing duplicate explanations and checking whether they disagree |
 | [Boilerplate Generation](boilerplate-generation.md) | Generate standard content such as license notices from canonical data | You do not need to reread examples and instructions to recreate text in the same format |
 
-## Choose by the problem
-
-- Unsure where to look each time: [Task Routing](task-routing.md), [Change Routing Map](change-routing-map.md)
-- Unsure what should change or how to tell when it is complete: [Set Design and Completion Criteria First](design-and-completion-criteria.md)
-- Unsure which parts of a large source file are relevant: [Context Priority](context-priority.md), [Source Structure Index](source-structure-index.md)
-- Unsure how deeply to analyze or what check is needed: [Language-specific Analysis](language-tool-setup.md)
-- Continuing to investigate after enough evidence is available: [Exploration Control](exploration-control.md), [Evidence Budget](evidence-budget.md)
-- Searching for tests from scratch after each change: [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md)
-- Rereading long rules or duplicate explanations: [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md)
 
 See [Adoption Priority](adoption-priority.md) to decide what to adopt first. Every method works without a dedicated tool. Only if you want to automate repeated searches or steps, choose an optional helper from the [method-to-tool map](tool-method-map.md) and check its README for instructions. These practices may be called context routing or context engineering, but first decide what the user prepares and what the AI receives.
