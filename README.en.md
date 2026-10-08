@@ -6,9 +6,9 @@ This project helps people using AI choose the code and documents to provide for 
 
 - **Method guides** — ways to decide what the AI should read and how far it should investigate, with example requests.
 - **Templates** — documents for writing project rules, project information, and notes for the current task.
-- **Helper tools** — programs for finding related files, code, and tests.
+- **Helper tools** — programs that help with file searches, task note generation, rule checks, and test selection.
 
-You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort finding files or investigating code. The information an AI refers to when answering or working is called its **context**.
+You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
 
 ## Give an AI the information it needs to do the work
 
