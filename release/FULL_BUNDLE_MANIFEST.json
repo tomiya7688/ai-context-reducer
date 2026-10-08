@@ -702,6 +702,16 @@
       "source": "templates/CONTEXT_PACK.md",
       "bundle_path": "templates/CONTEXT_PACK.md",
       "kind": "template"
+    },
+    {
+      "source": "templates/WRITING_GUIDE.md",
+      "bundle_path": "templates/WRITING_GUIDE.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/WRITING_GUIDE.en.md",
+      "bundle_path": "templates/WRITING_GUIDE.en.md",
+      "kind": "template"
     }
   ],
   "documentation_trees": [
