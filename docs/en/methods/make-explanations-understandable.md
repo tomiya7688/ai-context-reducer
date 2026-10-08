@@ -55,7 +55,9 @@ If an object name or condition appears only in earlier conversation, include it 
 
 ## 3. Have the AI verify whether suspected gaps are actually missing
 
-First ask the AI to list questions a first-time reader might ask. Then have it check whether the text or referenced material already answers them.
+First ask the AI to list questions a first-time reader might ask. Then have it check whether the text, or a reference linked from it that the reader can access, answers them.
+
+An answer found only in a specification supplied to the AI still leaves the reader's explanation incomplete. Use that specification to verify the answer, then add it to the text or link to a reference the reader can access. Put essential steps and success indicators with the relevant instructions.
 
 For example, it might ask “Where can I tell that saving succeeded?” If the next paragraph already says “The app displays ‘Saved’ when saving completes,” no additional explanation is needed. If that answer is too far from the relevant instruction to find easily, moving it closer is another option.
 
@@ -125,7 +127,9 @@ Prior knowledge: [what they know and what needs explaining]
 Purpose: [what they should understand, decide, or do]
 Sources: [specifications, observed operation results, etc.]
 
-First list questions the reader might ask, then check whether the text or references answer them.
+First list questions the reader might ask, then check whether the text answers them.
+If a reference linked from the text answers a question, also check that the reader can access it.
+If the answer exists only in supporting material, verify it and add it to the reader-facing text.
 Revise only sentences or paragraphs with confirmed gaps. Do not invent unsupported actions or conditions.
 Return the revised text and briefly list changed locations, reasons, and questions still needing confirmation.
 ```
