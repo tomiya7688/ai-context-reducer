@@ -2,11 +2,17 @@
 
 English | [日本語](README.md)
 
+This project helps people using AI choose the code and documents to provide for a task. It includes three kinds of resources:
+
+- **Method guides** — ways to decide what the AI should read and how far it should investigate, with example requests.
+- **Templates** — documents for writing project rules, project information, and notes for the current task.
+- **Helper tools** — programs that help with file searches, task note generation, rule checks, and test selection.
+
+You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
+
 ## Give an AI the information it needs to do the work
 
 For example, when fixing an error message for a settings file, giving an AI the whole project makes it search through unrelated code such as screens and logs. If you first find the settings loader and its related tests, then provide the relevant parts, you reduce search time and the amount the AI needs to read.
-
-Instructions, explanations, source code, and test results provided to an AI for a task are called its **context** here. This repository describes ways to keep the evidence needed for a task while reducing information that is unlikely to help.
 
 ## Where to start
 
