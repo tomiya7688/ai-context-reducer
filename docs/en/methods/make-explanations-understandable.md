@@ -71,6 +71,53 @@ Ask it to identify the location, why the reader would have difficulty, and the s
 
 Finally, have it reread from the specified reader's perspective and check that the information needed for the intended action or decision is present. For instructions, having a person try the steps also helps. An AI reporting that a text is clearer does not establish that actual users understood it.
 
+## Usually, have the authoring AI do a brief check
+
+Normally, ask the AI that wrote the explanation to perform the four steps above. After finding possible gaps, have it check the text and references available to the reader, then revise only locations with confirmed missing information.
+
+When requesting a check report, have it report only problematic locations, for example:
+
+```text
+“The settings are checked”: It is unclear whether the user or app checks them.
+Revised to “At startup, the app checks the settings file,” based on the startup specification.
+“Where to choose the destination”: Neither the text nor linked references explain it,
+and supporting material does not establish it.
+Question: Which screen lets the user choose the destination?
+```
+
+Do not request a pass/fail result for every item in every sentence or repeat the whole text in the check log. Leave understandable passages unchanged.
+
+Specify one of these output modes in the request:
+
+- **To inspect findings**: Return only problematic locations, reasons, proposed revisions, and questions needing confirmation. Do not duplicate the full text or the same findings in another format.
+- **To receive finished text**: Omit the long check log and return the complete revised text. Include unchanged parts; do not abbreviate the requested deliverable. If missing evidence prevents completion, also return the necessary questions briefly.
+
+## For important explanations, use a separate conversation as a reader check
+
+Checking outside the authoring conversation can expose assumptions known only to the writer when any of these conditions applies:
+
+- Publishing setup or operating instructions for first-time users.
+- Readers repeatedly ask follow-up questions about the same explanation.
+- The writer and reader have substantially different prior knowledge.
+- A misunderstanding could lead to an implementation or operating mistake.
+
+Open a new conversation and provide the reader, prior knowledge, purpose, and completed explanation. Provide references only when the intended reader can access them. Do not supply the writer's earlier conversation or internal specifications unavailable to the reader. Ask:
+
+```text
+Reader: [intended reader]
+Prior knowledge: [what they know]
+Purpose: [what they should be able to do]
+
+Read only the following explanation and references linked from it that the reader can access.
+Return locations and questions about additional information needed to achieve the purpose.
+Do not guess answers or rewrite the whole explanation.
+[completed explanation]
+```
+
+Give the returned questions to the authoring AI. Discard questions already answered in the text, verify actual gaps against supporting material, and revise only those locations. Keep questions without evidence for the requester to answer.
+
+This is an additional check of reader understanding. Reading the text again in another conversation adds input and output. Start with the usual check for short internal notes or explanations whose readers share the required knowledge. Another AI understanding the text does not establish that people can follow the operations.
+
 ## Six examples of revisions
 
 ### 1. The reference of “this” is unclear
@@ -117,26 +164,21 @@ The instruction to the user and the app's behavior are separate, without repeati
 
 ## Use it for one request
 
-Attach this guide to the AI request, or save it somewhere the AI can read and specify its path. Also provide the text to revise, the intended reader, and supporting material.
+Attach the [brief checking procedure template](../../../templates/WRITING_GUIDE.en.md), or save it where the AI can read it and specify its path. Fill in the current request's conditions:
 
 ```text
-Follow [this method guide's path or attached guide] to check this explanation.
+Check the explanation using the attached procedure (or [saved procedure path]).
 Target: [text or document path]
 Reader: [intended reader]
 Prior knowledge: [what they know and what needs explaining]
 Purpose: [what they should understand, decide, or do]
 Sources: [specifications, observed operation results, etc.]
-
-First list questions the reader might ask, then check whether the text answers them.
-If a reference linked from the text answers a question, also check that the reader can access it.
-If the answer exists only in supporting material, verify it and add it to the reader-facing text.
-Revise only sentences or paragraphs with confirmed gaps. Do not invent unsupported actions or conditions.
-Return the revised text and briefly list changed locations, reasons, and questions still needing confirmation.
+Output: [findings only / complete revised text]
 ```
 
 ## Where to keep it for repeated use
 
-Save shared reader assumptions, explanation checks, and revision steps briefly in your project's `docs/writing-guide.md`. If readers vary by document, specify the reader and purpose at the start of the document or in the current request.
+Copy the [template](../../../templates/WRITING_GUIDE.en.md) to your project's `docs/writing-guide.md`, and add shared reader assumptions if applicable. If readers vary by document, specify the reader and purpose at the start of the document or in the current request.
 
 In an instruction file your AI tool loads automatically, state when to use the guide and where it is. For an AI tool that supports `AGENTS.md`, for example, put this in the repository-root file:
 
@@ -163,6 +205,10 @@ Choi and colleagues use **decontextualization** to describe rewriting a sentence
 
 This guide draws on that idea to check missing names and conditions, and combines it with specifying readers, verifying suspected gaps, and revising only problematic passages. That paper does not evaluate these example requests or measure their effect on token usage across a conversation.
 
+The idea of another reader receiving an explanation and continuing the task is also related to [West and colleagues' paper](https://aclanthology.org/2026.eacl-long.386/). [2] Their **tandem training** intermittently hands generation to a weaker model while training a stronger one, encouraging solutions the weaker partner can continue correctly. This guide's separate-conversation reader check draws on that perspective; it does not implement the training method.
+
 ## References
 
 1. Eunsol Choi, Jennimaria Palomaki, Matthew Lamm, Tom Kwiatkowski, Dipanjan Das, Michael Collins. 2021. [Decontextualization: Making Sentences Stand-Alone](https://aclanthology.org/2021.tacl-1.27/). *Transactions of the Association for Computational Linguistics*, 9:447–461. DOI: [10.1162/tacl_a_00377](https://doi.org/10.1162/tacl_a_00377).
+
+2. Robert West, Ashton Anderson, Ece Kamar, Eric Horvitz. 2026. [Tandem Training for Language Models](https://aclanthology.org/2026.eacl-long.386/). *Proceedings of the 19th Conference of the European Chapter of the Association for Computational Linguistics (Volume 1: Long Papers)*, 8265–8278. DOI: [10.18653/v1/2026.eacl-long.386](https://doi.org/10.18653/v1/2026.eacl-long.386).
