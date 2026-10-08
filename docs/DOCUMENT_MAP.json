@@ -219,6 +219,12 @@
       "japanese": "docs/jp/導入/AIに渡す資料を選ぶ道具を試す.md",
       "english": "docs/en/adoption/getting-started.md",
       "english_status": "translated"
+    },
+    {
+      "id": "reader-friendly-explanation",
+      "japanese": "docs/jp/手法/読者が理解できる説明に直す.md",
+      "english": "docs/en/methods/make-explanations-understandable.md",
+      "english_status": "translated"
     }
   ]
 }
