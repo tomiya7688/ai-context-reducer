@@ -15,6 +15,7 @@ Choose the row closest to your current problem, then read one linked guide. You 
 - Continuing to investigate after enough evidence is available: [Exploration Control](exploration-control.md), [Evidence Budget](evidence-budget.md)
 - Searching for tests from scratch after each change: [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md)
 - Rereading long rules or duplicate explanations: [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md)
+- Repeatedly asking who does what or what to do after reading an AI explanation: [Make explanations understandable to their readers](methods/make-explanations-understandable.md)
 
 ### For your first code change
 
