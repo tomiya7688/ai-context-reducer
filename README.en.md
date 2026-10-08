@@ -10,9 +10,24 @@ This project helps people using AI choose the code and documents to provide for 
 
 You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
 
-## Give an AI the information it needs to do the work
+## Example: Fix a saved setting that disappears after a restart
 
-For example, when fixing an error message for a settings file, giving an AI the whole project makes it search through unrelated code such as screens and logs. If you first find the settings loader and its related tests, then provide the relevant parts, you reduce search time and the amount the AI needs to read.
+This is an illustrative example using a fictional app. Suppose you save a setting in the app's settings screen, but it resets when the app restarts.
+
+```text
+Ask the AI to read broadly
+  Give it the whole project and ask it to investigate the cause
+  → It also reads screen and feature code unrelated to settings
+
+Limit what you ask the AI to read
+  Ask it to search for the setting save code, startup loading code, and related tests
+  → Have it read the relevant code, setting requirements, and tests
+  → If another operation turns out to be involved, have it check that part too
+```
+
+Both approaches have the same goal: fix the app so the saved setting survives a restart. After the fix, save the same setting, restart the app, and check that it is retained.
+
+Limiting the reading scope reduces the unrelated screen and feature code you provide. Have the AI read the setting requirements and related tests, and check the behavior after the change, so the work keeps the information needed to make and verify the fix.
 
 ## Where to start
 
