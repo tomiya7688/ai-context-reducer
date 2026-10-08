@@ -213,6 +213,12 @@
       "japanese": "docs/jp/手法一覧.md",
       "english": "docs/en/method-index.md",
       "english_status": "translated"
+    },
+    {
+      "id": "getting-started",
+      "japanese": "docs/jp/導入/AIに渡す資料を選ぶ道具を試す.md",
+      "english": "docs/en/adoption/getting-started.md",
+      "english_status": "translated"
     }
   ]
 }
