@@ -89,7 +89,7 @@ Do not request a pass/fail result for every item in every sentence or repeat the
 
 Specify one of these output modes in the request:
 
-- **To inspect findings**: Return only problematic locations, reasons, proposed revisions, and questions needing confirmation. Do not duplicate the full text or the same findings in JSON.
+- **To inspect findings**: Return only problematic locations, reasons, proposed revisions, and questions needing confirmation. Do not duplicate the full text or the same findings in another format.
 - **To receive finished text**: Omit the long check log and return the complete revised text. Include unchanged parts; do not abbreviate the requested deliverable. If missing evidence prevents completion, also return the necessary questions briefly.
 
 ## For important explanations, use a separate conversation as a reader check
