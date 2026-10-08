@@ -19,4 +19,4 @@ Ask before writing when missing conditions would substantially change the conten
 
 - For “findings,” briefly return only problematic locations, reasons, proposed revisions, and questions needing confirmation. If none are found, say no explanation gaps were found.
 - For “complete revised text,” return the whole text including unchanged parts, without the long check log. Briefly append questions if unresolved facts prevent completion.
-- Do not duplicate the full text, check tables, and JSON. Leave sound sentences unchanged.
+- Do not duplicate the full text, check tables, and other formats with the same content. Leave sound sentences unchanged.
