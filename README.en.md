@@ -10,6 +10,10 @@ This project helps people using AI choose the code and documents to provide for 
 
 You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
 
+[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/method-index.md)
+
+Published v1.0.0 supports Windows, Linux, and macOS on x64 and arm64. Its overview and suggestion commands do not require installing a language runtime.
+
 ## Example: Fix a saved setting that disappears after a restart
 
 This is an illustrative example using a fictional app. Suppose you save a setting in the app's settings screen, but it resets when the app restarts.
