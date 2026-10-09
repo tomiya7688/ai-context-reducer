@@ -45,10 +45,13 @@ If the project already has a guide such as `AGENTS.md`, improve it instead of ad
 | Rechecking information that is already known | [Exploration Control](exploration-control.md), [Evidence Budget](evidence-budget.md) | Defines what needs to be known before making a decision |
 | Finding tests from scratch for every change | [Validation Routing](validation-routing.md), [Change / Test Impact Routing](change-impact-routing.md) | Starts with checks and test candidates related to the change |
 | Rereading the same rules or explanations | [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md) | Lets the reader use only explanations needed for the current location or check |
+| Repeatedly asking about the same content because AI explanations are unclear | [Make explanations understandable to their readers](methods/make-explanations-understandable.md) | Specifying the reader and purpose and filling only confirmed gaps can reduce questions about objects and operations |
 
 See the [Method Index](method-index.md) for method summaries. Try only the method that addresses the most frequent problem first; do not adopt everything at once.
 
 ### 4. Check whether it is worth keeping
+
+For repeated questions about explanations, use the [before-and-after question comparison](methods/make-explanations-understandable.md#compare-follow-up-questions-before-and-after). Record candidate questions separately from actual repeated explanations; fewer questions do not count as improvement if operations or conditions are incorrect.
 
 After adoption, check whether:
 
