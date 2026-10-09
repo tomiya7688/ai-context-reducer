@@ -225,6 +225,12 @@
       "japanese": "docs/jp/手法/読者が理解できる説明に直す.md",
       "english": "docs/en/methods/make-explanations-understandable.md",
       "english_status": "translated"
+    },
+    {
+      "id": "decision-rationale",
+      "japanese": "docs/jp/手法/仕様や実装を決めた理由をAIに渡す.md",
+      "english": "docs/en/methods/share-decision-reasons.md",
+      "english_status": "translated"
     }
   ]
 }

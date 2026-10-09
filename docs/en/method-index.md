@@ -17,6 +17,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 - Rereading long rules or duplicate explanations: [Hierarchical Context](hierarchical-context.md), [Policy Routing](policy-routing.md), [Documentation Duplication Control](documentation-duplication-control.md)
 - Repeatedly asking who does what or what to do after reading an AI explanation: [Make explanations understandable to their readers](methods/make-explanations-understandable.md). Use the [follow-up question comparison](methods/make-explanations-understandable.md#compare-follow-up-questions-before-and-after) to check whether the revision does more than lengthen the text.
 
+- The AI keeps rediscovering why a specification or implementation was chosen: [Give the AI decision reasons](methods/share-decision-reasons.md)
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.

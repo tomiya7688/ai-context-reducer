@@ -694,6 +694,16 @@
   ],
   "template_files": [
     {
+      "source": "templates/PROJECT_CONTEXT.md",
+      "bundle_path": "templates/PROJECT_CONTEXT.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/PROJECT_CONTEXT.en.md",
+      "bundle_path": "templates/PROJECT_CONTEXT.en.md",
+      "kind": "template"
+    },
+    {
       "source": "templates/AI_CONTEXT.md",
       "bundle_path": "templates/AI_CONTEXT.md",
       "kind": "template"
