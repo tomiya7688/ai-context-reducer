@@ -118,49 +118,121 @@ Give the returned questions to the authoring AI. Discard questions already answe
 
 This is an additional check of reader understanding. Reading the text again in another conversation adds input and output. Start with the usual check for short internal notes or explanations whose readers share the required knowledge. Another AI understanding the text does not establish that people can follow the operations.
 
-## Six examples of revisions
+## Seven examples of revisions
+
+These illustrative examples use a fictional app and a request to investigate with an AI. The app has a settings screen: selecting a file and pressing Load makes the app load the settings and display their values. Choosing a destination and pressing Save saves settings and displays “Saved.” Verify the facts against your own project's specifications or operation when revising real documentation.
 
 ### 1. The reference of “this” is unclear
 
-- Before: “Save this.”
-- After: “Save the values entered in the settings screen.”
-
-Naming the object makes it clear what is saved, even to a user who has not read the earlier conversation.
+- **Before**: “The app loads this and then displays this.”
+- **What the reader cannot determine**: What is loaded and what is displayed?
+- **After**: “The app loads the selected settings file and then displays the settings values on screen.”
+- **What changed**: Only the two references were replaced with their object names.
 
 ### 2. It is unclear who acts
 
-- Before: “The settings file is checked.”
-- After: “At startup, the app reads the settings file and checks that the required fields are present.”
+- **Before**: “The user selects a settings file and presses Load. It is then loaded and its settings values displayed.”
+- **What the reader cannot determine**: Does the user also load the file and display its values?
+- **After**: “The user selects a settings file and presses Load. The app then loads it and displays its settings values.”
+- **What changed**: The second sentence identifies the new actor. The unambiguous reference to the selected file is preserved.
 
-This names the app and what it checks. If the instruction asks a user to inspect a file, write it accordingly: “Open the settings file and check the destination field.”
+### 3. English terms do not explain the actions
 
-### 3. Technical terms replace an explanation
+- **Before**: “The AI investigation uses routing / scope / evidence / fallback.”
+- **What the reader cannot determine**: What should they give the AI, how far should it investigate, and what happens if it finds no answer?
+- **After**: “Tell the AI which material to read first and how far to investigate, and have it report the passages supporting its answer. If it cannot find an answer within that scope, have it choose the next material to read.”
+- **What changed**: The list of terms was replaced with the user's instructions and the AI's actions.
 
-- Before: “Limit the scope with Context Routing.”
-- After: “Tell the AI the task and ask it to list related documentation and code locations. Have it start its investigation there.”
+### 4. Abstract verbs do not specify an operation
 
-The reader can tell what to ask the AI without guessing the terms' meanings. Put research terms or names useful for searches after explaining the action.
+- **Before**: “Process the settings appropriately.”
+- **What the reader cannot determine**: What should they actually do?
+- **After**: “Choose a destination in the settings screen and press Save.”
+- **What changed**: “Process appropriately” was replaced with the location and concrete operations.
 
-### 4. “Process appropriately” does not specify an action
+### 5. The use condition and required input are missing
 
-- Before: “Process the settings appropriately.”
-- After: “Choose the destination in the settings screen, then press Save.”
+- **Before**: “Press Load.”
+- **What the reader cannot determine**: When should they use it and which file is the input?
+- **After**: “To use settings saved in a file, select that file in the settings screen and press Load.”
+- **What changed**: The use condition and file selection were added before the original operation.
 
-This states what the reader should do. If choosing a destination has conditions, confirm them in the specification and include them.
+### 6. Success cannot be recognized
 
-### 5. Prerequisites and results are missing
+- **Before**: “Choose a destination in the settings screen and press Save.”
+- **What the reader cannot determine**: What indicates that saving has finished?
+- **After**: “Choose a destination in the settings screen and press Save. Saving is complete when ‘Saved’ appears.”
+- **What changed**: The operation remained unchanged; one sentence naming the success indicator was added.
 
-- Before: “Press Save.”
-- After: “Choose the destination in the settings screen, then press Save. Saving is complete when ‘Saved’ appears.”
+### 7. Repeating explicit names makes the text unnecessarily long
 
-This adds the required choice and the indication of completion. Confirm in the specification or by using the app that a message like this actually exists.
+- **Before**: “The user presses the settings screen's Save button. When the user presses the settings screen's Save button, the app saves the settings screen's settings values.”
+- **What the reader cannot determine**: Nothing about the object or actor is missing. This example instead repeats the same location and button name, making the text harder to read.
+- **After**: “Press Save in the settings screen. The app saves the entered settings values.”
+- **What changed**: Repeated names were removed, and the user's instruction was separated from the app's behavior. Behavior and conditions were preserved.
 
-### 6. Repeating names makes the explanation harder to read
+## Compare follow-up questions before and after
 
-- Over-expanded: “The user should press the settings screen's Save button. When the user presses the settings screen's Save button, the app saves the settings screen's settings.”
-- After: “Press Save in the settings screen. The app saves the entered values.”
+A longer explanation is not by itself evidence of improvement. Keep the reader and purpose fixed, and compare questions whose answers cannot be determined from the explanation.
 
-The instruction to the user and the app's behavior are separate, without repeating the location and button name. Omit repeated names where the actor and object remain unambiguous.
+### 1. Keep the compared text and reader conditions consistent
+
+Save the original and revised explanations of the same content, and specify the reader's knowledge and purpose. For example: “A first-time app user can save settings and recognize completion.” Separately verify that revised operations and conditions agree with supporting material.
+
+You can keep the text in `docs/explanation-check/before.md` and `docs/explanation-check/after.md`, and reader assumptions, purpose, and results in `docs/explanation-check/results.md`. These paths identify what to give the AI and where to record findings. For one use, attachments or text pasted into a request are enough. Remove temporary files when the check is finished and the records are no longer needed.
+
+### 2. Collect questions the explanation cannot answer
+
+Start by reading the text yourself and checking these questions. When another person reads it, keep their prior knowledge consistent with the intended reader.
+
+- What does this refer to?
+- Who performs the action?
+- What does that word mean?
+- What exactly should be done?
+- When is it used, and with which input?
+- What indicates completion?
+
+Include only questions needed for the purpose. Combine duplicates and exclude questions answered by the text or a linked reference available to the reader. Check the original questions against the revision and include any new questions introduced by the revision.
+
+For an AI check, use the same material boundaries as the [separate-conversation reader check](#for-important-explanations-use-a-separate-conversation-as-a-reader-check). Give the original and revised texts to separate new conversations. Do not give either conversation the other text or the author's previous conversation. Combine the questions yourself and check whether each explanation answers them.
+
+```text
+Target: [before.md or after.md path, or attached text]
+Reader: [intended reader]
+Prior knowledge: [what they know]
+Purpose: [what they should be able to do]
+
+Read only the target text and references linked from it that the reader can access.
+Return questions that require asking for additional information to achieve the purpose,
+using “location / question.”
+Exclude duplicates and questions answered by the text. Do not guess answers.
+If none remain, return “No additional questions.”
+```
+
+### 3. Record remaining questions and actual repeated work
+
+Verify the questions yourself. For both versions, record the answer location or that it is missing. For example 6 above, “What indicates saving is complete?” remains unanswered before revision; afterward, “Saved” supplies the answer. This is an illustration, not a measurement involving an AI or real users.
+
+You can fill this table in `results.md` for each case. Do not treat blank or unmeasured entries as zero.
+
+| Record | Before | After |
+|---|---|---|
+| Date and reviewer; model and settings if an AI checks | [fill in] | [fill in] |
+| Unanswered questions and their count | [fill in] | [fill in] |
+| Answer locations in text or linked references | [fill in] | [fill in] |
+| Actual repetitions of the same explanation | [unmeasured if unavailable] | [unmeasured if unavailable] |
+| Exchanges requesting text revisions | [unmeasured if unavailable] | [unmeasured if unavailable] |
+| Incorrect explanations or missing required operations or conditions | [fill in] | [fill in] |
+
+Candidate question counts and actual follow-up questions in conversation are different measures. An AI's candidate questions do not establish actual reader understanding or a measured reduction in repeated explanation. Fewer questions do not constitute improvement if the revision introduced incorrect operations or conditions.
+
+### 4. Claim reduced reading only within what was measured
+
+Adding object names or operations may lengthen the first response. The aim is to reduce subsequent questions, repeated explanations, and revisions caused by missing meaning. Different prior knowledge changes how much explanation readers need.
+
+If you compared only unanswered questions, say “For this reader and example, fewer questions remained unanswered by the explanation.” Discuss fewer repetitions or revision exchanges only when actual conversations were recorded.
+
+If token counts are available, compare input and output from the initial request through completion, including additional checks. Use the same model, settings, and task conditions; do not treat one response's token count as the whole conversation's saving. Without token measurements, do not claim that total tokens decreased, specify a reduction percentage, or promise a reduction. Do not generalize a few examples to all readers or tasks.
 
 ## Use it for one request
 
