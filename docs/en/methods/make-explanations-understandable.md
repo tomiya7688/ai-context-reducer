@@ -131,9 +131,9 @@ These illustrative examples use a fictional app and a request to investigate wit
 
 ### 2. It is unclear who acts
 
-- **Before**: “The user selects a settings file. It is then loaded and its settings values displayed.”
+- **Before**: “The user selects a settings file and presses Load. It is then loaded and its settings values displayed.”
 - **What the reader cannot determine**: Does the user also load the file and display its values?
-- **After**: “The user selects a settings file. The app then loads it and displays its settings values.”
+- **After**: “The user selects a settings file and presses Load. The app then loads it and displays its settings values.”
 - **What changed**: The second sentence identifies the new actor. The unambiguous reference to the selected file is preserved.
 
 ### 3. English terms do not explain the actions
