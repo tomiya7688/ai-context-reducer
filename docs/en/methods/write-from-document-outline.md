@@ -10,7 +10,7 @@ When you ask an AI to write several operation guides, one may omit preparation a
 - If headings alone do not prevent omissions, specify what satisfies each section. For an operation guide, this includes the actor, screen, button names, and state after the action.
 - For a short, one-off answer, listing the required items in the request is simpler. If documents need substantially different structures, decide a suitable outline for each purpose rather than packing everything into one template.
 
-For inserting names or dates into fixed wording, you can use [generation from a fixed template](https://github.com/tomiya7688/ai-context-reducer/blob/main/docs/en/boilerplate-generation.md). Choose according to the following distinction.
+For inserting names or dates into fixed wording, you can use [generation from a fixed template](../boilerplate-generation.md). Choose according to the following distinction.
 
 | Desired output | What to provide | How the body is produced |
 | --- | --- | --- |
@@ -61,7 +61,8 @@ For checking the result, state what demonstrates success.
 If facts are missing and you cannot finish, ask about the missing items first.
 When I request only a draft, mark each unresolved item as “Needs confirmation: the fact to check.”
 Do not invent operations or values.
-If you think headings need to be added or removed, explain why before changing the body.
+If you think headings need to be added or removed, provide only the reason and proposed outline change.
+Do not change headings until I explicitly approve the outline change.
 Before saving, check required headings and their order, section content, and additions outside the outline.
 After checking, save the complete body to the specified destination.
 Report a draft with unresolved items as unfinished.
