@@ -694,6 +694,16 @@
   ],
   "template_files": [
     {
+      "source": "templates/DOCUMENT_OUTLINE.md",
+      "bundle_path": "templates/DOCUMENT_OUTLINE.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/DOCUMENT_OUTLINE.en.md",
+      "bundle_path": "templates/DOCUMENT_OUTLINE.en.md",
+      "kind": "template"
+    },
+    {
       "source": "templates/PROJECT_CONTEXT.md",
       "bundle_path": "templates/PROJECT_CONTEXT.md",
       "kind": "template"
