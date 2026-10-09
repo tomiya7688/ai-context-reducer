@@ -231,6 +231,12 @@
       "japanese": "docs/jp/手法/仕様や実装を決めた理由をAIに渡す.md",
       "english": "docs/en/methods/share-decision-reasons.md",
       "english_status": "translated"
+    },
+    {
+      "id": "document-outline",
+      "japanese": "docs/jp/手法/AIに文章の見出しと順番を渡して書かせる.md",
+      "english": "docs/en/methods/write-from-document-outline.md",
+      "english_status": "translated"
     }
   ]
 }
