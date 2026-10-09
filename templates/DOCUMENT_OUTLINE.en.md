@@ -1,7 +1,8 @@
 <!-- Operation guide outline. Brackets are writing instructions: replace them with source-supported prose.
 All four section headings below are required. Keep their order. Ask about missing facts; do not guess.
 For drafts, leave “Needs confirmation: the fact to check” and report the document as unfinished.
-Explain any proposed heading additions or removals first. Do not copy this comment into the finished document. -->
+Present the reason and proposal for any heading additions or removals; wait for explicit user approval before changing them.
+Do not copy this comment into the finished document. -->
 
 # [Operation name]
 
