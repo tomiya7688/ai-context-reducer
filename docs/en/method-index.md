@@ -19,6 +19,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - The AI keeps rediscovering why a specification or implementation was chosen: [Give the AI decision reasons](methods/share-decision-reasons.md)
 
+- Document headings or order keep changing: [Give the AI document headings and their order](methods/write-from-document-outline.md) — save a short outline and provide section requirements and factual sources.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
