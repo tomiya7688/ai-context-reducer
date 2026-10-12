@@ -237,6 +237,12 @@
       "japanese": "docs/jp/手法/AIに文章の見出しと順番を渡して書かせる.md",
       "english": "docs/en/methods/write-from-document-outline.md",
       "english_status": "translated"
+    },
+    {
+      "id": "coding-rule-compliance",
+      "japanese": "docs/jp/手法/AIにコードの決まりを読ませ、変更後に確かめさせる.md",
+      "english": "docs/en/methods/follow-coding-rules.md",
+      "english_status": "translated"
     }
   ]
 }
