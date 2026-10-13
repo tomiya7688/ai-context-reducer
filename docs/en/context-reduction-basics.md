@@ -6,6 +6,8 @@ Here, **context** means the instructions, code, documents, search results, and c
 
 Leaving out needed evidence can cause mistakes. The goal is not to make every prompt short, but to decide what to search, select, and verify in the original sources. Unrelated source files and full logs still count as input, leaving less context available for the requirements and errors that matter.
 
+For the model-side explanation of why LLM input is tokenized and why information inside a long input is not guaranteed to be used equally well, see [Context Amount and Use](llm-mechanics/context-amount-and-use.md).
+
 ## Example: improve an error message for a configuration file
 
 Suppose you want the application to explain why it could not load a configuration file. If you give the AI the whole project, it has to search through screens, configuration loading, logging, tests, and many other files to find the change.

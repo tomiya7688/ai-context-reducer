@@ -243,6 +243,84 @@
       "japanese": "docs/jp/手法/AIにコードの決まりを読ませ、変更後に確かめさせる.md",
       "english": "docs/en/methods/follow-coding-rules.md",
       "english_status": "translated"
+    },
+    {
+      "id": "llm-basics",
+      "japanese": "docs/jp/LLMの仕組み/LLMとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-an-llm.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-tokens",
+      "japanese": "docs/jp/LLMの仕組み/トークンとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-a-token.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-generation",
+      "japanese": "docs/jp/LLMの仕組み/LLMが文章を生成するまで.md",
+      "english": "docs/en/llm-mechanics/how-llm-generation-works.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "transformer-basics",
+      "japanese": "docs/jp/LLMの仕組み/Transformerとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-a-transformer.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "transformer-internals",
+      "japanese": "docs/jp/LLMの仕組み/Transformerの中では何が起きているのか.md",
+      "english": "docs/en/llm-mechanics/inside-a-transformer.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "attention-basics",
+      "japanese": "docs/jp/LLMの仕組み/Attentionとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-attention.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "transformer-to-llm",
+      "japanese": "docs/jp/LLMの仕組み/TransformerからLLMが生まれるまで.md",
+      "english": "docs/en/llm-mechanics/from-transformers-to-llms.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-code-generation",
+      "japanese": "docs/jp/LLMの仕組み/なぜLLMはコードを書けるのか.md",
+      "english": "docs/en/llm-mechanics/why-llms-can-write-code.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-window",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストウィンドウとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-a-context-window.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "training-vs-inference",
+      "japanese": "docs/jp/LLMの仕組み/学習と推論の違い.md",
+      "english": "docs/en/llm-mechanics/training-vs-inference.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-knowledge",
+      "japanese": "docs/jp/LLMの仕組み/LLMは何を知っているのか.md",
+      "english": "docs/en/llm-mechanics/what-does-an-llm-know.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-errors",
+      "japanese": "docs/jp/LLMの仕組み/なぜLLMは間違えるのか.md",
+      "english": "docs/en/llm-mechanics/why-llms-make-mistakes.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-amount-use",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストの量と使われ方.md",
+      "english": "docs/en/llm-mechanics/context-amount-and-use.md",
+      "english_status": "translated"
     }
   ]
 }
