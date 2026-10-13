@@ -4,6 +4,8 @@
 
 This index helps project users choose a method for avoiding repeated searches. The user prepares a guide, list, or check that fits the problem, then tells the AI where it is and how to use it. An AI does not necessarily read project documents automatically. For recurring use, confirm that the guide is registered in an instruction file or setting the AI tool actually loads.
 
+If your question is a concrete "how should I ask the AI to do this?" problem—such as later files in a long response becoming vague, choosing an editing mode, or reducing image-generation retries—start with the [AI usage FAQ](ai-usage/faq.md).
+
 ## Choose a guide for your problem
 
 Choose the row closest to your current problem, then read one linked guide. You do not need to read every entry in order.

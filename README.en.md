@@ -11,7 +11,7 @@ This project helps people using AI choose the code and documents to provide for 
 
 You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
 
-[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/method-index.md)
+[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [AI usage FAQ](docs/en/ai-usage/faq.md) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/method-index.md)
 
 Published v1.0.0 supports Windows, Linux, and macOS on x64 and arm64. Its overview and suggestion commands do not require installing a language runtime.
 
@@ -71,6 +71,7 @@ See [Context Reduction Basics](docs/en/context-reduction-basics.md) for a detail
 
 The main content is documentation and templates for guiding work and narrowing the information to read. It also has tools that help with tasks such as searching, creating indexes, and selecting checks. No tool is necessary for every project.
 
+- Start from a concrete problem asking an AI for help: [AI usage FAQ](docs/en/ai-usage/faq.md)
 - Learn the model mechanics behind context design: [What Is an LLM?](docs/en/llm-mechanics/what-is-an-llm.md)
 - See the fixed-fixture context measurement: [Measured benchmark](docs/en/measured-context-reduction-benchmark.md)
 - Find a method from the problem you have: [Method Index](docs/en/method-index.md)
