@@ -4,6 +4,8 @@
 
 An AI may add `SettingsLoader` or `loadConfigData` even though `readSettingsFile` already reads settings files. Following naming conventions does not resolve the duplication of responsibilities.
 
+A function is a callable unit of processing; a class groups behavior or state; a variable lets code refer to a value by name.
+
 Before drafting code, describe the required work and have the AI find functions, classes, or variables that already handle it. Check whether those components meet the current conditions before choosing to reuse, extend, or create a new component.
 
 ## When to use it and how to decide
@@ -96,7 +98,7 @@ If specifications or boundaries conflict, ask before making affected changes.
 
 Implement within the requested scope, then list added names and responsibilities.
 Check responsibility and processing overlap, impacts on existing users, dependency direction, and shared state.
-Run relevant existing tests and type/reference checks. Report results and unverified areas.
+Run relevant existing tests and type/reference checks for value types and call consistency. Report results and unverified areas.
 Do not report unexecuted or inapplicable checks as successful.
 ```
 
