@@ -30,6 +30,8 @@ This repository explains finding rules in [Check rules related to the current ch
 
 ### 2. Save concrete rules in one place
 
+When a reuse rule leaves you unsure which component fits, use [Inspect existing code before adding similar responsibilities](reuse-existing-code-before-adding.md).
+
 The following is a fictional JavaScript project, not this repository’s rules. Replace file paths and commands with ones that exist in your project.
 
 Use the relevant section of an existing rule document. If there is none, you could save the following as `docs/development/coding-rules.md`.
