@@ -321,6 +321,12 @@
       "japanese": "docs/jp/LLMの仕組み/コンテキストの量と使われ方.md",
       "english": "docs/en/llm-mechanics/context-amount-and-use.md",
       "english_status": "translated"
+    },
+    {
+      "id": "context-reduction-benchmark",
+      "japanese": "docs/jp/コンテキスト削減の実測ベンチマーク.md",
+      "english": "docs/en/measured-context-reduction-benchmark.md",
+      "english_status": "translated"
     }
   ]
 }

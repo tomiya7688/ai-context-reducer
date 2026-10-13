@@ -1,0 +1,41 @@
+[
+  {
+    "id": "settings-error-path",
+    "request": "When invalid settings.json is loaded, prepare the project evidence needed to change the error so it includes the failing file path.",
+    "search_terms": [
+      "SettingsLoadError",
+      "settings.json"
+    ],
+    "required_evidence": [
+      "src/settings.py",
+      "tests/test_settings.py",
+      "docs/settings.md"
+    ]
+  },
+  {
+    "id": "profile-display-name",
+    "request": "Prepare the project evidence needed to verify how display_name whitespace is normalized before a profile is rendered.",
+    "search_terms": [
+      "normalize_display_name",
+      "display_name"
+    ],
+    "required_evidence": [
+      "src/profile.py",
+      "tests/test_profile.py",
+      "docs/profile.md"
+    ]
+  },
+  {
+    "id": "notification-retry",
+    "request": "Prepare the project evidence needed to change notification retry behavior without retrying permanent failures.",
+    "search_terms": [
+      "send_with_retry",
+      "TemporaryNotificationError"
+    ],
+    "required_evidence": [
+      "src/notifier.py",
+      "tests/test_notifier.py",
+      "docs/notifier.md"
+    ]
+  }
+]
