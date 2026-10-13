@@ -333,6 +333,12 @@
       "japanese": "docs/jp/手法/AIに読む人の役に立つコードコメントを書かせる.md",
       "english": "docs/en/methods/write-useful-code-comments.md",
       "english_status": "translated"
+    },
+    {
+      "id": "compare-design-options",
+      "japanese": "docs/jp/手法/提示された設計案をプロジェクトの根拠で比較する.md",
+      "english": "docs/en/methods/compare-design-options-with-project-evidence.md",
+      "english_status": "translated"
     }
   ]
 }
