@@ -2,8 +2,9 @@
 
 English | [日本語](README.md)
 
-This project helps people using AI choose the code and documents to provide for a task. It includes three kinds of resources:
+This project helps people using AI choose the code and documents to provide for a task. It includes four kinds of resources:
 
+- **LLM mechanics** — foundational guides explaining tokens, Transformers, generation, training, code generation, and how those mechanics connect to context design.
 - **Method guides** — ways to decide what the AI should read and how far it should investigate, with example requests.
 - **Templates** — documents for writing project rules, project information, and notes for the current task.
 - **Helper tools** — programs that help with file searches, task note generation, rule checks, and test selection.
@@ -37,9 +38,10 @@ Limiting the reading scope reduces the unrelated screen and feature code you pro
 
 Choose the path that matches your goal. You do not need to read every document.
 
-1. **Learn the methods**: Read [Context Reduction Basics](docs/en/context-reduction-basics.md) for the overview, then choose one relevant guide from the [Method Index](docs/en/method-index.md). For a first code change, start with [Context Priority](docs/en/context-priority.md).
-2. **Apply them to your project**: Use [Adoption Priority](docs/en/adoption-priority.md) to choose a recurring problem, then use the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and procedures. Use the [AI_CONTEXT.md template](templates/AI_CONTEXT.md) to draft a short entry, then put it in an instruction file the active AI tool actually reads (such as `AGENTS.md` if supported).
-3. **Use a helper tool**: Choose a method first, then follow the [method-to-tool map](docs/en/tool-method-map.md) to a tool guide only if automation would help. Tools are optional.
+1. **Learn how LLMs work**: Start with [What Is an LLM?](docs/en/llm-mechanics/what-is-an-llm.md), then follow the guides through tokens, Transformers, Attention, training, code generation, and context use.
+2. **Learn the methods**: Read [Context Reduction Basics](docs/en/context-reduction-basics.md) for the overview, then choose one relevant guide from the [Method Index](docs/en/method-index.md). For a first code change, start with [Context Priority](docs/en/context-priority.md).
+3. **Apply them to your project**: Use [Adoption Priority](docs/en/adoption-priority.md) to choose a recurring problem, then use the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and procedures. Use the [AI_CONTEXT.md template](templates/AI_CONTEXT.md) to draft a short entry, then put it in an instruction file the active AI tool actually reads (such as `AGENTS.md` if supported).
+4. **Use a helper tool**: Choose a method first, then follow the [method-to-tool map](docs/en/tool-method-map.md) to a tool guide only if automation would help. Tools are optional.
 
 To use a method, attach its guide to the request or tell the AI its path. It may not load the guide automatically; for recurring use, register it in instructions or settings that your AI tool actually reads.
 
@@ -63,6 +65,7 @@ See [Context Reduction Basics](docs/en/context-reduction-basics.md) for a detail
 
 The main content is documentation and templates for guiding work and narrowing the information to read. It also has tools that help with tasks such as searching, creating indexes, and selecting checks. No tool is necessary for every project.
 
+- Learn the model mechanics behind context design: [What Is an LLM?](docs/en/llm-mechanics/what-is-an-llm.md)
 - Find a method from the problem you have: [Method Index](docs/en/method-index.md)
 - Decide what to adopt in a project: [Adoption Priority](docs/en/adoption-priority.md)
 - Ask an AI to inspect an existing project: [Adoption Prompt](docs/en/adoption-prompt.md)
@@ -94,6 +97,6 @@ Helper tool releases are available from [GitHub Releases](https://github.com/tom
 
 ## Documentation
 
-Japanese documents are under [`docs/jp/`](docs/jp/), with English versions under [`docs/en/`](docs/en/). This README does not repeat the details of every method; follow the [Method Index](docs/en/method-index.md) to reach each guide.
+Japanese documents are under [`docs/jp/`](docs/jp/), with English versions under [`docs/en/`](docs/en/). LLM foundations are separated under [`docs/en/llm-mechanics/`](docs/en/llm-mechanics/), while practical workflows remain in the [Method Index](docs/en/method-index.md) and method guides.
 
 This repository is provided under the [MIT License](LICENSE). External projects and content remain subject to the licenses from their respective distributors.

@@ -6,6 +6,12 @@ This repository describes ways to choose the information an AI needs for softwar
 
 The goal is not simply to make the AI read less. It is to reach the necessary information quickly and complete the work accurately by checking the original material.
 
+## Separate LLM mechanics from working methods
+
+This repository also includes foundational material about the model itself. Start with [What Is an LLM?](llm-mechanics/what-is-an-llm.md) to follow tokens, Transformers, Attention, training and inference, code generation, and context use.
+
+Those foundational guides explain why context selection can affect model output. The [method index](method-index.md) and individual method guides explain the separate practical question of which files to find, what to provide, and how to verify the work.
+
 ## Example: fix an input field
 
 Suppose an input field lets users submit an empty value. The relevant areas are the code that receives the value, the screen, the behavior after submission, and the tests for that behavior. There is no need to read unrelated screens or features in the project.
