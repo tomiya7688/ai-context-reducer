@@ -339,6 +339,12 @@
       "japanese": "docs/jp/手法/提示された設計案をプロジェクトの根拠で比較する.md",
       "english": "docs/en/methods/compare-design-options-with-project-evidence.md",
       "english_status": "translated"
+    },
+    {
+      "id": "ai-usage-faq",
+      "japanese": "docs/jp/AI利用/よくある質問.md",
+      "english": "docs/en/ai-usage/faq.md",
+      "english_status": "translated"
     }
   ]
 }
