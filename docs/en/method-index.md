@@ -23,6 +23,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - You repeatedly correct naming or reuse rules: [Have the AI read coding rules and check its changes](methods/follow-coding-rules.md) — use existing rules and checks, then inspect the changed diff.
 
+- Code comments do not explain usage or reasons: [Have the AI write code comments that help readers](methods/write-useful-code-comments.md) — provide rules and readers, then check useful information against diffs and evidence.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.

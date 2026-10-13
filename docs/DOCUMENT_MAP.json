@@ -327,6 +327,12 @@
       "japanese": "docs/jp/コンテキスト削減の実測ベンチマーク.md",
       "english": "docs/en/measured-context-reduction-benchmark.md",
       "english_status": "translated"
+    },
+    {
+      "id": "useful-code-comments",
+      "japanese": "docs/jp/手法/AIに読む人の役に立つコードコメントを書かせる.md",
+      "english": "docs/en/methods/write-useful-code-comments.md",
+      "english_status": "translated"
     }
   ]
 }
