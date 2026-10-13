@@ -345,6 +345,12 @@
       "japanese": "docs/jp/AI利用/よくある質問.md",
       "english": "docs/en/ai-usage/faq.md",
       "english_status": "translated"
+    },
+    {
+      "id": "reuse-existing-code",
+      "japanese": "docs/jp/手法/AIに既存コードを調べさせ、似た役割の追加を防ぐ.md",
+      "english": "docs/en/methods/reuse-existing-code-before-adding.md",
+      "english_status": "translated"
     }
   ]
 }
