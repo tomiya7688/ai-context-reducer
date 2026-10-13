@@ -19,6 +19,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - The AI keeps rediscovering why a specification or implementation was chosen: [Give the AI decision reasons](methods/share-decision-reasons.md)
 
+- You have a few design options and want to choose the one that fits the current project: [Compare proposed design options with project evidence](methods/compare-design-options-with-project-evidence.md) — compare the same criteria using evidence from specifications, code, configuration, and tests.
+
 - Document headings or order keep changing: [Give the AI document headings and their order](methods/write-from-document-outline.md) — save a short outline and provide section requirements and factual sources.
 
 - You repeatedly correct naming or reuse rules: [Have the AI read coding rules and check its changes](methods/follow-coding-rules.md) — use existing rules and checks, then inspect the changed diff.
@@ -83,6 +85,7 @@ Run checks required by the completion criteria and report references, results, a
 | Method | What to do | Why it reduces reading |
 |---|---|---|
 | [Set Design and Completion Criteria First](design-and-completion-criteria.md) | Record the goal, scope, conditions to preserve, and completion criteria before implementation | Implementers do not need to reread past conversations or broad documentation to infer the design intent |
+| [Compare proposed design options with project evidence](methods/compare-design-options-with-project-evidence.md) | Compare a small candidate set with the same criteria against current specifications, code, configuration, and tests | Investigation can focus on the original sources needed for the decision instead of expanding candidates or collecting generic pros and cons |
 
 ### Decide when to stop and what to verify
 

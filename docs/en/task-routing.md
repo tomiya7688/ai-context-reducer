@@ -16,6 +16,8 @@ Suppose you repeatedly search for the format description, import code, and relat
 
 The listed locations do not have to be the whole investigation. If the change also affects another feature, inspect its callers, additional tests, or design documents. The table marks where to start; it does not set a fixed boundary for the investigation.
 
+For a task that compares proposed design options, define criteria from the goal and mandatory conditions and compare every option against the same project evidence. See [Compare Proposed Design Options with Project Evidence](methods/compare-design-options-with-project-evidence.md) for the request and review procedure.
+
 ## What to include and how to update it
 
 Choose recurring kinds of work and record for each:
