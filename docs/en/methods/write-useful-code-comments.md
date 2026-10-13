@@ -149,7 +149,7 @@ Passing a format check does not establish usefulness or factual accuracy. Judge 
 
 Providing rules and readers first, then reviewing comments for changed code, can reduce repeated corrections of format or missing information. Short comments containing important conditions can also reduce reading whole functions or historical discussions merely to learn how to use them.
 
-Added comments consume input too. Repeating long design history or obvious explanations at every declaration can have the opposite effect. Keep necessary conditions and reasons short, and detailed history in one place. When the task needs implementation verification, inspect original code and tests rather than relying on comments alone. This repository has not measured the savings.
+Added comments consume input too. Repeating long design history or obvious explanations at every declaration can have the opposite effect. Keep necessary conditions and reasons short, and detailed history in one place. When the task needs implementation verification, inspect original code and tests rather than relying on comments alone. Savings from this comment method have not been measured.
 
 ## Supporting tools
 
