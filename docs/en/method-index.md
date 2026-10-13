@@ -29,6 +29,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - Code comments do not explain usage or reasons: [Have the AI write code comments that help readers](methods/write-useful-code-comments.md) — provide rules and readers, then check useful information against diffs and evidence.
 
+- Similar functions, classes, or state variables keep being added: [Inspect existing code before adding similar responsibilities](methods/reuse-existing-code-before-adding.md) — check definitions, users, and tests before choosing reuse, extension, or creation.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
