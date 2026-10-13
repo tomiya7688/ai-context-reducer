@@ -34,6 +34,12 @@ Both approaches have the same goal: fix the app so the saved setting survives a 
 
 Limiting the reading scope reduces the unrelated screen and feature code you provide. Have the AI read the setting requirements and related tests, and check the behavior after the change, so the work keeps the information needed to make and verify the fix.
 
+## Reproducible measured example
+
+A fixed synthetic repository compares three tasks under two strategies: send all 15 eligible files to AI context, or run a literal search first and send only the 3 matching files. All predefined required evidence remains present in all three tasks, while the total AI-visible character count falls from 14,478 to 3,543, a **75.5% reduction**.
+
+This is a fixed-fixture measurement, not a universal reduction rate or an actual LLM input-token measurement. The fixture, search conditions, script, and reference result are committed so the [Measured Context-Reduction Benchmark](docs/en/measured-context-reduction-benchmark.md) can be reproduced.
+
 ## Where to start
 
 Choose the path that matches your goal. You do not need to read every document.
@@ -66,6 +72,7 @@ See [Context Reduction Basics](docs/en/context-reduction-basics.md) for a detail
 The main content is documentation and templates for guiding work and narrowing the information to read. It also has tools that help with tasks such as searching, creating indexes, and selecting checks. No tool is necessary for every project.
 
 - Learn the model mechanics behind context design: [What Is an LLM?](docs/en/llm-mechanics/what-is-an-llm.md)
+- See the fixed-fixture context measurement: [Measured benchmark](docs/en/measured-context-reduction-benchmark.md)
 - Find a method from the problem you have: [Method Index](docs/en/method-index.md)
 - Decide what to adopt in a project: [Adoption Priority](docs/en/adoption-priority.md)
 - Ask an AI to inspect an existing project: [Adoption Prompt](docs/en/adoption-prompt.md)

@@ -1,0 +1,24 @@
+name: Context reduction benchmark
+
+on:
+  push:
+    paths:
+      - 'benchmarks/context-reduction/**'
+      - 'docs/jp/コンテキスト削減の実測ベンチマーク.md'
+      - 'docs/en/measured-context-reduction-benchmark.md'
+      - '.github/workflows/context-reduction-benchmark.yml'
+  pull_request:
+    paths:
+      - 'benchmarks/context-reduction/**'
+      - 'docs/jp/コンテキスト削減の実測ベンチマーク.md'
+      - 'docs/en/measured-context-reduction-benchmark.md'
+      - '.github/workflows/context-reduction-benchmark.yml'
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check reference benchmark
+        run: python3 benchmarks/context-reduction/benchmark.py --check-reference
