@@ -33,6 +33,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - A problem pointed out once remains elsewhere: [Find the same problem from one example](methods/find-same-problems-from-one-example.md) — define criteria and scope, then inspect candidate evidence before corrections.
 
+- You need usage estimates for planning tasks: [Build context-use estimates by task kind](ai-usage/estimate-context-use-by-task.md) — separate per-call input and cumulative usage, then compare median and range under matching conditions.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.

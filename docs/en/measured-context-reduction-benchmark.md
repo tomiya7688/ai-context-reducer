@@ -123,3 +123,7 @@ Use the same task and completion criteria for both strategies:
 6. Do not present one result as a universal reduction rate.
 
 The purpose is not to minimize a number. It is to avoid sending information the task does not need while preserving the evidence required to make and verify the change.
+
+## Estimate usage by task kind
+
+See [Build context-use estimates for each kind of task](ai-usage/estimate-context-use-by-task.md) for distinguishing input, output, and cumulative usage and recording comparable measurements.
