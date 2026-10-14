@@ -31,6 +31,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - Similar functions, classes, or state variables keep being added: [Inspect existing code before adding similar responsibilities](methods/reuse-existing-code-before-adding.md) — check definitions, users, and tests before choosing reuse, extension, or creation.
 
+- A problem pointed out once remains elsewhere: [Find the same problem from one example](methods/find-same-problems-from-one-example.md) — define criteria and scope, then inspect candidate evidence before corrections.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
