@@ -239,6 +239,8 @@ It reduces over-generalization from one example and separates mechanical candida
 
 ### Learn more
 
+[Find the same problem from one example](../methods/find-same-problems-from-one-example.md) explains saving criteria, reviewing candidates, rechecking corrections, and recording inspection coverage.
+
 For code, [Source Structure Index](../source-structure-index.md) can help find candidates. For documents and configuration, inspect each candidate in its original context instead of deciding from a text match alone.
 
 ## Which model or editing mode should I use for a task?
