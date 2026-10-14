@@ -357,6 +357,12 @@
       "japanese": "docs/jp/手法/一つの指摘から、同じ問題をAIに探させる.md",
       "english": "docs/en/methods/find-same-problems-from-one-example.md",
       "english_status": "translated"
+    },
+    {
+      "id": "context-usage-by-task",
+      "japanese": "docs/jp/AI利用/作業ごとのコンテキスト使用量の目安を作る.md",
+      "english": "docs/en/ai-usage/estimate-context-use-by-task.md",
+      "english_status": "translated"
     }
   ]
 }
