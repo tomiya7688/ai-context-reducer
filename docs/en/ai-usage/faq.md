@@ -295,7 +295,7 @@ It avoids treating model intelligence and tool permissions as the same capabilit
 
 ### Learn more
 
-See [Why can LLMs write code?](../llm-mechanics/why-llms-can-write-code.md).
+See [Why can LLMs write code?](../llm-mechanics/why-llms-can-write-code.md). For an overview of available agents and execution environments, see [Coding agents: types and how to choose](coding-agent-overview.md).
 
 ## I want fewer image-generation retries
 
