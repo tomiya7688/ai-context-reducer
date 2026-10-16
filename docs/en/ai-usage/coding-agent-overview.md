@@ -1,5 +1,7 @@
 # Coding agents: types and how to choose
 
+> Japanese source: [コーディングエージェントの種類と選び方](../../jp/AI利用/コーディングエージェントの種類と選び方.md)
+
 **Last checked: October 16, 2026.** This guide covers more than Codex, Claude Code, and Grok Build. It is not a ranking. Product capabilities, pricing, and availability change; verify current details in each linked official source.
 
 ## What is a coding agent?
