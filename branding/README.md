@@ -1,6 +1,6 @@
 # ObaPick 名称・見せ方の検討案
 
-この文書は [Issue #227](https://github.com/tomiya7688/ai-context-reducer/issues/227) に基づく**公開前のレビュー案**です。現行のGitHubリポジトリ名 `ai-context-reducer` と配布物名・CLI名はそのままです。
+この文書は[Issue #227](https://github.com/tomiya7688/ai-context-reducer/issues/227)を基に作成され、**2026年10月16日にObaPickを正式名称として採用**しました。[PR #228](https://github.com/tomiya7688/ai-context-reducer/pull/228)はマージ済みです。GitHubのリポジトリ名と配布物名・CLI名の移行は[Issue #230](https://github.com/tomiya7688/ai-context-reducer/issues/230)で別途管理します。
 
 ## 何を伝える名前か
 
@@ -18,7 +18,7 @@
 - READMEの日本語版・英語版で同じ訴求を保ち、既存の検証結果・導線・手法文書は変更しない。
 - 実測ベンチマークの**75.5%** は固定した合成fixtureでのAIへ渡す文字数の削減率であって、一般的なトークン消費や費用の削減率ではない。
 
-## GitHub About に記入する案（正式採用後）
+## GitHub About に記入する案（Issue #211で設定）
 
 Description:
 
@@ -26,18 +26,18 @@ Description:
 
 Topics候補: `context-engineering`, `llm`, `ai-coding`, `coding-agent`, `developer-tools`, `code-search`, `context-management`。
 
-このPRではAbout欄を変更しない。既存の [Issue #211](https://github.com/tomiya7688/ai-context-reducer/issues/211) で設定・確認する。
+About欄はまだ未設定。既存の [Issue #211](https://github.com/tomiya7688/ai-context-reducer/issues/211) で設定・確認する。
 
-## 名前を確定する前の確認事項
+## 移行時の確認事項
 
-- [ ] ユーザーが **ObaPickを正式名称として採用する** と明示する。
+- [x] ユーザーが **ObaPickを正式名称として採用する** と明示した（2026年10月16日）。
 - [ ] 商標、一般Web検索、会社・製品の名称、ドメイン、主要SNSの同名/類似名を確認する。GitHubで完全一致が見つからないだけでは採用判断に十分でない。
 - [ ] マスコット素材の正式な画像名・原作者の表記とTomiya Character License適用範囲を最終確認する。
 - [ ] 初見の人が「専用ツールに入れ替える必要はなく、手法の説明を読んで試せる」と理解できるか確認する。
 
 ## 改名実施時の移行項目
 
-正式承認後、**別Issue・別PR**として扱う。
+正式採用済み。GitHubリポジトリの改名や参照の移行は[Issue #230](https://github.com/tomiya7688/ai-context-reducer/issues/230)で管理する。
 
 1. GitHubのリポジトリ名変更と新旧URLの導線。
 2. READMEのリンク、日本語・英語文書、関連リポジトリからの参照。
