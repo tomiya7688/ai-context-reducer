@@ -363,6 +363,12 @@
       "japanese": "docs/jp/AI利用/作業ごとのコンテキスト使用量の目安を作る.md",
       "english": "docs/en/ai-usage/estimate-context-use-by-task.md",
       "english_status": "translated"
+    },
+    {
+      "id": "coding-agent-overview",
+      "japanese": "docs/jp/AI利用/コーディングエージェントの種類と選び方.md",
+      "english": "docs/en/ai-usage/coding-agent-overview.md",
+      "english_status": "translated"
     }
   ]
 }
