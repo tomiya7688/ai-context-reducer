@@ -1,4 +1,8 @@
-# ai-context-reducer
+# ObaPick
+
+<img src="assets/obapick-mascot.png" alt="ObaPick mascot" width="128" height="128" />
+
+**Give AI only the context it needs.**
 
 English | [日本語](README.md)
 
@@ -107,4 +111,4 @@ Helper tool releases are available from [GitHub Releases](https://github.com/tom
 
 Japanese documents are under [`docs/jp/`](docs/jp/), with English versions under [`docs/en/`](docs/en/). LLM foundations are separated under [`docs/en/llm-mechanics/`](docs/en/llm-mechanics/), while practical workflows remain in the [Method Index](docs/en/method-index.md) and method guides.
 
-This repository is provided under the [MIT License](LICENSE). External projects and content remain subject to the licenses from their respective distributors.
+The documentation and code in this repository are provided under the [MIT License](LICENSE). The mascot image ([assets/obapick-mascot.png](assets/obapick-mascot.png)) is separately subject to the [Tomiya Character License v1.0.1](https://github.com/tomiya7688/Tomiya_character_license/blob/main/LICENSE). See [mascot asset terms](assets/README.md). External projects and content remain subject to the licenses from their respective distributors.

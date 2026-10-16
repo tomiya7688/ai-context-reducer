@@ -1,4 +1,8 @@
-# ai-context-reducer
+# ObaPick
+
+<img src="assets/obapick-mascot.png" alt="ObaPick マスコット" width="128" height="128" />
+
+**AIに渡す情報を、必要な分だけ。**
 
 日本語 | [English](README.en.md)
 
@@ -108,4 +112,4 @@ AIに作業を頼む人に向けて、必要なコードや資料を選んで渡
 
 日本語文書は[`docs/jp/`](docs/jp/)にあり、英語版は[`docs/en/`](docs/en/)にあります。LLMそのものの基礎は[`docs/jp/LLMの仕組み/`](docs/jp/LLMの仕組み/)に、実際の作業方法は[手法一覧](docs/jp/手法一覧.md)と各手法文書に分けています。
 
-このリポジトリの内容は[MIT License](LICENSE)で提供します。外部プロジェクトや外部コンテンツは、それぞれの配布元のライセンスに従います。
+このリポジトリの文書とコードは[MIT License](LICENSE)で提供します。マスコット画像（[assets/obapick-mascot.png](assets/obapick-mascot.png)）には、別途[Tomiya Character License v1.0.1](https://github.com/tomiya7688/Tomiya_character_license/blob/main/LICENSE)が適用されます。詳しくは[画像の利用条件](assets/README.md)をご確認ください。外部プロジェクトや外部コンテンツは、それぞれの配布元のライセンスに従います。
