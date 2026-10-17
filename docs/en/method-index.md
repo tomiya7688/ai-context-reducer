@@ -37,6 +37,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - Implementation and review conversations are becoming mixed: [Assign AI roles and separate chats by task](ai-usage/split-chats-by-task.md) — specify responsibilities and permitted changes, then hand over necessary sources, diffs, and check results.
 
+- You keep restating the same work procedure: [Advance one listed task per signal](methods/run-one-task-per-signal.md) — provide the list, priorities, per-request scope, and stop conditions, then use “next” to request one ready task.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
