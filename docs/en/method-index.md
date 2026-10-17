@@ -35,6 +35,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - You need usage estimates for planning tasks: [Build context-use estimates by task kind](ai-usage/estimate-context-use-by-task.md) — separate per-call input and cumulative usage, then compare median and range under matching conditions.
 
+- Implementation and review conversations are becoming mixed: [Assign AI roles and separate chats by task](ai-usage/split-chats-by-task.md) — specify responsibilities and permitted changes, then hand over necessary sources, diffs, and check results.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
