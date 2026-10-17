@@ -399,6 +399,12 @@
       "japanese": "docs/jp/LLMの仕組み/コンテキストの量と計算量と料金の関係.md",
       "english": "docs/en/llm-mechanics/context-compute-and-cost.md",
       "english_status": "translated"
+    },
+    {
+      "id": "splitting-long-files-and-logs",
+      "japanese": "docs/jp/手法/長いファイルやログを区切ってAIに渡す.md",
+      "english": "docs/en/methods/splitting-long-files-and-logs.md",
+      "english_status": "translated"
     }
   ]
 }
