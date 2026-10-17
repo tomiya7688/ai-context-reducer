@@ -387,6 +387,12 @@
       "japanese": "docs/jp/手法/複数のAIに担当と編集範囲を分けて頼む.md",
       "english": "docs/en/methods/assign-agent-edit-ownership.md",
       "english_status": "translated"
+    },
+    {
+      "id": "splitting-long-files-and-logs",
+      "japanese": "docs/jp/手法/長いファイルやログを区切ってAIに渡す.md",
+      "english": "docs/en/methods/splitting-long-files-and-logs.md",
+      "english_status": "translated"
     }
   ]
 }
