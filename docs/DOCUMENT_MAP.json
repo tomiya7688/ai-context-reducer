@@ -393,6 +393,12 @@
       "japanese": "docs/jp/手法/長いファイルやログを区切ってAIに渡す.md",
       "english": "docs/en/methods/splitting-long-files-and-logs.md",
       "english_status": "translated"
+    },
+    {
+      "id": "readme-navigation",
+      "japanese": "docs/jp/手法/人とAIが必要な情報へ進めるREADMEを書く.md",
+      "english": "docs/en/methods/write-readme-for-people-and-ai.md",
+      "english_status": "translated"
     }
   ]
 }
