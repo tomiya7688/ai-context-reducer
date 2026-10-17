@@ -369,6 +369,12 @@
       "japanese": "docs/jp/AI利用/コーディングエージェントの種類と選び方.md",
       "english": "docs/en/ai-usage/coding-agent-overview.md",
       "english_status": "translated"
+    },
+    {
+      "id": "task-role-chats",
+      "japanese": "docs/jp/AI利用/作業ごとにAIの役割とチャットを分ける.md",
+      "english": "docs/en/ai-usage/split-chats-by-task.md",
+      "english_status": "translated"
     }
   ]
 }
