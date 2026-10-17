@@ -387,6 +387,18 @@
       "japanese": "docs/jp/手法/複数のAIに担当と編集範囲を分けて頼む.md",
       "english": "docs/en/methods/assign-agent-edit-ownership.md",
       "english_status": "translated"
+    },
+    {
+      "id": "context-definition",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-context.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-compute-cost",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストの量と計算量と料金の関係.md",
+      "english": "docs/en/llm-mechanics/context-compute-and-cost.md",
+      "english_status": "translated"
     }
   ]
 }

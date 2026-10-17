@@ -6,6 +6,8 @@ An autoregressive LLM does not normally construct an entire finished response in
 
 This guide follows the path from user text to generated output.
 
+[What Is Context?](what-is-context.md) first explains why earlier conversations and code are needed, and how visible text differs from the current model input.
+
 ## 1. The application assembles model input
 
 A chat application may combine the visible user message with system instructions, earlier messages, retrieved documents, and tool results. The exact format is product- and model-specific.
@@ -71,6 +73,14 @@ Generation continues until a stop token, a length limit, or another application-
 
 Implementations commonly use a **KV cache** to retain Key and Value tensors from previous positions so generation does not recompute all of them from scratch. A KV cache is temporary inference state, not parameter training or permanent memory.
 
+## Processing input and generating a continuation are different phases
+
+The sequence above does not mean that both input and output are newly generated one token at a time. The initial input already exists, so many positions can be processed together within each layer. This input processing is called prefill. Subsequently processing generated tokens to select further tokens is decode. Hugging Face's [Continuous batching](https://huggingface.co/docs/transformers/continuous_batching) provides an implementation example of grouped input processing.
+
+Likewise, “next input” in the diagram describes generation conditions, not a requirement to retransmit the entire sequence as a separate API request each time. Reusing previous numeric data in a KV cache still leaves the current position's references to that data. See Hugging Face's [How caching works](https://huggingface.co/docs/transformers/cache_explanation).
+
+Even generating the same number of tokens can require different work when the input being referenced has a different length. [Context Amount, Computation, and Cost](context-compute-and-cost.md) connects position-wise work, relationships between positions, cumulative usage, and billing units through concrete examples.
+
 ## Generation is not retrieval of a finished answer
 
 Later tokens are predicted from the prompt and the tokens already generated. If an early token introduces a wrong premise, later tokens may continue consistently from that wrong premise.
@@ -89,3 +99,5 @@ Choosing context is therefore not merely an exercise in shortening prompts. It d
 
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language-models.pdf)
+- [How caching works](https://huggingface.co/docs/transformers/cache_explanation) — reusing earlier Keys and Values while referencing them from the current position.
+- [Continuous batching](https://huggingface.co/docs/transformers/continuous_batching) — an implementation example processing multiple input tokens together during prefill.

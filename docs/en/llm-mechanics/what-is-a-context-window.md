@@ -6,6 +6,8 @@ Models are sometimes described as having a "128K context." It is misleading to r
 
 A **context window** is the bounded token range that a model can process for one inference. Exact accounting between input and generated output depends on the model and API.
 
+Context as information and the window as capacity are different concepts. Cumulative tokens across calls are different from current occupancy as well. See [What Is Context?](what-is-context.md).
+
 ## Context can include more than visible user text
 
 A chat system may send:
@@ -21,6 +23,14 @@ A chat system may send:
 The text visible in the interface therefore need not equal the actual model input.
 
 Output reservation and maximum generation length are also API-specific. Check the target service instead of assuming that the entire advertised context can always be used as user input.
+
+## Distinguish remaining capacity from whole-task usage
+
+Consider a fictional service allowing 10,000 tokens of combined input and generation, with a separate output limit of 3,000. With 6,000 input tokens, capacity leaves 4,000, but output is still limited to 3,000. With 8,000 input tokens, combined capacity leaves at most 2,000 for generation. This illustrates accounting, not an actual API's reservation or enforcement behavior.
+
+If reasoning tokens are included in generation under that service's rules, the entire allowance is not available for a visible answer. OpenAI's [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state) provides a product-specific example of these categories.
+
+Adding an earlier call's input to cumulative usage does not itself consume current capacity. Separate information actually carried into current processing from the record of past usage. Reusing input computation through caching also does not remove that input from processing, so a cache hit alone does not free window space. See [computation, billing, and caching](context-compute-and-cost.md).
 
 ## Being inside the window is not the same as being used reliably
 
@@ -42,7 +52,7 @@ A KV cache is likewise temporary computation state for generation, not permanent
 
 Pricing, latency, and memory behavior depend on the model and implementation, but more input means more data must be represented and processed.
 
-Modern systems use many optimizations, so this guide does not assign one universal complexity formula to every deployed model. The practical point is simpler: a larger context limit is not a reason to add unrelated material.
+[Context Amount, Computation, and Cost](context-compute-and-cost.md) separates position-wise processing, relationships between positions, and reuse during generation, explaining why equal call counts can involve unequal work. A larger context limit is not a reason to add unrelated material.
 
 ## What should remain in context?
 
@@ -77,3 +87,4 @@ A larger window does not eliminate the value of selecting evidence. See [Context
 
 - [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172)
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
+- [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state) — input, generation, and context capacity; a product-specific example.
