@@ -375,6 +375,12 @@
       "japanese": "docs/jp/AI利用/作業ごとにAIの役割とチャットを分ける.md",
       "english": "docs/en/ai-usage/split-chats-by-task.md",
       "english_status": "translated"
+    },
+    {
+      "id": "one-task-per-signal",
+      "japanese": "docs/jp/手法/課題一覧から一件ずつAIに進めさせる.md",
+      "english": "docs/en/methods/run-one-task-per-signal.md",
+      "english_status": "translated"
     }
   ]
 }
