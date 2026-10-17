@@ -41,6 +41,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - Multiple AI agents edit the same files and their results are hard to combine: [Assign responsibilities and edit boundaries to multiple AI agents](methods/assign-agent-edit-ownership.md) — give independent tasks owners and separate workspaces, keep shared files under one editor, and have the coordinator check the integrated result.
 
+- A needed file or log exceeds one read: [Split long files and logs into parts for the AI](methods/splitting-long-files-and-logs.md) — record the source snapshot and coverage, then compare per-part findings against original evidence.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
