@@ -95,6 +95,8 @@ Role instructions do not enforce file permissions. If the environment supports a
 
 Have the AI record the following in `docs/tasks/settings-save/handoff.md`. This is a blank template, not a completed verification report.
 
+With Git, a commit records a set of changes; its ID identifies a revision. Provide changes not yet recorded in Git separately as an uncommitted diff.
+
 ```markdown
 # Settings-save handoff
 - Goal and conditions: task.md
@@ -130,7 +132,7 @@ However, repeated specification reads and handoff preparation or checking can in
 
 ## Research on assigning roles
 
-[Zheng et al. (2024)](https://aclanthology.org/2024.findings-emnlp.888/) evaluated personas including 162 roles on 2,410 factual questions selected from MMLU. Adding roles did not improve overall accuracy compared with the no-role condition. [1]
+[Zheng et al. (2024)](https://aclanthology.org/2024.findings-emnlp.888/) evaluated personas including 162 roles on 2,410 factual questions selected from the MMLU knowledge-question evaluation dataset. Adding roles did not improve overall accuracy compared with the no-role condition. [1]
 
 [Luz de Araujo et al. (2025)](https://aclanthology.org/2025.emnlp-main.1364/) evaluated nine models on 27 tasks. Expert roles commonly produced improvement or no significant difference, while irrelevant persona details also affected performance. [2]
 
