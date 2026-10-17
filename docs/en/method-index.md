@@ -43,6 +43,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - A needed file or log exceeds one read: [Split long files and logs into parts for the AI](methods/splitting-long-files-and-logs.md) — record the source snapshot and coverage, then compare per-part findings against original evidence.
 
+- Readers cannot find setup or sources to give the AI from the README: [Write a README for people and AI](methods/write-readme-for-people-and-ai.md) — provide purpose-based entry points, actual references, and explicit reading instructions.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.
