@@ -39,6 +39,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - You keep restating the same work procedure: [Advance one listed task per signal](methods/run-one-task-per-signal.md) — provide the list, priorities, per-request scope, and stop conditions, then use “next” to request one ready task.
 
+- Multiple AI agents edit the same files and their results are hard to combine: [Assign responsibilities and edit boundaries to multiple AI agents](methods/assign-agent-edit-ownership.md) — give independent tasks owners and separate workspaces, keep shared files under one editor, and have the coordinator check the integrated result.
+
 ### For your first code change
 
 Start with [Context Priority](context-priority.md) to identify the behavior, specification, and tests for the change. Follow additional links only when you need help choosing the change type or checking its impact.

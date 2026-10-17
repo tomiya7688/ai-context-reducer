@@ -381,6 +381,12 @@
       "japanese": "docs/jp/手法/課題一覧から一件ずつAIに進めさせる.md",
       "english": "docs/en/methods/run-one-task-per-signal.md",
       "english_status": "translated"
+    },
+    {
+      "id": "parallel-agent-edit-ownership",
+      "japanese": "docs/jp/手法/複数のAIに担当と編集範囲を分けて頼む.md",
+      "english": "docs/en/methods/assign-agent-edit-ownership.md",
+      "english_status": "translated"
     }
   ]
 }
