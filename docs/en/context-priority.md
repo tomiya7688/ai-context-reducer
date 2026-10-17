@@ -19,6 +19,8 @@ You do not need to start with screen rendering, login behavior, or CSV input han
 
 You do not need to read a large candidate file from beginning to end. Search for the date-writing function or terms such as `CSV` and `date`, then read that code, its callers, and the surrounding test. A small specification or direct test may be more important than a large file. Size and past change frequency alone do not determine whether to read something.
 
+If the selected text itself exceeds a single-read limit, see [Split long files and logs into parts for the AI](methods/splitting-long-files-and-logs.md) for boundaries, coverage records, and combining findings. File selection and transferring the selected text are separate steps.
+
 ## When to widen the search
 
 If a test fails, also inspect the failing behavior and the code that creates its input. If you find another program that consumes the CSV format, inspect that code too. If the specification and implementation disagree, find the source that determines which one is correct. Expand the candidate list only to understand a newly discovered effect or its cause.
