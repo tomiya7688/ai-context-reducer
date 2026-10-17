@@ -34,6 +34,10 @@ When code or tests move, update the guide in the same change. If a row is out of
 
 This guide fits projects with several features or documents where recurring task types lead to different starting points. In a small project with only a few kinds of work and obvious source and tests, a short note in an existing guide is enough; a separate table may not be useful.
 
+## Advance one task at a time
+
+This guide identifies starting points for a selected task. To choose one remaining task per “next” signal, see [Advance one listed task per signal](methods/run-one-task-per-signal.md) for list preparation, selection criteria, and stop conditions.
+
 ## Example request to the AI
 
 For a one-time task, name this map in the request. For recurring use, link it from project instructions the AI actually reads.
