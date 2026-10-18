@@ -2,53 +2,93 @@
 
 > Japanese Source of Truth: [コード構造の索引](../jp/コード構造の索引.md)
 
-A source structure index is a searchable list of where functions and types are defined, and how they call or depend on one another. Narrow candidates with the index before reading a large source file from beginning to end. The index is a way to find what to read, not a replacement for the original source.
+When locating processing to change in a large program, you can use a searchable list of definitions of functions (named operations) and types (kinds of data) and their users. Have the AI narrow candidates with the list, then inspect their code and tests to limit unrelated files read up front.
 
-## Example: change how configuration is loaded
+The list is a guide to sources. Have the AI check that it matches current code before deciding how to change behavior or what to verify.
 
-Suppose you need to change how a configuration file is loaded. Search the index for the loading function, then follow its callers and the modules that use it. Related tests can also become candidates. First point the AI to the function and its direct relationships; read additional dependencies or tests when needed. This reduces the amount of unrelated screens and libraries read up front.
+## Example: change what happens when a settings file is missing
+
+Suppose a fictional settings app should use defaults when its settings file is missing. The following paths and function name are illustrative.
 
 ```text
-behavior to change
-  -> find related functions and types
-  -> check callers and related tests
-  -> read the necessary original code
-  -> expand the investigation if the effects are broader
+Settings-loading function: load_settings
+Definition file: src/settings.py
+Candidate user: app.py
+Candidate related tests: tests/test_settings.py
 ```
 
-## What to put in the index
+First have the AI inspect the definition in `src/settings.py`, its use in `app.py`, and expectations in `tests/test_settings.py`. Add settings screens or unrelated libraries only when evidence establishes a necessary relationship.
 
-The index may record:
+For example, although the list points to `app.py`, the current use might have moved to `src/startup.py`. Do not choose a change location from a reported line number or function name alone; use the following comparison procedure.
 
-- file, module, type, and function names
-- the file and line where each is defined
-- functions it calls and functions that call it
-- imports and dependencies between modules
-- the responsibility of each file or module
+## When to use it
 
-If an IDE, language tool, or static analyzer already provides this information, reuse it. [Tree-sitter](https://github.com/tree-sitter/tree-sitter), which can inspect code syntax, and [SCIP](https://github.com/scip-code/scip), which shares indexes of definitions and references, are examples. You do not need to add a new environment just to introduce an analyzer.
+An index helps when you repeatedly locate the same functions in large files or rediscover callers, dependencies, and tests after each change. Ordinary search is sufficient for a small task whose change location and checking procedure are already known.
 
-## How to use the index
+Reuse definition and reference results available in your existing development environment. Do not introduce a new index if recreating it costs more effort than it saves.
 
-1. From the request, identify a name to search for or a changed file.
-2. Use the index to find candidate definitions, callers, dependencies, and related tests.
-3. Open the original files and confirm the actual behavior and relationships.
-4. If the change affects shared code or a public specification, broaden the investigation and validation.
+## Information the list may contain, and its limits
 
-Even when the index returns many results, you do not need to send them all to the AI. Start with results directly related to the task. Once the needed references are clear, read the original documentation and source.
+For example, a list may contain the following. Availability depends on the analysis method.
 
-## When it helps, and its limits
+- File, type, and function names and definition locations
+- Functions called by a function, or places that call it
+- Imports between files
+- Leads for locating related tests
 
-An index helps when people repeatedly search large files for the same functions, or trace callers, dependencies, and tests after each change. For a small change where the relevant names and files are already known, normal search is enough. Do not add an index when generating and updating it takes more time than it saves.
+Lists can retain old locations or omit relationships. Selecting functions by names in configuration or generating code at runtime can create relationships analysis cannot detect. **Absence from the list is not evidence of no relationship.**
 
-An index only shows relationships the analyzer can detect. It may omit dynamic calls or generated code, and it may be out of date. Check the original code before changing it, and run the broader checks needed for changes to shared code or public specifications. Do not decide impact or safety from index results alone.
+## Compare the list with current code
 
-Treat index results as leads for investigation. Verify candidate definitions and callers in the original source, and use code and tests to make change decisions. The same workflow works with another index or search method.
+Have the AI follow this order. You can use the same steps when investigating yourself.
 
-## Example request to the AI
+1. **Open definitions.** Open the actual function or type at the reported path and inspect its current name and processing. If lines have shifted, search for the current definition. When names are shared, distinguish candidates using their file, containing type, inputs, and return values.
+2. **Open users.** Check which definition is actually imported, what is passed, and how return values or errors are handled. A matching name does not establish that the same function is used.
+3. **Open related tests.** Inspect inputs and expected results and establish that the tests cover the target behavior. Similar filenames alone do not establish relevance.
+4. **Add missing relationships.** When you find callees, shared processing, configuration, or other users, add the necessary definitions and related tests to the investigation. Record omitted relationships with paths and evidence. If the index can be updated, recreate it from its underlying information or current code.
 
-> Query the index for the target function or type, its callers, and related tests. Return only candidates relevant to this change, with paths and reasons. Open the selected original code and tests, and report possible relationships the index cannot detect and anything not verified.
+For the settings example, compare:
 
-## Optional tools and terminology
+| Location to open | What to check | When another relationship appears |
+| --- | --- | --- |
+| `src/settings.py` | Whether a missing file produces an exception or defaults | Follow the definition if loading delegates to another function |
+| `app.py` | Whether it uses the intended `load_settings`, and how it handles exceptions or defaults | Inspect the new location if use has moved; include other affected users |
+| `tests/test_settings.py` | Inputs and expectations with a present or missing file | Report a verification gap if no test covers a necessary condition |
 
-The [source-structure-index](../../tools/common/large/source-structure-index/README.md) indexes function and type definitions, callers, and dependencies, then returns candidates related to a name or changed file. It can also reuse results from available language analyzers. Terms: **Source Structure Index** / symbol index.
+Reading tests establishes their written expectations. Current success requires execution results. Leave unresolved definitions or users unverified too; do not have the AI infer cause, impact, or safety from the list alone.
+
+Expand scope for concrete gaps: behavior delegated elsewhere, changed expectations of another user, or missing tests for a required condition. Have the AI find sources that address that gap instead of adding unrelated files to compensate.
+
+## Where to provide the guide and an example request
+
+For a one-time task, attach relevant list entries and the change goal, then request the comparison steps above. For an AI that can open files, specify the index location and code paths. For a chat that cannot, attach or paste necessary candidate code and tests too. Paths alone do not supply contents.
+
+For recurring use, put the index location and update procedure in existing development guidance. An example new guide location is `docs/how-to-find-code.md`; link it from instructions the AI reads with the condition “when locating definitions or users.” Check whether files such as `AGENTS.md` load automatically in your environment.
+
+```text
+I am considering changing settings loading to use defaults when the settings file is missing.
+From the attached list, find candidate definitions, users, and related tests for load_settings.
+Open actual definitions and users and check inputs, return values, and error handling.
+Open related tests and inspect the target conditions and expected results.
+
+If you find unlisted callees or users, add their code and related tests to the investigation.
+Report stale paths, missing relationships, and unresolved locations with evidence.
+First propose change candidates and necessary checks; do not infer cause or impact from the list alone.
+Separate sources read, checks executed and their results, and unverified points.
+```
+
+## Why this can reduce reading
+
+Following candidates can avoid having the AI open every file to infer definitions and relationships. Comparing candidates with code and tests can help avoid edits based on stale guidance or another function with the same name, and subsequent reinvestigation.
+
+Creating, updating, and checking an index also costs effort. Preserve necessary code and tests and add sources when evidence establishes a relationship. A short list alone does not prove lower usage; compare read records or measured input usage when available.
+
+## Supporting tools
+
+- [source-structure-index](../../tools/common/large/source-structure-index/README.md): Combines existing analysis results and returns candidate definitions, references, and dependencies by name or changed file. It can extract relevant surrounding information. Relationships depend on the underlying analysis; complete caller information is not always available.
+- [Tree-sitter](https://github.com/tree-sitter/tree-sitter): Inspects code syntax, its grammatical structure, and can provide material for locating definitions.
+- [SCIP](https://github.com/scip-code/scip): A format and tooling for sharing indexes of definitions and references. It can support reuse of existing analysis results.
+
+## About this method
+
+A searchable list of code definitions and reference relationships that directs readers to original code is called a **Source Structure Index**, or symbol index.
