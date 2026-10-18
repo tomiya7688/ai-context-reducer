@@ -4,7 +4,7 @@
 
 When AI usage is high, inspect the record of one task before shortening instructions and sources indiscriminately. Find what was supplied repeatedly and where work was retried, then select one change. Try it under the same completion criteria and check whether the overall burden decreased without losing required quality.
 
-A new analysis tool is not required. Start with conversations, file-retrieval history, command results, and usage displays available in your current environment. One finding, such as supplying the same complete failed-test log twice, with its supporting record is enough to begin. Do not guess what happened in parts of the execution you cannot observe.
+You can start with conversations, file-retrieval history, command results, and usage displays available in your current environment. One finding, such as supplying the same complete failed-test log twice, with its supporting record is enough to begin. Do not guess what happened in parts of the execution you cannot observe.
 
 This guide covers **finding a cause → making one change → measuring again**. See [Build context-use estimates by task kind](../ai-usage/estimate-context-use-by-task.md) for token accounting and medians, and [Context Amount and Use](../llm-mechanics/context-amount-and-use.md) for how input relates to computation, cost, and quality.
 
@@ -42,13 +42,25 @@ Even the same revision may need another read for a different decision, to restor
 
 ### Avoid duplicate accounting
 
-Use call and attempt identifiers to count each execution once. Retrieving a saved response again is different from a retry that invokes the model anew. If a parent agent's aggregate includes its children, do not add the children's totals again. Keep overall totals with unknown breakdowns separate from identifiable individual records. [1][2]
+Tokens are units a model uses to handle text. Cache-read tokens represent reused input computation, while reasoning tokens are generated while constructing an answer. Check how the measurement source distinguishes totals from components.
+
+Use call and attempt identifiers to count each execution once. Retrieving a saved response again is different from a retry that invokes the model anew. If the parent agent (the coordinating AI) reports an aggregate that includes its children (the delegated AIs), do not add the children's totals again. Keep overall totals with unknown breakdowns separate from identifiable individual records. [1][2]
 
 For example, **hypothetical usage** of 6,000 input tokens, including 4,000 cache-read tokens, and 1,200 output tokens, including 700 reasoning tokens, totals 7,200. Do not add the components again. When cache writes are reported separately, check their relationship to the input total in the measurement source's specification. [1][2]
 
 Leave unavailable values blank and mark them unmeasured. A partial sum describes only the records obtained, not the entire task. Some instrumentation uses zero as a placeholder for missing usage, so inspect status and definitions as well as values. At the time checked, OpenTelemetry's generative-AI token conventions are in Development and also specify zero reporting with an unknown category when usage is absent. [2]
 
 Do not add successive snapshots of a cumulative counter. Use its increase during the period and check for counter resets. Likewise, do not add both the per-call sum and the equivalent counter increase. Keep prices, characters, estimated tokens, and provider-recorded tokens in separate fields.
+
+## Save the diagnosis record and give it to the AI
+
+Use an existing task record to keep the diagnostic table above and comparison table below together. An example new location is `.local/context-diagnosis/T1.md`. Start with the task ID, starting revision, completion criteria, and permitted log locations and record IDs. Follow with candidates, one proposed change, comparison results, and the decision. Do not duplicate complete original logs.
+
+If storing private task history inside the project, inspect existing exclusions and add `.local/` to `.gitignore` if necessary before use. Exclusions do not undo earlier publication. Keep shareable conclusions and reproduction conditions in a separate public document.
+
+For one diagnosis, attach the memo or specify its path to an AI that can read files. For a chat that cannot, paste necessary rows and permitted record excerpts. A path alone does not provide content.
+
+For recurring use, add a short condition to project instructions the AI reads, such as: “Only when asked to diagnose usage, read the specified task's diagnosis memo and use record IDs to inspect necessary originals.” Automatic loading of files such as `AGENTS.md` depends on the environment; check settings or read records. Ordinary implementation tasks need not load every earlier diagnosis memo.
 
 ## 3. Match the change to the cause
 
@@ -119,9 +131,10 @@ Lower tokens alone do not establish success when required tests were skipped, a 
 
 ## Request template
 
-Replace bracketed values and attach only records approved for access.
+Replace bracketed values and attach the diagnosis memo and only records approved for access.
 
 ```text
+The diagnosis memo is [for example: .local/context-diagnosis/T1.md].
 The target is [task ID and record location]. Completion requires [behavior and tests].
 Start read-only. Investigate repeated instructions, documents, tool results,
 and retries of the same failure. Do not load every log at once;
@@ -140,16 +153,33 @@ components or parent/child totals. Label missing usage as unmeasured
 and potential savings as estimates.
 ```
 
-## When to skip this, and supporting sources
+## Why this can reduce reading
+
+Correcting repeated instructions or unnecessary full-text delivery can reduce input carried into later calls. Correcting a failure that causes repeated attempts can also reduce the history and tool results supplied again. Retain necessary rereading and checks, and include additional diagnosis and summarization usage in the comparison.
+
+## When to skip this
 
 Detailed diagnosis can cost more than it saves for a one-off short question or a task with little repetition. Do not add tools merely to give an appearance of certainty when the needed records are unavailable. Start by retaining authorized records for the next task instead.
 
-Existing implementations can identify possible duplication and rereading from local instruction files and conversation records. Caveman's `learn` documentation is one example, but its diagnostic quantities are treated as estimates. The project also warns against treating shorter output alone as whole-task monetary savings. [4][5] Here these are references for diagnostic ideas, not required installations or connections. This guide does not adopt an extremely terse writing style or a product-specific score or reduction percentage.
+## Supporting tools
 
-Sources checked on October 18, 2026. The diagnostic tables, requests, and comparison plan are operational examples for this guide, not a measured benchmark.
+- [Caveman learn](https://github.com/JuliusBrussee/caveman/blob/main/docs/technical/learn.md): Identifies candidate improvements such as duplication and rereading in instruction files and conversation records, with supporting evidence. It can help diagnose local history, but its quantities are estimates. [4] [Honest Numbers](https://github.com/JuliusBrussee/caveman/blob/main/docs/HONEST-NUMBERS.md) explains separating output length from whole-task cost and recording regressions and unmeasured quantities. [5]
 
-1. OpenAI. [Observability and usage](https://developers.openai.com/api/docs/guides/agents-api/observability) — a product-specific recording example covering root/child work, retries, missing usage, components, and cost with caching. This citation is not an adoption recommendation.
-2. OpenTelemetry. [Generative AI inference token metrics](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-token-metrics.md) — Development status when checked; input/output components and cumulative versus distribution metrics. Check the version in use for names and missing-value conventions.
-3. Bai et al. [How Do AI Agents Spend Your Money?](https://arxiv.org/abs/2604.22750v2) — eight-model analysis on SWE-bench Verified; use variability and accuracy findings within their conditions, not as a general reduction rate.
-4. Caveman. [caveman learn](https://github.com/JuliusBrussee/caveman/blob/main/docs/technical/learn.md) — implementation documentation on local history diagnosis, evidence-backed candidates, and estimates.
-5. Caveman. [Honest Numbers](https://github.com/JuliusBrussee/caveman/blob/main/docs/HONEST-NUMBERS.md) — reporting that separates output length from whole-task cost and retains regressions and unmeasured quantities.
+## Relationship to research
+
+This workflow inspects repeated information in work records and compares one change at a time. Bai and colleagues [3] analyze usage variability and related patterns in coding evaluation tasks. Their study does not validate the savings from this guide's diagnostic procedure.
+
+## References
+
+Checked October 18, 2026. Diagnostic tables, requests, and comparison plans are operational examples, not a measured benchmark.
+
+### Research papers
+
+- [3] Longju Bai et al. (2026). [How Do AI Agents Spend Your Money? Analyzing and Predicting Token Consumption in Agentic Coding Tasks](https://arxiv.org/abs/2604.22750v2). arXiv:2604.22750v2 (preprint: a manuscript shared before journal or conference publication). An eight-model analysis on SWE-bench Verified, a benchmark of bug fixes in real repositories. Do not reinterpret its findings as a general reduction rate.
+
+### Official specifications and implementation documentation
+
+- [1] OpenAI. [Observability and usage](https://developers.openai.com/api/docs/guides/agents-api/observability) — a product-specific recording example covering root/child work, retries, missing usage, components, and cost with caching.
+- [2] OpenTelemetry. [Generative AI inference token metrics](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-token-metrics.md) — Development status when checked; input/output components and cumulative versus distribution metrics. Check the version in use for names and missing-value conventions.
+- [4] Caveman. [caveman learn](https://github.com/JuliusBrussee/caveman/blob/main/docs/technical/learn.md) — implementation documentation on local history diagnosis, evidence-backed candidates, and estimates.
+- [5] Caveman. [Honest Numbers](https://github.com/JuliusBrussee/caveman/blob/main/docs/HONEST-NUMBERS.md) — reporting that separates output length from whole-task cost and retains regressions and unmeasured quantities.
