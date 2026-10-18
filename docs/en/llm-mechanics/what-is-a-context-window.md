@@ -85,6 +85,13 @@ A larger window does not eliminate the value of selecting evidence. See [Context
 
 ## References
 
-- [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172)
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
+Checked October 18, 2026.
+
+### Research papers
+
+- Nelson F. Liu et al. (2024). [Lost in the Middle: How Language Models Use Long Contexts](https://aclanthology.org/2024.tacl-1.9/). Transactions of the Association for Computational Linguistics, 12, 157–173.
+- Ashish Vaswani et al. (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). NeurIPS.
+
+### Official documentation, technical reports, and practical guidance
+
 - [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state) — input, generation, and context capacity; a product-specific example.

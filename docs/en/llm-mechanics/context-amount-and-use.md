@@ -22,7 +22,7 @@ These sources investigate different problems. Distinguish what each varied and m
 
 | Source and scope | Compared conditions | Observation | What it does not establish |
 | --- | --- | --- | --- |
-| **Lost in the Middle**, a paper released in 2023 [1]; then-current models performing multi-document QA and key-value retrieval | The position of necessary information within long input | Performance often declined in the middle relative to the beginning or end | Not every current model necessarily misses information in the middle |
+| **Lost in the Middle**, released in 2023 and published in TACL in 2024 [1]; then-current models performing multi-document QA and key-value retrieval | The position of necessary information within long input | Performance often declined in the middle relative to the beginning or end | Not every current model necessarily misses information in the middle |
 | **GSM-IC**, ICML 2023 [2]; arithmetic word problems | Adding information unnecessary for the original solution | Accuracy declined for the evaluated models and methods | The same effect size cannot be assumed for code repair |
 | **RULER**, COLM 2024 [3]; 17 long-context models and 13 tasks | Varying input length and tasks, including multi-hop tracing and aggregation beyond retrieval | Many models declined with increasing length despite strong simple-retrieval results | Advertised capacity alone does not determine capability on every task |
 | **Context Rot**, Chroma technical report dated July 14, 2025 [4]; 18 models across the study | Input length and distractors in retrieval, conversation-history, and repetition experiments | Reports long-input degradation and differences associated with content | Not all 18 models participated in every experiment; no universal token threshold for degradation is established |
@@ -130,11 +130,16 @@ Read necessary long originals and exclude unnecessary short notes. Add missing e
 
 ## References
 
-Checked October 17, 2026. Distinguish the studies' models, tasks, and publication dates from current models and real work. This guide's repair examples and evaluation plan are not those studies' experimental results.
+Checked October 18, 2026. Distinguish the studies' models, tasks, and publication dates from current models and real work. This guide's repair examples and evaluation plan are not those studies' experimental results.
 
-1. Liu et al. [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172) — QA and retrieval with varied evidence positions.
-2. Shi et al. [Large Language Models Can Be Easily Distracted by Irrelevant Context](https://arxiv.org/abs/2302.00093) — GSM-IC arithmetic tasks with unnecessary information.
-3. Hsieh et al. [RULER: What's the Real Context Size of Your Long-Context Language Models?](https://arxiv.org/abs/2404.06654) — long-context evaluation including retrieval, multi-hop tracing, and aggregation.
-4. Chroma. [Context Rot: How Increasing Input Tokens Impacts LLM Performance](https://www.trychroma.com/research/context-rot) — technical report varying input length and distractors.
-5. Vaswani et al. [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — combining information across positions through Attention.
-6. Anthropic. [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — practical guidance on sufficient information and over-aggressive compaction.
+### Research papers
+
+- [1] Nelson F. Liu et al. (2024). [Lost in the Middle: How Language Models Use Long Contexts](https://aclanthology.org/2024.tacl-1.9/). Transactions of the Association for Computational Linguistics, 12, 157–173 — QA and retrieval with varied evidence positions.
+- [2] Freda Shi et al. (2023). [Large Language Models Can Be Easily Distracted by Irrelevant Context](https://arxiv.org/abs/2302.00093). ICML — GSM-IC arithmetic tasks with unnecessary information.
+- [3] Cheng-Ping Hsieh et al. (2024). [RULER: What's the Real Context Size of Your Long-Context Language Models?](https://arxiv.org/abs/2404.06654). COLM — long-context evaluation including retrieval, multi-hop tracing, and aggregation.
+- [5] Ashish Vaswani et al. (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). NeurIPS — combining information across positions through Attention.
+
+### Official documentation, technical reports, and practical guidance
+
+- [4] Kelly Hong, Anton Troynikov, Jeff Huber. (2025-07-14). [Context Rot: How Increasing Input Tokens Impacts LLM Performance](https://www.trychroma.com/research/context-rot). Chroma Technical Report — technical report varying input length and distractors.
+- [6] Anthropic. [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — practical guidance on sufficient information and over-aggressive compaction.

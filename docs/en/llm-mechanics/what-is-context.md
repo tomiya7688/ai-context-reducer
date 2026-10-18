@@ -109,8 +109,13 @@ Follow the model's specification for output that includes internal reasoning tok
 
 ## References
 
-Checked October 17, 2026. Applications, quantities, and divisions of responsibilities are illustrative, not measurements or claims about a particular product's internal architecture.
+Checked October 18, 2026. Applications, quantities, and divisions of responsibilities are illustrative, not measurements or claims about a particular product's internal architecture.
 
-1. Hugging Face. [Chat templates](https://huggingface.co/docs/transformers/chat_templating) — assembling conversation roles and content into a model-appropriate token sequence.
-2. Vaswani et al. [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — position representations, Attention, and autoregressive generation.
-3. OpenAI. [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state) — state carryover, input accounting, and context windows; used as a product-specific example.
+### Research papers
+
+- [2] Ashish Vaswani et al. (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). NeurIPS — position representations, Attention, and autoregressive generation.
+
+### Official documentation, technical reports, and practical guidance
+
+- [1] Hugging Face. [Chat templates](https://huggingface.co/docs/transformers/chat_templating) — assembling conversation roles and content into a model-appropriate token sequence.
+- [3] OpenAI. [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state) — state carryover, input accounting, and context windows; used as a product-specific example.

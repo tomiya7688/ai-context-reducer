@@ -97,7 +97,14 @@ Choosing context is therefore not merely an exercise in shortening prompts. It d
 
 ## References
 
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
-- [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language-models.pdf)
+Checked October 18, 2026.
+
+### Research papers
+
+- Ashish Vaswani et al. (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). NeurIPS.
+
+### Official documentation, technical reports, and practical guidance
+
+- Alec Radford et al. (2019). [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language-models.pdf). OpenAI Technical Report.
 - [How caching works](https://huggingface.co/docs/transformers/cache_explanation) — reusing earlier Keys and Values while referencing them from the current position.
 - [Continuous batching](https://huggingface.co/docs/transformers/continuous_batching) — an implementation example processing multiple input tokens together during prefill.

@@ -146,12 +146,17 @@ Search and summarization also have costs. If shortening one input involves repea
 
 ## References
 
-Checked October 17, 2026. Product-specific accounting is presented as an example of that product. Consult current official specifications for actual prices, limits, and cache conditions.
+Checked October 18, 2026. Product-specific accounting is presented as an example of that product. Consult current official specifications for actual prices, limits, and cache conditions.
 
-1. Vaswani et al. [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — Attention, position-wise computation, and causal masking.
-2. Hugging Face. [How caching works](https://huggingface.co/docs/transformers/cache_explanation) — autoregressive generation and KV reuse.
-3. Hugging Face. [Optimizing LLMs for Speed and Memory](https://huggingface.co/docs/transformers/llm_tutorial_optimization) — Attention working memory, FlashAttention, model weights, and cache costs.
-4. OpenAI. [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state) — carried-history input accounting and capacity.
-5. OpenAI. [Pricing](https://developers.openai.com/api/docs/pricing) — input and output billing categories; the illustrative yen prices above are not copied from this schedule.
-6. OpenAI. [Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching) — reusing input computation and interpreting usage components.
-7. OpenAI. [Reasoning models](https://developers.openai.com/api/docs/guides/reasoning) — reasoning tokens and output usage.
+### Research papers
+
+- [1] Ashish Vaswani et al. (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). NeurIPS — Attention, position-wise computation, and causal masking.
+
+### Official documentation, technical reports, and practical guidance
+
+- [2] Hugging Face. [How caching works](https://huggingface.co/docs/transformers/cache_explanation) — autoregressive generation and KV reuse.
+- [3] Hugging Face. [Optimizing LLMs for Speed and Memory](https://huggingface.co/docs/transformers/llm_tutorial_optimization) — Attention working memory, FlashAttention, model weights, and cache costs.
+- [4] OpenAI. [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state) — carried-history input accounting and capacity.
+- [5] OpenAI. [Pricing](https://developers.openai.com/api/docs/pricing) — input and output billing categories; the illustrative yen prices above are not copied from this schedule.
+- [6] OpenAI. [Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching) — reusing input computation and interpreting usage components.
+- [7] OpenAI. [Reasoning models](https://developers.openai.com/api/docs/guides/reasoning) — reasoning tokens and output usage.

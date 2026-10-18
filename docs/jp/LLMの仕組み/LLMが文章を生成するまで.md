@@ -97,9 +97,16 @@ Transformerの最終層から得た表現は、語彙中の各候補トークン
 
 したがって、LLMへ渡す情報を選ぶ作業は、単なる「プロンプトを短くする工夫」ではありません。モデルが次の出力を条件付ける材料そのものを選ぶ作業です。
 
-## 参考資料
+## 参考文献
 
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — Transformer、Scaled Dot-Product Attention、位置情報の基本構造。
-- [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language-models.pdf) — 自己回帰型Transformer言語モデルの例。
+2026年10月18日に確認。
+
+### 論文
+
+- Ashish Vaswani et al. (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). NeurIPS — Transformer、Scaled Dot-Product Attention、位置情報の基本構造。
+
+### 公式資料・技術報告・実務解説
+
+- Alec Radford et al. (2019). [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language-models.pdf). OpenAI Technical Report — 自己回帰型Transformer言語モデルの例。
 - [How caching works](https://huggingface.co/docs/transformers/cache_explanation) — 過去のKey・Valueの再利用と、現在の位置からの参照。
 - [Continuous batching](https://huggingface.co/docs/transformers/continuous_batching) — 入力の複数トークンを一度に扱うprefillの実装例。
