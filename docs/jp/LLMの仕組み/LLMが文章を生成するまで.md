@@ -4,6 +4,8 @@ LLMの回答は、完成した文章を内部で一度に作ってから表示�
 
 この文書では、利用者が文章を入力してから、モデルが続きを生成するまでを処理順に追います。
 
+「なぜ過去の会話やコードも必要なのか」「画面の文章と今回の入力はどう違うか」は、[コンテキストとは何か](コンテキストとは何か.md)で先に説明しています。
+
 ## 1. システムがモデルへ渡す入力を組み立てる
 
 チャットサービスでは、画面に入力したメッセージだけがモデルへ渡るとは限りません。システム指示、過去の会話、取得した資料、ツールの結果などをサービス側が一定の形式で並べ、モデルへ渡す一つの入力列を作る場合があります。
@@ -73,6 +75,14 @@ Transformerの最終層から得た表現は、語彙中の各候補トークン
 
 実際の推論実装では、過去のAttention計算に使うKeyとValueを**KV cache**へ保持し、生成済み部分を毎回すべて計算し直す量を減らす方法が広く使われます。KV cacheは計算を再利用するための一時的な状態であり、モデルのパラメータを学習し直す仕組みではありません。
 
+## 入力を処理する段階と、続きを生成する段階
+
+上の流れは、入力も出力も先頭から一トークンずつ新しく作る、という意味ではありません。最初の入力列は既に存在するので、モデルは層ごとに多くの位置をまとめて処理できます。この入力処理をprefillと呼びます。その後、生成したトークンを処理して次を選ぶ段階がdecodeです。入力をまとめて扱う実装例は、Hugging Faceの[Continuous batching](https://huggingface.co/docs/transformers/continuous_batching)にあります。
+
+また、上の「次の入力」は生成の条件を示した図であり、その全文を毎回別のAPIリクエストとして送り直すという意味ではありません。KVキャッシュで過去の数値を再利用しても、新しい位置からその数値を参照する処理は残ります。Hugging Faceの[How caching works](https://huggingface.co/docs/transformers/cache_explanation)で、この区別を確認できます。
+
+同じ数のトークンを生成する場合でも、参照する入力の長さで処理が異なります。[コンテキストの量と計算量と料金の関係](コンテキストの量と計算量と料金の関係.md)では、位置ごとの計算と位置間の計算、累積使用量、課金単位を具体例でつなぎます。
+
 ## 生成は「完成した答えの読み出し」ではない
 
 自己回帰生成では、後半のトークンは、それまでに生成した前半も入力として予測されます。そのため、前半で誤った前提を生成すると、その前提に沿って後半が続くことがあります。
@@ -87,7 +97,16 @@ Transformerの最終層から得た表現は、語彙中の各候補トークン
 
 したがって、LLMへ渡す情報を選ぶ作業は、単なる「プロンプトを短くする工夫」ではありません。モデルが次の出力を条件付ける材料そのものを選ぶ作業です。
 
-## 参考資料
+## 参考文献
 
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — Transformer、Scaled Dot-Product Attention、位置情報の基本構造。
-- [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language-models.pdf) — 自己回帰型Transformer言語モデルの例。
+2026年10月18日に確認。
+
+### 論文
+
+- Ashish Vaswani et al. (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). NeurIPS — Transformer、Scaled Dot-Product Attention、位置情報の基本構造。
+
+### 公式資料・技術報告・実務解説
+
+- Alec Radford et al. (2019). [Language Models are Unsupervised Multitask Learners](https://cdn.openai.com/better-language-models/language-models.pdf). OpenAI Technical Report — 自己回帰型Transformer言語モデルの例。
+- [How caching works](https://huggingface.co/docs/transformers/cache_explanation) — 過去のKey・Valueの再利用と、現在の位置からの参照。
+- [Continuous batching](https://huggingface.co/docs/transformers/continuous_batching) — 入力の複数トークンを一度に扱うprefillの実装例。

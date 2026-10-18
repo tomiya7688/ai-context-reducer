@@ -55,6 +55,12 @@ Choose the path that matches your goal. You do not need to read every document.
 
 To use a method, attach its guide to the request or tell the AI its path. It may not load the guide automatically; for recurring use, register it in instructions or settings that your AI tool actually reads.
 
+### Start from a question about context
+
+- What is supplied, and why is it needed? [What Is Context?](docs/en/llm-mechanics/what-is-context.md)
+- Why can equal call counts produce different usage and costs? [Context Amount, Computation, and Cost](docs/en/llm-mechanics/context-compute-and-cost.md)
+- What are the benefits beyond savings, and the risks of removing too much? [Context Amount and Use](docs/en/llm-mechanics/context-amount-and-use.md)
+
 ## Three ways to narrow the information
 
 ### 1. Use a program to find mechanical facts first
