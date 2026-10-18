@@ -35,6 +35,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - You need usage estimates for planning tasks: [Build context-use estimates by task kind](ai-usage/estimate-context-use-by-task.md) — separate per-call input and cumulative usage, then compare median and range under matching conditions.
 
+- You want to diagnose and reduce growing usage: [Find and improve unnecessary context use from AI work logs](methods/diagnose-repeated-context-from-work-logs.md) — inspect repeated inputs and retries, then compare quality, usage, and rework one change at a time.
+
 - Implementation and review conversations are becoming mixed: [Assign AI roles and separate chats by task](ai-usage/split-chats-by-task.md) — specify responsibilities and permitted changes, then hand over necessary sources, diffs, and check results.
 
 - You keep restating the same work procedure: [Advance one listed task per signal](methods/run-one-task-per-signal.md) — provide the list, priorities, per-request scope, and stop conditions, then use “next” to request one ready task.
