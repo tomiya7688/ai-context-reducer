@@ -411,6 +411,12 @@
       "japanese": "docs/jp/手法/人とAIが必要な情報へ進めるREADMEを書く.md",
       "english": "docs/en/methods/write-readme-for-people-and-ai.md",
       "english_status": "translated"
+    },
+    {
+      "id": "diagnose-repeated-context",
+      "japanese": "docs/jp/手法/AIの作業履歴から無駄な読み込みを見つけて改善する.md",
+      "english": "docs/en/methods/diagnose-repeated-context-from-work-logs.md",
+      "english_status": "translated"
     }
   ]
 }
