@@ -2,7 +2,7 @@
 
 > Japanese Source of Truth: [コード構造の索引](../jp/コード構造の索引.md)
 
-When locating processing to change in a large program, you can use a searchable list of function and type definitions and their users. Have the AI narrow candidates with the list, then inspect their code and tests to limit unrelated files read up front.
+When locating processing to change in a large program, you can use a searchable list of definitions of functions (named operations) and types (kinds of data) and their users. Have the AI narrow candidates with the list, then inspect their code and tests to limit unrelated files read up front.
 
 The list is a guide to sources. Have the AI check that it matches current code before deciding how to change behavior or what to verify.
 
@@ -33,7 +33,7 @@ For example, a list may contain the following. Availability depends on the analy
 
 - File, type, and function names and definition locations
 - Functions called by a function, or places that call it
-- Imports between files or modules
+- Imports between files
 - Leads for locating related tests
 
 Lists can retain old locations or omit relationships. Selecting functions by names in configuration or generating code at runtime can create relationships analysis cannot detect. **Absence from the list is not evidence of no relationship.**
@@ -86,7 +86,7 @@ Creating, updating, and checking an index also costs effort. Preserve necessary 
 ## Supporting tools
 
 - [source-structure-index](../../tools/common/large/source-structure-index/README.md): Combines existing analysis results and returns candidate definitions, references, and dependencies by name or changed file. It can extract relevant surrounding information. Relationships depend on the underlying analysis; complete caller information is not always available.
-- [Tree-sitter](https://github.com/tree-sitter/tree-sitter): Inspects code syntax and can provide material for locating definitions.
+- [Tree-sitter](https://github.com/tree-sitter/tree-sitter): Inspects code syntax, its grammatical structure, and can provide material for locating definitions.
 - [SCIP](https://github.com/scip-code/scip): A format and tooling for sharing indexes of definitions and references. It can support reuse of existing analysis results.
 
 ## About this method
