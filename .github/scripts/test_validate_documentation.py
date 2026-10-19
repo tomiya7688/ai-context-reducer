@@ -124,7 +124,7 @@ class DocumentationValidationTests(unittest.TestCase):
 
     def test_missing_language_navigation_is_detected(self) -> None:
         self.en.write_text("# Example\n", encoding="utf-8")
-        self.assert_error_contains("must link to its Japanese Source of Truth")
+        self.assert_error_contains("must link to its Japanese counterpart")
 
     def test_escaped_markdown_backtick_is_detected(self) -> None:
         (self.root / "README.en.md").write_text(

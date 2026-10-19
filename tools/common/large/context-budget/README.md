@@ -1,8 +1,10 @@
 # context-budget
 
-Candidate textがagent contextへ入った場合のコストをcompactに見積もります。これは [`Context Priority / Hotspot`](../../../../docs/jp/読む候補の優先度を付ける.md) の補助signalであり、costが高い候補を不要と判定するtoolではありません。
+候補のファイルが多く、どれを先に読むか迷うときに、文章量の多いファイルを見つける道具です。文章量が多いファイルは、読む前に検索などで必要な部分を探すと、作業しやすくなります。
 
-出力は自己説明的JSONです。tokenizer exact countではなく、routing用の概算であることを `token_estimate.approximate=true` として明示します。
+この道具は文章量の目安を出すだけです。どのファイルが作業に必要かは選びません。また、文章量が多いことを理由に、必要なファイルを読まないでよいとは判断しません。[今回読むファイルを選ぶ](../../../../docs/jp/手法/今回読むファイルを選ぶ.md)も参照してください。
+
+結果の数字は、実際の単語数ではなく概算です。`token_estimate.approximate=true` であることを示します。
 
 ## Usage
 
@@ -22,7 +24,7 @@ acr-toolbox context-budget --mode accurate --top 40 .
 
 native版はGo標準flag parserを使うため、optionはrepository pathより前に置きます。
 
-`fast` はfile size bytes / 4、`accurate` は実際にtextを読みdecoded character count / 4で見積もります。`accurate` という名前は「file内容を読むmode」という意味で、tokenizer exactではありません。
+`fast` はファイルの大きさから概算し、ファイルの文章は読みません。`accurate` は文章を読んで概算するため、`fast` より時間がかかります。どちらも実際の単語数を数えるものではありません。
 
 JSONの `token_estimate` に算定式と `reads_file_contents` を入れるため、READMEを再読しなくても結果の確度を判断できます。
 
@@ -46,7 +48,7 @@ Native counterpartでは `context_budget_command.go` がcommand固有実装、`r
 
 - tool内部は必要ならscope全体を読んでよい
 - agentへはtotal / largest candidates等へ圧縮して返す
-- Task Routingにより変更理由から対象moduleへ直接進む
+- 変更理由から、関係するmoduleへ直接進む
 - Source of Truthを重複させない
 - unrelated moduleを読まなくてもtargeted validationできる構造を維持する
 

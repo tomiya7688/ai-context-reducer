@@ -49,7 +49,7 @@ UPD Commander等の外部設計手法は内部実装規律の参考にしてよ�
 
 分割後、典型的な変更タスクについて次が成立するなら分割価値がある。
 
-### 1. Task Routing
+### 1. 変更内容から最初に読むファイルを決める
 
 変更内容から最初に読むfileを直接絞れる。
 
@@ -69,32 +69,32 @@ output contract変更
 
 変更理由が違うのに毎回同じ巨大fileを読む必要があるなら、分割候補とする。
 
-### 2. Responsibility Map
+### 2. 各ファイルやmoduleの担当を示す
 
 各file/moduleの責務を短い1文で説明できることを目標にする。
 
 責務説明が `A and B and C` のように複数の独立責務を並べないと書けない場合、理解負債のsignalとして分割を検討する。
 
-### 3. Hierarchical Context
+### 3. 変更場所に関係する指示だけを読む
 
 root policyを読んだ後、対象tool内でさらに局所的なworking setへ絞れる構造にする。
 
 小変更のために同じtool directory内の全sourceを読む必要がある構造は避ける。ただし、分割によって逆に読むfile数や契約数が増えるだけなら分割しない。
 
-### 4. Exploration Stop
+### 4. 追加調査を終える条件を決める
 
-agentが次を把握した時点で追加探索を止められる構造にする。
+AIが次の情報を確認したら、追加調査を止められる構造にする。
 
-- 変更責務
-- target file/module
-- direct contract
-- targeted validation
+- 変更箇所を担当する処理
+- 対象のfileやmodule
+- 直接関係する入出力の決まり
+- 実行するtestやbuild
 
 無関係な責務を確認しないと安全性を判断できない場合は、責務境界を見直す。
 
-### 5. Change / Validation Routing
+### 5. 変更に合う確認方法へ進める
 
-変更責務からtargeted test / build / smokeへ直接到達できるようにする。
+変更箇所から、関係するtest・build・起動確認へ直接進める構造にする。
 
 ```text
 processing変更 -> processing tests
@@ -103,7 +103,7 @@ CLI変更        -> CLI smoke / parsing tests
 shared contract変更 -> broader compatibility test
 ```
 
-毎回full suiteしか安全なvalidation routeがない場合は、test responsibilityも見直す。
+安全を確かめるために毎回すべてのtestを実行するしかない場合は、testごとの担当範囲も見直す。
 
 ### 6. Source of Truthを増やしすぎない
 
@@ -117,7 +117,7 @@ shared contract変更 -> broader compatibility test
 
 - 1fileを読むだけで責務全体を短く理解できる
 - 変更理由がほぼ同じ
-- targeted validationも同じ
+- 実行する確認方法も同じ
 - 分割するとimport / contract / file traversalが増えてagentのworking setが広がる
 - cosmeticなCommander / Messenger / Processing分割にしかならない
 
@@ -132,7 +132,7 @@ entrypoint
 
 これはtools開発のworking setを狭めるための内部設計であり、公開CLIや解析対象repoへUPD構造を要求するものではない。
 
-この基準により、`tools/` は「Context Reducerを提供するだけでなく、自身の開発にもTask Routing / Responsibility Map / Hierarchical Context / Exploration Stop / Targeted Validationを適用している」と説明できる状態を維持する。
+この基準により、`tools/` 自身の開発でも、変更箇所から読む範囲を絞り、各ファイルの役割を示し、追加調査を終える条件を決め、変更に合った確認を行えるようにする。
 
 ## Tool implementation rules
 
@@ -210,7 +210,7 @@ shared contract  -> Python/Goのfixture結果比較
 - broad scanがagent探索を置き換える価値を持つか
 - outputはagent向けにcompactか
 - 不完全解析ならその事実を明示できるか
-- Task Routingで最初に読むfileを絞れるか
-- Responsibility Mapとして責務を短く説明できるか
-- targeted validationへ直接routingできるか
+- 変更内容から最初に読むfileを絞れるか
+- 各fileの担当を短く説明できるか
+- 変更内容に合う確認へ直接進めるか
 - 分割するならagent working setが実際に小さくなるか

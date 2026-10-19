@@ -216,15 +216,26 @@ def validate(repo_root: Path) -> list[str]:
 
         jp_rel = jp.relative_to(repo_root.resolve()).as_posix()
         en_rel = en.relative_to(repo_root.resolve()).as_posix()
-        if not jp_rel.startswith("docs/jp/") or not jp_rel.endswith(".md"):
+        if not (
+            jp_rel.startswith("docs/jp/")
+            or jp_rel.startswith("docs/internal/jp/")
+        ) or not jp_rel.endswith(".md"):
             fail(
                 errors,
-                f"{doc_id}: japanese path must be Markdown under docs/jp: {jp_rel}",
+                f"{doc_id}: japanese path must be Markdown under a Japanese docs root: {jp_rel}",
             )
-        if not en_rel.startswith("docs/en/") or not en_rel.endswith(".md"):
+        if not (
+            en_rel.startswith("docs/en/")
+            or en_rel.startswith("docs/internal/en/")
+        ) or not en_rel.endswith(".md"):
             fail(
                 errors,
-                f"{doc_id}: english path must be Markdown under docs/en: {en_rel}",
+                f"{doc_id}: english path must be Markdown under an English docs root: {en_rel}",
+            )
+        if jp_rel.startswith("docs/internal/") != en_rel.startswith("docs/internal/"):
+            fail(
+                errors,
+                f"{doc_id}: Japanese and English documents must both be reader-facing or internal",
             )
         if jp_rel in japanese_paths:
             fail(errors, f"duplicate Japanese mapping target: {jp_rel}")
@@ -249,8 +260,12 @@ def validate(repo_root: Path) -> list[str]:
             fail(errors, f"{doc_id}: missing English file: {en_rel}")
         pairs.append((doc_id, jp, en))
 
-    actual_jp = markdown_files(repo_root, repo_root / "docs" / "jp")
-    actual_en = markdown_files(repo_root, repo_root / "docs" / "en")
+    actual_jp = markdown_files(repo_root, repo_root / "docs" / "jp") | markdown_files(
+        repo_root, repo_root / "docs" / "internal" / "jp"
+    )
+    actual_en = markdown_files(repo_root, repo_root / "docs" / "en") | markdown_files(
+        repo_root, repo_root / "docs" / "internal" / "en"
+    )
     for path in sorted(actual_jp - japanese_paths):
         fail(errors, f"unregistered Japanese document: {path}")
     for path in sorted(japanese_paths - actual_jp):
@@ -275,8 +290,8 @@ def validate(repo_root: Path) -> list[str]:
         if not linked_to_japanese:
             fail(
                 errors,
-                f"{doc_id}: English document must link to its Japanese "
-                f"Source of Truth: {en.relative_to(repo_root).as_posix()}",
+                f"{doc_id}: English document must link to its Japanese counterpart: "
+                f"{en.relative_to(repo_root).as_posix()}",
             )
 
     all_docs = [repo_root / path for path in sorted(actual_jp | actual_en)]

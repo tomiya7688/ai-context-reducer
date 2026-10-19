@@ -1,158 +1,48 @@
-# Context Pack
+# 今回の作業メモ
 
-> 現在タスクに必要な情報だけをまとめる一時パケット。
-> 原典ではなく索引。不要な Optional 項目は削除する。
+このメモには、今回の作業に必要な情報だけを書きます。詳しい仕様やコード全文、ログをコピーせず、必要な資料の場所を示します。
 
-## Task
-- Goal:
-- Required:
-- Acceptance:
-- Task / Issue:
-- Priority:
+## 作業内容
 
-## Out of Scope
-今回やらないことだけ必要に応じて書く。
+- 目的:
+- 変更する場所:
+- 変えてはいけないこと:
+- 今回は行わないこと:
 
-- 
+## 今回使う決定と理由
 
-## Working Set
-- Target files:
-- Changed files / symbols:
-- Matching tests:
-- Direct dependencies:
+今回の判断に関係するものだけ残します。長く有効な理由の全文はコピーせず、設計文書へ案内してください。
 
-## Required Constraints
-- 
+- 今回の決定・判断理由:
+- 理由の根拠・詳しい記録（パスと見出し）:
+- 状態・確認日（確定 / 提案 / 未確認 / 現在の適用は要確認）:
 
-## Routed References
-最初に読むものだけ。
+理由や根拠が不明ならAIに推測させず質問させます。提案・未確認の理由を決定済みの条件として扱わせないでください。
 
-- Read first:
-- Read only if needed:
+## 確認方法
 
-## Validation
-変更内容に必要な evidence だけ残す。
+- 終わりの目安:
+- 実行するテストや確認:
+- 確認できない場合に報告すること:
 
-- Targeted tests:
-- Build / smoke:
-- Runtime / visual evidence:
-- Policy checks:
-- Artifact validation:
-- Evidence coverage / count:
-- Unverified areas:
+## 詳しい資料
 
-`0 tests`、空走査、対象外だけの検査は成功根拠にしない。
-成功時は結果だけ残し、失敗時だけ必要なログを追加する。
+- 作業依頼:
+- 仕様や決まり:
+- 関連するコードやテスト:
 
-## Change Summary
-- Changed files:
-- Diff stat / shortstat:
-- Validation result:
+必要な資料だけ残してください。依頼内容はIssueや作業依頼、決定済みの仕様は設計文書、現在の動きはコードやテストで確認できるよう、該当するファイルやページの場所を書きます。
 
-full diff は実装・レビュー・問題調査に必要な場合だけ読む。
+## AIに渡す文
 
-## Exploration Status
-- Goal understood: yes / no
-- Required known: yes / no
-- Acceptance known: yes / no
-- Working set identified: yes / no
-- Out of scope known: yes / no
-
-十分なら探索を止める。不明点が実装・検証中に発生した場合だけ追加探索する。
-
----
-
-# Optional Extensions
-
-該当する場合だけ追加する。
-
-## Evidence Budget
-探索が長くなりやすいtaskだけ使う。token数のhard capではなく、必要証拠の不足を管理する。
-
-### Required evidence
-- 
-
-### Optional evidence
-- 
-
-### Evidence ledger
-- Known:
-- Missing:
-- Conflicts:
-- Unverified:
-
-`Missing: none` かつ矛盾が解消され、Acceptance判断に十分なら追加探索を止める。
-新しいread/searchは、Required evidenceの不足・矛盾・Acceptance確認・新たに判明した影響範囲のいずれかを埋める場合だけ行う。
-
-## Project / Current State
-- State summary reference:
-
-## Remote Delta
-- Ahead / behind:
-- Relevant remote commits:
-- Relevant changed files:
-- Diff stat:
-- Bounded diff excerpt:
-
-## Policy Context
-- Required rules:
-- Recommended rules:
-- Advisory / review targets:
-- Checker result:
-
-### Active Exception
-- Rule:
-- Reason:
-- Scope:
-- Mitigation:
-- Removal condition:
-- Source of truth:
-
-## Relevant Architecture
-- 
-
-## Special Validation
-- Headless validation:
-- Disposable workspace:
-- Deterministic seed / input:
-- RNG / clock / environment seam:
-- Structured evaluation:
-- Visual confirmation:
-- Generated / distribution artifact:
-- Artifact smoke:
-- Performance measurement:
-
-## Source Excerpts
-原典全文が不要な場合だけ最小抜粋を置く。
-
-## Packet Split
-長くなる場合は1ファイルに詰め込まず分割してよい。
+このメモをAIに見せられる場所へ保存し、依頼でファイルの場所を伝えます。会話に直接貼る場合も、長い資料ではなくこの短いメモを渡します。
 
 ```text
-task.md
-files.txt
-symbols.txt
-constraints.md
-diff.patch
+この作業メモを先に読んでください。目的、変更する場所、終わりの目安を確認してから作業してください。
+依頼内容はIssueや作業依頼を、決定済みの仕様はリンクされた設計文書を確認してください。現在の動きはコードやテストで確かめてください。
+メモにない条件を推測で決めず、不明な点は質問してください。
 ```
 
-## Context Priority
-- P0: task / required constraints
-- P1: target source / tests
-- P2: direct dependencies
-- P3: references
-- P4: history / auxiliary
+小さな変更なら目的と確認方法だけで十分です。複数日にわたる作業では、守る条件や今回は行わないことも書くと引き継ぎやすくなります。
 
-## Rules
-- Search first, read second。
-- repo全体、全Issues、全docsを無条件に含めない。
-- deferred / out-of-scope へ探索を広げない。
-- remote変更は compact delta を先に見る。
-- 規約は現在タスクに適用されるものだけ入れる。
-- diff / logs は必要なら bounded にする。
-- generated artifacts は必要な場合だけ含める。
-- unrelated refactor を混ぜない。
-- validation は smallest sufficient evidence を選ぶ。
-- UI / visual correctness をテスト結果だけで推測しない。
-- Evidence Budgetを使う場合、次のread/searchの理由を明示できなければ探索停止を優先する。
-- 古い Context Pack を source of truth にしない。
+今回の目的、読む資料、守る条件、確認方法だけを一時的にまとめてAIへ渡す作業メモを「Context Pack」と呼びます。

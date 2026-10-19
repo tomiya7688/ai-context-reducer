@@ -694,6 +694,26 @@
   ],
   "template_files": [
     {
+      "source": "templates/DOCUMENT_OUTLINE.md",
+      "bundle_path": "templates/DOCUMENT_OUTLINE.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/DOCUMENT_OUTLINE.en.md",
+      "bundle_path": "templates/DOCUMENT_OUTLINE.en.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/PROJECT_CONTEXT.md",
+      "bundle_path": "templates/PROJECT_CONTEXT.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/PROJECT_CONTEXT.en.md",
+      "bundle_path": "templates/PROJECT_CONTEXT.en.md",
+      "kind": "template"
+    },
+    {
       "source": "templates/AI_CONTEXT.md",
       "bundle_path": "templates/AI_CONTEXT.md",
       "kind": "template"
@@ -701,6 +721,16 @@
     {
       "source": "templates/CONTEXT_PACK.md",
       "bundle_path": "templates/CONTEXT_PACK.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/WRITING_GUIDE.md",
+      "bundle_path": "templates/WRITING_GUIDE.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/WRITING_GUIDE.en.md",
+      "bundle_path": "templates/WRITING_GUIDE.en.md",
       "kind": "template"
     }
   ],

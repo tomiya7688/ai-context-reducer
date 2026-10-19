@@ -30,7 +30,7 @@ remote_commits
 - compact field / truncation変更: `script/processing.py`
 - output contract変更: `tests/test_processing.py` も確認
 
-この分割は、Task Routing / Responsibility Map / Targeted Validationをtool開発自身へ適用するためのものです。
+この分け方により、変更した処理の担当箇所から読み始め、関係する確認だけを先に行えます。
 
 ## Usage
 

@@ -1,198 +1,86 @@
 # ai-context-reducer
 
-English | [日本語](README.md)
+[日本語](README.md) | English
 
-A repository of principles and methods for helping AI systems such as Codex and Claude Code reach the design and implementation information they need without reading more context than necessary.
+This project helps people using AI choose the code and documents to provide for a task. It includes three kinds of resources:
 
-The main focus is the methods and documentation. Portable helper tools are also provided so repeated work and mechanically decidable processing can happen outside the AI context. Major Common capabilities are available through the single `acr-toolbox` binary.
+- **Method guides** — ways to decide what the AI should read and how far it should investigate, with example requests.
+- **Templates** — documents for writing project rules, project information, and notes for the current task.
+- **Helper tools** — programs that help with file searches, task note generation, rule checks, and test selection.
 
-## Three principles to understand first
+You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
 
-Context reduction is based on three ideas:
+[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/methods/method-index.md)
 
-1. Use static analysis for what can be analyzed statically
-2. Bundle frequently repeated operations
-3. Make the AI read only the necessary subset
+Published v1.0.0 supports Windows, Linux, and macOS on x64 and arm64. Its overview and suggestion commands do not require installing a language runtime.
 
-Most individual methods and tools are one of these ideas or a combination of them. See [Context Reduction Basics](docs/en/context-reduction-basics.md) for details.
+## Example: Fix a saved setting that disappears after a restart
 
-## Goal
-
-> Instead of making the AI read a large amount of information to find what it needs, select and route the necessary information before giving it to the AI.
-
-Once enough information is available, stop exploring.
-
-> When Goal / Required / Acceptance / working set are sufficient, stop additional exploration.
-
-Priority:
+This is an illustrative example using a fictional app. Suppose you save a setting in the app's settings screen, but it resets when the app restarts.
 
 ```text
-accuracy
-  > speed of reaching the work target
-  > amount of context reduction
-  > amount of automation
+Ask the AI to read broadly
+  Give it the whole project and ask it to investigate the cause
+  → It also reads screen and feature code unrelated to settings
+
+Limit what you ask the AI to read
+  Ask it to search for the setting save code, startup loading code, and related tests
+  → Have it read the relevant code, setting requirements, and tests
+  → If another operation turns out to be involved, have it check that part too
 ```
 
-Treat summaries as indexes rather than replacements for original sources, and preserve a path back to source / tests / docs / diff when needed.
+Both approaches have the same goal: fix the app so the saved setting survives a restart. After the fix, save the same setting, restart the app, and check that it is retained.
 
-## Releases and downloads
+Limiting the reading scope reduces the unrelated screen and feature code you provide. Have the AI read the setting requirements and related tests, and check the behavior after the change, so the work keeps the information needed to make and verify the fix.
 
-Download published archives from [GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases).
+## New here?
 
-The current v1.0.x portable distribution provides archives for:
+Start with [Getting started](docs/en/adoption/getting-started.md) to get a first result. Continue with the following guides if you want to understand the approach or adopt it in your project. You do not need to read every document.
 
-- Windows x64 / arm64
-- Linux x64 / arm64
-- macOS x64 / arm64
+1. [Three ways to limit what the AI reads](docs/en/methods/context-reduction-basics.md) — how to reduce irrelevant information
+2. [Find a method by the problem you have](docs/en/methods/method-index.md) — a guide from common problems to explanations
+3. [Choose only the methods you need](docs/en/adoption/adoption-priority.md) — how to decide which guidance or tools to add
+4. [Ask AI to improve the project guide](docs/en/adoption/adoption-prompt.md) — a request you can give an AI to improve project guidance
 
-Each normal archive contains:
+## Start with these habits
 
-- `acr-toolbox`
-- `go-symbols`
-- `go-import-map`
-- `go-package-graph`
-- `affected-tests`
-- `README.md`
-- `TOOLS_README.md`
-- `LICENSE`
-- `RELEASE_MANIFEST.json`
+- Tell the AI the goal, conditions to preserve, and how to know it is done.
+- Search file names or contents before opening files, and start with relevant results.
+- Keep detailed explanations in one place; link to them elsewhere and say when to read them.
+- Broaden the search when important information is missing or shared code changes.
+- Run checks that match the change, and report anything you could not check.
 
-A common `SHA256SUMS` file is published alongside the six archives.
+This lets the AI start work before reading unrelated files or long logs. Keep the documents and tests needed to confirm correctness; removing necessary information can lead to the wrong change.
 
-Before distribution, GitHub Actions builds the actual native binaries for all six targets, runs E2E with those binaries, creates the archives, extracts them again, and verifies their contents. Source-side unit tests alone do not satisfy the Release gate.
+## Find a guide by problem
 
-```text
-acr-toolbox version
-acr-toolbox analyze <project-root>
-acr-toolbox select <project-root>
-```
+Use this table to find guidance for problems you encounter when asking an AI to do work.
 
-`acr-toolbox version` returns the release version, commit, OS, and architecture as JSON.
+| Problem | Guide |
+| --- | --- |
+| Each time I ask for work, I am unsure what information to give the AI | [Tell the AI where to start for each kind of work](docs/en/methods/task-routing.md), [Guide work by the kind of change](docs/en/methods/change-routing-map.md) |
+| I cannot decide what to ask the AI to change or how to judge completion | [Set the goal and finish conditions before work](docs/en/methods/design-and-completion-criteria.md) |
+| I cannot find the parts of a large codebase related to my request | [Choose which files to read](docs/en/methods/context-priority.md), [Find functions and where they are used](docs/en/methods/source-structure-index.md) |
+| I am unsure which method to use to inspect code | [Choose a language-appropriate method when analyzing code](docs/en/methods/analysis-depth-routing.md) |
+| The AI's investigation drags on, and I cannot tell when to stop | [Decide when the AI should stop investigating](docs/en/methods/exploration-control.md), [Before investigating, decide what checks can identify the cause](docs/en/methods/evidence-budget.md) |
+| I have to find tests again and cannot decide which checks to request | [Check a change in a way that matches what changed](docs/en/methods/validation-routing.md), [Decide which tests to run based on change impact](docs/en/methods/change-impact-routing.md) |
+| I keep including long rules or duplicate explanations in my requests to the AI | [Give the AI instructions for the files it will change](docs/en/methods/hierarchical-context.md), [Check only the rules that apply to this task](docs/en/methods/policy-routing.md), [Avoid repeating the same explanation](docs/en/methods/documentation-duplication-control.md) |
+| I repeatedly explain project rules or facts to the AI | [Templates for AGENTS.md, project context, and task notes](templates/README.md) |
 
-Starting with v1.1.0, the lightweight normal bundle remains available and a separate GUI Hub Full Bundle is added as a superset. The Full Bundle keeps the normal CLI contract and does not require users to install a Go toolchain. See [Full Bundle Distribution Design](docs/en/full-bundle-layout.md) and [Releasing v1.x](docs/en/releasing.md).
+You do not need every method. Add one only when it addresses a repeated problem and saves more search or checking time than it takes to maintain.
 
-## Ask Codex / Claude Code to adopt it
+## Downloads and helper tools
 
-The initial entry points are:
+Download files for Windows, Linux, and macOS from [GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases). For each operating system, files are available for common processors and ARM processors. The downloads include helper programs that search files and code, and find relationships between code and tests. They help locate only the relevant parts to pass to the AI, avoiding unrelated code and long search results.
 
-1. this `README.en.md`
-2. [Context Reduction Basics](docs/en/context-reduction-basics.md)
-3. [Adoption Priority](docs/en/adoption-priority.md)
-4. [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
+The `acr-toolbox` program combines several helpers. Run it from a command prompt to show its version, inspect code, or choose the next investigation or check. The [helper tool list](tools/README.md) explains what each tool can do and how to use it. You can also keep using search and check methods you already have.
 
-Then shallow-inspect the target repository and adopt **only the methods with meaningful expected benefit**, rather than everything.
-
-A ready-to-use request is available in [Adoption Prompt](docs/en/adoption-prompt.md).
-
-## Minimal Core
-
-Keep the Core useful for almost every project small:
-
-- a small `AI_CONTEXT.md` or equivalent AI entry point
-- Search first, read second
-- stop exploring once Goal / Required / Acceptance are known
-- explicit Source of Truth
-- do not mix unrelated refactors into the current task
-- targeted validation
-- explicitly record unverified areas as `Unverified`
-- normally exclude logs / generated artifacts / history from context
-
-For a small repository, it is fine to stop here.
-
-## Add methods according to expected benefit
-
-Choose additional methods from the characteristics of the target project.
-
-| Situation | Methods to prioritize |
-|---|---|
-| many docs / Issues / subsystems | Task Routing / Change Routing Map |
-| file / module responsibilities are unclear | Responsibility Map |
-| the existing architecture defines responsibility boundaries, layers, or official communication paths | Architecture Boundary Routing |
-| monorepo / multi-app with many local rules | Hierarchical Context / Scoped AI Instructions |
-| exploration continues after Required evidence is available | Evidence Budget / bounded evidence collection |
-| README alone no longer describes current capabilities and constraints | Current State summary |
-| multiple AIs, chats, or people update the remote | Remote Delta First |
-| huge codebase / expensive call or dependency exploration | Source Structure Index / changed-symbol routing |
-| large test suite is fully run for every change | Change / Test Impact Routing |
-| GUI / game / editor | headless-first + visual confirmation when needed |
-| random / time-dependent / simulation | deterministic seam / fixed input / bounded runtime |
-| package / distribution differs from source | artifact-boundary validation |
-| save / conversion / export creates temporary files | disposable validation workspace |
-| many coding rules | Policy Routing + compact policy checks |
-| repeated license / NOTICE / header text | Boilerplate Generation |
-
-See [Adoption Priority](docs/en/adoption-priority.md) for detailed adoption signals and project-size guidance.
-
-## Standard flow
-
-```text
-AI_CONTEXT / existing agent guide
-        ↓
-shallow inspection
-        ↓
-classify project signals
-        ↓
-current task: Goal / Required / Acceptance
-        ↓
-Search / Index / Routing
-        ↓
-stop exploration when sufficient
-        ↓
-target source / symbols / matching tests
-        ↓
-implementation
-        ↓
-smallest sufficient validation
-        ↓
-compact result + Unverified areas
-```
-
-When remote conflicts are possible, insert a compact remote delta before implementation.
+Instructions for maintainers, such as how this repository packages and releases files, are under [docs/internal/](docs/internal/README.md). Users do not need to read them.
 
 ## Documentation
 
-Japanese documentation under [`docs/jp/`](docs/jp/) is the Source of Truth. English translations are under [`docs/en/`](docs/en/). Japanese/English document pairs are managed by [`docs/DOCUMENT_MAP.json`](docs/DOCUMENT_MAP.json).
-
-You do not need to read all documentation when adopting the project.
-
-- **Method Index**: [`docs/en/method-index.md`](docs/en/method-index.md) — one-line descriptions of each method and links to the detailed documents
-- Basic principles: [`docs/en/context-reduction-basics.md`](docs/en/context-reduction-basics.md)
-- Adoption decisions: [`docs/en/adoption-priority.md`](docs/en/adoption-priority.md)
-- Adoption prompt: [`docs/en/adoption-prompt.md`](docs/en/adoption-prompt.md)
-- Basic guide: [`docs/en/guide.md`](docs/en/guide.md)
-- External tool reference policy: [`docs/en/external-tool-reference-policy.md`](docs/en/external-tool-reference-policy.md)
-- Release / completion gate: [`docs/en/releasing.md`](docs/en/releasing.md)
-- AI entry-point template: [`templates/AI_CONTEXT.md`](templates/AI_CONTEXT.md)
-- Task template: [`templates/CONTEXT_PACK.md`](templates/CONTEXT_PACK.md)
-
-Detailed links for individual methods are kept in the [Method Index](docs/en/method-index.md) rather than duplicated here.
-
-## Relationship to external projects
-
-AI Context Reducer may learn useful ideas from external repositories and existing projects, but its standard does not depend on a particular reference project.
-
-- generalize and adopt only useful methods
-- do not make an external repository a mandatory dependency
-- do not standardize a particular CLI, file format, or directory layout
-- keep it possible to satisfy the same principle with another implementation
-
-When linking to a concrete external tool, the general rule is to include only tools that are **free to use / commercially usable / do not require visible credit during normal use / are portable or easy to adopt**. See [External Tool Reference Policy](docs/en/external-tool-reference-policy.md).
-
-## Do not over-adopt
-
-This project's own practices must not cause context bloat.
-
-```text
-expected repeated context saving
-    > adoption + maintenance cost
-```
-
-Do not add a mechanism that fails this condition.
-
-The standard is adaptive: use a small mechanism for a small repository, and add routing / indexes only when a larger repository needs them.
+Japanese guides are under [docs/jp/](docs/jp/), with English versions under [docs/en/](docs/en/). The [document map](docs/DOCUMENT_MAP.json) records which pages are translations of each other.
 
 ## License
 
-Everything in this repository, including documentation, design, templates, scripts, utilities, and tools, is provided under the [MIT License](LICENSE).
-
-External projects and content linked or referenced from this repository remain subject to the licenses specified by their respective distributors.
+This repository is provided under the [MIT License](LICENSE), including its documents, designs, templates, and programs. External projects follow the terms set by their respective authors.

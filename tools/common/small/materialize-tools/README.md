@@ -162,7 +162,7 @@ Native:
 - cross-platform replace / restore fallback: `safe_replace.go`
 - validation: `materialize_command_test.go`
 
-Windows replacement変更ならplannerを読む必要はなく、selection変更ならwrite pathを読む必要はありません。この分割は一般的なlayeringではなく、Context Reducer自身のTask RoutingとExploration Stopをtool開発へ適用するためです。
+Windowsでの置き換え処理を変更するときは、配置先の選択処理を読む必要はありません。逆に、配置先の選択処理を変えるときは書き込み処理だけを読めば足ります。必要な処理から調べ始め、関係する範囲を確認したら調査を終えられるように分けています。
 
 ## Validation
 

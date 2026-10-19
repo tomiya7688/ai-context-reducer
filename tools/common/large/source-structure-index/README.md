@@ -243,7 +243,7 @@ Tests:
 - native SCIP: `structure_scip_adapter_test.go`
 - native Ctags: `structure_ctags_adapter_test.go`
 
-この分割は形式上のlayeringではなく、Context Reducer自身の Task Routing / Responsibility Map / Exploration Stop / Targeted Validation をtool開発へ適用するためです。
+この分割では、変更内容から読む場所を決め、各ファイルの担当を分け、必要な確認が終わったら調査を止められるようにしています。
 
 ## Validation
 
