@@ -34,6 +34,19 @@ If a quick check for obvious code-writing mistakes is available, run it before t
 
 Expand checks when a change affects several features, changes a promise used by other programs, or has an unclear impact. When there are many tests and it is hard to choose, see [Decide which tests to run based on change impact](change-impact-routing.md).
 
+When results depend on time, randomness, or environment settings, fix the inputs, settings, random seed, and time step where you can. You can then rerun under the same conditions and avoid comparing large amounts of output that differ from run to run. To find the cause of a behavior, record only the values that answer the current question, such as state, events, and decisions, in a short structured log. On success, keep a summary of what was checked; add detail only for a failure.
+
+Report what was checked, the result, and what was not checked, briefly:
+
+```text
+Checked:
+- Date conversion tests: 12 passed
+- Screen display: not applicable
+- Not checked: none
+```
+
+If the change is small and the target test is clear, that test plus the checks the project requires at completion may be enough. Do not skip a check that is needed to confirm correctness just to save time or log volume.
+
 ## Keep temporary check files separate
 
 When you or the AI saves, converts, or exports files for a check, use a temporary folder. This keeps check output out of the normal change list and prevents it from being mistaken for source material on the next task.
@@ -51,8 +64,13 @@ Keep files created only for checking in a temporary folder.
 
 Give the AI results related to the change instead of logs from every possible check. For screen changes or packaged files, ask it to inspect the actual screen or files when that is needed to confirm the result.
 
+## Optional helper tool
+
+- [validation-plan](../../../tools/common/medium/validation-plan/README.md) suggests the first checks to run from the changed files. Choose among the suggestions using the project's test procedure and completion conditions.
+
 ## Terms
 
 - **Test**: A repeatable way to run a program with chosen inputs and check whether it returns the expected result.
 - **Syntax check**: A check for obvious mistakes in how program code is written. It does not tell you whether the behavior is correct.
 - **Distribution package**: The program and required files collected for delivery to its users.
+- **Validation Routing / targeted validation**: Choosing checks that fit the property you need to confirm for the change.

@@ -14,7 +14,7 @@ PYTHON_TOOL_PATHS = [
 ]
 
 
-# choose はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# choose はOSとPython環境に合うmaterialize可能なtool一覧を選びます。
 def choose(source: Path, system: str | None = None, python_executable: str | None = None) -> tuple[str, list[dict[str, object]]]:
     tools_root = source / 'tools'
     system_name = (system or platform.system()).lower()

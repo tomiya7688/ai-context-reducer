@@ -38,6 +38,12 @@ Do not delete text just because it looks similar. Check that the needed informat
 
 Do not put new requirements only in a summary or index. If it differs from the defining document, update the summary after checking the full explanation.
 
+Similar wording does not always mean two explanations serve the same purpose. An introduction for beginners and operating steps for administrators, for example, may each need different details. Keep what each audience needs instead of deleting one copy.
+
+## Check the result after consolidating
+
+After moving the detailed explanation, confirm that each remaining note points to the right place, each link works, and the original documents still have the overview or warning their readers need. Tell readers what they can find at the link and when to read it, so someone reading only the README still knows the next step.
+
 ## Why this reduces context
 
 Keep one detailed copy and give the AI links to it instead of repeating the same long explanation across documents. This also makes the source easier to update consistently. Short descriptions and links still lead to the information when it is needed.
@@ -45,6 +51,10 @@ Keep one detailed copy and give the AI links to it instead of repeating the same
 ## When to consolidate
 
 Choose one defining document when several copies must be updated or have started to disagree. If the project is small and duplicate text has caused no problems, no special list or automated check is needed. Keep repeated short summaries when they help readers.
+
+## Terms
+
+- **Documentation Duplication Control / single source of truth**: Keeping one authoritative explanation instead of copying it into several documents.
 
 ## Optional helper tool
 

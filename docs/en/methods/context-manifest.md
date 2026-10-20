@@ -65,6 +65,10 @@ Do not treat the list alone as proof of a requirement or behavior.
 
 Give the AI a short list of locations and purposes so it can open only relevant files instead of reading them all in sequence. Keep details and logs in the original documents rather than copying them into the list.
 
+## Terms
+
+- **Context Manifest**: A list of the places where explanations, code, and tests that you often consult live, with the role of each. If the list and the original sources disagree, trust the original sources.
+
 ## Optional helper tool
 
 - If useful, `context-manifest` lists files and details such as their size. Use it to find candidate files to read, then have the AI choose what to read based on the task.

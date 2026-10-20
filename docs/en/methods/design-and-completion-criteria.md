@@ -38,7 +38,14 @@ If you do not give the AI a goal or finish line, it may search past conversation
 
 Consider an automatic check when the same check is repeated, a broken user-facing promise must be caught, or the files actually delivered must be inspected. An automatic check is a build or test run by a computer before changes are shared. Do not add one if its upkeep and runtime cost more than the checking time it saves. Leave usability or other judgments that a computer cannot make reliably for human review.
 
+## How this differs from choosing a verification method
+
+[Check a change in a way that matches what changed](validation-routing.md) decides which checks to run after a change. This method comes first: it decides the purpose, the constraints, the scope, and how to tell the work is complete. Checks that can be automated are then run in that later verification.
+
 ## If an assumption changes
 
 If an important condition is missing or the note disagrees with the code, update the note instead of guessing. If a required check cannot be performed, report it as unverified rather than complete.
 
+## Terms
+
+- **Acceptance Criteria / design-first**: Agreeing on the purpose and completion conditions before implementation begins. No special tool is needed.

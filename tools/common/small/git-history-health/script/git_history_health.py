@@ -12,12 +12,12 @@ TOOL = 'git-history-health'
 ERROR_LIMIT = 1200
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit は履歴size計測値と無効入力の理由をhealth JSONへ整形します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# bounded はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# bounded はerror文をtrimし、上限を超えるdiagnosticを一定長に切ります。
 def bounded(text: str) -> str:
     text = text.strip()
     return text if len(text) <= ERROR_LIMIT else text[:ERROR_LIMIT]
@@ -56,7 +56,7 @@ def collect_metrics(node: object, prefix: str = '') -> list[dict[str, object]]:
     return out
 
 
-# summarize はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# summarize はcount-objects JSONからpack・loose objectの容量指標を集計します。
 def summarize(payload: object, min_concern: float, max_findings: int) -> dict[str, object]:
     metrics = collect_metrics(payload)
     concerning = [row for row in metrics if float(row['level_of_concern']) >= min_concern]
@@ -72,7 +72,7 @@ def summarize(payload: object, min_concern: float, max_findings: int) -> dict[st
     }
 
 
-# run_git_sizer はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_git_sizer はgit-sizerをJSON modeで起動し、未導入・実行失敗・metricを分けます。
 def run_git_sizer(root: Path) -> tuple[object | None, str | None, str]:
     executable = shutil.which('git-sizer')
     if not executable:
@@ -92,7 +92,7 @@ def run_git_sizer(root: Path) -> tuple[object | None, str | None, str]:
         return None, bounded(str(exc)), 'failed'
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はGit履歴サイズの入力を読み、保存済み指標のhealth summaryを出力します。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Compress git-sizer JSON into bounded repository-history health findings.')
     parser.add_argument('root', nargs='?', default='.')

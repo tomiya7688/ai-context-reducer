@@ -37,6 +37,10 @@ Even a “no problems” result is useful only if the changed files were actuall
 
 When the AI receives only the names and lines with problems, it can start with relevant code. It does not need the output for every clean file or a full inventory. Keep the later tests and build; summarize their results instead of passing along every log line.
 
+## Terms
+
+- **Syntax Health Check**: Checking right after a change that the code follows the language's writing rules. It does not confirm that the code behaves correctly; check behavior separately.
+
 ## Optional helper tool
 
 - If useful, `syntax-health` lists files with problems using code parsers already available. Use it to check the syntax of multiple files. It does not install a parser.

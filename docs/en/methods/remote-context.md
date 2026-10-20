@@ -62,6 +62,12 @@ git merge --ff-only '@{upstream}'
 
 This proceeds only when Git can add the shared update directly after your current work. If you and the shared repository have made separate changes, do not combine them automatically. First decide how to bring them together. If you are unsure whether an update should be applied, keep checking instead of applying it automatically.
 
+## What to look at first
+
+After you get the new changes from the shared place, read the summary of changes first. A summary can include a short description of each update, the changed files, the amount changed, and a short excerpt of the diff. A diff shows the lines added or removed between two states. If the summary shows how a change affects your work, read only the relevant diffs and their direct dependencies. When the intent or result of a change is unclear, widen to the whole file, design documents, and tests. Do not settle a decision on a short summary alone.
+
+If you shorten a diff excerpt, state which range you omitted and keep the original diff available. A short view helps you find the changed parts; it is not a full review.
+
 ## Do this each time
 
 - Get information about shared changes before starting work.
@@ -87,3 +93,9 @@ Checking the changed-file list first lets the AI read only the relevant changes 
 ## Terms
 
 Git is a tool for recording and sharing file changes. In this guide, the shared location means a place such as GitHub where people share changes. `fetch` gets change information without rewriting your working files. `merge` applies the changes you reviewed to your local files.
+
+- **Remote Delta / delta-first review**: Looking first at what changed in the shared place since your last check.
+
+## Optional helper tool
+
+- [remote-delta](../../../tools/common/medium/remote-delta/README.md) summarizes the differences from the shared place. Do not decide from the summary alone; check the original content of relevant diffs.

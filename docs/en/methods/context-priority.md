@@ -38,3 +38,12 @@ Broaden the search only when the available information is not enough to decide.
 ## Why this reduces context
 
 Do not direct the AI to a huge file just because it is easy to find. If useful information is inside a large file, have it search first and then read the relevant part without skipping necessary details.
+
+## Terms
+
+- **Context Priority**: Deciding what to read first, starting with what relates to the change.
+
+## Optional helper tools
+
+- [context-budget](../../../tools/common/large/context-budget/README.md) estimates the size of candidate files, which helps you estimate how much you will read.
+- [hotspot-report](../../../tools/common/large/hotspot-report/README.md) finds large or deeply nested files. Both only help you choose investigation candidates; size alone does not show relevance.

@@ -6,7 +6,7 @@ import (
     "testing"
 )
 
-// TestBuildStructureIndexNormalizesPythonInputs は対象機能の契約と回帰条件が維持されることを確認します。
+// TestBuildStructureIndexNormalizesPythonInputs はPython analyzer入力pathをindex内で正規化することを確認します。
 func TestBuildStructureIndexNormalizesPythonInputs(t *testing.T) {
     dir := t.TempDir()
     symbols := filepath.Join(dir, "symbols.json")
@@ -37,7 +37,7 @@ func TestBuildStructureIndexNormalizesPythonInputs(t *testing.T) {
     if !edgeFound { t.Fatal("missing dependency edge") }
 }
 
-// TestBuildStructureIndexBridgesGoPackageToFile は対象機能の契約と回帰条件が維持されることを確認します。
+// TestBuildStructureIndexBridgesGoPackageToFile はGo package参照を具体的なsource fileへ接続することを確認します。
 func TestBuildStructureIndexBridgesGoPackageToFile(t *testing.T) {
     dir := t.TempDir()
     symbols := filepath.Join(dir, "symbols.json")
@@ -63,7 +63,7 @@ func TestBuildStructureIndexBridgesGoPackageToFile(t *testing.T) {
 }
 
 
-// TestBuildStructureIndexPropagatesAnalyzerWarnings は対象機能の契約と回帰条件が維持されることを確認します。
+// TestBuildStructureIndexPropagatesAnalyzerWarnings はlanguage analyzerのwarningを完成indexへ引き継ぐことを確認します。
 func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
     dir := t.TempDir()
     symbols := filepath.Join(dir, "symbols.json")
@@ -73,6 +73,7 @@ func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
       "files":[{"file":"broken.go","status":"parse_failed","symbols":[]}],
       "parse_error_count":1,
       "read_error_count":0,
+      "walk_error_count":3,
       "unsupported_input_count":2
     }`), 0o644); err != nil { t.Fatal(err) }
 
@@ -81,7 +82,7 @@ func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
     if len(index.InputErrors) != 1 {
         t.Fatalf("expected one analyzer warning, got %#v", index.InputErrors)
     }
-    want := symbols + ": analyzer warnings parse_error_count=1 unsupported_input_count=2"
+    want := symbols + ": analyzer warnings parse_error_count=1 walk_error_count=3 unsupported_input_count=2"
     if index.InputErrors[0] != want {
         t.Fatalf("unexpected analyzer warning: %q want %q", index.InputErrors[0], want)
     }
@@ -89,7 +90,7 @@ func TestBuildStructureIndexPropagatesAnalyzerWarnings(t *testing.T) {
 
 
 
-// TestBuildStructureIndexPropagatesGraphWarnings は対象機能の契約と回帰条件が維持されることを確認します。
+// TestBuildStructureIndexPropagatesGraphWarnings はdependency graph構築時のwarningを出力へ引き継ぐことを確認します。
 func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
     dir := t.TempDir()
     graph := filepath.Join(dir, "graph.json")
@@ -100,6 +101,7 @@ func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
       "edges":[],
       "parse_error_count":1,
       "read_error_count":2,
+      "walk_error_count":3,
       "scan_truncated":false
     }`), 0o644); err != nil { t.Fatal(err) }
 
@@ -108,14 +110,14 @@ func TestBuildStructureIndexPropagatesGraphWarnings(t *testing.T) {
     if len(index.InputErrors) != 1 {
         t.Fatalf("expected one graph warning, got %#v", index.InputErrors)
     }
-    want := graph + ": analyzer warnings parse_error_count=1 read_error_count=2"
+    want := graph + ": analyzer warnings parse_error_count=1 read_error_count=2 walk_error_count=3"
     if index.InputErrors[0] != want {
         t.Fatalf("unexpected graph warning: %q want %q", index.InputErrors[0], want)
     }
 }
 
 
-// TestStructureQueryAndExpansion は対象機能の契約と回帰条件が維持されることを確認します。
+// TestStructureQueryAndExpansion はquery結果から指定depthの依存fileを展開することを確認します。
 func TestStructureQueryAndExpansion(t *testing.T) {
     index := structureIndex{
         Format: structureIndexFormat,

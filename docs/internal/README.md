@@ -13,7 +13,7 @@
 | ツールの配布と実行方法 | [追加インストールを減らすツール運用](jp/追加インストールを減らすツール運用.md) | [Portable tools](en/portable-tools.md) |
 | 利用者向け文書で外部ツールを紹介するときの編集基準 | [日本語](../../.github/documentation/external-tool-reference-policy.ja.md) | [English](../../.github/documentation/external-tool-reference-policy.en.md) |
 | Full Bundleの構成と配布上の決まり | [配布設計](jp/Full%20Bundleの配布構成.md) | [Bundle layout](en/full-bundle-layout.md) |
-| リリースの手順と確認項目 | [リリース手順](jp/リリース手順.md) | [Release process](en/releasing.md) |
+| リリースの手順と確認項目 | [リリースを確認して公開する](jp/リリースを確認して公開する.md) | [Release process](en/releasing.md) |
 
 日本語文書を基準となる説明として、英語文書はその翻訳として管理します。対応関係は [`../DOCUMENT_MAP.json`](../DOCUMENT_MAP.json) に記録しています。
 

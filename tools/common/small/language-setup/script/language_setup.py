@@ -20,7 +20,7 @@ TOOLS={
     'gdscript':('gdscript/small/gdscript-symbols','gdscript/medium/gdscript-dependency-map','gdscript/large/godot-scene-graph'),
 }
 
-# first はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# first は候補executableを順に検索し、最初に利用できるpathを返します。
 def first(names):
     for n in names:
         p=shutil.which(n)
@@ -35,7 +35,7 @@ def walk(root):
         if p.is_file():
             yield p
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はrootの言語を検出し、必要環境と実行可能なsetup planを出力します。
 def main():
     ap=argparse.ArgumentParser(description='Select compatible language-specific tools from repository language + environment.')
     ap.add_argument('root',nargs='?',default='.')

@@ -54,6 +54,8 @@ AST / dataflow / architecture semanticsが必要なruleは `"semantic": true` �
 
 - `0`: error severity violationなし
 - `1`: error severity violationあり
-- `2`: invalid rule/config/input
+- `2`: invalid rule/config/input、またはread / walkが不完全
 
 warningはexit code 1にしません。
+
+rootが存在しない場合は`input_missing`、rootがdirectoryでない場合は`input_not_directory`、rootを確認できない場合は`input_unavailable`を返し、いずれもexit code `2`です。走査中の列挙失敗は`walk_error_count`と`walk_error_paths`、ファイル読込失敗は`read_error_paths`に記録します。いずれかがあると、error violationが見つからない場合でも`status`は`partial`となりexit code `2`です。violationと走査失敗が同時にある場合は`status: violations`とexit code `1`を維持しつつ、走査失敗の情報も返します。

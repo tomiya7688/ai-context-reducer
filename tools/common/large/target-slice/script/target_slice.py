@@ -12,8 +12,10 @@ def main():
     parser.add_argument('files', nargs='+')
     parser.add_argument('--before', type=int, default=3)
     parser.add_argument('--after', type=int, default=5)
-    parser.add_argument('--max-matches', type=int, default=20)
+    parser.add_argument('--max-matches', type=int, default=20,
+                        help='Maximum matches to return; 0 or a negative value means unlimited (default: 20).')
     args = parser.parse_args()
+    max_matches = max(0, args.max_matches)
 
     try:
         regex = re.compile(args.pattern, re.IGNORECASE)
@@ -44,6 +46,9 @@ def main():
         for index, line in enumerate(lines):
             if not regex.search(line):
                 continue
+            if max_matches > 0 and len(matches) >= max_matches:
+                truncated = True
+                break
             start = max(0, index - args.before)
             end = min(len(lines), index + args.after + 1)
             matches.append({
@@ -55,9 +60,6 @@ def main():
                     for number in range(start + 1, end + 1)
                 ],
             })
-            if len(matches) >= args.max_matches:
-                truncated = True
-                break
         if truncated:
             break
 

@@ -65,7 +65,7 @@ def build_result(root: Path, limit: int):
     }
 
 
-# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はGDScript projectのload・preload参照を集め、dependency mapを出力します。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')

@@ -25,6 +25,18 @@ func TestBuildResultDistinguishesParseFailure(t *testing.T) {
     }
 }
 
+// TestScanReportsReadFailureでsource read失敗がparse失敗へ混同されないことを検証する。
+func TestScanReportsReadFailure(t *testing.T) {
+    result := scan(filepath.Join(t.TempDir(), "missing.go"))
+    if result.Status != "read_failed" || result.Error == "" {
+        t.Fatalf("read failure was not preserved: %#v", result)
+    }
+    aggregate := resultFromRows([]fileSymbols{result}, nil)
+    if aggregate.Status != "ok_with_warnings" || aggregate.ReadErrorCount != 1 || aggregate.ParseErrorCount != 0 {
+        t.Fatalf("read failure was reported as clean or as parse failure: %#v", aggregate)
+    }
+}
+
 // TestBuildResultReportsUnsupportedAndMissingInputsでparse失敗・unsupported input・truncation契約が回帰していないことを検証する。
 func TestBuildResultReportsUnsupportedAndMissingInputs(t *testing.T) {
     dir := t.TempDir()

@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "fixture": {
+    "eligible_extensions": [
+      ".md",
+      ".py"
+    ],
+    "eligible_files": 15,
+    "tasks": 3
+  },
+  "measurement": {
+    "characters": "Python len() over UTF-8 decoded file text",
+    "utf8_bytes": "len(text.encode('utf-8'))",
+    "tokens": "not measured; pass --chars-per-token only for an explicitly labeled estimate",
+    "mechanical_search": "search scans fixture files, but only matched files are counted as AI context"
+  },
+  "tasks": [
+    {
+      "id": "settings-error-path",
+      "request": "When invalid settings.json is loaded, prepare the project evidence needed to change the error so it includes the failing file path.",
+      "search_terms": [
+        "SettingsLoadError",
+        "settings.json"
+      ],
+      "required_evidence": [
+        "docs/settings.md",
+        "src/settings.py",
+        "tests/test_settings.py"
+      ],
+      "baseline": {
+        "strategy": "read-all-eligible-files",
+        "ai_context_files": [
+          "docs/cache.md",
+          "docs/notifier.md",
+          "docs/profile.md",
+          "docs/report.md",
+          "docs/settings.md",
+          "src/cache.py",
+          "src/notifier.py",
+          "src/profile.py",
+          "src/report.py",
+          "src/settings.py",
+          "tests/test_cache.py",
+          "tests/test_notifier.py",
+          "tests/test_profile.py",
+          "tests/test_report.py",
+          "tests/test_settings.py"
+        ],
+        "ai_opened_files": 15,
+        "mechanical_search_commands": 0,
+        "mechanically_scanned_files": 0,
+        "metrics": {
+          "files": 15,
+          "characters": 4826,
+          "utf8_bytes": 4826,
+          "estimated_tokens": null
+        },
+        "required_evidence_complete": true
+      },
+      "context_reduced": {
+        "strategy": "literal-search-then-read-matches",
+        "ai_context_files": [
+          "docs/settings.md",
+          "src/settings.py",
+          "tests/test_settings.py"
+        ],
+        "ai_opened_files": 3,
+        "mechanical_search_commands": 1,
+        "mechanically_scanned_files": 15,
+        "metrics": {
+          "files": 3,
+          "characters": 1328,
+          "utf8_bytes": 1328,
+          "estimated_tokens": null
+        },
+        "required_evidence_complete": true
+      },
+      "reduction": {
+        "files_percent": 80,
+        "characters_percent": 72.5,
+        "utf8_bytes_percent": 72.5
+      }
+    },
+    {
+      "id": "profile-display-name",
+      "request": "Prepare the project evidence needed to verify how display_name whitespace is normalized before a profile is rendered.",
+      "search_terms": [
+        "normalize_display_name",
+        "display_name"
+      ],
+      "required_evidence": [
+        "docs/profile.md",
+        "src/profile.py",
+        "tests/test_profile.py"
+      ],
+      "baseline": {
+        "strategy": "read-all-eligible-files",
+        "ai_context_files": [
+          "docs/cache.md",
+          "docs/notifier.md",
+          "docs/profile.md",
+          "docs/report.md",
+          "docs/settings.md",
+          "src/cache.py",
+          "src/notifier.py",
+          "src/profile.py",
+          "src/report.py",
+          "src/settings.py",
+          "tests/test_cache.py",
+          "tests/test_notifier.py",
+          "tests/test_profile.py",
+          "tests/test_report.py",
+          "tests/test_settings.py"
+        ],
+        "ai_opened_files": 15,
+        "mechanical_search_commands": 0,
+        "mechanically_scanned_files": 0,
+        "metrics": {
+          "files": 15,
+          "characters": 4826,
+          "utf8_bytes": 4826,
+          "estimated_tokens": null
+        },
+        "required_evidence_complete": true
+      },
+      "context_reduced": {
+        "strategy": "literal-search-then-read-matches",
+        "ai_context_files": [
+          "docs/profile.md",
+          "src/profile.py",
+          "tests/test_profile.py"
+        ],
+        "ai_opened_files": 3,
+        "mechanical_search_commands": 1,
+        "mechanically_scanned_files": 15,
+        "metrics": {
+          "files": 3,
+          "characters": 1032,
+          "utf8_bytes": 1032,
+          "estimated_tokens": null
+        },
+        "required_evidence_complete": true
+      },
+      "reduction": {
+        "files_percent": 80,
+        "characters_percent": 78.6,
+        "utf8_bytes_percent": 78.6
+      }
+    },
+    {
+      "id": "notification-retry",
+      "request": "Prepare the project evidence needed to change notification retry behavior without retrying permanent failures.",
+      "search_terms": [
+        "send_with_retry",
+        "TemporaryNotificationError"
+      ],
+      "required_evidence": [
+        "docs/notifier.md",
+        "src/notifier.py",
+        "tests/test_notifier.py"
+      ],
+      "baseline": {
+        "strategy": "read-all-eligible-files",
+        "ai_context_files": [
+          "docs/cache.md",
+          "docs/notifier.md",
+          "docs/profile.md",
+          "docs/report.md",
+          "docs/settings.md",
+          "src/cache.py",
+          "src/notifier.py",
+          "src/profile.py",
+          "src/report.py",
+          "src/settings.py",
+          "tests/test_cache.py",
+          "tests/test_notifier.py",
+          "tests/test_profile.py",
+          "tests/test_report.py",
+          "tests/test_settings.py"
+        ],
+        "ai_opened_files": 15,
+        "mechanical_search_commands": 0,
+        "mechanically_scanned_files": 0,
+        "metrics": {
+          "files": 15,
+          "characters": 4826,
+          "utf8_bytes": 4826,
+          "estimated_tokens": null
+        },
+        "required_evidence_complete": true
+      },
+      "context_reduced": {
+        "strategy": "literal-search-then-read-matches",
+        "ai_context_files": [
+          "docs/notifier.md",
+          "src/notifier.py",
+          "tests/test_notifier.py"
+        ],
+        "ai_opened_files": 3,
+        "mechanical_search_commands": 1,
+        "mechanically_scanned_files": 15,
+        "metrics": {
+          "files": 3,
+          "characters": 1183,
+          "utf8_bytes": 1183,
+          "estimated_tokens": null
+        },
+        "required_evidence_complete": true
+      },
+      "reduction": {
+        "files_percent": 80,
+        "characters_percent": 75.5,
+        "utf8_bytes_percent": 75.5
+      }
+    }
+  ],
+  "aggregate": {
+    "baseline_ai_context_files": 45,
+    "context_reduced_ai_context_files": 9,
+    "baseline_characters": 14478,
+    "context_reduced_characters": 3543,
+    "baseline_utf8_bytes": 14478,
+    "context_reduced_utf8_bytes": 3543,
+    "files_reduction_percent": 80,
+    "characters_reduction_percent": 75.5,
+    "utf8_bytes_reduction_percent": 75.5,
+    "baseline_all_required_evidence_complete": true,
+    "context_reduced_all_required_evidence_complete": true
+  }
+}

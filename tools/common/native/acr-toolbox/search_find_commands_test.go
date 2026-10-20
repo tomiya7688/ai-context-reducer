@@ -6,7 +6,7 @@ import (
     "testing"
 )
 
-// TestSearchPortableJSONContract は対象機能の契約と回帰条件が維持されることを確認します。
+// TestSearchPortableJSONContract はportable検索が機械可読rowと終了statusを返すことを確認します。
 func TestSearchPortableJSONContract(t *testing.T) {
     root := t.TempDir()
     if err := os.MkdirAll(filepath.Join(root, "src"), 0o755); err != nil {
@@ -41,7 +41,7 @@ func TestSearchPortableJSONContract(t *testing.T) {
     }
 }
 
-// TestSearchTruncationContextAndInvalidRegex は対象機能の契約と回帰条件が維持されることを確認します。
+// TestSearchTruncationContextAndInvalidRegex はmatch周辺行の省略表示とregex errorを確認します。
 func TestSearchTruncationContextAndInvalidRegex(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "a.txt"), []byte("before\nneedle one\nafter\nneedle two\n"), 0o644); err != nil {
@@ -70,7 +70,7 @@ func TestSearchTruncationContextAndInvalidRegex(t *testing.T) {
     }
 }
 
-// TestFindPortableDefaultIsDeepAndPrunesDependencies は対象機能の契約と回帰条件が維持されることを確認します。
+// TestFindPortableDefaultIsDeepAndPrunesDependencies は既定で深く検索しdependency directoryを除くことを確認します。
 func TestFindPortableDefaultIsDeepAndPrunesDependencies(t *testing.T) {
     root := t.TempDir()
     deep := root
@@ -106,7 +106,7 @@ func TestFindPortableDefaultIsDeepAndPrunesDependencies(t *testing.T) {
     }
 }
 
-// TestFindSeparatesOutputAndScanTruncation は対象機能の契約と回帰条件が維持されることを確認します。
+// TestFindSeparatesOutputAndScanTruncation は返却件数上限と走査省略signalを別fieldで示すことを確認します。
 func TestFindSeparatesOutputAndScanTruncation(t *testing.T) {
     root := t.TempDir()
     for _, name := range []string{"a.txt", "b.txt", "c.txt"} {

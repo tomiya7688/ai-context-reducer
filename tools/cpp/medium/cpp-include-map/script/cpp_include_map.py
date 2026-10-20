@@ -14,7 +14,7 @@ IGNORE_DIRS = {
 EXTENSIONS = {'.cpp', '.cc', '.cxx', '.hpp', '.hh', '.hxx', '.h'}
 
 
-# 依存物・生成物を避けながら解析対象sourceを決定論的に列挙する。
+# C++ include mapの対象拡張子を選び、vendor・build directoryを避けて列挙します。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -27,7 +27,7 @@ def source_files(root: Path):
     return found
 
 
-# 解析対象の完全性とinclude依存を集約し、truncationや失敗件数も結果へ残す。
+# C++直接include edgeと読取・walk failureをfile単位のbounded mapへまとめます。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -66,7 +66,7 @@ def build_result(root: Path, limit: int):
     }
 
 
-# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はC++ include対象を検証し、file別include edgeと走査状態をJSONで返します。
 def main():
     parser = argparse.ArgumentParser(description='Build a C++ include map.')
     parser.add_argument('root', nargs='?', default='.')

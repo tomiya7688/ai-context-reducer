@@ -11,12 +11,12 @@ from pathlib import Path
 TOOL = 'syntax-health'
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit はper-file checker結果をhealth status付きJSONとして標準出力へ出します。
 def emit(value: object) -> None:
     print(json.dumps(value, ensure_ascii=False, indent=2))
 
 
-# int_value はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# int_value は整数入力を数値化し、bool以外の不正型はzeroへ丸めます。
 def int_value(value: object) -> int:
     if isinstance(value, bool):
         return int(value)
@@ -50,7 +50,7 @@ def normalize_rows(payload: object) -> list[dict[str, object]]:
     return rows
 
 
-# summarize はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# summarize は複数checkerの診断をseverity別の件数と短い詳細へ畳み込みます。
 def summarize(payload: object, max_files: int) -> dict[str, object]:
     rows = normalize_rows(payload)
     failing = [row for row in rows if not row['syntax_ok']]
@@ -67,7 +67,7 @@ def summarize(payload: object, max_files: int) -> dict[str, object]:
     }
 
 
-# run_tree_sitter はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_tree_sitter はtree-sitterを起動し、未導入・実行失敗・解析結果を区別します。
 def run_tree_sitter(targets: list[str]) -> tuple[object | None, str | None, str]:
     executable = shutil.which('tree-sitter')
     if executable is None:
@@ -84,7 +84,7 @@ def run_tree_sitter(targets: list[str]) -> tuple[object | None, str | None, str]
         return None, str(exc)[:1200], 'failed'
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は言語別syntax checkerの有無と実行結果を集め、health JSONを返します。
 def main() -> int:
     parser = argparse.ArgumentParser(description='Compact Tree-sitter parse health as self-describing JSON.')
     parser.add_argument('targets', nargs='*', help='Files/directories passed to tree-sitter parse.')

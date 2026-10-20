@@ -36,6 +36,19 @@ func TestBuildImportMapDistinguishesParseFailure(t *testing.T) {
     }
 }
 
+// TestFileImportsReportsReadFailureでsource read失敗とGo syntax不正が区別されることを検証する。
+func TestFileImportsReportsReadFailure(t *testing.T) {
+    missing := filepath.Join(t.TempDir(), "missing.go")
+    row := fileImports(missing)
+    if row.Status != "read_failed" || row.Error == "" {
+        t.Fatalf("read failure was not preserved: %#v", row)
+    }
+    result := buildImportMapFromFiles(filepath.Dir(missing), []string{missing}, 0)
+    if result.Status != "ok_with_warnings" || result.ReadErrorCount != 1 || result.ParseErrorCount != 0 {
+        t.Fatalf("read failure was reported as clean or as parse failure: %#v", result)
+    }
+}
+
 // TestBuildImportMapTruncationIsRealでparse失敗・unsupported input・truncation契約が回帰していないことを検証する。
 func TestBuildImportMapTruncationIsReal(t *testing.T) {
     dir := t.TempDir()

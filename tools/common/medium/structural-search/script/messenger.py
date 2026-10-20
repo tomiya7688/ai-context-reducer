@@ -22,7 +22,7 @@ def find_ast_grep() -> str | None:
     return candidate if 'ast-grep' in text else None
 
 
-# run_ast_grep はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# run_ast_grep はast-grepをJSON出力で実行し、match rowと実行errorを分けて返します。
 def run_ast_grep(executable: str, root: Path, pattern: str, language: str | None) -> tuple[bool, list[dict], str]:
     command = [
         executable,

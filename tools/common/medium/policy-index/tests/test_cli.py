@@ -9,7 +9,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / 'script' / 'policy_index.py'
 
 
 class PolicyIndexCLITests(unittest.TestCase):
-    # test_zero_limit_means_unlimited は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_zero_limit_means_unlimited はCLIのlimit zeroでpolicy候補を全件返すことを確認します。
     def test_zero_limit_means_unlimited(self):
         with tempfile.TemporaryDirectory() as tmp:
             policy = Path(tmp) / 'policy.md'
@@ -26,7 +26,7 @@ class PolicyIndexCLITests(unittest.TestCase):
             self.assertEqual(2, len(payload['findings']))
             self.assertFalse(payload['findings_truncated'])
 
-    # test_missing_only_input_is_explicit_failure は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_missing_only_input_is_explicit_failure は存在しない入力だけのscopeを成功扱いしないことを確認します。
     def test_missing_only_input_is_explicit_failure(self):
         with tempfile.TemporaryDirectory() as tmp:
             missing = Path(tmp) / 'missing.md'

@@ -43,7 +43,7 @@ def build_tree(root: Path, max_depth: int, max_entries: int) -> dict[str, object
     collect_tree(root, root, 1, max_depth, max_entries, state)
     return {
         'tool': 'tree-view',
-        'status': 'ok',
+        'status': 'ok_with_warnings' if state['read_error_paths'] else 'ok',
         'project_root': str(root),
         'max_depth': max_depth,
         'max_entries': max_entries,
@@ -51,13 +51,15 @@ def build_tree(root: Path, max_depth: int, max_entries: int) -> dict[str, object
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はroot・深さ・件数の指定を受け、tree-viewのJSONと終了statusを出力する。
 def main():
     ap = argparse.ArgumentParser(description='Portable bounded repository tree as self-describing JSON.')
     ap.add_argument('root', nargs='?', default='.')
     ap.add_argument('--max-depth', type=int, default=3)
     ap.add_argument('--max-entries', type=int, default=300, help='Output limit. 0 means unlimited within max-depth.')
     args = ap.parse_args()
+    if args.max_depth < 0 or args.max_entries < 0:
+        ap.error('--max-depth and --max-entries must be non-negative')
     root = Path(args.root).resolve()
     if not root.exists():
         result = {'tool': 'tree-view', 'status': 'input_missing', 'project_root': str(root)}
@@ -66,7 +68,8 @@ def main():
     else:
         result = build_tree(root, max(0, args.max_depth), max(0, args.max_entries))
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['status'] in {'ok', 'ok_with_warnings'} else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

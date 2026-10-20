@@ -51,7 +51,7 @@ def build_result(root: Path):
     }
 
 
-# CLI入力を検証し、通常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はC# project mapをgraph artifactへ集約し、truncation・failureを返します。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')

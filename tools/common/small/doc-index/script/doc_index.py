@@ -34,19 +34,19 @@ def build_index(root: Path, max_documents: int, max_headings_per_document: int) 
             if max_headings_per_document == 0 or len(headings) < max_headings_per_document:
                 headings.append({'line': n, 'level': len(m.group(1)), 'title': m.group(2)[:120]})
         if headings:
+            if max_documents > 0 and len(documents) >= max_documents:
+                documents_truncated = True
+                break
             documents.append({
                 'path': p.relative_to(root).as_posix(),
                 'heading_count': total_headings,
                 'headings': headings,
                 'headings_truncated': max_headings_per_document > 0 and total_headings > len(headings),
             })
-            if max_documents > 0 and len(documents) >= max_documents:
-                documents_truncated = True
-                break
 
     return {
         'tool': 'doc-index',
-        'status': 'ok',
+        'status': 'ok_with_warnings' if read_error_paths else 'ok',
         'project_root': str(root),
         'markdown_files_scanned': documents_scanned,
         'read_error_paths': read_error_paths,
@@ -55,13 +55,15 @@ def build_index(root: Path, max_documents: int, max_headings_per_document: int) 
     }
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はMarkdown headingを索引化し、文書上限と未返却候補をJSONで示します。
 def main():
     ap = argparse.ArgumentParser(description='Build a compact Markdown heading index as self-describing JSON.')
     ap.add_argument('root', nargs='?', default='.')
     ap.add_argument('--max-documents', type=int, default=0, help='Optional output limit. 0 means unlimited.')
     ap.add_argument('--max-headings-per-document', type=int, default=60, help='Heading output limit per document. 0 means unlimited.')
     args = ap.parse_args()
+    if args.max_documents < 0 or args.max_headings_per_document < 0:
+        ap.error('--max-documents and --max-headings-per-document must be non-negative')
     root = Path(args.root).resolve()
     if not root.exists():
         result = {'tool': 'doc-index', 'status': 'input_missing', 'project_root': str(root)}
@@ -70,6 +72,7 @@ def main():
     else:
         result = build_index(root, max(0, args.max_documents), max(0, args.max_headings_per_document))
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['status'] in {'ok', 'ok_with_warnings'} else 2
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

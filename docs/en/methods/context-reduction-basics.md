@@ -30,6 +30,16 @@ For a settings-saving change, start with the saving code and its tests. Look at 
 
 Use a short list or summary to find the files you need. When making a decision, check the actual documentation, code, and tests. Do not rely on a list or summary alone.
 
+## How to give it to the AI and check
+
+Put rules you reuse in the instruction files or settings that your AI actually reads. Whether it reads them automatically depends on the AI, so check its settings. For a one-time task, name the method page and the target directly in the request.
+
+Compare the files and checks the AI reports with the activity record and the diff. If your environment does not show what was read, the report alone does not show that the amount read went down. In that case, confirm that you reached the needed sources from the candidates and did not skip needed tests. If your environment can count tokens, you can compare before and after on the same kind of task.
+
+## When to use it and when to skip it
+
+For a one-off fix where the file to change and its test are clear from the request, read them directly; you do not need an index or a dedicated guide. If you keep searching several features for the same kind of request, look at what you searched again recently and put it in a short list or procedure. The test is whether the searching and rereading you save outweighs the effort of writing and updating the list. See [Choose only the methods you need](../adoption/adoption-priority.md) for examples.
+
 ## When choosing a method or tool
 
 Check whether it reduces any of these:
@@ -53,6 +63,8 @@ Report what you checked and what you could not check.
 ```
 
 This gives the AI the work goal before it searches. It can skip unrelated files while keeping the evidence needed for a correct change.
+
+How an LLM handles input as tokens, and why information in a long input is not always used equally well, is explained in [How much context is used and how](../llm-mechanics/context-amount-and-use.md). Choose helper tools from the [method and helper tool map](tool-method-map.md). Try existing search and short instructions first, and adopt a tool only if the repeated effort remains. This approach is sometimes called "context engineering" or "context routing."
 
 ## Terms
 

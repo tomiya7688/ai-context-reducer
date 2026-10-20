@@ -16,7 +16,7 @@ class PatternError(ValueError):
     pass
 
 
-# _bounded_text はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _bounded_text はcapture文字列を上限長で切り、実際に切った場合だけflagを立てます。
 def _bounded_text(text: str, limit: int) -> tuple[str, bool]:
     if len(text) <= limit:
         return text, False
@@ -63,7 +63,7 @@ def normalize_ast_grep_matches(rows: list[dict], max_results: int) -> tuple[list
     return normalized, truncated
 
 
-# _prepare_python_pattern はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _prepare_python_pattern はmetavariable記法をAST検索用に変換し、parse errorを専用例外にします。
 def _prepare_python_pattern(pattern: str) -> ast.AST:
     if '$$$' in pattern:
         raise PatternError('variadic_metavariables_require_ast_grep_backend')
@@ -78,7 +78,7 @@ def _prepare_python_pattern(pattern: str) -> ast.AST:
     return node.value if isinstance(node, ast.Expr) else node
 
 
-# _meta_name はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _meta_name はAST nameまたは文字列から有効なmetavariable名を取り出します。
 def _meta_name(value: object) -> str | None:
     if isinstance(value, ast.Name) and value.id.startswith(META_PREFIX):
         return value.id[len(META_PREFIX):]
@@ -87,14 +87,14 @@ def _meta_name(value: object) -> str | None:
     return None
 
 
-# _capture_signature はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _capture_signature はAST属性を除いた構造表現を作り、capture同値判定に使います。
 def _capture_signature(value: object) -> object:
     if isinstance(value, ast.AST):
         return ast.dump(value, include_attributes=False)
     return value
 
 
-# _matches はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _matches はpattern nodeを照合し、capture済みmetavariableの再出現も比較します。
 def _matches(pattern: object, candidate: object, captures: dict[str, object]) -> bool:
     meta = _meta_name(pattern)
     if meta is not None:
@@ -120,7 +120,7 @@ def _matches(pattern: object, candidate: object, captures: dict[str, object]) ->
     return pattern == candidate
 
 
-# _capture_text はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _capture_text はAST captureのsource文字列を上限付きの結果rowへ整形します。
 def _capture_text(source: str, value: object) -> dict:
     if isinstance(value, ast.AST):
         raw = ast.get_source_segment(source, value) or ''
@@ -130,7 +130,7 @@ def _capture_text(source: str, value: object) -> dict:
     return {'text': text, 'text_truncated': truncated}
 
 
-# _candidate_match はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# _candidate_match は一致nodeのpath・位置・capture textを結果rowへまとめます。
 def _candidate_match(path: Path, root: Path, source: str, node: ast.AST, captures: dict[str, object]) -> dict:
     raw = ast.get_source_segment(source, node) or ''
     text, text_truncated = _bounded_text(raw, TEXT_LIMIT)
@@ -152,7 +152,7 @@ def _candidate_match(path: Path, root: Path, source: str, node: ast.AST, capture
     return match
 
 
-# python_ast_search はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# python_ast_search はPython ASTを走査し、match上限・parse error・走査件数を返します。
 def python_ast_search(root: Path, pattern: str, max_results: int) -> dict:
     pattern_node = _prepare_python_pattern(pattern)
     matches = []

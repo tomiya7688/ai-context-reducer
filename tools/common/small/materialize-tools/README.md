@@ -2,6 +2,8 @@
 
 対象環境で利用できるportable tool implementationだけを、安全にdeployment directoryへmaterializeします。
 
+これは実行環境をinstallするtoolではなく、選んだ補助ツールのファイルを指定先へ配置するtoolです。どの状況なら既存環境や配布済みtoolを選ぶかは[追加インストールを減らしてツールを使う](../../../../docs/jp/手法/追加インストールを減らしてツールを使う.md)（[English](../../../../docs/en/methods/use-tools-without-extra-installs.md)）を参照してください。
+
 Copier / Cookiecutter等のversioned template運用から、Context Reducerに必要な次の考え方だけを取り込みます。
 
 - deterministic preview before apply

@@ -34,7 +34,7 @@ type contextPackState struct {
     StatusTruncated  bool
 }
 
-// contextPackGitLines はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// contextPackGitLines はGit差分の行を読み、失敗時も成功した空差分と区別します。
 func contextPackGitLines(root string, args ...string) contextPackGitResult {
     executable, err := exec.LookPath("git")
     if err != nil {
@@ -56,7 +56,7 @@ func contextPackGitLines(root string, args ...string) contextPackGitResult {
     return contextPackGitResult{OK: true, Lines: lines}
 }
 
-// boundedContextPackLines はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// boundedContextPackLines は差分行を指定上限に収め、省略の有無を返します。
 func boundedContextPackLines(lines []string, limit int) ([]string, bool) {
     if limit < 0 {
         limit = 0
@@ -88,7 +88,7 @@ func buildContextPackState(root string, limit int) contextPackState {
     }
 }
 
-// contextPackFailureLine はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// contextPackFailureLine はGit取得失敗を出力用の明示的な診断行へ変換します。
 func contextPackFailureLine(errorKind, queryName string) string {
     if errorKind == "git_unavailable" {
         return "- Git unavailable\n"

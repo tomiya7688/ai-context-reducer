@@ -47,8 +47,12 @@ type symbolsResult struct {
 // 1つのGo sourceをparseし、symbol一覧とread/parse失敗を別signalとして返す。
 func scan(path string) fileSymbols {
     normalized := filepath.ToSlash(path)
+    source, err := os.ReadFile(path)
+    if err != nil {
+        return fileSymbols{File: normalized, Status: "read_failed", Symbols: []symbol{}, Error: err.Error()}
+    }
     fset := token.NewFileSet()
-    file, err := parser.ParseFile(fset, path, nil, 0)
+    file, err := parser.ParseFile(fset, path, source, 0)
     if err != nil {
         return fileSymbols{File: normalized, Status: "parse_failed", Symbols: []symbol{}, Error: err.Error()}
     }
@@ -71,7 +75,7 @@ func scan(path string) fileSymbols {
     return fileSymbols{File: normalized, Status: "ok", Symbols: rows}
 }
 
-// file/directoriesを解析対象へ展開し、missingやunsupported inputを別signalとして保持する。
+// Go入力pathから対象fileを列挙し、missing rootや非Go fileをparse結果と分けます。
 func collect(paths []string) ([]fileSymbols, []unsupportedInput, error) {
     files := []string{}
     unsupported := []unsupportedInput{}
@@ -127,12 +131,17 @@ func collect(paths []string) ([]fileSymbols, []unsupportedInput, error) {
     return rows, unsupported, nil
 }
 
-// symbol解析結果とwarningを集約し、不完全なscanをclean扱いしない結果を作る。
+// Go fileのparse結果とwarningを統合し、未完了の走査をok statusへ丸めません。
 func buildResult(paths []string) (symbolsResult, error) {
     rows, unsupported, err := collect(paths)
     if err != nil {
         return symbolsResult{}, err
     }
+    return resultFromRows(rows, unsupported), nil
+}
+
+// file単位の解析結果とunsupported inputをwarning countへ集約する。
+func resultFromRows(rows []fileSymbols, unsupported []unsupportedInput) symbolsResult {
     result := symbolsResult{
         Tool: "go-symbols", Status: "ok", Language: "go", Files: rows,
         FileCount: len(rows), UnsupportedInputCount: len(unsupported), UnsupportedInputs: unsupported,
@@ -149,7 +158,7 @@ func buildResult(paths []string) (symbolsResult, error) {
     if result.ParseErrorCount > 0 || result.ReadErrorCount > 0 || result.UnsupportedInputCount > 0 {
         result.Status = "ok_with_warnings"
     }
-    return result, nil
+    return result
 }
 
 // CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。

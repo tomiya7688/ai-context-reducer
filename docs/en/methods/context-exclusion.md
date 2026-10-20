@@ -82,6 +82,14 @@ Create a separate list or automatic checker only when repeatedly sorting out the
 
 To actually keep files out of the AI's automatic reading scope, use the project-level exclusion setting supported by the AI product. The setting's filename and location vary, so check that product's instructions. `.gitignore` controls Git tracking; it does not tell an AI what to read. If the AI product has no exclusion setting, write a rule in the root `AGENTS.md` such as “Usually skip this path, but read it when the change or its tests need it,” and repeat that instruction in the task request. This guides the AI but does not technically prevent it from opening the files.
 
+If the project already has an `AGENTS.md`, `CLAUDE.md`, `AI_CONTEXT.md`, or similar guide, confirm that the AI you use reads it before adding the rule, and do not create a second file with the same role. Put an exclusion that applies to every task in the project's top-level guide. If it belongs only to a repeated workflow, put it in the Skill for that workflow when your AI supports Skills. File names, locations, and automatic loading vary by tool; see [Give the AI instructions for the files it will change](hierarchical-context.md).
+
+## When an excluded file becomes relevant
+
+When investigating a failed build, read the log lines related to that failure. When checking a release package, inspect the package contents. Fixing a generated-file problem may require checking both the source that creates the file and the generated result.
+
+For such a task, temporarily remove the path from the guide or tool exclusion, or explicitly ask the AI to read only the files it needs. Restore the normal exclusion after the check. An exclusion sets the initial candidates to skip; it is not a reason to ignore evidence the task needs.
+
 ## Tell the AI what to do
 
 ```text
@@ -96,6 +104,7 @@ The AI no longer receives unrelated logs or generated files for every task. When
 
 ## Terms
 
+- **Context Exclusion / ignore rules**: The policy of leaving files out of the places the AI checks first, together with the settings that implement it. The method skips these files in routine work but reads them when the task needs them.
 - **File usually skipped by the AI**: A file or folder unnecessary for many tasks but needed for a particular task.
 - **Sharing or recording settings**: Settings such as `.gitignore` that control whether project files are shared or recorded. These are separate from what the AI reads.
 

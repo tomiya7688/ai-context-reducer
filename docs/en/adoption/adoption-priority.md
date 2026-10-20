@@ -50,6 +50,14 @@ For a small project, these basics may be enough.
 
 Adding only guidance that addresses a real problem keeps the AI from reading extra instructions and lists on every task. For example, if all tests in a small project finish in seconds, running them all may be simpler than maintaining a test-selection map. If there are many tests and each run produces long logs, a map that points to tests related to the change can help.
 
+## When it is worth adding a method
+
+Add a method when the effort it repeatedly saves outweighs the cost of introducing and maintaining it. Judge by whether the amount read and the time spent searching actually went down while accuracy and needed checks were kept.
+
+For example, if you spend 12 minutes finding the target for the same kind of task and do it 8 times a month, that is about 96 minutes of searching. If writing an entry guide takes 30 minutes, updating it takes 10 minutes a month, and each search then takes 3 minutes, the monthly work is about 34 minutes, so the method pays off even after maintenance. For a one-time task where the search takes 12 minutes, there is no need to spend 30 minutes building a dedicated index. These numbers only show how to calculate; they are not a pass mark. Estimate from the searches and time you actually repeated recently and the effort of keeping the method up to date.
+
+Size is not the only factor. If several people or AIs update the same repository, consider a step to check what changed since your last check, plus a short shared note of each task's goal and scope.
+
 ## Wait for evidence before adding these
 
 - A large code index that takes substantial work to update
@@ -69,6 +77,8 @@ Do not add a method if setting it up and maintaining it costs more than the repe
 6. Briefly report what was added and what was skipped, with reasons.
 
 Choose methods that solve real problems, not ones that only seem useful for a possible future need.
+
+See [Find a method by the problem you have](../methods/method-index.md) for the methods, and the [method and helper tool map](../methods/tool-method-map.md) for the matching helper tools. This procedure is called **Method Adoption / method selection**.
 
 ## How to judge the benefit
 

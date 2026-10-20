@@ -55,7 +55,7 @@ def build_result(root: Path, max_source_files: int):
     }
 
 
-# CLI入力を検証し、通常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はC# project referencesとsource scanからproject dependency mapを作ります。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')

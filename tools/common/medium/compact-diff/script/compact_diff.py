@@ -1,36 +1,55 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import shutil
 import subprocess
 
 
-# run_git はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
-def run_git(*args: str) -> tuple[bool, str]:
-    result = subprocess.run(['git', *args], text=True, capture_output=True, check=False)
-    return result.returncode == 0, result.stdout.strip()
+# run_git はGit subprocessのstdout・stderr・終了状態を呼び出し側へ返します。
+def run_git(*args: str) -> tuple[bool, str, str]:
+    executable = shutil.which('git')
+    if executable is None:
+        return False, '', 'git_unavailable'
+    try:
+        result = subprocess.run([executable, *args], text=True, capture_output=True, check=False)
+    except OSError:
+        return False, '', 'git_unavailable'
+    error_kind = '' if result.returncode == 0 else 'git_query_failed'
+    return result.returncode == 0, result.stdout.strip(), error_kind
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はGit diffを取得してchange summaryへ圧縮し、query failureを区別します。
 def main():
     parser = argparse.ArgumentParser(description='Return compact Git diff evidence as self-describing JSON.')
     parser.add_argument('--base', default='HEAD~1')
     parser.add_argument('--head', default='HEAD')
     parser.add_argument('--max-lines', type=int, default=120)
     args = parser.parse_args()
+    if args.max_lines < 0:
+        parser.error('--max-lines must be non-negative')
 
-    log_ok, commits = run_git('log', '--oneline', f'{args.base}..{args.head}')
-    files_ok, changed = run_git('diff', '--name-status', args.base, args.head)
-    stat_ok, shortstat = run_git('diff', '--shortstat', args.base, args.head)
-    diff_ok, diff_text = run_git('diff', '--unified=2', args.base, args.head)
+    repository_ok, _, repository_error = run_git('rev-parse', '--is-inside-work-tree')
+    if not repository_ok:
+        error_kind = 'git_unavailable' if repository_error == 'git_unavailable' else 'git_unavailable_or_not_repository'
+        query_results = []
+    else:
+        query_results = [
+            run_git('log', '--oneline', f'{args.base}..{args.head}'),
+            run_git('diff', '--name-status', args.base, args.head),
+            run_git('diff', '--shortstat', args.base, args.head),
+            run_git('diff', '--unified=2', args.base, args.head),
+        ]
+        error_kind = 'git_query_failed' if not all(result[0] for result in query_results) else ''
 
-    if not all((log_ok, files_ok, stat_ok, diff_ok)):
+    if error_kind:
         result = {
             'tool': 'compact-diff',
-            'status': 'git_query_failed',
+            'status': error_kind,
             'base': args.base,
             'head': args.head,
         }
     else:
+        commits, changed, shortstat, diff_text = (result[1] for result in query_results)
         diff_lines = diff_text.splitlines()
         result = {
             'tool': 'compact-diff',
@@ -46,7 +65,8 @@ def main():
         }
 
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['status'] == 'ok' else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

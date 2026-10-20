@@ -81,4 +81,8 @@ Give the AI the row for the kind of work so it starts from relevant locations in
 ## Terms
 
 - **Original request**: The full work request or specification that a short description summarizes.
+- **Task Routing**: Linking each kind of work to the explanation, code, and tests to check first.
 
+## Optional helper tool
+
+- [change-router](../../../tools/common/medium/change-router/README.md) suggests the tests and documents to check first from changed files. Verify its candidates against your guide table and original sources.

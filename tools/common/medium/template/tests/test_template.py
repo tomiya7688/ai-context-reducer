@@ -5,10 +5,10 @@ from pathlib import Path
 SCRIPT=Path(__file__).resolve().parents[1]/"script"/"template.py"
 
 class TemplateTests(unittest.TestCase):
-    # run_tool はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+    # run_tool はtemplate CLIを呼び出し、生成・check結果をassert可能なprocess resultにします。
     def run_tool(self,*args):
         return subprocess.run([sys.executable,str(SCRIPT),*map(str,args)],text=True,capture_output=True)
-    # test_generate_check_and_drift は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_generate_check_and_drift は生成物一致時はcheck成功、変数変更後はdrift検出となることを確認します。
     def test_generate_check_and_drift(self):
         with tempfile.TemporaryDirectory() as td:
             r=Path(td);tpl=r/"tpl.txt";vars=r/"vars.json";out=r/"out.txt"
@@ -18,7 +18,7 @@ class TemplateTests(unittest.TestCase):
             self.assertEqual(self.run_tool(*base,"--check").returncode,0)
             vars.write_text('{"name":"Other"}\n',encoding="utf-8")
             self.assertEqual(self.run_tool(*base,"--check").returncode,1)
-    # test_required_and_directory_dry_run は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_required_and_directory_dry_run は必須変数不足を検出し、directory previewで書込みしないことを確認します。
     def test_required_and_directory_dry_run(self):
         with tempfile.TemporaryDirectory() as td:
             r=Path(td);tpl=r/"tpl";tpl.mkdir();(tpl/"a.txt").write_text("{{name}}\n",encoding="utf-8");vars=r/"vars.json";out=r/"out"

@@ -10,7 +10,7 @@ from messenger import candidate_index, is_test_candidate
 
 
 class ChangeRouterMessengerTests(unittest.TestCase):
-    # test_test_candidate_avoids_substring_false_positive は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_test_candidate_avoids_substring_false_positive はtestを含む別語pathをtest候補にしないことを確認します。
     def test_test_candidate_avoids_substring_false_positive(self):
         self.assertFalse(is_test_candidate(Path('latest.py'), set()))
         self.assertFalse(is_test_candidate(Path('contest.py'), set()))
@@ -18,7 +18,7 @@ class ChangeRouterMessengerTests(unittest.TestCase):
         self.assertTrue(is_test_candidate(Path('widget.test.js'), set()))
         self.assertTrue(is_test_candidate(Path('widget.py'), {'tests'}))
 
-    # test_exact_index_cap_is_not_truncated は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_exact_index_cap_is_not_truncated は候補数がindex上限と等しい時はtruncatedにしないことを確認します。
     def test_exact_index_cap_is_not_truncated(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -32,7 +32,7 @@ class ChangeRouterMessengerTests(unittest.TestCase):
             self.assertFalse(truncated)
             self.assertEqual(0, errors)
 
-    # test_additional_candidate_marks_truncation は対象機能の契約と回帰条件が維持されることを確認する。
+    # test_additional_candidate_marks_truncation は上限を超えるcandidateが存在すれば省略を報告することを確認します。
     def test_additional_candidate_marks_truncation(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

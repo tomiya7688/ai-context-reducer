@@ -29,7 +29,7 @@ func emitValidationPlanJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// validationPathTerms はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// validationPathTerms はpathに含まれる既知のtest・build語を判定用termへ分解します。
 func validationPathTerms(path string) map[string]bool {
     lower := strings.ToLower(path)
     parts := strings.FieldsFunc(lower, func(r rune) bool {
@@ -44,7 +44,7 @@ func validationPathTerms(path string) map[string]bool {
     return out
 }
 
-// validationHasAny はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// validationHasAny は語境界を考慮し、入力に指定語が含まれるかを返します。
 func validationHasAny(terms map[string]bool, wanted map[string]bool) bool {
     for term := range wanted {
         if terms[term] {
@@ -54,7 +54,7 @@ func validationHasAny(terms map[string]bool, wanted map[string]bool) bool {
     return false
 }
 
-// validationAppendUnique はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// validationAppendUnique はvalidation actionを重複登録せず、初出順を保持します。
 func validationAppendUnique(out []string, seen map[string]bool, values ...string) []string {
     for _, value := range values {
         if !seen[value] {
@@ -65,7 +65,7 @@ func validationAppendUnique(out []string, seen map[string]bool, values ...string
     return out
 }
 
-// classifyValidationPath はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// classifyValidationPath は変更pathの種類から実行すべきvalidation actionを選びます。
 func classifyValidationPath(path string) []string {
     lower := strings.ToLower(path)
     terms := validationPathTerms(lower)

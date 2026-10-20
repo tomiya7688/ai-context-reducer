@@ -7,7 +7,7 @@ import (
     "runtime"
 )
 
-// firstAvailable はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// firstAvailable は候補commandを順に調べ、最初に見つかった実行ファイル名を返します。
 func firstAvailable(names ...string) string {
     for _, name := range names {
         if p, err := exec.LookPath(name); err == nil {

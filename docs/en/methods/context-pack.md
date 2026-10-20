@@ -69,3 +69,8 @@ Give the AI one short note with the current goal and starting files so it does n
 
 - **Task note**: A short guide to the current goal, where to look, constraints, and how to check the work.
 - **Context Pack**: A name for giving the AI a task note together with the information and checks needed for that task.
+- **Context Pack**: A short note that lets someone read, at the start of work, the goal, target, conditions to keep, and how to judge completion for the work in progress. You can start from the [task note template](../../../templates/CONTEXT_PACK.md) and keep only the items you need.
+
+## Optional helper tool
+
+- [context-pack-builder](../../../tools/common/medium/context-pack-builder/README.md) drafts a task note covering the goal, sources, and completion conditions from request materials. Check the draft against the original sources.

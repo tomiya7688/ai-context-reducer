@@ -17,6 +17,8 @@ Start with an existing map between code and tests, or use the project's existing
 
 If there is no map, search for code that uses the changed function and for related tests. If those callers and tests cannot cover the change, run tests for the related folder.
 
+If a project already has a way to see dependencies between code or packages, add the code that uses the changed code, and the tests that check that code, to the candidates. If coverage records exist, you can use them as supporting evidence for which tests passed through the changed lines. Coverage does not show paths that were not exercised or indirect effects, so do not use the tests it lists as your only evidence.
+
 ## Tell the AI what to do
 
 ```text
@@ -49,7 +51,7 @@ A map is useful when the test suite is large or slow, or when the AI repeatedly 
 
 ## Optional helper tools
 
-- If useful, `affected-tests` lists tests that may relate to changed files. Use it to find tests to run first. Have the AI broaden the checks if the list does not cover the change.
-- If useful, `source-structure-index affected` uses recorded code relationships to show areas that may be affected. Use it to check whether a change may reach other code.
+- If useful, [`affected-tests` (Python)](../../../tools/python/medium/affected-tests/README.md) and [`affected-tests` (Go)](../../../tools/go/medium/affected-tests/README.md) list tests that may relate to changed files. Use it to find tests to run first. Have the AI broaden the checks if the list does not cover the change.
+- If useful, [`source-structure-index affected`](../../../tools/common/large/source-structure-index/README.md) uses recorded code relationships to show areas that may be affected. Use it to check whether a change may reach other code.
 
-Neither tool can guarantee that an incomplete map has no omissions. Broaden checks when the change may have wide effects or the map is uncertain. Reuse an existing project tool for finding dependent code if one is available.
+Checking such candidates against the real code and tests is called **Change Impact Routing / affected test selection**. Neither tool can guarantee that an incomplete map has no omissions. Broaden checks when the change may have wide effects or the map is uncertain. Reuse an existing project tool for finding dependent code if one is available.

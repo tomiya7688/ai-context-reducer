@@ -53,7 +53,11 @@ func modulePath(root string) string {
 
 // 1つのGo sourceをparseし、import依存とparse失敗を別signalとして返す。
 func importsOf(path string) ([]string, string) {
-    file, err := parser.ParseFile(token.NewFileSet(), path, nil, parser.ImportsOnly)
+    source, err := os.ReadFile(path)
+    if err != nil {
+        return nil, "read_failed"
+    }
+    file, err := parser.ParseFile(token.NewFileSet(), path, source, parser.ImportsOnly)
     if err != nil {
         return nil, "parse_failed"
     }
@@ -116,6 +120,11 @@ func buildPackageGraph(root string, limit int) (graphOutput, error) {
     if err != nil {
         return graphOutput{}, err
     }
+    return buildPackageGraphFromFiles(root, allFiles, limit), nil
+}
+
+// file一覧をpackage依存とfailure countへ集約する。
+func buildPackageGraphFromFiles(root string, allFiles []string, limit int) graphOutput {
     if limit < 0 {
         limit = 0
     }
@@ -128,6 +137,7 @@ func buildPackageGraph(root string, limit int) (graphOutput, error) {
     module := modulePath(root)
     packages := map[string]map[string]bool{}
     parseErrors := 0
+    readErrors := 0
     for _, path := range files {
         pkg := packageName(root, module, filepath.Dir(path))
         if _, ok := packages[pkg]; !ok {
@@ -136,6 +146,10 @@ func buildPackageGraph(root string, limit int) (graphOutput, error) {
         imports, status := importsOf(path)
         if status == "parse_failed" {
             parseErrors++
+            continue
+        }
+        if status == "read_failed" {
+            readErrors++
             continue
         }
         for _, dep := range imports {
@@ -163,15 +177,15 @@ func buildPackageGraph(root string, limit int) (graphOutput, error) {
     })
 
     status := "ok"
-    if parseErrors > 0 || truncated {
+    if parseErrors > 0 || readErrors > 0 || truncated {
         status = "ok_with_warnings"
     }
     return graphOutput{
         Tool: "go-package-graph", Status: status, Language: "go",
         RootPath: filepath.ToSlash(root), Module: module, PackageCount: len(packages),
         Edges: edges, EdgeCount: len(edges), FilesScanned: len(files),
-        FileCountTotal: len(allFiles), ParseErrorCount: parseErrors, ScanTruncated: truncated,
-    }, nil
+        FileCountTotal: len(allFiles), ParseErrorCount: parseErrors, ReadErrorCount: readErrors, ScanTruncated: truncated,
+    }
 }
 
 // graph結果を単一JSON表現へ出力し、同内容のtext重複を避ける。

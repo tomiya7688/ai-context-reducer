@@ -15,9 +15,36 @@ type languageRunResult struct {
     Backend string `json:"backend,omitempty"`
     OutputPath string `json:"output_path,omitempty"`
     Error string `json:"error,omitempty"`
+    ReadErrorCount int `json:"read_error_count,omitempty"`
+    WalkErrorCount int `json:"walk_error_count,omitempty"`
 }
 
-// boundedErr はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// summarizeLanguageStatuses はanalyzerとrouting scanの警告を上位statusへ集約します。
+func summarizeLanguageStatuses(statuses []string, scanWalkErrors int) (string, int, int, int) {
+    failed, skipped, warnings := 0, 0, 0
+    for _, status := range statuses {
+        switch status {
+        case "failed", "write_failed":
+            failed++
+        case "skipped":
+            skipped++
+        case "ok":
+        default:
+            warnings++
+        }
+    }
+    resultStatus := "ok"
+    if failed > 0 {
+        resultStatus = "ok_with_failures"
+    } else if warnings > 0 || scanWalkErrors > 0 {
+        resultStatus = "ok_with_warnings"
+    } else if skipped > 0 {
+        resultStatus = "ok_with_skips"
+    }
+    return resultStatus, failed, skipped, warnings
+}
+
+// boundedErr はanalyzerの診断文をstdout JSONのサイズ上限内に収めます。
 func boundedErr(data []byte) string {
     s := strings.TrimSpace(string(data))
     if len(s) > 1200 { return s[:1200] }
@@ -55,6 +82,18 @@ func cmdLanguageRun(args []string) int {
     outDir:=*out
     if !filepath.IsAbs(outDir) { outDir=filepath.Join(absRoot,outDir) }
 
+    rootInfo, statErr := os.Stat(absRoot)
+    if statErr != nil {
+        status := "input_read_failed"
+        if os.IsNotExist(statErr) { status = "input_missing" }
+        emitLanguageRunInputFailure(status, absRoot, outDir)
+        return 2
+    }
+    if !rootInfo.IsDir() {
+        emitLanguageRunInputFailure("input_not_directory", absRoot, outDir)
+        return 2
+    }
+
     walked,err:=walkWithOptions(absRoot,false)
     if err!=nil {
         selectorWriteJSON(map[string]any{"tool":"language-run","status":"scan_failed","error":selectorBoundedText(err.Error(),800)})
@@ -74,18 +113,23 @@ func cmdLanguageRun(args []string) int {
     for _,lang:=range order {
         if detected[lang] { results=append(results,runLanguageTool(small[lang],absRoot,outDir)) }
     }
-    status:="ok"; failed:=0; skipped:=0
-    for _,r:=range results {
-        if r.Status=="failed"||r.Status=="write_failed" { failed++ }
-        if r.Status=="skipped" { skipped++ }
-    }
-    if failed>0 { status="ok_with_failures" } else if skipped>0 { status="ok_with_skips" }
+    statuses:=make([]string,0,len(results))
+    for _,r:=range results { statuses=append(statuses,r.Status) }
+    status,failed,skipped,warnings:=summarizeLanguageStatuses(statuses,walked.WalkErrorCount)
     enc:=json.NewEncoder(os.Stdout); enc.SetIndent("","  "); _=enc.Encode(map[string]any{
         "tool":"language-run","status":status,"project_root":absRoot,"output_directory":outDir,
-        "results":results,"failure_count":failed,"skip_count":skipped,
+        "results":results,"failure_count":failed,"skip_count":skipped,"warning_count":warnings+walked.WalkErrorCount,"walk_error_count":walked.WalkErrorCount,
         "backend_policy":"all bundled Small symbol analyzers use acr-toolbox native fallback; language SDKs are not required",
         "note":"full analyzer outputs are written to files; stdout stays compact",
     })
     if failed>0 { return 1 }
     return 0
+}
+
+// emitLanguageRunInputFailure は未取得rootを空の成功scanと混同させないJSONを返す。
+func emitLanguageRunInputFailure(status, root, outDir string) {
+    selectorWriteJSON(map[string]any{
+        "tool":"language-run","status":status,"project_root":root,"output_directory":outDir,
+        "results":[]languageRunResult{},"failure_count":1,"skip_count":0,
+    })
 }

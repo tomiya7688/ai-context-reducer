@@ -7,12 +7,12 @@ from messenger import iter_text_files
 from processing import estimate_accurate, estimate_fast, summarize
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit は候補fileのtoken estimate・priority・budget超過を利用者向けに出力します。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は候補fileのtoken estimateとpriorityを集計し、budget内の読込案を出力します。
 def main():
     parser = argparse.ArgumentParser(description='Estimate how much agent context candidate text would consume.')
     parser.add_argument('root', nargs='?', default='.')
@@ -21,14 +21,16 @@ def main():
     parser.add_argument('--max-files', type=int, default=0, help='Optional safety limit. 0 means no file-count limit.')
     parser.add_argument('--include-ignored', action='store_true')
     args = parser.parse_args()
+    if args.top < 0 or args.max_files < 0:
+        parser.error('--top and --max-files must be non-negative')
 
     root = Path(args.root).resolve()
     if not root.exists():
         emit({'tool': 'context-budget', 'status': 'input_missing', 'root_path': str(root)})
-        return
+        return 2
     if not root.is_dir():
         emit({'tool': 'context-budget', 'status': 'input_not_directory', 'root_path': str(root)})
-        return
+        return 2
 
     estimator = estimate_accurate if args.mode == 'accurate' else estimate_fast
     rows = []
@@ -60,7 +62,8 @@ def main():
     )
     result['root_path'] = str(root)
     emit(result)
+    return 0 if result['status'] in {'ok', 'ok_with_warnings'} else 2
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

@@ -12,14 +12,14 @@ HEADINGS = {
 }
 
 
-# term_present はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# term_present は見出し語を語境界で照合し、部分一致によるsection誤選択を防ぎます。
 def term_present(text: str, term: str) -> bool:
     if any(ord(char) > 127 for char in term):
         return term in text
     return re.search(rf'(?<![a-z0-9_]){re.escape(term)}(?![a-z0-9_])', text) is not None
 
 
-# section はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# section は見出し本文を次の見出しまで集め、行数limitによる省略を示します。
 def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
     limit = max(0, limit)
     out = []
@@ -31,7 +31,7 @@ def section(lines: list[str], start: int, limit: int) -> tuple[list[str], bool]:
     return out[:limit], len(out) > limit
 
 
-# extract_sections はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# extract_sections は既知の見出し語に対応する本文と各sectionの省略状態を抽出します。
 def extract_sections(lines: list[str], limit: int) -> tuple[dict[str, list[str]], dict[str, bool]]:
     sections = {key: [] for key in HEADINGS}
     truncated = {key: False for key in HEADINGS}
@@ -48,7 +48,7 @@ def extract_sections(lines: list[str], limit: int) -> tuple[dict[str, list[str]]
     return sections, truncated
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はMarkdownから受入条件sectionを抽出し、追跡可能な項目一覧を返します。
 def main():
     parser = argparse.ArgumentParser(description='Extract Goal/Required/Acceptance/Deferred sections from markdown as self-describing JSON.')
     parser.add_argument('file')

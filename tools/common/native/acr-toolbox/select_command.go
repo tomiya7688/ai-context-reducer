@@ -28,27 +28,27 @@ var selectorTypeSignals = map[string][]string{
 var selectorExternal = []string{"rg", "fd", "ast-grep", "sg", "ctags", "scip", "tree-sitter", "scc", "git-sizer"}
 var selectorPhaseOrder = map[string]int{"orient": 0, "search": 1, "scope": 2, "inspect": 3, "validate": 4, "stop": 5}
 
-// selectorWriteJSON はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// selectorWriteJSON はselector結果を整形JSONとして標準出力へ書き出します。
 func selectorWriteJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
-// selectorBoundedText はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// selectorBoundedText は候補の説明文を最大文字数以内に切り詰めます。
 func selectorBoundedText(text string, limit int) string {
     if limit <= 0 || len(text) <= limit { return text }
     return text[:limit]
 }
 
-// selectorItem はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// selectorItem はmetadataの任意値を表示可能な文字列として取り出します。
 func selectorItem(path, reason, phase, activation, availability string) map[string]any {
     if activation == "" { activation = "always" }
     if availability == "" { availability = "ready" }
     return map[string]any{"tool_path": path, "phase": phase, "activation": activation, "availability": availability, "reason": reason}
 }
 
-// selectorAvailability はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// selectorAvailability はtool metadataから実行可否と未導入理由を読み取ります。
 func selectorAvailability(path string, external map[string]bool) string {
     switch path {
     case "common/small/text-search":
@@ -67,7 +67,7 @@ func selectorAvailability(path string, external map[string]bool) string {
     return "ready"
 }
 
-// selectorDedupeSort はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// selectorDedupeSort はtool候補の重複を除き、scoreと名前で安定整列します。
 func selectorDedupeSort(rows []map[string]any, key string) []map[string]any {
     seen := map[string]bool{}
     out := []map[string]any{}
@@ -85,7 +85,7 @@ func selectorDedupeSort(rows []map[string]any, key string) []map[string]any {
     return out
 }
 
-// selectorRecommendations はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// selectorRecommendations は入力条件に合うtool候補を順位付けし、理由付きで返します。
 func selectorRecommendations(size string, languages [][2]any, projectTypes []string, docs, tests int, hasGit bool, external map[string]bool) ([]map[string]any, []map[string]any, []map[string]any, []map[string]any) {
     recommended := []map[string]any{
         selectorItem("common/small/repo-profile", "identify repository size and language mix before deeper reads", "orient", "always", selectorAvailability("common/small/repo-profile", external)),

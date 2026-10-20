@@ -36,7 +36,7 @@ func captureJSONCommand(t *testing.T, run func() int) (int, map[string]any) {
     return code, payload
 }
 
-// TestContextEstimateAccurateReadsTextButRemainsApproximate は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestContextEstimateAccurateReadsTextButRemainsApproximate は推定が実内容を読む一方で近似値と表示されることを確認します。
 func TestContextEstimateAccurateReadsTextButRemainsApproximate(t *testing.T) {
     root := t.TempDir()
     path := filepath.Join(root, "sample.py")
@@ -62,7 +62,7 @@ func TestContextEstimateAccurateReadsTextButRemainsApproximate(t *testing.T) {
     }
 }
 
-// TestContextBudgetCLIReportsApproximationAndExactTruncation は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestContextBudgetCLIReportsApproximationAndExactTruncation はCLIが推定値と実際の省略状態を別々に示すことを確認します。
 func TestContextBudgetCLIReportsApproximationAndExactTruncation(t *testing.T) {
     root := t.TempDir()
     for _, name := range []string{"a.py", "b.py"} {
@@ -93,7 +93,7 @@ func TestContextBudgetCLIReportsApproximationAndExactTruncation(t *testing.T) {
     }
 }
 
-// TestHotspotScanLimitOnlyMarksRealTruncation は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestHotspotScanLimitOnlyMarksRealTruncation は上限超過時だけ履歴scanをtruncatedと報告することを確認します。
 func TestHotspotScanLimitOnlyMarksRealTruncation(t *testing.T) {
     root := t.TempDir()
     if err := os.WriteFile(filepath.Join(root, "a.txt"), []byte("a"), 0o644); err != nil {

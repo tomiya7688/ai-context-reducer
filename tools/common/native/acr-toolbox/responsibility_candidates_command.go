@@ -26,13 +26,13 @@ type responsibilityCandidateRow struct {
     SizeAvailable bool
 }
 
-// responsibilityIgnoredDir はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// responsibilityIgnoredDir は生成物や依存cacheなど役割候補から除くdirectoryを識別します。
 func responsibilityIgnoredDir(name string) bool {
     lower := strings.ToLower(name)
     return ignoreDirs[lower] || lower == "generated"
 }
 
-// scanResponsibilityCandidates は対象scopeを走査し、agentへ渡す候補情報を収集します。
+// scanResponsibilityCandidates はsource・文書の役割候補を集め、上限とscan errorを返します。
 func scanResponsibilityCandidates(root string, maxScanFiles int) ([]responsibilityCandidateRow, int, bool, int, int, error) {
     rows := []responsibilityCandidateRow{}
     scanned := 0
@@ -84,7 +84,7 @@ func scanResponsibilityCandidates(root string, maxScanFiles int) ([]responsibili
     return rows, scanned, truncated, statErrors, walkErrors, nil
 }
 
-// sortResponsibilityCandidates はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// sortResponsibilityCandidates は候補を優先度・パス順に整え、同じ入力で順序を安定させます。
 func sortResponsibilityCandidates(rows []responsibilityCandidateRow) {
     sort.Slice(rows, func(i, j int) bool {
         if rows[i].SizeAvailable != rows[j].SizeAvailable {

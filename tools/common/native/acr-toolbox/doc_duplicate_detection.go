@@ -27,7 +27,7 @@ func normalizeDuplicateLine(line string) string {
     return strings.TrimSpace(replacer.Replace(text))
 }
 
-// truncateRunes はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// truncateRunes はUTF-8文字境界を保ったまま表示用文字列を上限で切ります。
 func truncateRunes(text string, limit int) string {
     runes := []rune(text)
     if len(runes) <= limit {
@@ -36,7 +36,7 @@ func truncateRunes(text string, limit int) string {
     return string(runes[:limit])
 }
 
-// collectNativeDocumentDuplicates は対象scopeを走査し、agentへ渡す候補情報を収集します。
+// collectNativeDocumentDuplicates は文書を正規化・比較し、重複候補と走査失敗を集めます。
 func collectNativeDocumentDuplicates(documents []docDuplicateDocument, minChars int) []docDuplicateGroup {
     if minChars < 0 {
         minChars = 0

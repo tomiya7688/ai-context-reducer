@@ -74,3 +74,34 @@ func TestIncompleteDependencyMapForcesBroaderFallback(t *testing.T) {
         t.Fatalf("unexpected dependency state: %#v", got.DependencyMap)
     }
 }
+
+// TestUnavailableParseCheckForcesBroaderFallback はsyntax検査不可mapのfallbackを確認する。
+func TestUnavailableParseCheckForcesBroaderFallback(t *testing.T) {
+	available := false
+	deps := depMap{Files: []depRow{}, ParseCheckAvailable: &available}
+	state := dependencyState(deps, true)
+	if state.Complete {
+		t.Fatal("map with unavailable syntax check must be incomplete")
+	}
+	found := false
+	for _, reason := range state.Reasons {
+		if reason == "dependency_map_parse_check_unavailable" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("missing parse-check reason: %#v", state.Reasons)
+	}
+}
+
+// TestDependencyWalkErrorForcesBroaderFallback は走査警告を不確実なimpactとして扱います。
+func TestDependencyWalkErrorForcesBroaderFallback(t *testing.T) {
+    deps := depMap{WalkErrorCount: 1}
+    got := analyze([]string{"src/parser/lexer.go"}, config{}, deps, true)
+    if got.Status != "ok_with_warnings" || !got.ImpactUncertain || got.Fallback != "broader-or-full" {
+        t.Fatalf("walk error did not reach test impact: %#v", got)
+    }
+    if len(got.DependencyMap.Reasons) != 1 || got.DependencyMap.Reasons[0] != "walk_error_count=1" {
+        t.Fatalf("missing walk error reason: %#v", got.DependencyMap.Reasons)
+    }
+}

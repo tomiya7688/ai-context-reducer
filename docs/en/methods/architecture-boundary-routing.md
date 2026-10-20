@@ -37,6 +37,10 @@ For a feature map used repeatedly, save it as `docs/feature-ownership.md`, for e
 
 Tell the AI to start from the existing feature layout instead of reading the whole project to infer what each part does. Ask it to broaden the search when the change affects several features or the guide cannot answer the question, so important connections are not skipped.
 
+## Terms
+
+- **Architecture Boundary Routing**: Using an existing division of responsibilities to decide which part owns a change and where to start reading.
+
 ## Optional helper tools
 
 - If useful, the [Function and file relationship tool](../../../tools/common/large/source-structure-index/README.md) lists relationships between functions and files. Use the list as a starting point and have the AI check the code and tests too.

@@ -20,7 +20,7 @@ type Invoker interface {
 	Invoke(context.Context, backend.Request) backend.Result
 }
 
-// Server はstatic GUIとCLI backend APIを同一localhost originで提供します。
+// Server はstatic GUIとCLI backend APIを同一loopback originで提供します。
 type Server struct {
 	Invoker        Invoker
 	SessionToken   string

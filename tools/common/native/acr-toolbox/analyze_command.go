@@ -26,20 +26,20 @@ var analyzeTypeSignals = map[string][]string{
     "rule_heavy": {"rules", "specification", "protocol", "validator", "policy"},
 }
 
-// analyzeWriteJSON はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// analyzeWriteJSON は解析結果をJSONで標準出力へ書き、CLIの出力形式を揃えます。
 func analyzeWriteJSON(value any) {
     enc := json.NewEncoder(os.Stdout)
     enc.SetIndent("", "  ")
     _ = enc.Encode(value)
 }
 
-// analyzeBoundedText はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// analyzeBoundedText は診断文を上限内に切り詰めてJSONへ安全に含めます。
 func analyzeBoundedText(text string, limit int) string {
     if limit <= 0 || len(text) <= limit { return text }
     return text[:limit]
 }
 
-// nativeExternalTools はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// nativeExternalTools はPATH上の任意解析ツールを検出し、利用可否を報告します。
 func nativeExternalTools() []string {
     candidates := []string{"rg", "fd", "ast-grep", "sg", "ctags", "scip", "tree-sitter", "scc", "git-sizer"}
     out := []string{}

@@ -173,7 +173,7 @@
     },
     {
       "id": "releasing",
-      "japanese": "docs/internal/jp/リリース手順.md",
+      "japanese": "docs/internal/jp/リリースを確認して公開する.md",
       "english": "docs/internal/en/releasing.md",
       "english_status": "translated"
     },
@@ -295,6 +295,144 @@
       "id": "readme-navigation",
       "japanese": "docs/jp/手法/人とAIが必要な情報へ進めるREADMEを書く.md",
       "english": "docs/en/methods/write-readme-for-people-and-ai.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "tool-method-map",
+      "japanese": "docs/jp/手法/手法と補助ツールの対応表.md",
+      "english": "docs/en/methods/tool-method-map.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-basics",
+      "japanese": "docs/jp/LLMの仕組み/LLMとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-an-llm.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-tokens",
+      "japanese": "docs/jp/LLMの仕組み/トークンとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-a-token.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-generation",
+      "japanese": "docs/jp/LLMの仕組み/LLMが文章を生成するまで.md",
+      "english": "docs/en/llm-mechanics/how-llm-generation-works.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "transformer-basics",
+      "japanese": "docs/jp/LLMの仕組み/Transformerとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-a-transformer.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "transformer-internals",
+      "japanese": "docs/jp/LLMの仕組み/Transformerの中では何が起きているのか.md",
+      "english": "docs/en/llm-mechanics/inside-a-transformer.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "attention-basics",
+      "japanese": "docs/jp/LLMの仕組み/Attentionとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-attention.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "transformer-to-llm",
+      "japanese": "docs/jp/LLMの仕組み/TransformerからLLMが生まれるまで.md",
+      "english": "docs/en/llm-mechanics/from-transformers-to-llms.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-code-generation",
+      "japanese": "docs/jp/LLMの仕組み/なぜLLMはコードを書けるのか.md",
+      "english": "docs/en/llm-mechanics/why-llms-can-write-code.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-window",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストウィンドウとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-a-context-window.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "training-vs-inference",
+      "japanese": "docs/jp/LLMの仕組み/学習と推論の違い.md",
+      "english": "docs/en/llm-mechanics/training-vs-inference.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-knowledge",
+      "japanese": "docs/jp/LLMの仕組み/LLMは何を知っているのか.md",
+      "english": "docs/en/llm-mechanics/what-does-an-llm-know.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "llm-errors",
+      "japanese": "docs/jp/LLMの仕組み/なぜLLMは間違えるのか.md",
+      "english": "docs/en/llm-mechanics/why-llms-make-mistakes.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-amount-use",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストの量と使われ方.md",
+      "english": "docs/en/llm-mechanics/context-amount-and-use.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-reduction-benchmark",
+      "japanese": "docs/jp/AI利用/コンテキスト削減の実測ベンチマーク.md",
+      "english": "docs/en/ai-usage/measured-context-reduction-benchmark.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "compare-design-options",
+      "japanese": "docs/jp/手法/提示された設計案をプロジェクトの根拠で比較する.md",
+      "english": "docs/en/methods/compare-design-options-with-project-evidence.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "ai-usage-faq",
+      "japanese": "docs/jp/AI利用/よくある質問.md",
+      "english": "docs/en/ai-usage/faq.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "coding-agent-overview",
+      "japanese": "docs/jp/AI利用/コーディングエージェントの種類と選び方.md",
+      "english": "docs/en/ai-usage/coding-agent-overview.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-definition",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストとは何か.md",
+      "english": "docs/en/llm-mechanics/what-is-context.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-compute-cost",
+      "japanese": "docs/jp/LLMの仕組み/コンテキストの量と計算量と料金の関係.md",
+      "english": "docs/en/llm-mechanics/context-compute-and-cost.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "diagnose-repeated-context",
+      "japanese": "docs/jp/手法/AIの作業履歴から無駄な読み込みを見つけて改善する.md",
+      "english": "docs/en/methods/diagnose-repeated-context-from-work-logs.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "shorten-investigation-with-external-tools",
+      "japanese": "docs/jp/手法/外部ツールを使って調査を短くする.md",
+      "english": "docs/en/methods/shorten-investigation-with-external-tools.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "use-tools-without-extra-installs",
+      "japanese": "docs/jp/手法/追加インストールを減らしてツールを使う.md",
+      "english": "docs/en/methods/use-tools-without-extra-installs.md",
       "english_status": "translated"
     }
   ]

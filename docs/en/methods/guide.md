@@ -4,6 +4,12 @@ When you ask an AI to read an entire repository, it also receives information un
 
 > Japanese version: [AIに作業を頼むときの基本手順](../../jp/手法/AIに作業を頼むときの基本手順.md)
 
+## Read the LLM fundamentals separately from the methods
+
+This repository also has background material on how LLMs work, apart from the working methods. Start with [What is an LLM?](../llm-mechanics/what-is-an-llm.md) and follow it through tokens, the Transformer, attention, training and inference, code generation, and how context is used.
+
+That material explains why the way you choose context affects the output. For how to find files, what to give the AI, and how to check the result, use [Find a method by the problem you have](method-index.md) and the individual method pages.
+
 ## Decide what “done” means first
 
 For example, suppose the task is “add a language selector to the settings screen.” Before starting, decide:
@@ -98,3 +104,12 @@ Run checks that match the change and report anything you could not verify.
 ```
 
 This gives the AI a clear starting point, so it does not need to read the whole project to infer the goal. Necessary code, requirements, and checks remain in scope.
+
+A list or short description of candidates is only a clue for where to read. When you judge what the code means or whether a change is safe, have the AI read the original code and tests. If the checked scope is limited, say so; do not report "no problems" when a check did not examine the target or could not examine some places. When several people or AIs update the same place, also check whether other changes arrived during your work.
+
+## Terms
+
+- **Context Engineering**: Choosing the information to give the AI. It is sometimes called by this name.
+- **Context Routing**: Choosing where to read or which sources to consult. It is sometimes called by this name.
+
+Try existing search and the project's guides first. Only if a repeated task remains, choose a helper tool from the [method and helper tool map](tool-method-map.md).

@@ -74,3 +74,8 @@ Deciding in advance what information is needed avoids reading loosely related ma
 
 - **Scope of checks**: The code, tests, guides, and other material the AI reads to make a decision about the task.
 - **Required evidence**: Inputs, code, and test results needed to make a decision or confirm that the fix works.
+- **Evidence Budget**: Deciding in advance what evidence a judgment needs, and investigating only enough to confirm it.
+
+## Optional helper tool
+
+- [acceptance-extractor](../../../tools/common/medium/acceptance-extractor/README.md) extracts the goal, required items, and completion conditions from a task note. Check for omissions against the original text.

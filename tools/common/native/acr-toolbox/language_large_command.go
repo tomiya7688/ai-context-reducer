@@ -18,12 +18,12 @@ type largeBackendPlan struct {
     Reason string `json:"reason"`
 }
 
-// largeBackendRunSupported はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// largeBackendRunSupported は実行要求されたbackendと対象言語の対応可否を返します。
 func largeBackendRunSupported(backend string) bool {
     return backend == "existing-scip-index" || backend == "universal-ctags"
 }
 
-// finalizeLargePlan はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// finalizeLargePlan は検出したbackend情報から自動実行しないLarge解析計画を確定します。
 func finalizeLargePlan(plan largeBackendPlan) largeBackendPlan {
     plan.RunSupported = largeBackendRunSupported(plan.Backend)
     if plan.RunSupported {
@@ -132,7 +132,7 @@ func cmdLanguageLargePlan(args []string) int {
     return 0
 }
 
-// fileExists はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// fileExists は指定pathが通常fileとして存在する場合だけtrueを返します。
 func fileExists(path string) bool {
     info,err:=os.Stat(path)
     return err==nil && !info.IsDir()

@@ -73,6 +73,14 @@ Reusable release procedure: registered release skill
 - Do not copy the same rule into several guides or skills.
 - Remove or update instructions and examples that are no longer used.
 
+After you add a new instruction, ask the AI to do a simple task and check that it actually reads or invokes the instruction. If your tool can show which files it loaded, check that record. If it cannot, compare the reported paths, the diff, and the check results with what the guide says. Do not treat the AI's own statement as proof that a file was loaded automatically. Update the links and commands in your guides whenever files move or tests change.
+
+## When instructions conflict
+
+The top-level guide states conditions for the whole project; a guide in a lower folder adds conditions for that location. For example, if the top-level guide says "do not change the stored format," a desktop-only guide must not quietly cancel that condition. The task request states the goal and completion conditions for this task, but it does not silently disable a long-lived rule.
+
+Which instruction takes priority depends on the AI and the project's rules. If you find a conflict, do not pick one by a private rule: check the relevant specification or original document. If you still cannot decide, have the AI report the conflict before it changes anything.
+
 ## When separate guides help
 
 - The project has multiple apps, such as desktop and web versions.
@@ -97,3 +105,11 @@ If this AI product does not load them automatically, open the listed files yours
 ## Why this reduces context
 
 For a desktop change, give the AI shared rules and desktop instructions, but leave web-only guidance out. It can start without reading every product's procedures, and shared rules only need to be updated in one place.
+
+## Optional helper tool
+
+- [scoped-guides](../../../tools/common/small/scoped-guides/README.md) finds the guides that may apply from a target file's parent folders and lists only their paths and reasons. Use it instead of walking up the folders by hand.
+
+## Terms
+
+- **Hierarchical Context / scoped instructions**: Splitting instructions so the AI reads the ones that match the location of the work.

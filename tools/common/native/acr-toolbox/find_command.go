@@ -41,7 +41,7 @@ func emitFindJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// boundedFindError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// boundedFindError はfind backendの診断文をJSON向けの長さに制限します。
 func boundedFindError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= 1200 {
@@ -67,7 +67,7 @@ func findPatternMatch(name, rel, pattern string) bool {
     return err == nil && ok
 }
 
-// pathDepth はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// pathDepth はrootからの相対パス要素数を数え、深さ制限に使います。
 func pathDepth(rel string) int {
     if rel == "" || rel == "." {
         return 0
@@ -75,7 +75,7 @@ func pathDepth(rel string) int {
     return len(strings.Split(filepath.ToSlash(rel), "/"))
 }
 
-// portableFind はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// portableFind は外部依存なしでパスを検索し、件数・深さ・走査上限を適用します。
 func portableFind(root, pattern, entryType string, maxResults, maxDepth, maxVisited int) ([]findResult, bool, bool, findStats, error) {
     results := []findResult{}
     stats := findStats{WalkErrorPaths: []string{}}
@@ -159,7 +159,7 @@ func portableFind(root, pattern, entryType string, maxResults, maxDepth, maxVisi
     return results, resultsTruncated, scanTruncated, stats, nil
 }
 
-// fdFind はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// fdFind はfdの結果を相対パスへ整え、コマンド失敗と走査失敗を分けて返します。
 func fdFind(executable, root, pattern, entryType string, maxResults, maxDepth int) ([]findResult, bool, string) {
     args := []string{"--glob", "--case-sensitive", "--hidden", "--no-ignore", "--color", "never"}
     if entryType == "file" {

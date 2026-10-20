@@ -1,101 +1,37 @@
-# Releasing v1.x
+# Verify and Publish a Release
 
-> Japanese version: [リリース手順](../jp/リリース手順.md)
+> Japanese version: [リリースを確認して公開する](../jp/リリースを確認して公開する.md)
 
-v1.0.0 is the first user distribution. v1.0.x patch releases are maintenance changes that preserve the public CLI / JSON contract / bundle contents and use the same completion gate.
+A release is the set of files that users download and run. Passing source tests alone does not prove that the package contains everything users need or works after extraction. Verify the code, the packages for each environment, and the compressed archives before publishing.
 
-## Release gate
+## Steps before publishing
 
-Before creating a Release, every job in `.github/workflows/release.yml` must be green.
+For example, to distribute `v1.0.1`, first check the version and required files in [`RELEASE_MANIFEST.json`](../../../release/RELEASE_MANIFEST.json). The current normal bundle contains five executables, a README, a tool guide, a license, and the manifest. Use that manifest as the source of truth for filenames and supported environments.
 
-The completion CI verifies:
+Next, run the release checks. Source validation checks repository consistency and the syntax of validation scripts, checks Python tool syntax and tests, and runs static analysis and tests for all Go tools. This catches basic source problems before packages are built.
 
-1. repository consistency / `git diff --check`
-2. compile + tests for all Python tools
-3. tests for all Go modules
-4. native builds on Windows x64 / arm64, Linux x64 / arm64, and macOS x64 / arm64
-5. E2E using the binaries that will actually be distributed on each platform
-6. Small / Medium language fallbacks
-7. policy success / violation exit codes
-8. template generate / check / drift detection
-9. scoped guide resolution
-10. major search / find / routing / context / Git commands
-11. actual execution of standalone Go tools
-12. archive extraction and required-file verification
-13. existence of all six archives
-14. generation of `SHA256SUMS`
+Then build packages for x64 and arm64 on Windows, Linux, and macOS. Run the main commands against a sample project and check their results. On Windows, also check that the launcher script returns the correct exit status. The GUI Hub is started separately and checked for a local connection and response. That confirms startup and response only; it does not exercise every GUI action.
 
-If any gate fails, the Release job does not run.
+After making a zip or tar.gz for each environment, extract it again. Check the extracted file layout, required files, and executable permissions, then run the same main checks again. This tests the actual archive users receive, rather than only the working folder. Finally, confirm that there is exactly one archive for each of the six environments and generate `SHA256SUMS`, which lists a checksum for each archive.
 
-## User distribution
+## What the results establish
 
-`release/RELEASE_MANIFEST.json` is the Source of Truth for the current v1.0.x distribution.
+Passing all these checks means the current automated process has verified the source checks, normal packages for the six environments, and the tested behavior after extraction. Producing a candidate package does not publish a release. A change on `main` starts candidate checks only when its files match the paths in [`release.yml`](../../../.github/workflows/release.yml). A change outside those paths, such as a release-document-only change, does not start them.
 
-Required contents:
+The GUI Hub check is a limited startup check. It does not test every screen and action or a complete Full Bundle archive resolved from its manifest. The current workflow does not create a Full Bundle archive for publication; it checks startup using the normal bundle and GUI Hub. Do not infer unperformed checks from a successful run.
 
-- `acr-toolbox`
-- `go-symbols`
-- `go-import-map`
-- `go-package-graph`
-- `affected-tests`
-- `README.md`
-- `TOOLS_README.md`
-- `LICENSE`
-- `RELEASE_MANIFEST.json`
+## Ask an AI to verify a release
 
-Windows executables use the `.exe` suffix.
-
-## Platforms
+Give the AI this guide and the paths to the release manifest, workflow, and acceptance checks, and name the target version or commit. Ask it to follow the procedure and report verified and unverified areas separately. A verification request does not authorize publishing: tell the AI not to create, push, or publish a tag unless you explicitly request those actions.
 
 ```text
-ai-context-reducer-v<version>-windows-x64.zip
-ai-context-reducer-v<version>-windows-arm64.zip
-ai-context-reducer-v<version>-linux-x64.tar.gz
-ai-context-reducer-v<version>-linux-arm64.tar.gz
-ai-context-reducer-v<version>-macos-x64.tar.gz
-ai-context-reducer-v<version>-macos-arm64.tar.gz
-SHA256SUMS
+Target: [version or commit]
+Verify it using this release guide. Use RELEASE_MANIFEST.json, release.yml, and acceptance.sh as the sources of truth, and list the checks before running them.
+Report commands and results, the distribution artifacts verified, and checks not run. Do not create, push, or publish a tag.
 ```
 
-The current candidate version must match `release_version` in `release/RELEASE_MANIFEST.json`.
+## Publish
 
-## Bundle variants
+After candidate checks pass, a person reviews the package contents and known bugs, then creates and pushes a release tag. The automated checks run again on the exact commit named by that tag. GitHub publishes the verified files as a Release only after all required checks pass. Publishing through a manual workflow run also requires the matching tag to exist and publishing to be explicitly selected.
 
-Starting with v1.1.0, the lightweight normal bundle and the GUI Hub Full Bundle are separate artifacts.
-
-- normal bundle: `release/RELEASE_MANIFEST.json`
-- Full Bundle: `release/FULL_BUNDLE_MANIFEST.json`
-- Full Bundle layout / compatibility: [Full Bundle Distribution Layout](full-bundle-layout.md)
-
-The Full Bundle is a superset that preserves the normal bundle root contents. It does not require users to install Go source or a Go toolchain.
-
-## Candidate validation
-
-Release-related changes on `main` run the same completion workflow. In that case, the workflow does not publish a Release; it only produces the `v1-release-candidate` artifact.
-
-A green candidate CI on `main` does not automatically create a tag or GitHub Release.
-
-## Publishing
-
-Publishing must always start from an explicit action.
-
-```text
-main candidate CI green
-  -> final distribution / bug check
-  -> a human creates and pushes the release tag
-  -> rerun completion workflow on the tagged commit
-  -> all jobs succeed
-  -> create GitHub Release
-```
-
-Since `v1.0.0`, there is no automatic promotion from a `main` push or READY marker to a tag / Release.
-
-Publishing through `workflow_dispatch` also requires a matching tag to exist in the repository.
-
-## Post-release
-
-New language support, additional external backends, and heuristic improvements after v1.0.0 are tracked as new Issues. Do not append new features to the completion conditions of a patch release.
-
-## v1.0.0 validation record
-
-See [release/validation/v1.0.0.md](../../../release/validation/v1.0.0.md) for the final validation record of the published v1.0.0 release.
+See the [validation record](../../../release/validation/v1.0.0.md) for checks actually completed for v1.0.0. For exact commands and checks, consult the [release workflow](../../../.github/workflows/release.yml) and [acceptance checks](../../../release/scripts/acceptance.sh).

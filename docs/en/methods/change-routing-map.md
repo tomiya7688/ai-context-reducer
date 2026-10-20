@@ -36,6 +36,15 @@ Reuse existing folder ownership notes or file maps instead of creating a duplica
 
 Give the AI the row for the kind of change so it can start at the listed files instead of searching the whole project. Keep locations and purpose in the map, and have the AI open detailed sources only when needed. If the target is unclear or shared code changes, ask it to expand the search so the shorter starting list does not hide missing checks.
 
+## How to use and update the map
+
+1. Identify the behavior the request changes.
+2. Find the closest kind of change in the map, then check its first code and tests.
+3. If the change turns out to be wider than the row assumes, add the direct users and the related contract tests.
+4. If no row fits, search normally; once you know a reliable place to check, update the map.
+
+The map is an entry point. It does not guarantee that the listed files are always enough. If the map and the current code disagree, check the code and tests and fix the stale row. Fix the map in the same change that moves code or tests. If the project already divides responsibilities into screens, storage, or communication, use that division in the map instead of inventing a new one.
+
 ## When to use a map
 
 A map helps when people repeatedly search for the same code and tests. A small project with only a few obvious change areas may not need one. Do not keep adding rows if updating the map costs more than finding the files.
@@ -44,3 +53,10 @@ A map helps when people repeatedly search for the same code and tests. A small p
 
 Save a reusable map as `docs/change-checks.md`, for example. Link to it from the root `AGENTS.md` and tell the AI to consult the matching row before starting. If your AI does not automatically read `AGENTS.md`, give it the map's path in the task request. For a one-time change, put the files and checks directly in the request instead of creating a map.
 
+## Optional helper tool
+
+- [change-router](../../../tools/common/medium/change-router/README.md) suggests the tests and documents to check first from changed files. Verify its candidates against the map and the original sources.
+
+## Terms
+
+- **Change Routing Map**: A table, and the way of using it, that links each kind of change to the first code to read, the tests to run first, and the explanations to read when needed.

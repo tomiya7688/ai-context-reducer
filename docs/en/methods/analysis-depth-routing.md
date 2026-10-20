@@ -21,6 +21,8 @@ Prefer search, editors, compilers, and tests that are already available. A compi
 
 Before passing results to the AI, keep only what is needed. Provide relevant problem locations, test results, and unchecked conditions instead of a complete list of successful files or a long log.
 
+Lightweight analysis may work without a runtime or compiler, but it only suggests where to look. It does not confirm behavior, types, or build correctness. A deeper analysis is not always better: stop when you have the evidence you need, and do not hand the AI the full output. In a small project where the target and tests are already known, skip the dedicated analysis and read the source.
+
 ## Example instruction for the AI
 
 ```text
@@ -35,8 +37,14 @@ Limit the results to the parts relevant to the change.
 
 When search can answer the question, do not give the AI a project-wide analysis or long build output. If search cannot establish correctness, ask it to inspect code connections, run language-specific checks, or execute the relevant tests in order. This keeps results focused without skipping necessary checks.
 
+## Optional helper tools
+
+- [language-setup](../../../tools/common/small/language-setup/README.md) checks the project's languages and the runtimes you can use, and suggests what to run.
+- [language-run](../../../tools/common/small/language-run/README.md) runs the matching lightweight analysis and saves the result to a file. Give the AI only the candidates the current question needs, not the whole result.
+
 ## Terms
 
 - **Syntax check**: A check for obvious mistakes in how a program is written. It does not establish runtime behavior.
 - **Type check**: A check that values such as numbers and text are used consistently as they pass between operations.
 - **Compiler**: A tool that transforms a program into a runnable form and reports syntax or type problems.
+- **lightweight search / dependency analysis / language-specific analysis**: Finding locations by name, analyzing references and dependencies between files, and inspecting code with a language's own tools such as its compiler.

@@ -18,7 +18,7 @@ type syntaxHealthRow struct {
     MissingCount int    `json:"missing_count"`
 }
 
-// syntaxInt はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// syntaxInt はsyntax health payloadから整数値を読み、未設定値を既定値にします。
 func syntaxInt(value any) int {
     switch v := value.(type) {
     case float64:
@@ -33,7 +33,7 @@ func syntaxInt(value any) int {
     return 0
 }
 
-// syntaxString はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// syntaxString はsyntax health payloadの文字列fieldを安全に取り出します。
 func syntaxString(row map[string]any, names ...string) string {
     for _, name := range names {
         if value, ok := row[name].(string); ok {

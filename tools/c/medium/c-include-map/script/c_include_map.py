@@ -14,7 +14,7 @@ IGNORE_DIRS = {
 EXTENSIONS = {'.c', '.h'}
 
 
-# 依存物・生成物を避けながら解析対象sourceを決定論的に列挙する。
+# C include map向けにC・header fileを選び、生成物と外部dependencyを除外します。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -27,7 +27,7 @@ def source_files(root: Path):
     return found
 
 
-# 解析対象の完全性とinclude依存を集約し、truncationや失敗件数も結果へ残す。
+# Cの直接include relationをfile別にまとめ、未読・省略された範囲をstatusへ記録します。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -66,7 +66,7 @@ def build_result(root: Path, limit: int):
     }
 
 
-# CLI入力を検証し、正常結果と失敗状態を同じ機械可読JSON契約で返す。
+# main はC include対象を探索し、直接include edgeとscanの完全性を報告します。
 def main():
     parser = argparse.ArgumentParser(description='Build a C include map.')
     parser.add_argument('root', nargs='?', default='.')

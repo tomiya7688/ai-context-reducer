@@ -2,53 +2,93 @@
 > Japanese version: [関数や使われている場所を探す](../../jp/手法/関数や使われている場所を探す.md)
 
 
-This example shows how to find the parts of a large program related to a change. The file and function names below are examples.
+When locating processing to change in a large program, you can use a searchable list of definitions of functions (named operations) and types (kinds of data) and their users. Have the AI narrow candidates with the list, then inspect their code and tests to limit unrelated files read up front.
+
+The list is a guide to sources. Have the AI check that it matches current code before deciding how to change behavior or what to verify.
 
 ## Example: change what happens when a settings file is missing
 
-Suppose a made-up settings app should use default settings when its settings file is missing. A list of code locations shows:
+Suppose a fictional settings app should use defaults when its settings file is missing. The following paths and function name are illustrative.
 
 ```text
-Settings-loading code: load_settings
-File containing it: src/settings.py
-Place that uses it: app.py
-File for checking its behavior: tests/test_settings.py
+Settings-loading function: load_settings
+Definition file: src/settings.py
+Candidate user: app.py
+Candidate related tests: tests/test_settings.py
 ```
 
-Give these locations to the AI and ask it to check:
+First have the AI inspect the definition in `src/settings.py`, its use in `app.py`, and expectations in `tests/test_settings.py`. Add settings screens or unrelated libraries only when evidence establishes a necessary relationship.
 
-1. Read `src/settings.py` to see what happens now when the settings file is missing.
-2. Read `app.py` to see where the loaded settings are used.
-3. Read `tests/test_settings.py` to see how the current behavior is checked and what to check after the change.
+For example, although the list points to `app.py`, the current use might have moved to `src/startup.py`. Do not choose a change location from a reported line number or function name alone; use the following comparison procedure.
 
-These three places give you enough to start planning the change. You do not need to read the settings screen or unrelated libraries first. If you discover another file is involved, check that file too.
+## When to use it
 
-## When to use this
+An index helps when you repeatedly locate the same functions in large files or rediscover callers, dependencies, and tests after each change. Ordinary search is sufficient for a small task whose change location and checking procedure are already known.
 
-This is useful when it takes a long time to find related parts in a large program. For a small task where you already know what to change and how to check it, ordinary file search is enough.
+Reuse definition and reference results available in your existing development environment. Do not introduce a new index if recreating it costs more effort than it saves.
 
-## Do not rely on the list alone
+## Information the list may contain, and its limits
 
-The list may be out of date or may not show every connection. Open the actual program and the files used to check its behavior, and confirm the list is correct. Do not decide the impact or safety of a change from the list alone.
+For example, a list may contain the following. Availability depends on the analysis method.
 
-## Tell the AI what to do
+- File, type, and function names and definition locations
+- Functions called by a function, or places that call it
+- Imports between files
+- Leads for locating related tests
+
+Lists can retain old locations or omit relationships. Selecting functions by names in configuration or generating code at runtime can create relationships analysis cannot detect. **Absence from the list is not evidence of no relationship.**
+
+## Compare the list with current code
+
+Have the AI follow this order. You can use the same steps when investigating yourself.
+
+1. **Open definitions.** Open the actual function or type at the reported path and inspect its current name and processing. If lines have shifted, search for the current definition. When names are shared, distinguish candidates using their file, containing type, inputs, and return values.
+2. **Open users.** Check which definition is actually imported, what is passed, and how return values or errors are handled. A matching name does not establish that the same function is used.
+3. **Open related tests.** Inspect inputs and expected results and establish that the tests cover the target behavior. Similar filenames alone do not establish relevance.
+4. **Add missing relationships.** When you find callees, shared processing, configuration, or other users, add the necessary definitions and related tests to the investigation. Record omitted relationships with paths and evidence. If the index can be updated, recreate it from its underlying information or current code.
+
+For the settings example, compare:
+
+| Location to open | What to check | When another relationship appears |
+| --- | --- | --- |
+| `src/settings.py` | Whether a missing file produces an exception or defaults | Follow the definition if loading delegates to another function |
+| `app.py` | Whether it uses the intended `load_settings`, and how it handles exceptions or defaults | Inspect the new location if use has moved; include other affected users |
+| `tests/test_settings.py` | Inputs and expectations with a present or missing file | Report a verification gap if no test covers a necessary condition |
+
+Reading tests establishes their written expectations. Current success requires execution results. Leave unresolved definitions or users unverified too; do not have the AI infer cause, impact, or safety from the list alone.
+
+Expand scope for concrete gaps: behavior delegated elsewhere, changed expectations of another user, or missing tests for a required condition. Have the AI find sources that address that gap instead of adding unrelated files to compensate.
+
+## Where to provide the guide and an example request
+
+For a one-time task, attach relevant list entries and the change goal, then request the comparison steps above. For an AI that can open files, specify the index location and code paths. For a chat that cannot, attach or paste necessary candidate code and tests too. Paths alone do not supply contents.
+
+For recurring use, put the index location and update procedure in existing development guidance. An example new guide location is `docs/how-to-find-code.md`; link it from instructions the AI reads with the condition “when locating definitions or users.” Check whether files such as `AGENTS.md` load automatically in your environment.
 
 ```text
-Search for the name of the code I am changing. List where it is defined, where it is used, and which tests relate to it.
-Open the listed code and related tests to confirm the list is current.
-If you find a connection missing from the list, include that area and its tests.
+I am considering changing settings loading to use defaults when the settings file is missing.
+From the attached list, find candidate definitions, users, and related tests for load_settings.
+Open actual definitions and users and check inputs, return values, and error handling.
+Open related tests and inspect the target conditions and expected results.
+
+If you find unlisted callees or users, add their code and related tests to the investigation.
+Report stale paths, missing relationships, and unresolved locations with evidence.
+First propose change candidates and necessary checks; do not infer cause or impact from the list alone.
+Separate sources read, checks executed and their results, and unverified points.
 ```
 
-## Why this reduces context
+## Why this can reduce reading
 
-Give the AI the list and ask it to start from related code and the places that use it instead of opening every file to guess how they connect. The list is only a starting point; ask the AI to confirm the code and tests needed to make a decision.
+Following candidates can avoid having the AI open every file to infer definitions and relationships. Comparing candidates with code and tests can help avoid edits based on stale guidance or another function with the same name, and subsequent reinvestigation.
 
-## Terms
+Creating, updating, and checking an index also costs effort. Preserve necessary code and tests and add sources when evidence establishes a relationship. A short list alone does not prove lower usage; compare read records or measured input usage when available.
 
-A function is a named operation that can be called from another part of a program.
+## Supporting tools
 
-## Optional helper tool
+- [source-structure-index](../../../tools/common/large/source-structure-index/README.md): Combines existing analysis results and returns candidate definitions, references, and dependencies by name or changed file. It can extract relevant surrounding information. Relationships depend on the underlying analysis; complete caller information is not always available.
+- [Tree-sitter](https://github.com/tree-sitter/tree-sitter): Inspects code syntax, its grammatical structure, and can provide material for locating definitions.
+- [SCIP](https://github.com/scip-code/scip): A format and tooling for sharing indexes of definitions and references. It can support reuse of existing analysis results.
 
-- If useful, the [Function and file relationship tool](../../../tools/common/large/source-structure-index/README.md) lists relationships between functions and files. Use it to find related code. Treat the list as a starting point and have the AI check the code and tests too.
+## About this method
 
-Ordinary search or tools already used by the project can serve the same purpose.
+A searchable list of code definitions and reference relationships that directs readers to original code is called a **Source Structure Index**, or symbol index.

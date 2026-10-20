@@ -32,7 +32,7 @@ func captureTextCommand(t *testing.T, run func() int) (int, string) {
     return code, string(data)
 }
 
-// TestContextManifestPriorityMatchesPythonContract は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestContextManifestPriorityMatchesPythonContract はnative manifestの候補順位がPython版と一致することを確認します。
 func TestContextManifestPriorityMatchesPythonContract(t *testing.T) {
     cases := map[string]string{
         "README.md":         "P0",
@@ -48,7 +48,7 @@ func TestContextManifestPriorityMatchesPythonContract(t *testing.T) {
     }
 }
 
-// TestContextManifestCLIIsBoundedAndSelfDescribing は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestContextManifestCLIIsBoundedAndSelfDescribing はCLIが上限と候補の役割を出力へ含めることを確認します。
 func TestContextManifestCLIIsBoundedAndSelfDescribing(t *testing.T) {
     root := t.TempDir()
     files := map[string]string{
@@ -85,7 +85,7 @@ func TestContextManifestCLIIsBoundedAndSelfDescribing(t *testing.T) {
     }
 }
 
-// TestContextPackRenderingDistinguishesCleanAndGitFailure は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestContextPackRenderingDistinguishesCleanAndGitFailure は正常な空差分とGit取得失敗の出力を区別します。
 func TestContextPackRenderingDistinguishesCleanAndGitFailure(t *testing.T) {
     task := contextPackTask{Goal: "g"}
     clean := renderNativeContextPack(task, contextPackState{ChangedQueryOK: true, StatusQueryOK: true})
@@ -107,7 +107,7 @@ func TestContextPackRenderingDistinguishesCleanAndGitFailure(t *testing.T) {
     }
 }
 
-// TestContextPackBoundedLinesNormalizeNegativeLimit は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestContextPackBoundedLinesNormalizeNegativeLimit は負のline上限を安全な既定値へ正規化することを確認します。
 func TestContextPackBoundedLinesNormalizeNegativeLimit(t *testing.T) {
     rows, truncated := boundedContextPackLines([]string{"a", "b"}, -1)
     if len(rows) != 0 || !truncated {
@@ -119,7 +119,7 @@ func TestContextPackBoundedLinesNormalizeNegativeLimit(t *testing.T) {
     }
 }
 
-// TestContextPackGitUnavailableIsExplicit は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestContextPackGitUnavailableIsExplicit はGit情報が取れない場合に理由を明示することを確認します。
 func TestContextPackGitUnavailableIsExplicit(t *testing.T) {
     t.Setenv("PATH", "")
     result := contextPackGitLines(t.TempDir(), "status", "--short")

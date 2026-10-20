@@ -19,7 +19,7 @@ type hotspotRow struct {
 
 var errStopHotspotScan = errors.New("hotspot scan limit reached")
 
-// scanHotspots は対象scopeを走査し、agentへ渡す候補情報を収集します。
+// scanHotspots はGit変更履歴から頻繁に変更されるパスを集計します。
 func scanHotspots(root string, maxFiles int) ([]hotspotRow, int, int, bool, error) {
     rows := []hotspotRow{}
     statErrors := 0

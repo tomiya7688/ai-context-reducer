@@ -7,7 +7,7 @@ import (
     "strings"
 )
 
-// structureAffectedPathKey はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// structureAffectedPathKey はpath表記を正規化し、影響対象の重複照合に使うkeyを返します。
 func structureAffectedPathKey(raw string) string {
     value := strings.ReplaceAll(raw, "\\", "/")
     for strings.HasPrefix(value, "./") {
@@ -16,7 +16,7 @@ func structureAffectedPathKey(raw string) string {
     return value
 }
 
-// affectedStructure はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// affectedStructure は変更pathから参照元・参照先をたどり、影響を受ける構造nodeを列挙します。
 func affectedStructure(index structureIndex, changedFiles []string, maxResults int) map[string]any {
     nodes := map[string]structureNode{}
     fileIDsByPath := map[string]string{}

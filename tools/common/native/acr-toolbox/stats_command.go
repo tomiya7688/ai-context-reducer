@@ -65,7 +65,7 @@ func emitStatsJSON(value any) {
     _ = enc.Encode(value)
 }
 
-// boundedStatsError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// boundedStatsError は統計収集の診断文を出力上限内に整えます。
 func boundedStatsError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= 1200 {
@@ -74,7 +74,7 @@ func boundedStatsError(text string) string {
     return text[:1200]
 }
 
-// statsIgnoredDir はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// statsIgnoredDir は統計対象から除外する生成物・依存directoryを判定します。
 func statsIgnoredDir(name string) bool {
     if strings.EqualFold(name, "generated") {
         return true
@@ -82,7 +82,7 @@ func statsIgnoredDir(name string) bool {
     return ignoreDirs[strings.ToLower(name)]
 }
 
-// lineCount はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// lineCount はfile内の改行数から最終行を含む行数を計算します。
 func lineCount(data []byte) int {
     if len(data) == 0 {
         return 0

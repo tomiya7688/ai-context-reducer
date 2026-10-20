@@ -17,6 +17,12 @@ Values for this file:
 
 After generating the file, check that the values are correct, no empty placeholders remain, and required sections are present. The generated text alone cannot prove that legal terms or project requirements are correct; check the approved wording.
 
+## Keep the template and the input values separate
+
+Put text, headings, and settings that never change in the template. Put values that change with each task, such as a name, version, or date, in the input. If you copy the same content into several files, a fix to the shared part is easy to miss, so keep one source for it.
+
+Treat the generated document or file as the product to use. When the template must change, fix the template and regenerate instead of editing the product by hand. For public documents or terms where the meaning matters, keep track of which template version and input values produced the result. A simple internal note may not need that tracking.
+
 ## Tell the AI what to do
 
 ```text
@@ -37,6 +43,10 @@ Use one when files of the same form are created repeatedly, rewriting the whole 
 ## Where to keep a template and how to point the AI to it
 
 Save a reusable template under `templates/` with a name that describes its purpose. When asking the AI to use it, give both the template path and the path where the completed document should be saved. If several people reuse the process, link to the template from `AGENTS.md` or a guide under `docs/`. Merely placing a template in the repository does not ensure the AI will use it.
+
+## Terms
+
+- **Template Generation / boilerplate generation**: Keeping the shared parts in a template and filling in only the values that change to create a document or file.
 
 ## Optional helper tool
 

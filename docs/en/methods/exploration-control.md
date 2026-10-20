@@ -63,7 +63,12 @@ Report required checks that you could not perform as unverified.
 
 Tell the AI what information it needs before it can begin, and ask it to stop reading once it has that information. Have it search again only when a new, relevant question comes up, so unrelated material is not added to the task.
 
+## Optional helper tools
+
+- [exploration-stop-check](../../../tools/common/medium/exploration-stop-check/README.md) checks whether a task note contains the information needed to start. It is a light check, so confirm any gaps against the request and the original sources.
+
 ## Terms
 
 - **Stop point for investigation**: The information needed before ending a search and moving on to a fix or verification.
 - **Test**: A repeatable way to run a program with the same input and check whether it returns the expected result.
+- **Exploration Stop / stop condition**: Deciding before an investigation what must be known to stop, and moving on once it is known.

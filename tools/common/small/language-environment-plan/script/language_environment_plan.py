@@ -13,7 +13,7 @@ LANGS = {
 }
 
 
-# first_available はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# first_available は候補commandを順にPATH照会し、最初の実行pathを返します。
 def first_available(names):
     for name in names:
         path = shutil.which(name)
@@ -22,7 +22,7 @@ def first_available(names):
     return ''
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main はlanguage setupに必要なruntimeを検出し、未導入環境をplanとして報告します。
 def main():
     languages = {}
     for name, commands in LANGS.items():

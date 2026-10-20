@@ -20,7 +20,7 @@ DEFAULT_IGNORE = {
 ERROR_PATH_LIMIT = 20
 
 
-# emit は内部結果を安定した利用者向け表現へ変換する。
+# emit はmatch・truncation・walk errorを検索CLIのJSON fieldへまとめます。
 def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
@@ -30,7 +30,7 @@ def normalize_limit(value: int) -> int:
     return max(0, value)
 
 
-# validate_regex はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# validate_regex はregexをcompileし、無効なpatternの診断文字列を返します。
 def validate_regex(pattern: str) -> str | None:
     try:
         re.compile(pattern)
@@ -39,7 +39,7 @@ def validate_regex(pattern: str) -> str | None:
     return None
 
 
-# relative_path はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# relative_path はroot相対pathをPOSIX形式にし、root外pathは正規化して返します。
 def relative_path(root: Path, path: Path) -> str:
     try:
         return path.relative_to(root).as_posix()
@@ -47,9 +47,9 @@ def relative_path(root: Path, path: Path) -> str:
         return path.as_posix()
 
 
-# iter_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# iter_files は指定root以下から除外・size条件を満たす検索対象fileを列挙します。
 def iter_files(root: Path, globs: list[str], excludes: list[str], max_bytes: int, stats: dict[str, object]):
-    # walk_error は対象scopeを調べ、routingに必要な情報だけを集める。
+    # walk_error は検索中に読めなかったdirectoryとpathを統計へ記録します。
     def walk_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -78,7 +78,7 @@ def iter_files(root: Path, globs: list[str], excludes: list[str], max_bytes: int
             yield path
 
 
-# looks_binary はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# looks_binary は先頭bytesのNUL有無でbinary候補を判定し、read failureは除外側に倒します。
 def looks_binary(path: Path) -> bool:
     try:
         with path.open('rb') as handle:
@@ -87,7 +87,7 @@ def looks_binary(path: Path) -> bool:
         return True
 
 
-# portable_search はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# portable_search は外部検索toolなしで走査し、match・除外・各上限状態を返します。
 def portable_search(
     root: Path,
     pattern: str,
@@ -153,7 +153,7 @@ def portable_search(
     return matches, False, stats
 
 
-# rg_glob_args はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# rg_glob_args はignore・include・exclude規則をripgrep用glob引数へ変換します。
 def rg_glob_args(globs: list[str], excludes: list[str]) -> list[str]:
     args: list[str] = []
     for name in sorted(DEFAULT_IGNORE):
@@ -165,7 +165,7 @@ def rg_glob_args(globs: list[str], excludes: list[str]) -> list[str]:
     return args
 
 
-# ripgrep_search はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# ripgrep_search はripgrepを条件付き実行し、match結果とbackend失敗を分けます。
 def ripgrep_search(
     executable: str,
     root: Path,
@@ -237,7 +237,7 @@ def ripgrep_search(
     return matches, False, None
 
 
-# main はCLI入力を解釈し、自己説明的な出力と終了状態を確定する。
+# main は検索語・対象・backendを検証し、bounded match結果とstatusを出力する。
 def main() -> int:
     parser = argparse.ArgumentParser(
         description='Search text and return compact self-describing JSON. Uses ripgrep when compatible and available.'

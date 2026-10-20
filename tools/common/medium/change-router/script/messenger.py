@@ -12,7 +12,7 @@ DOC_EXTS = {'.md', '.rst', '.txt'}
 TEST_DIRS = {'test', 'tests', 'spec', 'specs'}
 
 
-# changed_files はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# changed_files は指定baseとの差分pathを取得し、Git実行失敗をstatusへ残します。
 def changed_files(root: Path, base: str | None) -> dict[str, object]:
     cmd = ['git', '-C', str(root), 'diff', '--name-only', base or 'HEAD']
     try:
@@ -42,13 +42,13 @@ def is_test_candidate(path: Path, rel_parts: set[str]) -> bool:
     )
 
 
-# candidate_index はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# candidate_index はrepoを走査してrouting用fileを索引化し、walk errorと省略を記録します。
 def candidate_index(root: Path, max_files: int) -> tuple[list[dict[str, object]], bool, int]:
     rows: list[dict[str, object]] = []
     truncated = False
     walk_error_count = 0
 
-    # on_walk_error はこのtool内の処理責務を局所化し、呼び出し側の理解負債を増やさない。
+# on_walk_error はtest indexの列挙失敗を記録し、候補mapをcomplete扱いしないようにします。
     def on_walk_error(_error: OSError) -> None:
         nonlocal walk_error_count
         walk_error_count += 1

@@ -7,7 +7,7 @@ import (
     "testing"
 )
 
-// TestNativeMaterializeSelectionPreservesWrapperLayout は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestNativeMaterializeSelectionPreservesWrapperLayout は選択された相対pathとwrapper階層が保たれることを確認します。
 func TestNativeMaterializeSelectionPreservesWrapperLayout(t *testing.T) {
     source := t.TempDir()
     wrapper := filepath.Join(source, "tools", "analyze.sh")
@@ -32,7 +32,7 @@ func TestNativeMaterializeSelectionPreservesWrapperLayout(t *testing.T) {
     }
 }
 
-// TestPlanNativeMaterializationProtectsDifferentDestination は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestPlanNativeMaterializationProtectsDifferentDestination は異なる既存内容の上書きを計画段階で拒否します。
 func TestPlanNativeMaterializationProtectsDifferentDestination(t *testing.T) {
     source := t.TempDir()
     out := t.TempDir()
@@ -74,7 +74,7 @@ func TestPlanNativeMaterializationProtectsDifferentDestination(t *testing.T) {
     }
 }
 
-// TestNativeMaterializeManifestMatchesPythonFormat は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestNativeMaterializeManifestMatchesPythonFormat はnative manifestのfieldとpathがPython形式に合うことを確認します。
 func TestNativeMaterializeManifestMatchesPythonFormat(t *testing.T) {
     revision := "abc123"
     actions := []materializeAction{{
@@ -97,7 +97,7 @@ func TestNativeMaterializeManifestMatchesPythonFormat(t *testing.T) {
     }
 }
 
-// TestReplaceMaterializedFileReplacesExistingDestination は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestReplaceMaterializedFileReplacesExistingDestination は安全な置換で既存destinationが新内容になることを確認します。
 func TestReplaceMaterializedFileReplacesExistingDestination(t *testing.T) {
     root := t.TempDir()
     destination := filepath.Join(root, "tool.bin")
@@ -124,7 +124,7 @@ func TestReplaceMaterializedFileReplacesExistingDestination(t *testing.T) {
     }
 }
 
-// TestAtomicNativeJSONReplacesExistingManifest は対象機能の期待contractが将来の変更で崩れないことを検証します。
+// TestAtomicNativeJSONReplacesExistingManifest はatomic writeが既存manifestを破損なく更新することを確認します。
 func TestAtomicNativeJSONReplacesExistingManifest(t *testing.T) {
     path := filepath.Join(t.TempDir(), materializeManifestName)
     if err := os.WriteFile(path, []byte("old"), 0o644); err != nil {

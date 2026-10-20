@@ -47,3 +47,6 @@ If the note disagrees with the code or tests, check them and update the note aft
 
 Give the AI one short note about the project's current features and limits so it does not have to search the README and old work requests. Include links and ask it to open detailed sources only when needed.
 
+## Terms
+
+- **Context State (project snapshot)**: Keeping a short record of what the project can do now, its constraints, and what it does not support yet. It needs no special tool; a README or a short note is enough to start.

@@ -40,7 +40,7 @@ def dependencies(path: Path):
     return 'ok', sorted(deps), None
 
 
-# 依存物・生成物を避けながら解析対象sourceを決定論的に列挙する。
+# Python module graph用sourceを除外規則で絞り、常にpath順で処理します。
 def source_files(root: Path):
     found = []
     for current, dirs, files in os.walk(root):
@@ -53,7 +53,7 @@ def source_files(root: Path):
     return found
 
 
-# 全体scanの完全性と依存edgeを自己説明的なgraph結果へ集約する。
+# module node・import edge・cycleとscan completenessをgraph artifactへ統合します。
 def build_result(root: Path, limit: int):
     all_files = source_files(root)
     limit = max(0, limit)
@@ -89,7 +89,7 @@ def build_result(root: Path, limit: int):
     }
 
 
-# CLI入力を検証し、通常結果と失敗状態を同じ機械可読契約で返す。
+# main はPython module間importをgraph化し、artifactと不完全性signalを出力します。
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('root', nargs='?', default='.')

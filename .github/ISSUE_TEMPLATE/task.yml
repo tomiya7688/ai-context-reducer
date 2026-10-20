@@ -1,0 +1,62 @@
+name: 実装・改善
+description: 新しい実装、既存機能の改善、保守作業を定義します
+title: "[task] "
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 目的
+      description: 何を実現するIssueかを具体的に書いてください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: なぜ必要か
+      description: 現在どんな問題や繰り返しコストがあり、何を改善するのかを書いてください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: 対象範囲
+      description: 変更するfile、module、文書、CLIなどを書いてください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: 変更してはいけないもの・設計条件
+      description: 互換性、CLI/JSON contract、配布構成など、守る条件があれば書いてください。
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      options:
+        - P0 - 公開文書・利用者が理解するための基盤
+        - P1 - 正しさに関わる実装・バグ
+        - P2 - source内部の可読性・保守性
+        - P3 - CI・Release仕上げ・その他
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 完了条件
+      description: 完了を機械的または具体的に判断できる条件を書いてください。
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: validation
+    attributes:
+      label: 検証方法
+      description: test、build、文書確認、Release E2Eなど、完了時に確認する内容を書いてください。

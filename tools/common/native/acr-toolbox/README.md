@@ -325,3 +325,12 @@ acr-toolbox template --template templates/ --vars vars.json --out generated/ --c
 ```
 
 `{{name}}` の単純置換だけを扱うdeterministic generatorです。required variable、unresolved placeholder、dry-run/check-only、compact change hint、template metadataを持ちます。高度なlifecycleはCopier/Cookiecutter等へ委譲します。
+
+
+## slice
+
+```text
+acr-toolbox slice --max-matches 20 PATTERN FILE [FILE...]
+```
+
+`--max-matches` のdefaultは20です。正の値では上限を超えるmatchを実際に検出した場合だけ truncation markerを出し、0以下は無制限です。

@@ -2,6 +2,8 @@
 
 AIへ渡す情報量を減らすための前処理・routing・validation補助ツール群です。
 
+各ツールがどの作業方法を補助するか、また使わなくてよい場合は、[手法とツールの対応表（日本語）](../docs/jp/手法/手法と補助ツールの対応表.md)または[英語版](../docs/en/methods/tool-method-map.md)を参照してください。手法の説明が原典であり、ツールはすべて任意です。
+
 ## Entry
 
 ```text
@@ -71,6 +73,7 @@ processing      -> matching / analysis / rendering
 ## Output policy
 
 Machine outputの共通契約は `tools/JSON_CONTRACT.md` をSource of Truthとします。
+対象Python CLIのstatusとprocess exit code対応表は `tools/PYTHON_CLI_EXIT_POLICY.md` を参照してください。
 
 - JSONが自然な結果形式なら、README/helpを毎回読まなくても意味が分かる自己説明的JSONを優先する
 - 同じ事実をprose summaryとstructured fieldへ二重に入れない
@@ -137,34 +140,13 @@ csharp/c/cpp/gdscript
 profiles       optional project-type / routing input
 ```
 
-## Main routing tools
+## Related methods
 
-```text
-プロジェクト情報を調べる -> analyze-and-recommend / acr-toolbox analyze
-言語と解析環境を調べる -> language-setup / acr-toolbox language-setup
-コードを軽く調べる -> language-run / acr-toolbox language-run
-ファイル間の関係を調べる -> acr-toolbox language-medium-run
-詳しい解析の準備をする -> acr-toolbox language-large-plan
-作業場所に合う指示を読む -> scoped-guides / acr-toolbox scoped-guides
-使うtoolを決める -> tool-selector / acr-toolbox select
-検索して場所を探す -> search / find / structural-search / tree / doc-index / slice
-調査を終える条件を確かめる -> acceptance-extractor / exploration-stop-check
-共有先との差分を見る -> remote-delta / compact-diff
-各ファイルの担当を整理する -> responsibility-candidates
-変更内容から読む場所を探す -> change-router
-機能ごとの境界を調べる -> architecture-boundary-router (optional)
-変更に関係するテストを探す -> affected-tests
-作業に関係する規則を探す・確認する -> policy-index / policy-check / acr-toolbox policy-check
-似た説明がある文書を探す -> doc-duplicate-hints
-普段は読ませないファイルの候補を調べる -> ignore-candidates
-ひな型からファイルを作る -> template / acr-toolbox template
-Validation                -> validation-plan / Syntax Health Validation -> syntax-health (when available) / compact-log
-Context pack              -> context-pack-builder
-Source structure          -> language-specific symbols / dependency / graph tools -> source-structure-index
-Context manifest          -> Context Manifest -> context-manifest (optional)
-Context priority          -> Context Priority / Hotspot -> context-budget / hotspot-report (signals)
-Git history health        -> git-history-health
-```
+The method guides explain what to do and when. This README and each tool README explain implementation details. Keep the complete method-to-tool correspondence in the [method and tool map](../docs/jp/手法/手法と補助ツールの対応表.md) ([English](../docs/en/methods/tool-method-map.md)) rather than maintaining a second routing list here.
+
+When you want to avoid asking users to install another runtime or SDK, start with [追加インストールを減らしてツールを使う](../docs/jp/手法/追加インストールを減らしてツールを使う.md) ([English](../docs/en/methods/use-tools-without-extra-installs.md)). It explains how to choose among an already available runtime, a prebuilt native tool, and an available fallback. [language-setup](common/small/language-setup/README.md) reports which analyzers are usable without installing missing dependencies; [materialize-tools](common/small/materialize-tools/README.md) copies selected portable tools into a destination without installing a runtime. [tool-selector](common/small/tool-selector/README.md) also marks tools whose required backend is unavailable.
+
+The main command groups are repository inspection, search and slicing, language analysis, task and validation routing, context preparation, and template generation. See the command index below or the native toolbox guide for available commands.
 
 `tool-selector` は候補を `orient -> search -> scope -> inspect -> validate -> stop` の順で返します。各entryは `phase / activation / availability / reason` を持ち、external backendが必要なtoolは利用可能性もrouting時点で反映します。
 
@@ -172,19 +154,40 @@ Git history health        -> git-history-health
 
 `source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
 
-`context-manifest` は [資料の場所を短い一覧にする](../docs/jp/手法/資料の場所を短い一覧にする.md) の補助実装です。手法のSource of Truthはdocs側にあり、repository-wide file listやtool固有priorityを手法そのものにはしません。agentへ渡すmanifestはpointer中心かつboundedにし、現在taskとの関連でworking setを選びます。
+`context-manifest` は、候補ファイルの場所を目録にまとめる実装です。repository-wideの全file listやtool固有のpriorityを、作業対象の判断に使うものではありません。
 
-`context-budget` / `hotspot-report` は [今回読むファイルを選ぶ](../docs/jp/手法/今回読むファイルを選ぶ.md) の補助signalです。size / cost / depth等はtask relevanceの代わりではなく、高精度routingやsliceが必要な場所を判断する材料として使います。hotspot上位を自動的に読む対象にはしません。
+`context-budget` / `hotspot-report` は、候補の大きさや推定costなどを簡潔に示します。これらの値は作業との関連性を判定せず、上位候補を自動的に読む対象にするものでもありません。
 
-`doc-duplicate-hints` は [同じ説明を何度も書かない](../docs/jp/手法/同じ説明を何度も書かない.md) のhint実装です。重複候補を絞るだけで、どちらがSource of Truthか、intentional duplicationか、削除可能かは決定しません。自動削除・自動統合には使いません。
+`doc-duplicate-hints` は、似た説明がある箇所を候補として示すだけです。どれが原典か、意図した繰り返しか、削除できるかは判断せず、自動削除・統合もしません。
 
-`ignore-candidates` は [AIに普段読ませないファイルを決める](../docs/jp/手法/AIに普段読ませないファイルを決める.md) の候補提示実装です。generated / logs / vendor / caches等を通常contextから外す候補を示すだけで、Source of Truth判定や `.gitignore` 等への適用は行いません。validationで必要なartifactはtask-specific evidenceとして別扱いします。
+`ignore-candidates` は、通常は読まなくてよい可能性があるpathを候補として示すだけです。原典かどうかの判断や `.gitignore` の変更は行いません。検証に必要な生成物は作業に応じて扱います。
 
-`syntax-health` は [まず、コードの構文チェックをする](../docs/jp/手法/まず、コードの構文チェックをする.md) の補助実装です。利用可能なparserの結果をcheap evidenceへ圧縮するだけで、syntax successをsemantic correctnessやtask completionとはみなしません。parser / grammarを自動installせず、必要なtargeted tests / compiler / runtime validationへroutingします。
+`syntax-health` は、利用可能な解析器の結果を簡潔に示します。構文確認の成功を、動作の正しさや作業完了とはみなしません。解析器や文法定義を自動で導入するものでもありません。
 
-`architecture-boundary-router` は [機能ごとのコードの分け方から読む場所を決める](../docs/jp/手法/機能ごとのコードの分け方から読む場所を決める.md) の補助実装です。手法のSource of Truthはdocs側にあり、tool仕様やprofile形式を手法そのものにはしません。対象projectが既に持つ責務・境界情報を任意profileとして渡した場合だけ、最初のworking set選択に使い、特定architectureへの適合checkerにはしません。
+`architecture-boundary-router` は、対象projectが用意した担当範囲や接続関係の情報から、調査を始める候補を示します。特定の設計方式への適合は検査しません。
+
+手法の説明: [資料の場所を短い一覧にする](../docs/jp/手法/資料の場所を短い一覧にする.md)、[今回読むファイルを選ぶ](../docs/jp/手法/今回読むファイルを選ぶ.md)、[同じ説明を何度も書かない](../docs/jp/手法/同じ説明を何度も書かない.md)、[AIに普段読ませないファイルを決める](../docs/jp/手法/AIに普段読ませないファイルを決める.md)、[まず、コードの構文チェックをする](../docs/jp/手法/まず、コードの構文チェックをする.md)、[機能ごとのコードの分け方から読む場所を決める](../docs/jp/手法/機能ごとのコードの分け方から読む場所を決める.md)
 
 UPD Commanderを含む外部設計手法は、tools内部の責務分離や実装構造の参考にできますが、ai-context-reducerの機能要件・適合条件・標準architectureにはしません。
+
+## External integration boundaries
+
+External programs are optional dependencies. This table records which functions the repository reuses, what portable fallback it provides, and which advanced implementations it intentionally delegates. It is a maintenance reference for `tools/`, not a list of product recommendations; see [External Tool Reference Policy](../.github/documentation/external-tool-reference-policy.ja.md) before adding a product link to public method documentation.
+
+| Capability | External example | Repository-local fallback | Delegated / unsupported |
+|---|---|---|---|
+| Fast text search | ripgrep | `acr-toolbox search` | full ripgrep-compatible CLI / all optimizations |
+| File discovery | fd | `acr-toolbox find` | full fd-compatible filters / UX |
+| Syntax / structural search | ast-grep | `structural-search` (Python AST fallback) | multi-language AST rule engine / rewrite engine |
+| Affected test routing | Nx / Pants | `affected-tests`, `structure-index affected` | full build-graph / coverage engine |
+| Scoped AI instructions | agent-native scoped instructions | `scoped-guides` | reproduction of agent-specific precedence |
+| Policy checking | ast-grep / Semgrep, etc. | `policy-check` | AST / dataflow / taint / semantic rule engine |
+| Canonical templates | Copier / Cookiecutter | `template` | Jinja2 compatibility / Copier update algorithm |
+| Source / semantic index | SCIP / Universal Ctags | `structure-index` adapters + portable language analyzers | full SCIP compiler / indexer reimplementation |
+| Syntax health | Tree-sitter | existing Tree-sitter integration when available | automatic grammar / runtime installation |
+| Git repository health | git-sizer | `git-history-health` adapter / fallback routing | full Git object analyzer reimplementation |
+
+Use an available high-quality external backend when it is justified; otherwise use the repository fallback. If a task needs a delegated feature, report that dependency or limitation rather than silently treating an approximate fallback as equivalent.
 
 ## Core rules
 
@@ -195,7 +198,7 @@ UPD Commanderを含む外部設計手法は、tools内部の責務分離や実�
 - external toolが既にある場合は高品質backendとして使ってよい
 - toolの維持コストがagent-context削減効果を上回るなら追加しない
 
-詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/internal/jp/追加インストールを減らすツール運用.md` を参照してください。
+詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/jp/手法/追加インストールを減らしてツールを使う.md`、`docs/internal/jp/追加インストールを減らすツール運用.md` を参照してください。
 
 
 ## Language portability

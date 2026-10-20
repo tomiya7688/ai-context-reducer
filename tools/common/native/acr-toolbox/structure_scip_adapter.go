@@ -17,7 +17,7 @@ type structureSCIPFailure struct {
     Error  string
 }
 
-// boundedSCIPError はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// boundedSCIPError はSCIP backendの失敗情報を上限内へ収めて返します。
 func boundedSCIPError(text string) string {
     text = strings.TrimSpace(text)
     if len(text) <= structureSCIPErrorLimit {
@@ -26,7 +26,7 @@ func boundedSCIPError(text string) string {
     return text[:structureSCIPErrorLimit] + "... truncated"
 }
 
-// scipMapField はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// scipMapField はSCIP documentのfieldをobjectとして読み、欠損・型違いを扱います。
 func scipMapField(row map[string]any, camel, snake string) any {
     if value, ok := row[camel]; ok {
         return value
@@ -34,12 +34,12 @@ func scipMapField(row map[string]any, camel, snake string) any {
     return row[snake]
 }
 
-// scipRoles はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// scipRoles はSCIP symbol descriptorから表示用のrole一覧を取り出します。
 func scipRoles(row map[string]any) int {
     return structureInt(scipMapField(row, "symbolRoles", "symbol_roles"))
 }
 
-// scipRangeLines はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// scipRangeLines はSCIP rangeの開始・終了行を1-basedの行範囲へ変換します。
 func scipRangeLines(raw any) (int, int) {
     values, ok := raw.([]any)
     if !ok || (len(values) != 3 && len(values) != 4) {
@@ -276,7 +276,7 @@ func writeSCIPAdapterJSON(path string, payload any) error {
     return os.WriteFile(path, data, 0o644)
 }
 
-// prepareStructureSCIPBuildArgs はこの責務内の変換・routingを局所化し、呼び出し側のworking setを増やさないための処理です。
+// prepareStructureSCIPBuildArgs はSCIP CLIへ渡すsourceと出力先optionを整えます。
 func prepareStructureSCIPBuildArgs(args []string) ([]string, func(), *structureSCIPFailure) {
     remaining := []string{}
     scipIndexes := []string{}
