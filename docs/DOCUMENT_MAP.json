@@ -417,6 +417,18 @@
       "japanese": "docs/jp/手法/AIの作業履歴から無駄な読み込みを見つけて改善する.md",
       "english": "docs/en/methods/diagnose-repeated-context-from-work-logs.md",
       "english_status": "translated"
+    },
+    {
+      "id": "shared-rules-four-ai-tools",
+      "japanese": "docs/jp/AI利用/4つのAIで共通ルールを使う.md",
+      "english": "docs/en/ai-usage/use-shared-rules-across-four-ai-tools.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "shared-ai-task-workflow",
+      "japanese": "docs/jp/AI利用/AIの作業開始からPRまでの共通ワークフロー.md",
+      "english": "docs/en/ai-usage/ai-task-workflow.md",
+      "english_status": "translated"
     }
   ]
 }
