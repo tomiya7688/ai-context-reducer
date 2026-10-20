@@ -15,7 +15,7 @@ AIに作業を頼む人に向けて、必要なコードや資料を選んで渡
 
 依頼例やひな型を、普段使うAIに渡すだけでも始められます。調査や確認、文書作成を省力化したいときは、補助ツールも使えます。AIが作業のために受け取る指示やコード、資料、検索・確認の結果などを「コンテキスト」と呼びます。
 
-[最新の配布物](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [AI利用Q&A](docs/jp/AI利用/よくある質問.md) · [コーディングエージェント紹介](docs/jp/AI利用/コーディングエージェントの種類と選び方.md) · [4つのAIで共通ルールを使う](docs/jp/AI利用/4つのAIで共通ルールを使う.md) · [約5分で補助ツールを試す](docs/jp/導入/AIに渡す資料を選ぶ道具を試す.md) · [手法一覧](docs/jp/手法一覧.md)
+[最新の配布物](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [AI利用Q&A](docs/jp/AI利用/よくある質問.md) · [コーディングエージェント紹介](docs/jp/AI利用/コーディングエージェントの種類と選び方.md) · [4つのAIで共通ルールを使う](docs/jp/AI利用/4つのAIで共通ルールを使う.md) · [AI作業の共通ワークフロー](docs/jp/AI利用/AIの作業開始からPRまでの共通ワークフロー.md) · [約5分で補助ツールを試す](docs/jp/導入/AIに渡す資料を選ぶ道具を試す.md) · [手法一覧](docs/jp/手法一覧.md)
 
 配布中の v1.0.0 は Windows・Linux・macOS の x64 / arm64 に対応しています。概要と操作案の表示には、言語環境の追加インストールは不要です。
 

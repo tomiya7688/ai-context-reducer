@@ -6,6 +6,8 @@ Copying the same instructions into four AI-specific files creates inconsistencie
 
 **Keep the canonical rules in the root [AGENTS.md](../../../AGENTS.md).** Tool-specific files only provide the entry points. The common rules cover scope, Japanese/English documentation, verification, permissions, and reporting.
 
+Before any substantive investigation or edits, follow the [shared task workflow](ai-task-workflow.md). In a new task with local Git, first check worktree safety, then **successfully run `git pull --ff-only origin main` on main**. In API-only environments such as some ChatGPT setups, verify the latest remote commit and do not claim to have executed git pull.
+
 ## How each environment accesses the rules
 
 | Environment | Repository entry point | What to verify |
@@ -26,6 +28,8 @@ When working on repository tomiya7688/ai-context-reducer,
 retrieve and read AGENTS.md from the repository root before editing.
 Do not claim to have read a file that was not available.
 If access is unavailable, explain the limitation and ask for the required text.
+First follow the shared task workflow. If Git commands are unavailable,
+check the latest remote SHA and task base; never claim to have pulled.
 Check original sources and completion criteria for the current task separately.
 ```
 
