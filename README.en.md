@@ -15,7 +15,7 @@ This project helps people using AI choose the code and documents to provide for 
 
 You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
 
-[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [AI usage FAQ](docs/en/ai-usage/faq.md) · [Coding agents guide](docs/en/ai-usage/coding-agent-overview.md) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/method-index.md)
+[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [AI usage FAQ](docs/en/ai-usage/faq.md) · [Coding agents guide](docs/en/ai-usage/coding-agent-overview.md) · [Shared rules for four AI tools](docs/en/ai-usage/use-shared-rules-across-four-ai-tools.md) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/method-index.md)
 
 Published v1.0.0 supports Windows, Linux, and macOS on x64 and arm64. Its overview and suggestion commands do not require installing a language runtime.
 
