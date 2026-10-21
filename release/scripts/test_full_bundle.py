@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from full_bundle import build, verify
+from archive_tools import extract, pack
 
 
 # {責務: [FullBundleTests: 欠落・改変・追加ファイルを検出する契約を検証する]}
@@ -87,6 +88,49 @@ class FullBundleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.stage()
         self.assertFalse(self.out.exists())
+
+    # {責務: [test_document_links_and_exclusions: 未同梱の参照を固定しコード例を保つ]}
+    def test_document_links_and_exclusions(self):
+        (self.repo / "guide.md").write_text('[source](source.py)\n```markdown\n[example](missing.md)\n```\n', encoding="utf-8")
+        (self.repo / "source.py").write_text("pass\n", encoding="utf-8")
+        self.manifest["template_files"] = [{"source": "guide.md", "bundle_path": "guide.md", "kind": "document"}]
+        self.save_manifest()
+        self.stage()
+        text = (self.out / "guide.md").read_text(encoding="utf-8")
+        self.assertIn('github.com/tomiya7688/ai-context-reducer/blob/main/source.py', text)
+        self.assertIn('[example](missing.md)', text)
+        verify(self.repo, self.out, "1.0.0")
+
+    # {責務: [test_excluded_sources: 同梱禁止のソースをマニフェストでも許可しない]}
+    def test_excluded_sources(self):
+        self.manifest["excluded_from_full_bundle"] = ["**/*.go"]
+        self.manifest["template_files"] = [{"source": "secret.go", "bundle_path": "secret.go", "kind": "document"}]
+        self.save_manifest()
+        with self.assertRaises(ValueError):
+            self.stage()
+
+    # {責務: [test_archive_roundtrip: 日本語パスを含むzipとtarの再展開を照合する]}
+    def test_archive_roundtrip(self):
+        (self.repo / "日本語.md").write_text("# 日本語\n", encoding="utf-8")
+        self.manifest["template_files"] = [{"source": "日本語.md", "bundle_path": "docs/日本語.md", "kind": "document"}]
+        self.save_manifest()
+        self.stage()
+        for suffix in (".zip", ".tar.gz"):
+            archive = self.root / ("candidate" + suffix)
+            destination = self.root / ("extracted" + suffix)
+            pack(self.out, archive)
+            extract(archive, destination)
+            verify(self.repo, destination / self.out.name, "1.0.0")
+
+    # {責務: [test_unsafe_archive: 展開先外へのファイル作成を拒否する]}
+    def test_unsafe_archive(self):
+        import zipfile
+        archive = self.root / "unsafe.zip"
+        with zipfile.ZipFile(archive, "w") as output:
+            output.writestr("../outside", "no")
+        with self.assertRaises(ValueError):
+            extract(archive, self.root / "extracted")
+        self.assertFalse((self.root / "outside").exists())
 
 
 if __name__ == "__main__":

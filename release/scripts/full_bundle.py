@@ -1,10 +1,13 @@
 """Build and verify the actual Full Bundle, without installing dependencies."""
 
 import argparse
+import fnmatch
 import hashlib
 import json
+import re
 import shutil
 from pathlib import Path
+from urllib.parse import quote, unquote, urlsplit
 
 
 # {責務: [safe_path: 配布ルート外やリンク先への書込みを拒否する], 引数: [root: 基準, relative: 相対パス], 戻り値: [path: 安全なパス]}
@@ -12,8 +15,11 @@ def safe_path(root, relative):
     path = root / relative
     if Path(relative).is_absolute() or not path.resolve().is_relative_to(root.resolve()):
         raise ValueError(f"path escapes bundle: {relative}")
-    if any(part.is_symlink() for part in [path, *path.parents] if part != root.parent):
-        raise ValueError(f"symlink is not allowed: {relative}")
+    for part in [path, *path.parents]:
+        if part.is_symlink():
+            raise ValueError(f"symlink is not allowed: {relative}")
+        if part == root:
+            break
     return path
 
 
@@ -54,7 +60,48 @@ def manifest_entries(repo, manifest, suffix):
             if destination in entries:
                 raise ValueError(f"duplicate bundle path: {destination}")
             entries[destination] = {"source": file.relative_to(repo).as_posix(), "kind": "document"}
+    for destination in entries:
+        for pattern in manifest.get("excluded_from_full_bundle", []):
+            if fnmatch.fnmatchcase(destination, pattern) or fnmatch.fnmatchcase(destination, pattern.removeprefix("**/")):
+                raise ValueError(f"excluded bundle entry: {destination}")
     return entries
+
+
+# {責務: [document_links: 同梱しない原本への参照を版固定URLへ変換する], 引数: [repo: 原本, bundle: 配布先, entries: 対応表, commit: 参照版], 戻り値: [なし]}
+def document_links(repo, bundle, entries, commit):
+    for destination, item in entries.items():
+        if not destination.endswith(".md") or item.get("normal_bundle_compatible"):
+            continue
+        source = repo / item["source"]
+        target = bundle / destination
+
+        # {責務: [replace: 未同梱の参照先だけを原本URLへ向ける], 引数: [match: Markdownリンク], 戻り値: [text: 置換結果]}
+        def replace(match):
+            raw = match.group(2).strip().strip("<>")
+            parts = urlsplit(raw)
+            if parts.scheme or parts.netloc or not parts.path or raw.startswith("/"):
+                return match.group(0)
+            relative = unquote(parts.path.strip("<>"))
+            if (target.parent / relative).exists():
+                return match.group(0)
+            original = (source.parent / relative).resolve()
+            if not original.is_relative_to(repo.resolve()) or not original.exists():
+                raise ValueError(f"unresolvable documentation link: {destination}: {raw}")
+            route = "raw.githubusercontent.com/tomiya7688/ai-context-reducer" if match.group(1).startswith("!") else "github.com/tomiya7688/ai-context-reducer/blob"
+            url = f"https://{route}/{commit}/{quote(original.relative_to(repo).as_posix())}"
+            if parts.fragment:
+                url += "#" + parts.fragment
+            return match.group(1) + url + match.group(3)
+
+        lines, fenced = [], False
+        for line in target.read_text(encoding="utf-8").splitlines(keepends=True):
+            if line.lstrip().startswith(("```", "~~~")):
+                fenced = not fenced
+            elif not fenced:
+                line = re.sub(r'(!?\[[^\]\n]*\]\()([^\n)]+)(\))', replace, line)
+                line = re.sub(r'^(\[[^\]\n]+\]:\s*)(<[^>]+>|[^\s]+)(.*)$', replace, line)
+            lines.append(line)
+        target.write_text("".join(lines), encoding="utf-8")
 
 
 # {責務: [inventory: 配布物の全ファイルをハッシュ付きで記録する], 引数: [bundle: 配布ルート], 戻り値: [files: 相対パスとハッシュ]}
@@ -69,7 +116,7 @@ def inventory(bundle):
 
 
 # {責務: [build: 原本とビルド済み成果物から同梱版を作る], 引数: [repo: 原本, normal: 通常版, gui: GUI, output: 新規出力先, version: 版], 戻り値: [なし]}
-def build(repo, normal, gui, output, version):
+def build(repo, normal, gui, output, version, commit="main"):
     if output.exists():
         raise ValueError(f"output already exists: {output}")
     manifest = json.loads((repo / "release/FULL_BUNDLE_MANIFEST.json").read_text(encoding="utf-8"))
@@ -105,7 +152,8 @@ def build(repo, normal, gui, output, version):
     manifest["target_release_version"] = version
     manifest["artifact_status"] = "candidate_under_validation"
     candidate_manifest.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    record = {"version": version, "files": inventory(output)}
+    document_links(repo, output, entries, commit)
+    record = {"version": version, "source_commit": commit, "files": inventory(output)}
     (output / "BUNDLE_FILES.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
 
 
@@ -116,8 +164,11 @@ def verify(repo, bundle, version):
     expected = set(manifest_entries(repo, manifest, suffix))
     record = json.loads((bundle / "BUNDLE_FILES.json").read_text(encoding="utf-8"))
     actual = inventory(bundle)
-    if record["version"] != version or set(actual) != expected or actual != record["files"]:
-        raise ValueError("bundle inventory/version/hash mismatch")
+    missing = sorted(expected - set(actual))
+    extra = sorted(set(actual) - expected)
+    changed = sorted(path for path in actual if actual[path] != record["files"].get(path))
+    if record["version"] != version or missing or extra or changed or set(record["files"]) != expected:
+        raise ValueError(f"bundle mismatch: missing={missing}, extra={extra}, changed={changed}")
     for path in ("RELEASE_MANIFEST.json", "FULL_BUNDLE_MANIFEST.json"):
         data = json.loads((bundle / path).read_text(encoding="utf-8"))
         key = "release_version" if path == "RELEASE_MANIFEST.json" else "target_release_version"
@@ -134,11 +185,12 @@ def main():
     parser.add_argument("--version", required=True)
     parser.add_argument("--normal", type=Path)
     parser.add_argument("--gui", type=Path)
+    parser.add_argument("--source-commit", default="main")
     args = parser.parse_args()
     if args.action == "build":
         if args.normal is None or args.gui is None:
             parser.error("build requires --normal and --gui")
-        build(args.repo.resolve(), args.normal.resolve(), args.gui.resolve(), args.bundle.resolve(), args.version)
+        build(args.repo.resolve(), args.normal.resolve(), args.gui.resolve(), args.bundle.resolve(), args.version, args.source_commit)
     verify(args.repo.resolve(), args.bundle.resolve(), args.version)
     print(f"Full Bundle {args.action} passed: {args.version}")
 
