@@ -24,13 +24,14 @@ For a concrete question such as "output gets rough only in the later part of a m
 
 ## The AI is reading unrelated material
 
-- [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md) — specify responsibilities and permitted changes, then hand over necessary sources, diffs, and check results.
+- [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md) — when unrelated research, implementation, and writing accumulate in one chat, explain why cache reuse does not remove history, when to split, and what evidence to hand over.
 
 - [Summarize project capabilities and limitations](context-state.md) — give the AI a short note about which features work and what their limits are.
 - [Write a short note for the current task](context-pack.md) — give the AI the goal, relevant documents, and conditions for this task.
 - [Make a short list of where information lives](context-manifest.md) — give the AI a map of documents without copying all their contents.
 - [Choose which files to read](context-priority.md) — direct it to files most relevant to the task.
 - [Split long files and logs into parts for the AI](splitting-long-files-and-logs.md) — have the AI read content that does not fit at once in order and record ranges and evidence.
+- [Give the AI only the relevant parts of a web page](retrieve-relevant-webpage-information.md) — select evidence from large amounts of text or tables by task, keep source references, and retrieve more if needed.
 - [Decide what the AI usually does not need to read](context-exclusion.md) — identify logs and generated files to inspect only when needed.
 - [Decide when the AI should stop investigating](exploration-control.md) — tell it when to stop once it has enough information to begin.
 - [Before investigating, decide what checks can identify the cause](evidence-budget.md) — decide what to check and when to broaden the investigation.

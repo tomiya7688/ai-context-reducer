@@ -10,6 +10,10 @@
 
 Tool自身がagentの代わりに広くファイルを読むことは問題ありません。広い解析によってcompactな結果を返せるなら、それはContext Reducerとして有効です。
 
+## コメントの規則
+
+`tools/` のコードとテストを変更する前に [COMMENT_RULES.md](COMMENT_RULES.md) を読み、宣言前と実装内部に必要な日本語コメントを書きます。規則本文は他のファイルへ複製しません。
+
 ## Read routing
 
 1. `tools/README.md`

@@ -1,61 +1,73 @@
-# path-find
+# ファイルの場所を探す（path-find）
 
-Repository内のpath候補をagentへcompactに返すfinderです。既に `fd` が使える場合は外部backendを利用し、無い環境ではstdlib / native fallbackで動作します。外部toolを自動installしません。
+あなたがAIにコードの調査を頼むときは、**探しているファイルの名前や種類を先に絞る**と、関係のないファイルをAIに渡さずに済みます。
 
-## Use
+補助ツール `path-find` は、あなたが指定したフォルダーから、名前などの条件に合うファイルやフォルダーを探し、**見つかった場所の一覧**を返します。ファイルの中身をAIに読ませるツールではありません。
 
-Python:
+## あなたが直接使う場合
 
-```sh
-python tools/common/small/path-find/script/path_find.py '*.py' src
-python tools/common/small/path-find/script/path_find.py --type dir '*test*' .
-```
-
-Native:
+あなたは、Pythonが使える環境なら、ObaPickのリポジトリのルートで次のように実行できます。例では `src` フォルダーから `.py` で終わる名前を探します。
 
 ```sh
-acr-toolbox find '*.py' src
-acr-toolbox find --type dir '*test*' .
+python3 tools/common/small/path-find/script/path_find.py '*.py' src
 ```
 
-Go標準flag parserを使うnative版ではoptionをpositional argumentより前へ置きます。
+ファイルではなくフォルダーを探したい場合は、次のように指定してください。
 
-通常は `--backend` を指定しません。`auto` が既定で、compatibleなqueryなら `fd`、それ以外は `portable` を使います。明示的な検証時だけ `--backend portable` / `--backend fd` を使います。
+```sh
+python3 tools/common/small/path-find/script/path_find.py --type dir '*test*' .
+```
 
-## Output
+**配布済みの `acr-toolbox` を使う場合:** あなたは対応する実行ファイルを[配布ページ](https://github.com/tomiya7688/ai-context-reducer/releases/latest)から取得できます。展開した場所で、次の操作ができます（Linux・macOSの例）。
 
-stdoutはself-describing JSONだけです。
+```sh
+./acr-toolbox find --max-results 20 '*.py' /path/to/project/src
+./acr-toolbox find --type dir '*test*' /path/to/project
+```
 
-- `tool`: `path-find`
-- `status`: `ok`, `partial`, input/backend error等
-- `root_path`: 実際に探索したscope
-- `query`: pattern / type / max depth
-- `backend`: `fd` または `portable`
-- `results[]`: `path / kind`
-- `results_truncated`: agent-visible result上限で未返却候補があるか
-- `scan_truncated`: 明示的なportable scan safety capで探索自体が不完全か
-- `walk_error_count`: filesystem warning数
-- `backend_fallback`: auto external backendが失敗しportableへ戻った場合だけ存在
+Windowsでは、展開先の `acr-toolbox.exe` を呼び出してください。引数で指定する場所は、あなたのプロジェクトに合わせて書き換えます。**配布済みの実行ファイルを使うだけなら、PythonやGoを新たに導入する必要はありません。** `acr-toolbox` では、`--type` のような指定を検索対象の名前・場所より前に置いてください。
 
-成功した0件と入力/scan failureを区別します。
+## AIに使わせる場合
 
-## Limits
-
-- `--max-results 0`: output unlimited
-- `--max-depth 0`: traversal depth unlimited
-- `--max-visited 0`: portable internal scan unlimited
-
-以前の既定 `max-depth=20 / max-visited=20000` は深いrepositoryでrouting候補を黙って落とすため廃止しました。performance/safety capが必要な場合だけ明示します。
-
-Generated / dependency / cache directoryは既定でpruneします。
-
-## Development routing
+あなたが使っているAIに**コマンド実行の機能とアクセス権**がある場合は、AIにこのツールを実行させることもできます。次はあなたがAIへ送る依頼文の例です。
 
 ```text
-Python CLI + portable/fd boundary -> script/path_find.py
-Python contract tests             -> tests/test_path_find.py
-Native finder implementation      -> tools/common/native/acr-toolbox/find_command.go
-Native contract tests             -> search_find_commands_test.go
+設定の読込処理に関係するPythonファイルを探してください。
+path-findが利用できる場合は、まずファイル名から候補を探してください。
+候補の場所と選んだ理由を示し、実際のコードと関連テストを確認してください。
+ツールが使えない場合は、利用できる検索方法で調べてください。
+この段階ではファイルを変更しないでください。
 ```
 
-小さい単一責務toolなのでPython版は1fileを維持します。native版は従来の複数browse command fileからfinderだけを分離し、path探索変更時にtree/stats/doc-indexを読む必要をなくしています。
+AIがあなたのプロジェクトへアクセスできない場合は、あなたが上のコマンドを実行し、返ってきた候補の場所と必要な元コードをAIに渡してください。
+
+## ツールが何を調べ、何を返すか
+
+| あなたが指定すること | 補助ツールが行うこと |
+| --- | --- |
+| `'*.py'` のような名前の条件 | 条件に合う名前や相対位置を探します |
+| `src` のようなフォルダー | その場所から下を調べます |
+| `--type file` または `--type dir` | ファイルかフォルダーか、検索対象を選びます |
+| `--max-results 20` | 返す候補数の上限を20件にします |
+| `--max-depth 2` | 調べる階層の深さを制限します |
+
+補助ツールは結果を **JSON形式**（項目名と値を組にしたデータ）で返します。出力には次の項目があります。
+
+| 結果の項目名 | 読み方 |
+| --- | --- |
+| `status` | `ok` なら実行できています。`partial` などなら失敗や未確認の部分を確かめてください |
+| `root_path` | 実際に調べたフォルダー |
+| `results` | 見つかった候補。`path` は場所、`kind` はファイルかフォルダーかを示します |
+| `results_truncated` | 表示件数の上限によって、返していない候補があるか |
+| `scan_truncated` | 指定された走査上限により、調査そのものを途中で止めたか |
+| `walk_error_count` | 調べられなかった場所があった件数 |
+
+結果が0件でも、エラーがなく正常に検索できた場合と、対象の場所を読めず検索できなかった場合は違います。**あなたは `status` と、途中で調査を止めたかどうかも確認してください。** `results` の一覧だけで「他には存在しない」と断定しないでください。
+
+通常は、生成物や外部の依存ファイルなどのフォルダーを検索対象から除きます。今回の作業でその中身が必要なら、別の検索方法で調べてください。
+
+## 使わなくてもよい場合
+
+あなたのエディターにある検索機能で対象が見つかるなら、このツールを追加する必要はありません。補助ツールが返すのは**候補の場所**であって、不具合の原因や正しい修正ではありません。あなたは候補をAIに渡して元コードを調べさせ、変更後には実際の差分とテスト結果を確かめてください。
+
+他の補助ツールについては[ObaPickの補助ツール一覧](../../../README.md)を参照できます。

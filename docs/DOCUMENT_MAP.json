@@ -434,6 +434,12 @@
       "japanese": "docs/jp/手法/追加インストールを減らしてツールを使う.md",
       "english": "docs/en/methods/use-tools-without-extra-installs.md",
       "english_status": "translated"
+    },
+    {
+      "id": "task-focused-web-context",
+      "japanese": "docs/jp/手法/Webページから必要な情報だけをAIに渡す.md",
+      "english": "docs/en/methods/retrieve-relevant-webpage-information.md",
+      "english_status": "translated"
     }
   ]
 }

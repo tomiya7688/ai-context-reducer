@@ -15,6 +15,61 @@ A role name alone does not specify what to check or return. Add the goal, target
 
 When conversations about other tasks grow long, open a new chat and provide only necessary information. Saying “now act as a reviewer” in the same chat does not remove earlier conversation from its input.
 
+## Use a new chat for unrelated work
+
+**Continuing one task** and **accumulating unrelated tasks in one chat** are different. Even if you select only a few source files per task, earlier conversations and tool results can enlarge the next model input when the application carries them forward.
+
+Consider three **illustrative** tasks:
+
+| Task | Everything in one chat | Separate chats |
+| --- | --- | --- |
+| ① Fix a settings-save bug | Adds the reproduction, failed runs, edits, and tests to the conversation | Keeps those details with the bug fix |
+| ② Investigate a new data format | Earlier bug-fix discussion may still be included in later inputs | Starts with the research question, sources and constraints |
+| ③ Improve public documentation | Previous implementation and research discussion may still remain | Provides the draft, target readers and writing rules |
+
+**When the goal changes, reconsider which previous facts the new task needs.** Keep the same chat while investigating a failure whose earlier steps matter. For a separate research task, a new chat is often more appropriate. If the documentation depends on an implementation decision, hand over that decision and its source, not the entire history.
+
+Saying “new task now” or “act as the documentation editor” in the same thread does not guarantee that earlier history is removed from the model's input. Check how the host application assembles context.
+
+### Saved history, one-call input and cumulative usage are different
+
+- **Visible saved history:** Messages you can scroll through. They are not necessarily all sent to the model on the next request.
+- **Input for one model call:** Instructions, selected history, documents and tool results supplied on that request. Even “next” can accompany a long context.
+- **Cumulative task usage:** Input and output over multiple calls. Repeatedly supplied history can be counted again in multiple requests.
+- **Context window:** The amount of content a model can handle at one time. It is not the total of all requests in a task.
+
+Applications may **summarize older exchanges, exclude earlier portions, or retrieve selected facts** rather than forwarding every visible message. Do not assume the whole displayed thread is always resent or that all past details remain available. See [What Is Context?](../llm-mechanics/what-is-context.md) for what is available in a call and [Context Amount, Computation, and Cost](../llm-mechanics/context-compute-and-cost.md) for usage accounting.
+
+### Prompt caching does not remove old text from context
+
+Some providers use **prompt caching** to reuse computed states for a matching prefix of instructions and earlier conversation. It can reduce processing work, latency or price under supported conditions. But **the reused content still belongs to the context the model can attend to**. Reusing computation is not the same as omitting past messages or increasing the context window.
+
+The [OpenAI prompt caching documentation](https://developers.openai.com/api/docs/guides/prompt-caching) describes reusing matching prompt prefixes. Summarization or truncation may change a prefix and reduce cache reuse. Use provider usage fields to check cache reuse, and **do not add cached tokens a second time to the total input**.
+
+A fresh chat can keep irrelevant earlier work out of the next task's context. It can also require duplicated shared instructions and sources or lose cache reuse. **Splitting does not guarantee lower total tokens or lower bills.**
+
+### Handoff for a fresh chat
+
+Instead of pasting a whole conversation, provide the smallest reliable handoff:
+
+~~~text
+Goal: Reflect the existing settings-save behavior in user documentation
+Decision and reason: What changed and where the supporting decision is recorded
+Constraints: Preserve the existing settings-file format
+Original sources: Specification, code and exact revision or diff
+Checks: Commands run, target revision, results and evidence locations
+Open questions: Unresolved issues and unverified areas
+Allowed work: Edit documentation only; do not edit program code
+~~~
+
+This is a template, **not evidence of completed work**. Verify the revision and sources before reusing conclusions. Some applications automatically attach project instructions, memory, or documents to a new chat; check what the model actually receives.
+
+### Do not split tasks too finely
+
+A bug investigation and its reproduction tests may belong together because their sequence matters. Starting an independent agent and writing a handoff for every tiny question can increase repeated input and coordination work.
+
+When measuring whether chat splitting helps, use **equivalent completion criteria** and count all inputs, outputs, handoffs, retries, and separate chats. Savings achieved by omitting required specifications or tests are not a successful comparison. For measurement methods see [Build context-use estimates by task kind](estimate-context-use-by-task.md).
+
 ## Decide how much separation is useful
 
 | Situation | Approach to try | Example criterion |

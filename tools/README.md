@@ -1,215 +1,66 @@
-# Tools
+# ObaPickの補助ツール
 
-AIへ渡す情報量を減らすための前処理・routing・validation補助ツール群です。
+AIにコードの修正を頼む前に、**関係するファイル・仕様・テストを見つける**ための道具です。大きなコードや長いログを、そのままAIへ全部渡さずに済むよう、候補を探したり、必要な部分を取り出したりできます。
 
-各ツールがどの作業方法を補助するか、また使わなくてよい場合は、[手法とツールの対応表（日本語）](../docs/jp/手法/手法と補助ツールの対応表.md)または[英語版](../docs/en/methods/tool-method-map.md)を参照してください。手法の説明が原典であり、ツールはすべて任意です。
+**ツールは必須ではありません。** ObaPickの[手法一覧](../docs/jp/手法/困りごとから手法を探す.md)にある依頼文や考え方は、普段のAIと既存の検索機能だけでも使えます。今回の作業が普通の検索で済むなら、追加のツールを導入する必要はありません。
 
-## Entry
+## どんなことができるか
 
-```text
-Windows: tools/setup.bat <project-root>
-Linux/macOS: tools/setup.sh <project-root>
-```
+| やりたいこと | 最初に試すもの | 得られる結果 |
+| --- | --- | --- |
+| プロジェクトを調べる準備をする | `acr-toolbox analyze` | 対象フォルダーのファイルや言語などの概要 |
+| 使えそうな調査方法を知る | `acr-toolbox select` | 今回利用できる道具の候補と、使う場面の案内 |
+| 関係するコードを探す | `acr-toolbox search` | 検索語が見つかったファイルと位置の候補 |
+| 名前や拡張子でファイルを探す | `acr-toolbox find` | 条件に合うファイルの場所 |
+| 修正後に何を検査するか考える | [validation-plan](common/medium/validation-plan/README.md) | 変更ファイルに応じた確認方法の候補 |
+| コードの依存関係を詳しく調べる | [source-structure-index](common/large/source-structure-index/README.md) | 定義や利用先を見つけるための索引 |
 
-不足runtime / SDKは自動installしません。利用可能なnative / Python / external toolだけを候補化します。セットアップ時はcompatibleなSmall language analyzerだけ自動実行し、full resultは対象projectの `.acr/language/` へ保存します。
+これらの結果は**調査の候補**です。検索で見つけた名前だけで不具合の原因を決めたり、テスト候補を表示しただけで検査が完了したと扱ったりしないでください。元のコードと仕様を確認し、必要なテストを実行します。
 
-通常のrouting入口は次です。
+ツールと説明している手法の対応を調べたい場合は、[手法と補助ツールの対応表](../docs/jp/手法/手法と補助ツールの対応表.md)を開いてください（[English](../docs/en/methods/tool-method-map.md)）。
 
-```text
-analyze-and-recommend / acr-toolbox analyze
-  -> repository / runtime facts
-  -> tool-selector / acr-toolbox select
-  -> orient -> search -> scope -> inspect -> validate -> stop
-```
+## 最初に試す（配布済みの実行ファイル）
 
-`analyze` は同じtoolを重複して推薦しません。推薦するtoolの順序と、調査を終える条件は `tool-selector` / `acr-toolbox select` が決めます。
+[GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases/latest)から、お使いのOSとCPUに対応する**配布用の圧縮ファイル**を選んで展開します。実行ファイルだけを試すなら、GoやPythonを新しくインストールする必要はありません。配布物の選び方や展開方法は[約5分で試す手順](../docs/jp/導入/AIに渡す資料を選ぶ道具を試す.md)にあります。
 
-## Development routing
+展開先でターミナルを開き、**調べたいプロジェクトのフォルダー**を引数に指定します。ここで示すパスは例なので、自分の環境に置き換えてください。
 
-`tools/` 自体にもContext Reducerを適用します。
+**Windows（コマンドプロンプト）**
 
-```text
-tools/README.md
-  -> tools/AI_CONTEXT.md
-  -> target subtree local guide
-  -> target tool README
-  -> taskに対応するsource / tests / run-or-build script
-  -> direct dependency only if needed
-```
+~~~text
+.\acr-toolbox.exe analyze "C:\path\to\project"
+.\acr-toolbox.exe select "C:\path\to\project"
+.\acr-toolbox.exe search --max-results 20 "save" "C:\path\to\project\src"
+~~~
 
-Goal・入出力契約・変更対象・validationが揃ったら探索を止めます。
+**Linux・macOS**
 
-分割もこの目的で行います。変更内容から関係するfileへ進み、無関係な処理を読まずに必要な確認まで行える構造を優先します。
+~~~text
+./acr-toolbox analyze "/path/to/project"
+./acr-toolbox select "/path/to/project"
+./acr-toolbox search --max-results 20 "save" "/path/to/project/src"
+~~~
 
-### Self-application examples
+- `analyze` は概要を調べます。修正箇所を自動で特定するコマンドではありません。
+- `select` は利用可能な方法と候補の順序を案内します。表示された操作をすべて実行する必要はありません。
+- `search` は、例では `save` を含む場所を探し、表示する結果を最大20件に制限します。探す名前と対象フォルダーを変えて使います。
 
-次のtoolは、変更内容に応じて読む場所を絞り、各ファイルの役割を分け、必要な資料だけを読み、確認に必要な情報がそろったら調査を終える構成にしています。
+結果は項目名と値を持つ**JSON形式**で表示されます。最初は状態を示す項目、調べたフォルダー、候補のパスと選ばれた理由を確認してください。エラーや「途中で打ち切った」表示があれば、その範囲は未確認です。JSONの全内容を毎回AIへ貼る必要はありません。
 
-```text
-change-router
-context-pack-builder
-remote-delta
-architecture-boundary-router
-structural-search
-context-manifest
-context-budget
-policy-index
-doc-duplicate-hints
-source-structure-index
-tool-selector
-```
+AIが自分でファイルを開ける環境では、検索で見つかったパスを渡して**元コードと関連テストを読ませる**と、無関係な大量の本文を添付せずに進められます。ファイルを読めないチャットには、必要なコード・仕様・テストを添付します。
 
-複数の変更理由を持つ場合、必要に応じて次の責務へ分離します。
+## ツールを増やさない方がよいとき
 
-```text
-entrypoint      -> CLI / compact output
-commander       -> orchestration / routing
-messenger       -> Git / filesystem / external process / profile等のboundary I/O
-processing      -> matching / analysis / rendering
-```
+一つの関数名を探すだけなら、手元のエディターの検索で十分な場合があります。すでに `rg` などを使っている場合も、同じための道具を追加せずに済みます。
 
-小さい単一責務toolは形式だけでは分割しません。分割後にagentのworking setが実際に小さくなる場合だけ採用します。
+専用の検索・解析器が必要な場合は、プロジェクトの既存ツールを優先してください。ObaPickの補助ツールは、自動で不足する言語環境やSDKをインストールしません。使えない解析があれば、その旨を確認して別の方法を選びます。
 
-## Output policy
+## ソースから使う場合と、詳しい説明
 
-Machine outputの共通契約は `tools/JSON_CONTRACT.md` をSource of Truthとします。
-対象Python CLIのstatusとprocess exit code対応表は `tools/PYTHON_CLI_EXIT_POLICY.md` を参照してください。
+手元のソースから必要な補助ツールを選ぶ場合は、Windowsの `tools/setup.bat`、Linux・macOSの `tools/setup.sh` を使えます。ソースからのセットアップは実行可能な解析器などを調べ、対象プロジェクトの `.acr/language/` に結果を保存する場合があります。**配布済み実行ファイルを試す手順とは別**です。
 
-- JSONが自然な結果形式なら、README/helpを毎回読まなくても意味が分かる自己説明的JSONを優先する
-- 同じ事実をprose summaryとstructured fieldへ二重に入れない
-- successful empty / unavailable / failure / truncated / unknownを区別する
-- agent向け出力はbounded / compact
-- full source / full log / full treeを既定出力にしない
-- uncertainty / fallback / truncationを明示する
-- 原典へ戻れるpath / symbol / reasonを残す
-- 変更に関係する確認を優先する
-- Markdown生成など成果物形式自体が目的のtoolは、無理にJSON化しない
+- [acr-toolboxの詳しいコマンド説明](common/native/acr-toolbox/README.md)：コマンドの引数、結果と注意事項。
+- [各ツールと手法の対応](../docs/jp/手法/手法と補助ツールの対応表.md)：必要なツールだけ選ぶ。
+- [導入時に追加インストールを減らす考え方](../docs/jp/手法/追加インストールを減らしてツールを使う.md)：使える実行環境と配布済みツールの選び方。
+- [ツールの内部構成・開発・検証](DEVELOPMENT.md)：コマンドの担当ファイル、外部プログラムとの境界、共通の出力方針。**ツールを使い始めるだけなら読む必要はありません。**
 
-Tool内部では、agentの探索を置き換えるためにscope全体やfile本文を読んで構いません。精度を落としてまで内部I/Oを減らすことは目的ではありません。
-
-```text
-agent context should be bounded
-internal work may be broad
-accuracy > internal scan minimization
-```
-
-## Python / Go
-
-Python版とGo版は独立実装です。
-
-- Python: build不要。stdlib中心。必要なら `run.bat` / `run.sh`
-- Go: stdlib中心。`build.bat` / `build.sh` で test + build
-- generic toolは合理的なら両方へ実装する
-- 共有コードではなくCLI契約・fixture・testで整合を取る
-
-## Validation
-
-`.github/workflows/test-tools.yml` は `tools/**` 更新時に次を検証します。
-
-```text
-Python -> compileall + 各 tests/test_*.py をstdlibだけで実行
-Go     -> tools配下の全 go.mod を列挙して go test ./...
-```
-
-portable binary buildも `go test ./...` 成功後だけartifact buildへ進みます。
-
-## Native toolbox
-
-`tools/common/native/acr-toolbox` はCommon機能のportable Go binaryです。Release buildでは `acr-toolbox version` でversion / commit / OS / architectureを確認できます。
-
-主なsubcommand:
-
-```text
-analyze select search find tree stats doc-index slice
-compact-log compact-diff remote-delta git-history-health syntax-health
-structure-index context-budget hotspot-report context-manifest context-pack-builder
-change-router validation-plan responsibility-candidates policy-index
-doc-duplicate-hints ignore-candidates acceptance-extractor exploration-stop-check
-materialize scoped-guides policy-check template version language-setup language-run language-medium-run language-large-plan language-large-run language-env env
-```
-
-## Categories
-
-```text
-common/small   shallow profile / cheap search
-common/medium  routing / direct dependency / task context
-common/large   graph / context-cost / whole-scope analysis
-python         Python-specific analysis
-go             Go-specific analysis
-csharp/c/cpp/gdscript
-profiles       optional project-type / routing input
-```
-
-## Related methods
-
-The method guides explain what to do and when. This README and each tool README explain implementation details. Keep the complete method-to-tool correspondence in the [method and tool map](../docs/jp/手法/手法と補助ツールの対応表.md) ([English](../docs/en/methods/tool-method-map.md)) rather than maintaining a second routing list here.
-
-When you want to avoid asking users to install another runtime or SDK, start with [追加インストールを減らしてツールを使う](../docs/jp/手法/追加インストールを減らしてツールを使う.md) ([English](../docs/en/methods/use-tools-without-extra-installs.md)). It explains how to choose among an already available runtime, a prebuilt native tool, and an available fallback. [language-setup](common/small/language-setup/README.md) reports which analyzers are usable without installing missing dependencies; [materialize-tools](common/small/materialize-tools/README.md) copies selected portable tools into a destination without installing a runtime. [tool-selector](common/small/tool-selector/README.md) also marks tools whose required backend is unavailable.
-
-The main command groups are repository inspection, search and slicing, language analysis, task and validation routing, context preparation, and template generation. See the command index below or the native toolbox guide for available commands.
-
-`tool-selector` は候補を `orient -> search -> scope -> inspect -> validate -> stop` の順で返します。各entryは `phase / activation / availability / reason` を持ち、external backendが必要なtoolは利用可能性もrouting時点で反映します。
-
-`structural-search` はplain text searchでは候補が広すぎる場合に構文形状で絞ります。既に `ast-grep` があればbackendとして再利用し、無ければPython sourceだけstdlib AST fallbackを使います。外部toolは自動installしません。
-
-`source-structure-index` はlanguage-specific analyzerや外部indexerの結果を共通IRへ正規化し、full indexをagentへ再出力せず、`query` / bounded `expand` で必要部分だけ返します。SCIP / Tree-sitter等の完全再実装ではありません。Python版と `acr-toolbox structure-index` は同じindex formatを読み書きしますが、実装コードは共有しません。
-
-`context-manifest` は、候補ファイルの場所を目録にまとめる実装です。repository-wideの全file listやtool固有のpriorityを、作業対象の判断に使うものではありません。
-
-`context-budget` / `hotspot-report` は、候補の大きさや推定costなどを簡潔に示します。これらの値は作業との関連性を判定せず、上位候補を自動的に読む対象にするものでもありません。
-
-`doc-duplicate-hints` は、似た説明がある箇所を候補として示すだけです。どれが原典か、意図した繰り返しか、削除できるかは判断せず、自動削除・統合もしません。
-
-`ignore-candidates` は、通常は読まなくてよい可能性があるpathを候補として示すだけです。原典かどうかの判断や `.gitignore` の変更は行いません。検証に必要な生成物は作業に応じて扱います。
-
-`syntax-health` は、利用可能な解析器の結果を簡潔に示します。構文確認の成功を、動作の正しさや作業完了とはみなしません。解析器や文法定義を自動で導入するものでもありません。
-
-`architecture-boundary-router` は、対象projectが用意した担当範囲や接続関係の情報から、調査を始める候補を示します。特定の設計方式への適合は検査しません。
-
-手法の説明: [資料の場所を短い一覧にする](../docs/jp/手法/資料の場所を短い一覧にする.md)、[今回読むファイルを選ぶ](../docs/jp/手法/今回読むファイルを選ぶ.md)、[同じ説明を何度も書かない](../docs/jp/手法/同じ説明を何度も書かない.md)、[AIに普段読ませないファイルを決める](../docs/jp/手法/AIに普段読ませないファイルを決める.md)、[まず、コードの構文チェックをする](../docs/jp/手法/まず、コードの構文チェックをする.md)、[機能ごとのコードの分け方から読む場所を決める](../docs/jp/手法/機能ごとのコードの分け方から読む場所を決める.md)
-
-UPD Commanderを含む外部設計手法は、tools内部の責務分離や実装構造の参考にできますが、ai-context-reducerの機能要件・適合条件・標準architectureにはしません。
-
-## External integration boundaries
-
-External programs are optional dependencies. This table records which functions the repository reuses, what portable fallback it provides, and which advanced implementations it intentionally delegates. It is a maintenance reference for `tools/`, not a list of product recommendations; see [External Tool Reference Policy](../.github/documentation/external-tool-reference-policy.ja.md) before adding a product link to public method documentation.
-
-| Capability | External example | Repository-local fallback | Delegated / unsupported |
-|---|---|---|---|
-| Fast text search | ripgrep | `acr-toolbox search` | full ripgrep-compatible CLI / all optimizations |
-| File discovery | fd | `acr-toolbox find` | full fd-compatible filters / UX |
-| Syntax / structural search | ast-grep | `structural-search` (Python AST fallback) | multi-language AST rule engine / rewrite engine |
-| Affected test routing | Nx / Pants | `affected-tests`, `structure-index affected` | full build-graph / coverage engine |
-| Scoped AI instructions | agent-native scoped instructions | `scoped-guides` | reproduction of agent-specific precedence |
-| Policy checking | ast-grep / Semgrep, etc. | `policy-check` | AST / dataflow / taint / semantic rule engine |
-| Canonical templates | Copier / Cookiecutter | `template` | Jinja2 compatibility / Copier update algorithm |
-| Source / semantic index | SCIP / Universal Ctags | `structure-index` adapters + portable language analyzers | full SCIP compiler / indexer reimplementation |
-| Syntax health | Tree-sitter | existing Tree-sitter integration when available | automatic grammar / runtime installation |
-| Git repository health | git-sizer | `git-history-health` adapter / fallback routing | full Git object analyzer reimplementation |
-
-Use an available high-quality external backend when it is justified; otherwise use the repository fallback. If a task needs a delegated feature, report that dependency or limitation rather than silently treating an approximate fallback as equivalent.
-
-## Core rules
-
-- full source / logs / docsをagentへ再出力しない
-- generated outputをSource of Truthにしない
-- runtime / SDK / packageを勝手にinstallしない
-- Small repoへ不要なLarge解析を持ち込まない
-- external toolが既にある場合は高品質backendとして使ってよい
-- toolの維持コストがagent-context削減効果を上回るなら追加しない
-
-詳細は各tool README、`tools/AI_CONTEXT.md`、`tools/JSON_CONTRACT.md`、`tools/NATIVE_COVERAGE.md`、`docs/jp/手法/追加インストールを減らしてツールを使う.md`、`docs/internal/jp/追加インストールを減らすツール運用.md` を参照してください。
-
-
-## Language portability
-
-```text
-Small  -> acr-toolbox native shallow symbols
-Medium -> acr-toolbox native dependency/project-map fallback
-Large  -> existing SDK/compiler/parser when justified
-```
-
-Small/Medium routingはPythonや各言語SDKが無くても成立します。Largeや高精度解析だけ既存runtime/compiler/parserを利用し、自動installはしません。
-
-
-Large解析は `language-large-plan` でbackend候補を確認してから、必要な場合だけ `language-large-run --allow-heavy` を明示実行します。SCIP / Universal Ctags が利用可能なら source-structure-index へ統合し、無ければMedium evidenceで止めます。

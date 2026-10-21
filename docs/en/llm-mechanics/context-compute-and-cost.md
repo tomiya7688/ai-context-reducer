@@ -126,6 +126,8 @@ A cache hit can lower cost or processing time without freeing space in the conte
 
 Calculate real prices using the applicable categories: ordinary input, cache reads, sometimes cache writes, output, and others. Check totals and component definitions so cached input is not added twice to ordinary input. [5][6]
 
+For a practical example of why cache reuse does not justify keeping unrelated tasks in the same conversation, see [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md).
+
 ## Visible answer length is not sufficient either
 
 Some reasoning models generate reasoning tokens that are not directly displayed to the user. For example, OpenAI documents that these occupy context space and are billed as output. Which information is carried into another call depends on the model and settings. [7]
