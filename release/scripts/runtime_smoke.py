@@ -66,6 +66,13 @@ def gui_smoke(bundle, project, env, work):
                 result = json.load(response)
             if result["result"]["state"] != "success":
                 raise RuntimeError(f"GUI failed to execute packaged CLI: {result}")
+            heavy = json.dumps({"action_id": "large-run", "project_root": str(project), "values": {}}).encode()
+            request = urllib.request.Request(url + "/api/run", data=heavy,
+                                             headers={"Content-Type": "application/json", "X-ACR-Session": token.group(1)})
+            with opener.open(request, timeout=10) as response:
+                result = json.load(response)
+            if result["result"]["state"] != "confirmation_required":
+                raise RuntimeError("GUI executed heavy analysis without confirmation")
         finally:
             process.terminate()
             try:
@@ -102,6 +109,18 @@ def main():
             name = "analyze.bat" if os.name == "nt" else "analyze.sh"
             command = [shell, "/d", "/c", str(bundle / name), str(project)] if os.name == "nt" else [shell, str(bundle / name), str(project)]
             run_json(command, env, project)
+            name = "setup.bat" if os.name == "nt" else "setup.sh"
+            command = [shell, "/d", "/c", str(bundle / name), str(project)] if os.name == "nt" else [shell, str(bundle / name), str(project)]
+            result = subprocess.run(command, env=env, cwd=project, capture_output=True, text=True, timeout=30)
+            if result.returncode != 0 or result.stderr.strip():
+                raise RuntimeError(f"packaged setup failed: {result.returncode}: {result.stderr}")
+            decoder, remaining, reports = json.JSONDecoder(), result.stdout.strip(), []
+            while remaining:
+                report, end = decoder.raw_decode(remaining)
+                reports.append(report)
+                remaining = remaining[end:].strip()
+            if len(reports) != 5:
+                raise RuntimeError("packaged setup omitted an operation")
             gui_smoke(bundle, project, env, work)
         if list(home.rglob("*")):
             raise RuntimeError("distribution modified the isolated user home")
