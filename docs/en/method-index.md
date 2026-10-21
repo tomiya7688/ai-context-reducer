@@ -45,6 +45,8 @@ Choose the row closest to your current problem, then read one linked guide. You 
 
 - A needed file or log exceeds one read: [Split long files and logs into parts for the AI](methods/splitting-long-files-and-logs.md) — record the source snapshot and coverage, then compare per-part findings against original evidence.
 
+- A web page contains much more text or many more controls than the task requires: [Give the AI only the relevant parts of a web page](methods/retrieve-relevant-webpage-information.md) — select evidence by task, keep source references and retrieve more if needed.
+
 - Readers cannot find setup or sources to give the AI from the README: [Write a README for people and AI](methods/write-readme-for-people-and-ai.md) — provide purpose-based entry points, actual references, and explicit reading instructions.
 
 ### For your first code change
