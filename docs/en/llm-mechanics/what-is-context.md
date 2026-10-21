@@ -8,6 +8,8 @@ Why can you ask an LLM to “fix the function from earlier”? Did it permanentl
 
 We follow the application that supplies information separately from the model that computes an output. Capacity limits are covered in [What Is a Context Window?](what-is-a-context-window.md), and processing and billing in [Context Amount, Computation, and Cost](context-compute-and-cost.md).
 
+For practical guidance on keeping unrelated history out of new tasks, see [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md). Saved conversations and content actually provided to a model are not the same thing.
+
 ## Why are instructions alone not enough?
 
 Suppose you ask two fictional applications to “fix the setting that disappears after restarting.”
