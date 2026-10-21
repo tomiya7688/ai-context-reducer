@@ -8,6 +8,9 @@ on:
       - 'tools/**'
       - 'release/**'
       - 'README.md'
+      - 'README.en.md'
+      - 'docs/**'
+      - 'templates/**'
       - 'LICENSE'
       - '.github/workflows/release.yml'
     tags:
@@ -17,13 +20,26 @@ on:
       version:
         description: 'Candidate version without v prefix'
         required: true
-        default: '1.0.1'
+        default: '1.0.0'
         type: string
       publish:
         description: 'Publish GitHub Release after every gate passes (requires matching existing tag)'
         required: true
         default: false
         type: boolean
+      approved_commit:
+        description: 'Exact validated commit approved for publication (empty for validation only)'
+        required: false
+        default: ''
+        type: string
+  pull_request:
+    paths:
+      - 'tools/**'
+      - 'release/**'
+      - 'docs/**'
+      - 'templates/**'
+      - 'README*'
+      - '.github/workflows/release.yml'
 permissions:
   contents: write
 
@@ -42,16 +58,19 @@ jobs:
       - name: Resolve release version
         id: version
         shell: bash
+        env:
+          CANDIDATE_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            version="${{ inputs.version }}"
+            version="$CANDIDATE_VERSION"
           elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
             version="${GITHUB_REF_NAME#v}"
           else
-            version="1.0.1"
+            version="1.0.0"
           fi
           [ -n "$version" ]
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
           echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Repository consistency
         shell: bash
@@ -63,6 +82,13 @@ jobs:
           test -f release/RELEASE_MANIFEST.json
           bash -n release/scripts/acceptance.sh
           bash -n release/scripts/acr_hub_loopback_smoke.sh
+      - name: Validate release builder and documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python release/scripts/test_full_bundle.py
+          python .github/scripts/test_validate_documentation.py
+          python .github/scripts/validate_documentation.py .
       - name: Compile and test all Python tools
         shell: bash
         run: |
@@ -125,20 +151,27 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Resolve release version and bundle path
         shell: bash
+        env:
+          CANDIDATE_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            version="${{ inputs.version }}"
+            version="$CANDIDATE_VERSION"
           elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
             version="${GITHUB_REF_NAME#v}"
           else
-            version="1.0.1"
+            version="1.0.0"
           fi
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
           echo "RELEASE_VERSION=$version" >> "$GITHUB_ENV"
           echo "RELEASE_TAG=v$version" >> "$GITHUB_ENV"
           echo "BUNDLE=$RUNNER_TEMP/ai-context-reducer-v$version-${{ matrix.name }}" >> "$GITHUB_ENV"
+          echo "FULL_BUNDLE=$RUNNER_TEMP/ai-context-reducer-full-v$version-${{ matrix.name }}" >> "$GITHUB_ENV"
       - name: Build exact user distribution
         shell: bash
         run: |
@@ -170,16 +203,20 @@ jobs:
           )
           echo "GUI_HUB_BIN=$GUI_HUB_BIN" >> "$GITHUB_ENV"
 
-          cp README.md "$BUNDLE/README.md"
-          cp tools/README.md "$BUNDLE/TOOLS_README.md"
+          cp release/README.cli.md "$BUNDLE/README.md"
+          cp release/README.cli.md "$BUNDLE/TOOLS_README.md"
           cp LICENSE "$BUNDLE/LICENSE"
           cp release/RELEASE_MANIFEST.json "$BUNDLE/RELEASE_MANIFEST.json"
+          python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["BUNDLE"])/"RELEASE_MANIFEST.json"; d=json.loads(p.read_text()); d["release_version"]=os.environ["RELEASE_VERSION"]; p.write_text(json.dumps(d,indent=2)+"\n")'
+          python release/scripts/full_bundle.py build --repo . --normal "$BUNDLE" --gui "$GUI_HUB_BIN" --bundle "$FULL_BUNDLE" --version "$RELEASE_VERSION"
       - name: Execute full user-distribution acceptance suite
         shell: bash
         run: |
           set -euo pipefail
           bash release/scripts/acceptance.sh "$BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance"
-          bash release/scripts/acr_hub_loopback_smoke.sh "$BUNDLE" "$GUI_HUB_BIN" "$RUNNER_TEMP/acr-hub-smoke-bundle"
+          bash release/scripts/acceptance.sh "$FULL_BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/full-release-acceptance"
+          python release/scripts/runtime_smoke.py "$BUNDLE"
+          python release/scripts/runtime_smoke.py "$FULL_BUNDLE" --full
       - name: Verify Windows setup.bat exit propagation
         if: runner.os == 'Windows'
         shell: pwsh
@@ -192,6 +229,9 @@ jobs:
           archive="$RUNNER_TEMP/ai-context-reducer-v$RELEASE_VERSION-${{ matrix.name }}.tar.gz"
           tar -C "$RUNNER_TEMP" -czf "$archive" "$(basename "$BUNDLE")"
           echo "ARCHIVE=$archive" >> "$GITHUB_ENV"
+          full_archive="$RUNNER_TEMP/ai-context-reducer-full-v$RELEASE_VERSION-${{ matrix.name }}.tar.gz"
+          tar -C "$RUNNER_TEMP" -czf "$full_archive" "$(basename "$FULL_BUNDLE")"
+          echo "FULL_ARCHIVE=$full_archive" >> "$GITHUB_ENV"
       - name: Package zip distribution
         if: matrix.archive == 'zip'
         shell: pwsh
@@ -203,6 +243,11 @@ jobs:
           Compress-Archive -Path $leaf -DestinationPath $archive -Force
           Pop-Location
           "ARCHIVE=$archive" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          $fullArchive = Join-Path $env:RUNNER_TEMP "ai-context-reducer-full-v$env:RELEASE_VERSION-${{ matrix.name }}.zip"
+          Push-Location (Split-Path -Parent $env:FULL_BUNDLE)
+          Compress-Archive -Path (Split-Path -Leaf $env:FULL_BUNDLE) -DestinationPath $fullArchive -Force
+          Pop-Location
+          "FULL_ARCHIVE=$fullArchive" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Verify packaged archive by extracting it again
         shell: bash
         run: |
@@ -236,11 +281,24 @@ jobs:
           fi
 
           bash release/scripts/acceptance.sh "$extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance-extracted"
-          bash release/scripts/acr_hub_loopback_smoke.sh "$extracted" "$GUI_HUB_BIN" "$RUNNER_TEMP/acr-hub-smoke-bundle-extracted"
+          python release/scripts/runtime_smoke.py "$extracted"
+          full_verify="$RUNNER_TEMP/full-archive-verify"
+          mkdir -p "$full_verify"
+          case "$FULL_ARCHIVE" in
+            *.zip) unzip -q "$FULL_ARCHIVE" -d "$full_verify" ;;
+            *.tar.gz) tar -xzf "$FULL_ARCHIVE" -C "$full_verify" ;;
+            *) exit 1 ;;
+          esac
+          full_extracted="$full_verify/$(basename "$FULL_BUNDLE")"
+          python release/scripts/full_bundle.py verify --repo . --bundle "$full_extracted" --version "$RELEASE_VERSION"
+          bash release/scripts/acceptance.sh "$full_extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/full-acceptance-extracted"
+          python release/scripts/runtime_smoke.py "$full_extracted" --full
       - uses: actions/upload-artifact@v4
         with:
           name: release-v${{ env.RELEASE_VERSION }}-${{ matrix.name }}
-          path: ${{ env.ARCHIVE }}
+          path: |
+            ${{ env.ARCHIVE }}
+            ${{ env.FULL_ARCHIVE }}
           if-no-files-found: error
           retention-days: 14
 
@@ -254,16 +312,18 @@ jobs:
           pattern: release-v*
           path: release-assets
           merge-multiple: true
-      - name: Verify all six archives exist exactly once
+      - name: Verify all twelve archives exist exactly once
         shell: bash
+        env:
+          CANDIDATE_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            version="${{ inputs.version }}"
+            version="$CANDIDATE_VERSION"
           elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
             version="${GITHUB_REF_NAME#v}"
           else
-            version="1.0.1"
+            version="1.0.0"
           fi
           cd release-assets
           expected=(
@@ -274,13 +334,18 @@ jobs:
             "ai-context-reducer-v$version-macos-x64.tar.gz"
             "ai-context-reducer-v$version-macos-arm64.tar.gz"
           )
+          for platform in linux-x64 linux-arm64 windows-x64 windows-arm64 macos-x64 macos-arm64; do
+            suffix=tar.gz
+            [[ "$platform" != windows-* ]] || suffix=zip
+            expected+=("ai-context-reducer-full-v$version-$platform.$suffix")
+          done
           actual_count="$(find . -maxdepth 1 -type f \( -name '*.zip' -o -name '*.tar.gz' \) | wc -l | tr -d ' ')"
-          [ "$actual_count" -eq 6 ]
+          [ "$actual_count" -eq 12 ]
           for file in "${expected[@]}"; do
             test -s "$file"
           done
           sha256sum "${expected[@]}" > SHA256SUMS
-          test "$(wc -l < SHA256SUMS | tr -d ' ')" -eq 6
+          test "$(wc -l < SHA256SUMS | tr -d ' ')" -eq 12
       - name: Upload final release candidate set
         uses: actions/upload-artifact@v4
         with:
@@ -298,7 +363,7 @@ jobs:
       - source-validation
       - distribution-e2e
       - verify-release-set
-    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish)
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -310,10 +375,13 @@ jobs:
           path: release-assets
       - name: Resolve tag
         shell: bash
+        env:
+          CANDIDATE_VERSION: ${{ inputs.version }}
+          APPROVED_COMMIT: ${{ inputs.approved_commit }}
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            tag="v${{ inputs.version }}"
+            tag="v$CANDIDATE_VERSION"
           else
             tag="$GITHUB_REF_NAME"
           fi
@@ -323,6 +391,10 @@ jobs:
           }
           tag_commit="$(git rev-list -n 1 "$tag")"
           validated_commit="$(git rev-parse HEAD)"
+          [ "$APPROVED_COMMIT" = "$validated_commit" ] || {
+            echo 'Publishing requires explicit approval of this exact commit.' >&2
+            exit 1
+          }
           [ "$tag_commit" = "$validated_commit" ] || {
             echo "tag $tag points to $tag_commit but validated commit is $validated_commit" >&2
             exit 1
