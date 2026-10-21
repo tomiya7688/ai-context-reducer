@@ -5,7 +5,8 @@
 | 文書 | 内容 |
 | --- | --- |
 | [workflow.md](workflow.md) | 作業の始め方から、PR・CI・自己レビュー・マージまでの手順 |
-| [coding-rules.md](coding-rules.md) | コードを書くときの決まりと、自己レビューの観点 |
+| [coding-rules.md](coding-rules.md) | コードと文書を変更するときの共通ルールと、自己レビューの観点 |
+| [documentation-writing-rules.md](documentation-writing-rules.md) | 利用者向け文書を書く場合の主語・行為主体・利用者と保守者の区別 |
 
 ## 置き場所の区別
 
