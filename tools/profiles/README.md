@@ -10,7 +10,7 @@
 | Data Tool | import/export, datasets, converters | dry-run, disposable workspace, generated-data validation |
 | Packaged App | installer, publish, release, dist | artifact-boundary validation, artifact smoke |
 | Simulation / AI | random, physics, eval, seed | deterministic seam, fixed inputs, structured observation |
-| Rule-heavy | rules, protocols, specifications | Policy Routing, Responsibility Map, targeted checkers |
+| Rule-heavy | rules, protocols, specifications | 作業に関係する規則や担当箇所を探す、規則を確認するツール |
 
 ## Architecture routing profiles
 

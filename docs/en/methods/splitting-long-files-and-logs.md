@@ -108,7 +108,7 @@ Do not turn an investigation request into a source reorganization. If restructur
 
 ## How this relates to other guides
 
-[Choose which files to read](../context-priority.md) narrows candidate files. [Make a short list of where information lives](../context-manifest.md) provides starting points for finding necessary text. This guide handles selected text that is itself too long, including how to transfer it and record coverage.
+[Choose which files to read](context-priority.md) narrows candidate files. [Make a short list of where information lives](context-manifest.md) provides starting points for finding necessary text. This guide handles selected text that is itself too long, including how to transfer it and record coverage.
 
 ## Why this can reduce what the AI reads
 

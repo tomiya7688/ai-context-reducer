@@ -2,7 +2,7 @@
 
 対象環境で利用できるportable tool implementationだけを、安全にdeployment directoryへmaterializeします。
 
-これは実行環境をinstallするtoolではなく、選んだ補助ツールのファイルを指定先へ配置するtoolです。どの状況なら既存環境や配布済みtoolを選ぶかは[追加インストールを減らしてツールを使う](../../../../docs/jp/追加インストールを減らしてツールを使う.md)（[English](../../../../docs/en/portable-tools.md)）を参照してください。
+これは実行環境をinstallするtoolではなく、選んだ補助ツールのファイルを指定先へ配置するtoolです。どの状況なら既存環境や配布済みtoolを選ぶかは[追加インストールを減らしてツールを使う](../../../../docs/jp/手法/追加インストールを減らしてツールを使う.md)（[English](../../../../docs/en/methods/use-tools-without-extra-installs.md)）を参照してください。
 
 Copier / Cookiecutter等のversioned template運用から、Context Reducerに必要な次の考え方だけを取り込みます。
 
@@ -164,7 +164,7 @@ Native:
 - cross-platform replace / restore fallback: `safe_replace.go`
 - validation: `materialize_command_test.go`
 
-Windows replacement変更ならplannerを読む必要はなく、selection変更ならwrite pathを読む必要はありません。この分割は一般的なlayeringではなく、Context Reducer自身のTask RoutingとExploration Stopをtool開発へ適用するためです。
+Windowsでの置き換え処理を変更するときは、配置先の選択処理を読む必要はありません。逆に、配置先の選択処理を変えるときは書き込み処理だけを読めば足ります。必要な処理から調べ始め、関係する範囲を確認したら調査を終えられるように分けています。
 
 ## Validation
 

@@ -7,7 +7,7 @@ body:
     attributes:
       label: 対象文書
       description: READMEまたはdocs内のpathを書いてください。
-      placeholder: docs/jp/コンテキスト削減の基本.md
+      placeholder: docs/jp/手法/AIに読む情報を絞る3つの方法.md
     validations:
       required: true
 

@@ -129,7 +129,7 @@ The same procedure applies in this repository when missing methods become Issues
 4. Record verification and remaining work. Update the Issue state when its completion criteria are met.
 5. After receiving the report, you send the next signal.
 
-After choosing a task, use the [task-type starting-point guide](../task-routing.md) to determine what to read first. This guide chooses the next task; the starting-point guide chooses where to begin reading for that task.
+After choosing a task, use the [task-type starting-point guide](task-routing.md) to determine what to read first. This guide chooses the next task; the starting-point guide chooses where to begin reading for that task.
 
 ## How this differs from automatic repetition
 
@@ -160,4 +160,3 @@ An AI repeatedly receiving results and choosing and performing its next operatio
 ## References
 
 1. Shunyu Yao et al. (2023). [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629v3). ICLR 2023, arXiv:2210.03629v3, Section 2.
-

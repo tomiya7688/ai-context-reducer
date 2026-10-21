@@ -4,7 +4,7 @@
 
 **Give AI only the context it needs.**
 
-English | [日本語](README.md)
+[日本語](README.md) | English
 
 This project helps people using AI choose the code and documents to provide for a task. It includes four kinds of resources:
 
@@ -15,7 +15,7 @@ This project helps people using AI choose the code and documents to provide for 
 
 You can start by giving example requests or completed templates to the AI you already use. Helper tools are also available when you want to spend less effort investigating, checking, or creating documents. Instructions, code, documents, search results, and check results provided to an AI for a task are called its **context**.
 
-[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [AI usage FAQ](docs/en/ai-usage/faq.md) · [Coding agents guide](docs/en/ai-usage/coding-agent-overview.md) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/method-index.md)
+[Latest release](https://github.com/tomiya7688/ai-context-reducer/releases/latest) · [AI usage FAQ](docs/en/ai-usage/faq.md) · [Coding agents guide](docs/en/ai-usage/coding-agent-overview.md) · [Try a helper tool in about five minutes](docs/en/adoption/getting-started.md) · [Method Index](docs/en/methods/method-index.md)
 
 Published v1.0.0 supports Windows, Linux, and macOS on x64 and arm64. Its overview and suggestion commands do not require installing a language runtime.
 
@@ -42,16 +42,18 @@ Limiting the reading scope reduces the unrelated screen and feature code you pro
 
 A fixed synthetic repository compares three tasks under two strategies: send all 15 eligible files to AI context, or run a literal search first and send only the 3 matching files. All predefined required evidence remains present in all three tasks, while the total AI-visible character count falls from 14,478 to 3,543, a **75.5% reduction**.
 
-This is a fixed-fixture measurement, not a universal reduction rate or an actual LLM input-token measurement. The fixture, search conditions, script, and reference result are committed so the [Measured Context-Reduction Benchmark](docs/en/measured-context-reduction-benchmark.md) can be reproduced.
+This is a fixed-fixture measurement, not a universal reduction rate or an actual LLM input-token measurement. The fixture, search conditions, script, and reference result are committed so the [Measured Context-Reduction Benchmark](docs/en/ai-usage/measured-context-reduction-benchmark.md) can be reproduced.
 
-## Where to start
+## New here?
 
-Choose the path that matches your goal. You do not need to read every document.
+Start with [Getting started](docs/en/adoption/getting-started.md) to get a first result. Continue with the following guides if you want to understand the approach or adopt it in your project. You do not need to read every document.
 
-1. **Learn how LLMs work**: Start with [What Is an LLM?](docs/en/llm-mechanics/what-is-an-llm.md), then follow the guides through tokens, Transformers, Attention, training, code generation, and context use.
-2. **Learn the methods**: Read [Context Reduction Basics](docs/en/context-reduction-basics.md) for the overview, then choose one relevant guide from the [Method Index](docs/en/method-index.md). For a first code change, start with [Context Priority](docs/en/context-priority.md).
-3. **Apply them to your project**: Use [Adoption Priority](docs/en/adoption-priority.md) to choose a recurring problem, then use the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and procedures. Use the [AI_CONTEXT.md template](templates/AI_CONTEXT.md) to draft a short entry, then put it in an instruction file the active AI tool actually reads (such as `AGENTS.md` if supported).
-4. **Use a helper tool**: Choose a method first, then follow the [method-to-tool map](docs/en/tool-method-map.md) to a tool guide only if automation would help. Tools are optional.
+1. [Three ways to limit what the AI reads](docs/en/methods/context-reduction-basics.md) — how to reduce irrelevant information
+2. [Find a method by the problem you have](docs/en/methods/method-index.md) — a guide from common problems to explanations
+3. [Choose only the methods you need](docs/en/adoption/adoption-priority.md) — how to decide which guidance or tools to add
+4. [Ask AI to improve the project guide](docs/en/adoption/adoption-prompt.md) — a request you can give an AI to improve project guidance
+
+To learn how LLMs work, start with [What Is an LLM?](docs/en/llm-mechanics/what-is-an-llm.md) and follow the guides through tokens, Transformers, Attention, training, code generation, and context use. If you want to use a helper tool, choose a method first, then follow the [method-to-tool map](docs/en/methods/tool-method-map.md) to a tool guide only if automation would help. Tools are optional.
 
 To use a method, attach its guide to the request or tell the AI its path. It may not load the guide automatically; for recurring use, register it in instructions or settings that your AI tool actually reads.
 
@@ -61,60 +63,48 @@ To use a method, attach its guide to the request or tell the AI its path. It may
 - Why can equal call counts produce different usage and costs? [Context Amount, Computation, and Cost](docs/en/llm-mechanics/context-compute-and-cost.md)
 - What are the benefits beyond savings, and the risks of removing too much? [Context Amount and Use](docs/en/llm-mechanics/context-amount-and-use.md)
 
-## Three ways to narrow the information
+## Start with these habits
 
-### 1. Use a program to find mechanical facts first
+- Tell the AI the goal, conditions to preserve, and how to know it is done.
+- Search file names or contents before opening files, and start with relevant results.
+- Keep detailed explanations in one place; link to them elsewhere and say when to read them.
+- Broaden the search when important information is missing or shared code changes.
+- Run checks that match the change, and report anything you could not check.
 
-Search or analysis can find file names, function names, and references to other files, then narrow the candidates related to a change. This avoids asking the AI to read large amounts of code just to build a list and helps it reach the implementation it needs sooner. After narrowing the candidates, read the original code to understand its design and behavior.
+This lets the AI start work before reading unrelated files or long logs. Keep the documents and tests needed to confirm correctness; removing necessary information can lead to the wrong change.
 
-### 2. Package steps that are repeated
+## Find a guide by problem
 
-If the same steps are repeated to find the changed code and its tests, put them in a short guide or helper tool. The next task does not need to reinvent the search process. Do not build a system for one-time work or when maintaining it would take more effort than it saves.
+Use this table to find guidance for problems you encounter when asking an AI to do work.
 
-### 3. Read only the relevant parts
+| Problem | Guide |
+| --- | --- |
+| Each time I ask for work, I am unsure what information to give the AI | [Tell the AI where to start for each kind of work](docs/en/methods/task-routing.md), [Guide work by the kind of change](docs/en/methods/change-routing-map.md) |
+| I cannot decide what to ask the AI to change or how to judge completion | [Set the goal and finish conditions before work](docs/en/methods/design-and-completion-criteria.md) |
+| I cannot find the parts of a large codebase related to my request | [Choose which files to read](docs/en/methods/context-priority.md), [Find functions and where they are used](docs/en/methods/source-structure-index.md) |
+| I am unsure which method to use to inspect code | [Choose a language-appropriate method when analyzing code](docs/en/methods/analysis-depth-routing.md) |
+| The AI's investigation drags on, and I cannot tell when to stop | [Decide when the AI should stop investigating](docs/en/methods/exploration-control.md), [Before investigating, decide what checks can identify the cause](docs/en/methods/evidence-budget.md) |
+| I have to find tests again and cannot decide which checks to request | [Check a change in a way that matches what changed](docs/en/methods/validation-routing.md), [Decide which tests to run based on change impact](docs/en/methods/change-impact-routing.md) |
+| I keep including long rules or duplicate explanations in my requests to the AI | [Give the AI instructions for the files it will change](docs/en/methods/hierarchical-context.md), [Check only the rules that apply to this task](docs/en/methods/policy-routing.md), [Avoid repeating the same explanation](docs/en/methods/documentation-duplication-control.md) |
+| I have a concrete problem asking an AI for help | [AI usage FAQ](docs/en/ai-usage/faq.md), [Coding agents guide](docs/en/ai-usage/coding-agent-overview.md) |
+| I want to choose among several design options for this project | [Compare design options with project evidence](docs/en/methods/compare-design-options-with-project-evidence.md) |
+| I want to find why AI usage keeps growing and improve it | [Diagnose repeated context from work logs](docs/en/methods/diagnose-repeated-context-from-work-logs.md), [Estimate context use by task](docs/en/ai-usage/estimate-context-use-by-task.md) |
+| I repeatedly explain project rules or facts to the AI | [Templates for AGENTS.md, project context, and task notes](templates/README.md) |
 
-After locating the change, read the parts of the implementation, explanation, and tests needed for the task. This avoids reading everything, while keeping the evidence needed for decisions and verification. Return to the original material when checking the result.
+You do not need every method. Add one only when it addresses a repeated problem and saves more search or checking time than it takes to maintain.
 
-See [Context Reduction Basics](docs/en/context-reduction-basics.md) for a detailed explanation of these three methods.
+## Downloads and helper tools
 
-## What this repository contains
+Download files for Windows, Linux, and macOS from [GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases). For each operating system, files are available for common processors and ARM processors. The downloads include helper programs that search files and code, and find relationships between code and tests. They help locate only the relevant parts to pass to the AI, avoiding unrelated code and long search results.
 
-The main content is documentation and templates for guiding work and narrowing the information to read. It also has tools that help with tasks such as searching, creating indexes, and selecting checks. No tool is necessary for every project.
+The `acr-toolbox` program combines several helpers. Run it from a command prompt to show its version, inspect code, or choose the next investigation or check. The [helper tool list](tools/README.md) explains what each tool can do and how to use it. You can also keep using search and check methods you already have.
 
-- Start from a concrete problem asking an AI for help: [AI usage FAQ](docs/en/ai-usage/faq.md)
-- Learn the model mechanics behind context design: [What Is an LLM?](docs/en/llm-mechanics/what-is-an-llm.md)
-- See the fixed-fixture context measurement: [Measured benchmark](docs/en/measured-context-reduction-benchmark.md)
-- Find a method from the problem you have: [Method Index](docs/en/method-index.md)
-- Decide what to adopt in a project: [Adoption Priority](docs/en/adoption-priority.md)
-- Ask an AI to inspect an existing project: [Adoption Prompt](docs/en/adoption-prompt.md)
-- Template for a short AI entry guide: [AI_CONTEXT.md](templates/AI_CONTEXT.md)
-- Helper tool documentation: [tools/README.md](tools/README.md)
-
-## Try it in an existing project
-
-Start with [Adoption Priority](docs/en/adoption-priority.md) to pick one recurring problem, then use the [Adoption Prompt](docs/en/adoption-prompt.md) to review the existing guides and work procedures. After adoption, check whether it is easier to reach the needed code and tests, and whether any necessary checks were missed.
-
-## Tell the AI to use a method
-
-For one task, attach the selected method guide or name its path in the request, then adapt its example to your task. For recurring work, put a link and its scope in project instructions the AI actually reads. Which files load automatically depends on the AI tool, so check its settings.
-
-For example, to narrow the files and tests for a settings change, ask:
-
-```text
-The goal is to show why loading a setting failed.
-First list candidate locations for the settings loader and its related test, with paths and reasons.
-Check the selected original code and test, then make the needed change and run the test.
-At the end, report files read, checks run and results, and anything not verified.
-```
-
-The benefit is that unrelated files are not sent to the AI, reducing that input. Compare reported files, commands, and results with the diff or visible work log. If the environment has no read history or token measurement, do not claim a measured reduction; check that investigation was narrowed without omitting the required code or tests.
-
-## Downloads
-
-Helper tool releases are available from [GitHub Releases](https://github.com/tomiya7688/ai-context-reducer/releases). See [Releasing](docs/en/releasing.md) for supported environments, archive contents, and verification. You can also use the documentation ideas without installing any tools.
+Instructions for maintainers, such as how this repository packages and releases files, are under [docs/internal/](docs/internal/README.md). Users do not need to read them.
 
 ## Documentation
 
-Japanese documents are under [`docs/jp/`](docs/jp/), with English versions under [`docs/en/`](docs/en/). LLM foundations are separated under [`docs/en/llm-mechanics/`](docs/en/llm-mechanics/), while practical workflows remain in the [Method Index](docs/en/method-index.md) and method guides.
+Japanese guides are under [docs/jp/](docs/jp/), with English versions under [docs/en/](docs/en/). LLM foundations are under [docs/en/llm-mechanics/](docs/en/llm-mechanics/), while practical workflows are in the [Method Index](docs/en/methods/method-index.md) and the method guides. The [document map](docs/DOCUMENT_MAP.json) records which pages are translations of each other.
 
-The documentation and code in this repository are provided under the [MIT License](LICENSE). The mascot image ([assets/obapick-mascot.png](assets/obapick-mascot.png)) is separately subject to the [Tomiya Character License v1.0.1](https://github.com/tomiya7688/Tomiya_character_license/blob/main/LICENSE). See [mascot asset terms](assets/README.md). External projects and content remain subject to the licenses from their respective distributors.
+## License
+
+This repository is provided under the [MIT License](LICENSE), including its documents, designs, templates, and programs. The mascot image ([assets/obapick-mascot.png](assets/obapick-mascot.png)) is separately subject to the [Tomiya Character License v1.0.1](https://github.com/tomiya7688/Tomiya_character_license/blob/main/LICENSE). See [mascot asset terms](assets/README.md). External projects and content remain subject to the licenses from their respective distributors.

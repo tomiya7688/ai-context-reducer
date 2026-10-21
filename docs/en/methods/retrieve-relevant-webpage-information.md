@@ -6,7 +6,7 @@ When asking an AI to inspect a web page, do not automatically give it every line
 
 For example, a management page may contain hundreds of product rows. If the task concerns one product's inventory, search for its ID and select the matching row together with its column headers. If the selected content is insufficient, **return to the original page and examine more of it** rather than guessing.
 
-This guide focuses on web-page-specific selection and safe interaction. For general tool selection see [Use External Tools](../external-tools.md), and for deciding which evidence is required see [Evidence Budget](../evidence-budget.md).
+This guide focuses on web-page-specific selection and safe interaction. For general tool selection see [Use External Tools](shorten-investigation-with-external-tools.md), and for deciding which evidence is required see [Evidence Budget](evidence-budget.md).
 
 ## Separate reading from changing the page
 

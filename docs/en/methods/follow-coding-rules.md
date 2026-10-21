@@ -26,7 +26,7 @@ Before having the AI write new rules, ask it to inspect these locations.
 | Check configurations and command lists | Automated rules and how to run them | Target files and enabled rules; a file alone does not ensure execution |
 | Existing code and tests | Component usage and required behavior | Older code may violate current rules |
 
-This repository explains finding rules in [Check rules related to the current change](../policy-routing.md) and using instructions by location in [Separate rules by location](../hierarchical-context.md).
+This repository explains finding rules in [Check rules related to the current change](policy-routing.md) and using instructions by location in [Separate rules by location](hierarchical-context.md).
 
 ### 2. Save concrete rules in one place
 

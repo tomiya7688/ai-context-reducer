@@ -177,7 +177,7 @@ You establish evidence and work boundaries before a large edit, and expand the s
 
 ### Learn more
 
-Use [Set design and completion criteria first](../design-and-completion-criteria.md), [Context Priority](../context-priority.md), and [Choose validation scope from the change's impact](../change-impact-routing.md).
+Use [Set design and completion criteria first](../methods/design-and-completion-criteria.md), [Context Priority](../methods/context-priority.md), and [Choose validation scope from the change's impact](../methods/change-impact-routing.md).
 
 ## The AI keeps adding classes, variables, functions, or logic with overlapping responsibilities
 
@@ -206,7 +206,7 @@ The AI checks whether project structure can be reused before adding another para
 
 ### Learn more
 
-Use [Source Structure Index](../source-structure-index.md) for definitions and callers, and [Have the AI read coding rules and check its changes](../methods/follow-coding-rules.md) for project reuse rules.
+Use [Source Structure Index](../methods/source-structure-index.md) for definitions and callers, and [Have the AI read coding rules and check its changes](../methods/follow-coding-rules.md) for project reuse rules.
 
 ## I pointed out one problem and want the AI to find the same kind elsewhere
 
@@ -241,7 +241,7 @@ It reduces over-generalization from one example and separates mechanical candida
 
 [Find the same problem from one example](../methods/find-same-problems-from-one-example.md) explains saving criteria, reviewing candidates, rechecking corrections, and recording inspection coverage.
 
-For code, [Source Structure Index](../source-structure-index.md) can help find candidates. For documents and configuration, inspect each candidate in its original context instead of deciding from a text match alone.
+For code, [Source Structure Index](../methods/source-structure-index.md) can help find candidates. For documents and configuration, inspect each candidate in its original context instead of deciding from a text match alone.
 
 ## Which model or editing mode should I use for a task?
 

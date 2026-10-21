@@ -38,7 +38,7 @@ acr-toolbox context-pack-builder --output CONTEXT_PACK.md <repo-root>
 - Native CLI / Git state / Markdown rendering: `tools/common/native/acr-toolbox/context_pack_command.go`
 - Native contract validation: `tools/common/native/acr-toolbox/context_generation_commands_test.go`
 
-分割は、ai-context-reducer自身の Task Routing / Responsibility Map / Targeted Validation をtool開発へ適用するために行います。小変更で無関係な責務を読ませないことを優先します。
+変更内容から読む場所を決め、担当ごとに処理を分け、小さな変更では無関係なコードを読まずに済むようにしています。
 
 ## Targeted validation
 

@@ -1,6 +1,6 @@
 # context-manifest
 
-Repository filesをagent向けpriority manifestへ圧縮します。manifestはrouting hintであり、原典ファイルの代替ではありません。手法そのものは [`docs/jp/参照先の目録（Context%20Manifest）.md`](../../../../docs/jp/参照先の目録（Context%20Manifest）.md) を参照してください。
+Repository filesをagent向けpriority manifestへ圧縮します。manifestはrouting hintであり、原典ファイルの代替ではありません。手法そのものは [資料の場所を短い一覧にする](../../../../docs/jp/手法/資料の場所を短い一覧にする.md) を参照してください。
 
 ## Usage
 
@@ -67,10 +67,10 @@ Native validation             -> tools/common/native/acr-toolbox/context_generat
 
 priority rule変更でfilesystem traversalを読む必要はありません。収集対象変更でpriority logicを読む必要もありません。
 
-## Context Reducer self-application
+## このツールの開発で重視すること
 
-- Responsibility Map: collectionとpriority classificationを分離
-- Task Routing: 変更理由から対象fileへ直接進む
-- Hierarchical Context: このREADME -> 対象moduleの順に読む
-- Exploration Stop: target moduleと入出力契約が分かれば他module探索を止める
+- ファイルの収集と、読む順の判定を分ける
+- 変更理由から、対象のファイルやmoduleへ進む
+- このREADMEを読んでから、変更対象の説明を読む
+- 対象moduleと入出力の決まりが分かったら、他のmoduleは読み進めない
 - Source of Truth: priority規則は `processing.py` / native command、収集規則は `messenger.py` / native repository walker

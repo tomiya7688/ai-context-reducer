@@ -714,8 +714,13 @@
       "kind": "template"
     },
     {
-      "source": "templates/AI_CONTEXT.md",
-      "bundle_path": "templates/AI_CONTEXT.md",
+      "source": "templates/AGENTS.md",
+      "bundle_path": "templates/AGENTS.md",
+      "kind": "template"
+    },
+    {
+      "source": "templates/README.md",
+      "bundle_path": "templates/README.md",
       "kind": "template"
     },
     {

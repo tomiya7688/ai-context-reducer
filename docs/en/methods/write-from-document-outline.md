@@ -10,7 +10,7 @@ When you ask an AI to write several operation guides, one may omit preparation a
 - If headings alone do not prevent omissions, specify what satisfies each section. For an operation guide, this includes the actor, screen, button names, and state after the action.
 - For a short, one-off answer, listing the required items in the request is simpler. If documents need substantially different structures, decide a suitable outline for each purpose rather than packing everything into one template.
 
-For inserting names or dates into fixed wording, you can use [generation from a fixed template](../boilerplate-generation.md). Choose according to the following distinction.
+For inserting names or dates into fixed wording, you can use [generation from a fixed template](boilerplate-generation.md). Choose according to the following distinction.
 
 | Desired output | What to provide | How the body is produced |
 | --- | --- | --- |

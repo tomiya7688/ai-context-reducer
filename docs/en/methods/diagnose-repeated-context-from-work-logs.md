@@ -80,7 +80,7 @@ The table lists diagnostic candidates. Matching a row does not authorize removin
 
 A Skill is a name used by some AI tools for registered task-specific procedures. Its presence as a file does not prove that its description enters every model input; first establish how it is loaded.
 
-For placement and delegation details, use [Hierarchical Context](../hierarchical-context.md), [Documentation Duplication Control](../documentation-duplication-control.md), and [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md). Use [Exploration Control](../exploration-control.md) to bound the investigation rather than expanding it indefinitely in the name of diagnosis.
+For placement and delegation details, use [Hierarchical Context](hierarchical-context.md), [Documentation Duplication Control](documentation-duplication-control.md), and [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md). Use [Exploration Control](exploration-control.md) to bound the investigation rather than expanding it indefinitely in the name of diagnosis.
 
 ## 4. Select one candidate and try only an approved change
 

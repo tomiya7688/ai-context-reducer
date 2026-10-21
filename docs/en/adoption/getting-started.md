@@ -101,5 +101,5 @@ If a chat-only AI cannot read your files, also attach the located code, requirem
 
 ## Where to go next
 
-- [Find a method by the problem you have](../method-index.md) — Find ways to narrow information and example AI requests for your task.
+- [Find a method by the problem you have](../methods/method-index.md) — Find ways to narrow information and example AI requests for your task.
 - [Helper tool documentation](../../../tools/README.md) — Find other operations and the detailed tool guides.

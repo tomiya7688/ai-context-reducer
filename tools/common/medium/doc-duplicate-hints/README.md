@@ -1,6 +1,6 @@
 # doc-duplicate-hints
 
-Documentationの重複候補をagentへcompactな自己説明的JSONで返します。これは [`Documentation Duplication Control`](../../../../docs/jp/文書の同じ説明を一か所にまとめる.md) のhint toolであり、候補を自動削除・自動統合したり、Source of Truthを自動決定したりしません。
+Documentationの重複候補をagentへcompactな自己説明的JSONで返します。これは [同じ説明を何度も書かない](../../../../docs/jp/手法/同じ説明を何度も書かない.md) のhint toolであり、候補を自動削除・自動統合したり、Source of Truthを自動決定したりしません。
 
 ## Usage
 
@@ -34,7 +34,7 @@ native detection        -> tools/common/native/acr-toolbox/doc_duplicate_detecti
 
 重複判定ロジックを変えるときにfilesystem処理を読む必要はありません。文書対象や読込方法を変えるときはdiscovery側だけを先に読みます。
 
-この構造はTask Routing / Responsibility Map / Hierarchical Contextをtool開発自身へ適用するためのものです。
+この分け方により、変更した処理の場所と担当を確認し、関係するファイルだけを調べられます。
 
 ## Validation
 

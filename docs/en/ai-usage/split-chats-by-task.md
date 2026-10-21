@@ -210,4 +210,3 @@ Assigning responsibilities to multiple AIs and exchanging their results is **mul
 1. Mingqian Zheng et al. (2024). [When “A Helpful Assistant” Is Not Really Helpful: Personas in System Prompts Do Not Improve Performances of Large Language Models](https://aclanthology.org/2024.findings-emnlp.888/). Findings of EMNLP 2024, pp. 15126–15154.
 2. Pedro Henrique Luz de Araujo et al. (2025). [Principled Personas: Defining and Measuring the Intended Effects of Persona Prompting on Task Performance](https://aclanthology.org/2025.emnlp-main.1364/). EMNLP 2025, pp. 26857–26886.
 3. Chen Qian et al. (2024). [ChatDev: Communicative Agents for Software Development](https://aclanthology.org/2024.acl-long.810/). ACL 2024, pp. 15174–15186.
-

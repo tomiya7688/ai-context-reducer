@@ -44,7 +44,7 @@ Check whether cache counters are components of input totals or separate categori
 
 ### Text selected from a fixed small repository
 
-This repository’s [measured benchmark](../measured-context-reduction-benchmark.md) selects material for three investigations from five features containing 15 implementation, test, and document files. It counts selected file text without generating actual AI responses.
+This repository’s [measured benchmark](https://github.com/tomiya7688/ai-context-reducer/blob/4621d09c9d6a5b4131f6d6b9e46c29fc321730c2/docs/en/measured-context-reduction-benchmark.md) selects material for three investigations from five features containing 15 implementation, test, and document files. It counts selected file text without generating actual AI responses.
 
 | Investigation | Selected characters after search | Files |
 | --- | ---: | ---: |
@@ -136,7 +136,7 @@ If the AI cannot read logs or usage displays, provide the values and their defin
 
 ## How this differs from a reduction benchmark
 
-The [measured benchmark](../measured-context-reduction-benchmark.md) compares the same task before and after narrowing information. These estimates group comparable tasks by kind to plan reading scope or work units.
+The [measured benchmark](https://github.com/tomiya7688/ai-context-reducer/blob/4621d09c9d6a5b4131f6d6b9e46c29fc321730c2/docs/en/measured-context-reduction-benchmark.md) compares the same task before and after narrowing information. These estimates group comparable tasks by kind to plan reading scope or work units.
 
 Using estimates to narrow material can reduce irrelevant inputs or repeated investigations. Recording and handoffs add input too. Compare whole-task usage while preserving necessary evidence and completion conditions.
 

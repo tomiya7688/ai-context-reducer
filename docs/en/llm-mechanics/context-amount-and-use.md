@@ -120,13 +120,13 @@ Compare the same task kind, starting revision, model, settings, and completion c
 
 Keep failures and runs stopped by missing information, not just successful cases. Where practical, repeat matching conditions and inspect the spread of results. Without usage measurements, do not substitute character reductions for measured token or price savings.
 
-See [Build context-use estimates by task kind](../ai-usage/estimate-context-use-by-task.md) for detailed recording. Also distinguish whether this repository's [measured benchmark](../measured-context-reduction-benchmark.md) measures actual LLM repair quality or the amount of material provided.
+See [Build context-use estimates by task kind](../ai-usage/estimate-context-use-by-task.md) for detailed recording. Also distinguish whether this repository's [measured benchmark](../ai-usage/measured-context-reduction-benchmark.md) measures actual LLM repair quality or the amount of material provided.
 
 ## Select what correct completion requires, not the smallest input
 
 Context reduction is not about making an AI work with inadequate information. **It selects information so the model can use necessary evidence correctly, with the aim of reducing cost, time, and rework through correct completion.**
 
-Read necessary long originals and exclude unnecessary short notes. Add missing evidence when discovered and report unverified areas. Continue to [Context Reduction Basics](../context-reduction-basics.md) and the [Method Index](../method-index.md); for a first code change, start with [Context Priority](../context-priority.md).
+Read necessary long originals and exclude unnecessary short notes. Add missing evidence when discovered and report unverified areas. Continue to [Context Reduction Basics](../methods/context-reduction-basics.md) and the [Method Index](../methods/method-index.md); for a first code change, start with [Context Priority](../methods/context-priority.md).
 
 ## References
 

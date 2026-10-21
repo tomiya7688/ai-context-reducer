@@ -80,8 +80,8 @@ After checking the candidates, have the agent inspect the source, requirements a
 
 ObaPick does not require a specific agent. It focuses on choosing task-relevant code and documents while keeping the evidence needed for correct work.
 
-- [Context Reduction Basics](../context-reduction-basics.md) — what to omit and preserve.
-- [Context Priority](../context-priority.md) — finding relevant code and tests.
+- [Context Reduction Basics](../methods/context-reduction-basics.md) — what to omit and preserve.
+- [Context Priority](../methods/context-priority.md) — finding relevant code and tests.
 - [AI Usage FAQ](faq.md) — choosing models and editing workflows.
 
 Whether an agent reads `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or other instruction files automatically depends on the product and configuration. **Simply adding ObaPick documents does not guarantee that an agent reads them.** Name the required documents explicitly.

@@ -98,7 +98,7 @@ including file names and the relevant section or symbol.
 Do not make the decision from search-result snippets alone; inspect the original locations used as evidence.
 ```
 
-[Evidence Budget](../evidence-budget.md) can help define the evidence needed before investigation expands.
+[Evidence Budget](evidence-budget.md) can help define the evidence needed before investigation expands.
 
 ## 4. Separate fact, inference, and unknown
 

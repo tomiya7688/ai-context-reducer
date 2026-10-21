@@ -4,9 +4,14 @@
   "japanese_root": "docs/jp",
   "english_root": "docs/en",
   "mapping_source_of_truth": "docs/DOCUMENT_MAP.json",
+  "maintainer_document_roots": {
+    "japanese": "docs/internal/jp",
+    "english": "docs/internal/en",
+    "purpose": "Repository-specific design and maintenance documents; separate from reader-facing method guides."
+  },
   "filename_policy": {
-    "japanese": "Japanese filenames are required under docs/jp.",
-    "english": "English filenames are required under docs/en.",
+    "japanese": "Reader-facing Japanese filenames are required under docs/jp; repository-specific documents go under docs/internal/jp.",
+    "english": "Reader-facing English filenames are required under docs/en; repository-specific documents go under docs/internal/en.",
     "filenames_do_not_need_to_match_across_languages": true
   },
   "translation_policy": {
@@ -17,201 +22,123 @@
   },
   "documents": [
     {
+      "id": "reader-friendly-explanation",
+      "japanese": "docs/jp/手法/読者が理解できる説明に直す.md",
+      "english": "docs/en/methods/make-explanations-understandable.md",
+      "english_status": "translated"
+    },
+    {
       "id": "adoption-priority",
-      "japanese": "docs/jp/導入優先度.md",
-      "english": "docs/en/adoption-priority.md",
+      "japanese": "docs/jp/導入/必要な方法だけ選ぶ.md",
+      "english": "docs/en/adoption/adoption-priority.md",
       "english_status": "translated"
     },
     {
       "id": "adoption-prompt",
-      "japanese": "docs/jp/AIに読み方の仕組みを整えてもらう.md",
-      "english": "docs/en/adoption-prompt.md",
+      "japanese": "docs/jp/導入/AIに作業ルールを整えてもらう.md",
+      "english": "docs/en/adoption/adoption-prompt.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "analysis-depth-routing",
+      "japanese": "docs/jp/手法/コードを解析するときは、言語に合った方法を選ぶ.md",
+      "english": "docs/en/methods/analysis-depth-routing.md",
       "english_status": "translated"
     },
     {
       "id": "architecture-boundary-routing",
-      "japanese": "docs/jp/既存の担当分けから読む場所を決める.md",
-      "english": "docs/en/architecture-boundary-routing.md",
+      "japanese": "docs/jp/手法/機能ごとのコードの分け方から読む場所を決める.md",
+      "english": "docs/en/methods/architecture-boundary-routing.md",
       "english_status": "translated"
     },
     {
       "id": "boilerplate-generation",
-      "japanese": "docs/jp/決まった文章やファイルをひな型から作る.md",
-      "english": "docs/en/boilerplate-generation.md",
+      "japanese": "docs/jp/手法/繰り返し使う文書や設定をひな型から作る.md",
+      "english": "docs/en/methods/boilerplate-generation.md",
       "english_status": "translated"
     },
     {
       "id": "change-impact-routing",
-      "japanese": "docs/jp/変更の影響から検証範囲を選ぶ.md",
-      "english": "docs/en/change-impact-routing.md",
+      "japanese": "docs/jp/手法/変更の影響から実行するテストを決める.md",
+      "english": "docs/en/methods/change-impact-routing.md",
       "english_status": "translated"
     },
     {
       "id": "change-routing-map",
-      "japanese": "docs/jp/変更内容から確認先を選ぶ.md",
-      "english": "docs/en/change-routing-map.md",
+      "japanese": "docs/jp/手法/変更内容ごとに読む場所と確認方法を一覧にする.md",
+      "english": "docs/en/methods/change-routing-map.md",
       "english_status": "translated"
     },
     {
       "id": "context-exclusion",
-      "japanese": "docs/jp/ふだん読まないファイルを決める.md",
-      "english": "docs/en/context-exclusion.md",
+      "japanese": "docs/jp/手法/AIに普段読ませないファイルを決める.md",
+      "english": "docs/en/methods/context-exclusion.md",
       "english_status": "translated"
     },
     {
       "id": "context-manifest",
-      "japanese": "docs/jp/参照先の目録（Context Manifest）.md",
-      "english": "docs/en/context-manifest.md",
+      "japanese": "docs/jp/手法/資料の場所を短い一覧にする.md",
+      "english": "docs/en/methods/context-manifest.md",
       "english_status": "translated"
     },
     {
       "id": "context-pack",
-      "japanese": "docs/jp/作業用メモ（Context Pack）.md",
-      "english": "docs/en/context-pack.md",
+      "japanese": "docs/jp/手法/今回の作業に必要なことを短くまとめる.md",
+      "english": "docs/en/methods/context-pack.md",
       "english_status": "translated"
     },
     {
       "id": "context-priority",
-      "japanese": "docs/jp/変更に必要なファイルから読む.md",
-      "english": "docs/en/context-priority.md",
+      "japanese": "docs/jp/手法/今回読むファイルを選ぶ.md",
+      "english": "docs/en/methods/context-priority.md",
       "english_status": "translated"
     },
     {
       "id": "context-reduction-basics",
-      "japanese": "docs/jp/コンテキスト削減の基本.md",
-      "english": "docs/en/context-reduction-basics.md",
+      "japanese": "docs/jp/手法/AIに読む情報を絞る3つの方法.md",
+      "english": "docs/en/methods/context-reduction-basics.md",
       "english_status": "translated"
     },
     {
       "id": "context-state",
-      "japanese": "docs/jp/現在の状態を短くまとめる.md",
-      "english": "docs/en/context-state.md",
+      "japanese": "docs/jp/手法/プロジェクトでできることと制限を短くまとめる.md",
+      "english": "docs/en/methods/context-state.md",
       "english_status": "translated"
     },
     {
       "id": "documentation-duplication-control",
-      "japanese": "docs/jp/文書の同じ説明を一か所にまとめる.md",
-      "english": "docs/en/documentation-duplication-control.md",
+      "japanese": "docs/jp/手法/同じ説明を何度も書かない.md",
+      "english": "docs/en/methods/documentation-duplication-control.md",
       "english_status": "translated"
     },
     {
       "id": "evidence-budget",
-      "japanese": "docs/jp/必要な確認を先に決める.md",
-      "english": "docs/en/evidence-budget.md",
+      "japanese": "docs/jp/手法/調査前に、原因を判断する確認項目を決める.md",
+      "english": "docs/en/methods/evidence-budget.md",
       "english_status": "translated"
     },
     {
       "id": "exploration-control",
-      "japanese": "docs/jp/調査を止める条件を決める.md",
-      "english": "docs/en/exploration-control.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "external-tool-reference-policy",
-      "japanese": "docs/jp/外部ツールを紹介するときの確認基準.md",
-      "english": "docs/en/external-tool-reference-policy.md",
+      "japanese": "docs/jp/手法/AIに調査を止めさせる条件を決める.md",
+      "english": "docs/en/methods/exploration-control.md",
       "english_status": "translated"
     },
     {
       "id": "external-tools",
-      "japanese": "docs/jp/外部ツールを使って調査を短くする.md",
-      "english": "docs/en/external-tools.md",
+      "japanese": "docs/internal/jp/外部ツールの使い方.md",
+      "english": "docs/internal/en/external-tools.md",
       "english_status": "translated"
     },
     {
       "id": "full-bundle-layout",
-      "japanese": "docs/jp/Full Bundleの配布構成.md",
-      "english": "docs/en/full-bundle-layout.md",
+      "japanese": "docs/internal/jp/Full Bundleの配布構成.md",
+      "english": "docs/internal/en/full-bundle-layout.md",
       "english_status": "translated"
     },
     {
       "id": "guide",
-      "japanese": "docs/jp/基本方針.md",
-      "english": "docs/en/guide.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "hierarchical-context",
-      "japanese": "docs/jp/場所ごとに作業ルールを分ける.md",
-      "english": "docs/en/hierarchical-context.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "language-tool-setup",
-      "japanese": "docs/jp/言語に合った解析方法を選ぶ.md",
-      "english": "docs/en/language-tool-setup.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "policy-routing",
-      "japanese": "docs/jp/今回の変更に関係する規則を確認する.md",
-      "english": "docs/en/policy-routing.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "portable-tools",
-      "japanese": "docs/jp/追加インストールを減らしてツールを使う.md",
-      "english": "docs/en/portable-tools.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "releasing",
-      "japanese": "docs/jp/リリースを確認して公開する.md",
-      "english": "docs/en/releasing.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "remote-context",
-      "japanese": "docs/jp/リモートとの差分を先に確認する.md",
-      "english": "docs/en/remote-context.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "responsibility-map",
-      "japanese": "docs/jp/ファイルとモジュールの役割表.md",
-      "english": "docs/en/responsibility-map.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "source-structure-index",
-      "japanese": "docs/jp/コード構造の索引.md",
-      "english": "docs/en/source-structure-index.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "syntax-health-validation",
-      "japanese": "docs/jp/構文チェックを最初の確認に使う.md",
-      "english": "docs/en/syntax-health-validation.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "task-routing",
-      "japanese": "docs/jp/作業別の案内表.md",
-      "english": "docs/en/task-routing.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "tool-method-map",
-      "japanese": "docs/jp/手法と補助ツールの対応表.md",
-      "english": "docs/en/tool-method-map.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "validation-routing",
-      "japanese": "docs/jp/変更に合わせて確認方法を選ぶ.md",
-      "english": "docs/en/validation-routing.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "design-and-completion-criteria",
-      "japanese": "docs/jp/設計と完了条件を先に決める.md",
-      "english": "docs/en/design-and-completion-criteria.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "method-index",
-      "japanese": "docs/jp/手法一覧.md",
-      "english": "docs/en/method-index.md",
+      "japanese": "docs/jp/手法/AIに作業を頼むときの基本手順.md",
+      "english": "docs/en/methods/guide.md",
       "english_status": "translated"
     },
     {
@@ -221,15 +148,117 @@
       "english_status": "translated"
     },
     {
-      "id": "reader-friendly-explanation",
-      "japanese": "docs/jp/手法/読者が理解できる説明に直す.md",
-      "english": "docs/en/methods/make-explanations-understandable.md",
+      "id": "hierarchical-context",
+      "japanese": "docs/jp/手法/AIに作業場所に合った指示書を読ませる.md",
+      "english": "docs/en/methods/hierarchical-context.md",
       "english_status": "translated"
     },
     {
-      "id": "decision-rationale",
-      "japanese": "docs/jp/手法/仕様や実装を決めた理由をAIに渡す.md",
-      "english": "docs/en/methods/share-decision-reasons.md",
+      "id": "language-tool-setup",
+      "japanese": "docs/internal/jp/言語別ツールの選び方.md",
+      "english": "docs/internal/en/language-tool-setup.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "policy-routing",
+      "japanese": "docs/jp/手法/今回の作業に関係する決まりだけ確認する.md",
+      "english": "docs/en/methods/policy-routing.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "portable-tools",
+      "japanese": "docs/internal/jp/追加インストールを減らすツール運用.md",
+      "english": "docs/internal/en/portable-tools.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "releasing",
+      "japanese": "docs/internal/jp/リリースを確認して公開する.md",
+      "english": "docs/internal/en/releasing.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "remote-context",
+      "japanese": "docs/jp/手法/作業前に共有先で変わったファイルを確認する.md",
+      "english": "docs/en/methods/remote-context.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "responsibility-map",
+      "japanese": "docs/jp/手法/ファイルやフォルダーの担当を探す.md",
+      "english": "docs/en/methods/responsibility-map.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "source-structure-index",
+      "japanese": "docs/jp/手法/関数や使われている場所を探す.md",
+      "english": "docs/en/methods/source-structure-index.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "splitting-long-files-and-logs",
+      "japanese": "docs/jp/手法/長いファイルやログを区切ってAIに渡す.md",
+      "english": "docs/en/methods/splitting-long-files-and-logs.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "syntax-health-validation",
+      "japanese": "docs/jp/手法/まず、コードの構文チェックをする.md",
+      "english": "docs/en/methods/syntax-health-validation.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "task-routing",
+      "japanese": "docs/jp/手法/作業の種類ごとに、AIに最初に読む場所を伝える.md",
+      "english": "docs/en/methods/task-routing.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "validation-routing",
+      "japanese": "docs/jp/手法/変更に合った方法で動作を確かめる.md",
+      "english": "docs/en/methods/validation-routing.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "design-and-completion-criteria",
+      "japanese": "docs/jp/手法/作業を始める前に、目的と終わりを決める.md",
+      "english": "docs/en/methods/design-and-completion-criteria.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "method-index",
+      "japanese": "docs/jp/手法/困りごとから手法を探す.md",
+      "english": "docs/en/methods/method-index.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "context-usage-by-task",
+      "japanese": "docs/jp/AI利用/作業ごとのコンテキスト使用量の目安を作る.md",
+      "english": "docs/en/ai-usage/estimate-context-use-by-task.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "same-problem-investigation",
+      "japanese": "docs/jp/手法/一つの指摘から、同じ問題をAIに探させる.md",
+      "english": "docs/en/methods/find-same-problems-from-one-example.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "reuse-existing-code",
+      "japanese": "docs/jp/手法/AIに既存コードを調べさせ、似た役割の追加を防ぐ.md",
+      "english": "docs/en/methods/reuse-existing-code-before-adding.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "useful-code-comments",
+      "japanese": "docs/jp/手法/AIに読む人の役に立つコードコメントを書かせる.md",
+      "english": "docs/en/methods/write-useful-code-comments.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "coding-rule-compliance",
+      "japanese": "docs/jp/手法/AIにコードの決まりを読ませ、変更後に確かめさせる.md",
+      "english": "docs/en/methods/follow-coding-rules.md",
       "english_status": "translated"
     },
     {
@@ -239,9 +268,39 @@
       "english_status": "translated"
     },
     {
-      "id": "coding-rule-compliance",
-      "japanese": "docs/jp/手法/AIにコードの決まりを読ませ、変更後に確かめさせる.md",
-      "english": "docs/en/methods/follow-coding-rules.md",
+      "id": "decision-rationale",
+      "japanese": "docs/jp/手法/仕様や実装を決めた理由をAIに渡す.md",
+      "english": "docs/en/methods/share-decision-reasons.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "task-role-chats",
+      "japanese": "docs/jp/AI利用/作業ごとにAIの役割とチャットを分ける.md",
+      "english": "docs/en/ai-usage/split-chats-by-task.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "one-task-per-signal",
+      "japanese": "docs/jp/手法/課題一覧から一件ずつAIに進めさせる.md",
+      "english": "docs/en/methods/run-one-task-per-signal.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "parallel-agent-edit-ownership",
+      "japanese": "docs/jp/手法/複数のAIに担当と編集範囲を分けて頼む.md",
+      "english": "docs/en/methods/assign-agent-edit-ownership.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "readme-navigation",
+      "japanese": "docs/jp/手法/人とAIが必要な情報へ進めるREADMEを書く.md",
+      "english": "docs/en/methods/write-readme-for-people-and-ai.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "tool-method-map",
+      "japanese": "docs/jp/手法/手法と補助ツールの対応表.md",
+      "english": "docs/en/methods/tool-method-map.md",
       "english_status": "translated"
     },
     {
@@ -324,14 +383,8 @@
     },
     {
       "id": "context-reduction-benchmark",
-      "japanese": "docs/jp/コンテキスト削減の実測ベンチマーク.md",
-      "english": "docs/en/measured-context-reduction-benchmark.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "useful-code-comments",
-      "japanese": "docs/jp/手法/AIに読む人の役に立つコードコメントを書かせる.md",
-      "english": "docs/en/methods/write-useful-code-comments.md",
+      "japanese": "docs/jp/AI利用/コンテキスト削減の実測ベンチマーク.md",
+      "english": "docs/en/ai-usage/measured-context-reduction-benchmark.md",
       "english_status": "translated"
     },
     {
@@ -347,45 +400,9 @@
       "english_status": "translated"
     },
     {
-      "id": "reuse-existing-code",
-      "japanese": "docs/jp/手法/AIに既存コードを調べさせ、似た役割の追加を防ぐ.md",
-      "english": "docs/en/methods/reuse-existing-code-before-adding.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "same-problem-investigation",
-      "japanese": "docs/jp/手法/一つの指摘から、同じ問題をAIに探させる.md",
-      "english": "docs/en/methods/find-same-problems-from-one-example.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "context-usage-by-task",
-      "japanese": "docs/jp/AI利用/作業ごとのコンテキスト使用量の目安を作る.md",
-      "english": "docs/en/ai-usage/estimate-context-use-by-task.md",
-      "english_status": "translated"
-    },
-    {
       "id": "coding-agent-overview",
       "japanese": "docs/jp/AI利用/コーディングエージェントの種類と選び方.md",
       "english": "docs/en/ai-usage/coding-agent-overview.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "task-role-chats",
-      "japanese": "docs/jp/AI利用/作業ごとにAIの役割とチャットを分ける.md",
-      "english": "docs/en/ai-usage/split-chats-by-task.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "one-task-per-signal",
-      "japanese": "docs/jp/手法/課題一覧から一件ずつAIに進めさせる.md",
-      "english": "docs/en/methods/run-one-task-per-signal.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "parallel-agent-edit-ownership",
-      "japanese": "docs/jp/手法/複数のAIに担当と編集範囲を分けて頼む.md",
-      "english": "docs/en/methods/assign-agent-edit-ownership.md",
       "english_status": "translated"
     },
     {
@@ -401,21 +418,21 @@
       "english_status": "translated"
     },
     {
-      "id": "splitting-long-files-and-logs",
-      "japanese": "docs/jp/手法/長いファイルやログを区切ってAIに渡す.md",
-      "english": "docs/en/methods/splitting-long-files-and-logs.md",
-      "english_status": "translated"
-    },
-    {
-      "id": "readme-navigation",
-      "japanese": "docs/jp/手法/人とAIが必要な情報へ進めるREADMEを書く.md",
-      "english": "docs/en/methods/write-readme-for-people-and-ai.md",
-      "english_status": "translated"
-    },
-    {
       "id": "diagnose-repeated-context",
       "japanese": "docs/jp/手法/AIの作業履歴から無駄な読み込みを見つけて改善する.md",
       "english": "docs/en/methods/diagnose-repeated-context-from-work-logs.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "shorten-investigation-with-external-tools",
+      "japanese": "docs/jp/手法/外部ツールを使って調査を短くする.md",
+      "english": "docs/en/methods/shorten-investigation-with-external-tools.md",
+      "english_status": "translated"
+    },
+    {
+      "id": "use-tools-without-extra-installs",
+      "japanese": "docs/jp/手法/追加インストールを減らしてツールを使う.md",
+      "english": "docs/en/methods/use-tools-without-extra-installs.md",
       "english_status": "translated"
     },
     {
