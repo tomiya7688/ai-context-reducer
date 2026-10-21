@@ -42,6 +42,8 @@ When output is large, show only the matches, summaries, or warnings needed for t
 
 Analysis results are pointers to original sources. Check the formal specification for requirements and current code or tests for behavior. If tool output conflicts with its sources, investigate the source of the mismatch instead of trusting a stale index or an incorrect candidate.
 
+For long web pages and lists of browser controls, see [Give the AI only the relevant parts of a web page](methods/retrieve-relevant-webpage-information.md). It separates element selection from verifying a live interaction target.
+
 ## Implementations in this repository
 
 This repository also has helpers for searching, finding files, inspecting code structure, and summarizing repository statistics. Their supported tools, commands, configuration, and output formats belong in their individual READMEs. The method works without a particular tool, using available commands or manual search.

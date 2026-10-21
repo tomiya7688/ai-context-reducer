@@ -417,6 +417,12 @@
       "japanese": "docs/jp/手法/AIの作業履歴から無駄な読み込みを見つけて改善する.md",
       "english": "docs/en/methods/diagnose-repeated-context-from-work-logs.md",
       "english_status": "translated"
+    },
+    {
+      "id": "task-focused-web-context",
+      "japanese": "docs/jp/手法/Webページから必要な情報だけをAIに渡す.md",
+      "english": "docs/en/methods/retrieve-relevant-webpage-information.md",
+      "english_status": "translated"
     }
   ]
 }
