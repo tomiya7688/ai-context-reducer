@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Portable path finder with optional fd acceleration."""
+"""ファイルやフォルダーを探し、利用できる場合は既存の検索プログラムを使う。"""
 from __future__ import annotations
 
 import argparse
@@ -24,18 +24,71 @@ def emit(payload: dict[str, object]) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-# normalized は表記揺れを正規化し、後段の比較条件を単純化する。
+# {
+#   責務: [
+#     normalized: ファイルの場所を比較しやすい表記へそろえる
+#   ],
+#   処理: [
+#     1: 区切り文字を統一する,
+#     2: 先頭の相対位置表示と末尾の区切りを取り除く
+#   ],
+#   引数: [
+#     path: ファイルの場所
+#   ],
+#   戻り値: [
+#     1: 比較用に表記をそろえた場所
+#   ]
+# }
 def normalized(path: str) -> str:
     value = path.replace('\\', '/').removeprefix('./')
     return value.rstrip('/')
 
 
-# matches_pattern はbasenameまたはroot相対pathがglob patternに一致するか判定します。
+# {
+#   責務: [
+#     matches_pattern: 名前か相対位置が指定された検索条件に合うか調べる
+#   ],
+#   処理: [
+#     1: ファイル名を照合する,
+#     2: 一致しなければ相対位置を照合する
+#   ],
+#   引数: [
+#     name: ファイル名,
+#     rel: 調査対象の起点からの相対位置,
+#     pattern: 検索条件
+#   ],
+#   戻り値: [
+#     1: 一致したときは真、一致しないときは偽
+#   ]
+# }
 def matches_pattern(name: str, rel: str, pattern: str) -> bool:
     return fnmatch.fnmatchcase(name, pattern) or fnmatch.fnmatchcase(rel, pattern)
 
 
-# portable_find は外部fdなしで走査し、深さ・訪問・結果上限の省略状態を返します。
+# {
+#   責務: [
+#     portable_find: 外部の検索プログラムに頼らずファイル候補を探す
+#   ],
+#   処理: [
+#     1: 対象フォルダーを順に調べ、通常は除外する場所を飛ばす,
+#     2: 名前と種類と深さに合う候補を集める,
+#     3: 上限に達した場合は未確認の可能性を残す
+#   ],
+#   引数: [
+#     root: 調査を始めるフォルダー,
+#     pattern: 名前や相対位置に対する検索条件,
+#     entry_type: 探す項目の種類,
+#     max_results: 返す候補数の上限,
+#     max_depth: 調べる深さの上限,
+#     max_visited: 調べる項目数の上限
+#   ],
+#   戻り値: [
+#     1: 見つけた候補,
+#     2: 返さなかった候補があるか,
+#     3: 訪問上限によって調査を打ち切ったか,
+#     4: 調査中の失敗についての記録
+#   ]
+# }
 def portable_find(
     root: Path,
     pattern: str,
@@ -49,9 +102,22 @@ def portable_find(
     scan_truncated = False
     visited = 0
     stats: dict[str, object] = {'walk_error_count': 0, 'walk_error_paths': []}
+    # 上限を超えた候補が存在するか確かめるため、一件余分に探す。
     wanted = max_results + 1 if max_results > 0 else 0
 
-    # walk_error はOSが列挙できなかったpathを記録し、結果の完全性判定に渡します。
+    # {
+    #   責務: [
+    #     walk_error: 調査できなかったフォルダーの件数と場所を記録する
+    #   ],
+    #   処理: [
+    #     1: 失敗した件数を増やす,
+    #     2: 上限内で失敗した場所を追加する
+    #   ],
+    #   引数: [
+    #     error: フォルダーの列挙で起きた失敗
+    #   ],
+    #   戻り値: []
+    # }
     def walk_error(error: OSError) -> None:
         stats['walk_error_count'] = int(stats['walk_error_count']) + 1
         paths = stats['walk_error_paths']
@@ -63,6 +129,7 @@ def portable_find(
         depth = 0 if rel_dir == Path('.') else len(rel_dir.parts)
         dirs[:] = sorted(d for d in dirs if d.lower() not in IGNORE)
         if max_depth > 0 and depth >= max_depth:
+            # 深さの上限に達した位置では、下のフォルダーへ進まない。
             dirs[:] = []
 
         entries: list[tuple[str, str]] = []
