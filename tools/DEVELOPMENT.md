@@ -215,3 +215,19 @@ Small/Medium routingはPythonや各言語SDKが無くても成立します。Lar
 
 
 Large解析は `language-large-plan` でbackend候補を確認してから、必要な場合だけ `language-large-run --allow-heavy` を明示実行します。SCIP / Universal Ctags が利用可能なら source-structure-index へ統合し、無ければMedium evidenceで止めます。
+
+
+## path-find の内部構成
+
+補助ツール `path-find` の開発・保守に必要な情報です。利用するだけの読者向けではありません。
+
+| 変更内容 | 主に確認するファイル |
+| --- | --- |
+| Python版の検索と外部プログラムの切替え | `common/small/path-find/script/path_find.py` |
+| Python版の検索結果と失敗時の検査 | `common/small/path-find/tests/test_path_find.py` |
+| Go版の検索機能 | `common/native/acr-toolbox/find_command.go` |
+| Go版の対応検査 | `common/native/acr-toolbox/search_find_commands_test.go` |
+
+検索条件が外部の `fd` に対応する場合は `fd` を使い、それ以外では標準の検索処理を使います。実装の選択と結果の状態は出力項目の `backend` と `backend_fallback` で確認できます。検証のために実装を固定するときだけ `--backend` を指定してください。
+
+`--max-results 0` は結果件数の制限なし、`--max-depth 0` は深さの制限なし、`--max-visited 0` は検索項目数の制限なしです。既定で深さや走査の打切りを設けず、指定された上限で調査が不完全になった場合は出力に記録します。
