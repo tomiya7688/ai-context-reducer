@@ -96,12 +96,8 @@ jobs:
         run: |
           set -euo pipefail
           python -m compileall -q tools
-          mapfile -t tests < <(find tools -type f -path '*/tests/test_*.py' | sort)
-          printf 'Python tests: %s\n' "${#tests[@]}"
-          for file in "${tests[@]}"; do
-            echo "==> $file"
-            python "$file"
-          done
+          python release/scripts/test_python_test_runner.py
+          python release/scripts/run_python_tests.py
       - name: Vet and test every Go module
         shell: bash
         run: |

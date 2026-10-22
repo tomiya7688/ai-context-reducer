@@ -5,10 +5,14 @@ on:
     paths:
       - 'tools/**'
       - '.github/workflows/test-tools.yml'
+      - 'release/scripts/run_python_tests.py'
+      - 'release/scripts/test_python_test_runner.py'
   pull_request:
     paths:
       - 'tools/**'
       - '.github/workflows/test-tools.yml'
+      - 'release/scripts/run_python_tests.py'
+      - 'release/scripts/test_python_test_runner.py'
   workflow_dispatch:
 
 jobs:
@@ -25,12 +29,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mapfile -t tests < <(find tools -type f -path '*/tests/test_*.py' | sort)
-          printf 'discovered %s Python test files\n' "${#tests[@]}"
-          for file in "${tests[@]}"; do
-            echo "==> $file"
-            python "$file"
-          done
+          python release/scripts/test_python_test_runner.py
+          python release/scripts/run_python_tests.py
 
   go:
     runs-on: ubuntu-latest
