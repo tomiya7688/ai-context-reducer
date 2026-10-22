@@ -1,57 +1,60 @@
-# validation-plan
+# 変更したファイルから確認方法の候補を出す（validation-plan）
 
-Changed file pathから、最小限のtargeted validation候補を自己説明的JSONで返します。
+AIにコードを変更させた後は、その変更に合った検査が必要です。例えば設定ファイルなら読込形式の検査、コードなら関連テストや構文検査が考えられます。
 
-これはbuild/test systemのSource of Truthではなく、最初に検証すべき種類を絞るrouting hintです。repository固有のtest commandが分かる場合はそちらを優先します。
+補助ツール `validation-plan` は、あなたが指定した**ファイルの名前と拡張子**から、試すとよい検査の種類を一覧にして返します。**実際にファイルを開いて内容を分析したり、テストを実行したりはしません。** 検査の候補を決める手助けをするだけなので、あなたはプロジェクトの仕様とテスト環境に合わせて必要な検査を決めてください。
 
-## Usage
+## あなたが直接使う
 
-Python:
+あなたは、変更したファイルの場所を一つ以上指定できます。次は `src/parser.py` と `config/schema.json` を変更した例です。
 
-```text
-python script/validation_plan.py src/parser.py config/schema.json
+**Pythonが使える場合（リポジトリのルートから）**
+
+```sh
+python3 tools/common/medium/validation-plan/script/validation_plan.py \
+  src/parser.py config/schema.json
 ```
 
-Native:
+**配布済み `acr-toolbox` を使う場合**
 
-```text
-acr-toolbox validation-plan src/parser.py config/schema.json
+```sh
+./acr-toolbox validation-plan src/parser.py config/schema.json
 ```
 
-## Matching semantics
+後者は配布物を展開した場所で実行する例です。Windowsでは `acr-toolbox.exe` を呼び出してください。配布済み実行ファイルを使うだけならPythonやGoの導入は不要です。
 
-短いtermをpath全体のsubstringでは判定しません。path / filenameをtokenizeして判定するため、`build/core.py` の `ui` や `latest.py` の `test` のような偶然のsubstringで別カテゴリへ誤routingしないようにします。
+ツールは、指定した各ファイルについて検査の候補を返します。実際の修正内容やプロジェクトのテストコマンドは知らないため、**候補が表示されても検査を実行したことにはなりません。**
 
-主な分類:
+## AIに使わせる場合
 
-- UI / scene / layout -> headless smoke + 必要時visual confirmation
-- package / installer / release -> artifact generation + artifact smoke
-- parser / lexer / validator / protocol -> targeted regression + contract/spec check
-- random / simulation / physics / agent -> deterministic seam/fixed seed + bounded runtime
-- structured data -> schema/parser validation + representative data check
-- source file -> targeted tests + syntax/build check
+AIがコマンド実行できる環境なら、AIにこのツールを実行させ、その結果と変更内容を比べて検査方法を考えさせることもできます。
 
-該当しないfileは `targeted validation` を返します。
-
-## Output contract
+**次は、あなたがAIに送る依頼文の例です。**
 
 ```text
-tool
-status
-validation_by_file[]
-  changed_file
-  recommended_validation[]
+今回変更したファイルは src/parser.py と config/schema.json です。
+validation-planが使えるなら、検査方法の候補を出してください。
+候補は実際のテスト実行結果ではないため、元の仕様とテストの場所を確認してください。
+実行できる検査を選び、実行したコマンドと結果、未実施の検査を報告してください。
 ```
 
-同じ意味のvalidationは重複して返しません。
+AIにコマンド実行機能がない場合は、あなたが上記コマンドを使って結果をAIへ渡してください。AIが提案した検査を実行できない場合は、あなた自身が必要な検査を実行して結果を確かめられます。
 
-## Development routing
+## 結果の読み方
 
-Python版は小さな単一責務toolなので形式的に分割しません。
+ツールは、項目名と値を組にしたJSON形式の結果を返します。
 
-```text
-Python classification / CLI -> script/validation_plan.py
-Python validation           -> tests/test_validation_plan.py
-Native classification / CLI -> tools/common/native/acr-toolbox/validation_plan_command.go
-Native validation           -> tools/common/native/acr-toolbox/change_validation_commands_test.go
-```
+| 結果の項目 | 意味 |
+| --- | --- |
+| `status` | `ok` なら候補一覧を作れた状態 |
+| `validation_by_file` | ファイルごとの検査候補の一覧 |
+| `changed_file` | あなたが入力したファイル名 |
+| `recommended_validation` | ツールが名前と拡張子から選んだ検査の種類 |
+
+例えば `src/parser.py` なら、関連するテスト、構文検査、仕様に合っているかの確認が候補になります。`config/schema.json` なら、データ形式の検査と代表的な入力を使った確認が候補になります。実際の結果は、あなたの入力した名前によって変わります。
+
+ツールが返す検査名は英語の値ですが、それは結果の項目として用いられる**プログラム上の識別子**です。AIへ渡すときは、何を確かめる検査なのか日本語で補っても構いません。
+
+## 使わなくてもよい場合
+
+あなたのプロジェクトで実行すべきテストと確認方法が既に決まっている場合は、そちらを優先してください。ファイル名からの推測より、仕様書や実際のコード・テストを確認した方が正確です。[変更に合った方法で動作を確かめる](../../../../docs/jp/手法/変更に合った方法で動作を確かめる.md)も参照できます。

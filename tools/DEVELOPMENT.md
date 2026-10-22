@@ -231,3 +231,24 @@ Large解析は `language-large-plan` でbackend候補を確認してから、必
 検索条件が外部の `fd` に対応する場合は `fd` を使い、それ以外では標準の検索処理を使います。実装の選択と結果の状態は出力項目の `backend` と `backend_fallback` で確認できます。検証のために実装を固定するときだけ `--backend` を指定してください。
 
 `--max-results 0` は結果件数の制限なし、`--max-depth 0` は深さの制限なし、`--max-visited 0` は検索項目数の制限なしです。既定で深さや走査の打切りを設けず、指定された上限で調査が不完全になった場合は出力に記録します。
+
+
+## 作業メモ生成・検査候補の内部実装
+
+この節はObaPickのツール自体を修正する開発者向けです。利用者向けの使い方はそれぞれのREADMEを参照してください。
+
+| 変更する処理 | 確認するファイル |
+| --- | --- |
+| 作業メモ生成のPython入口 | `common/medium/context-pack-builder/script/context_pack_builder.py` |
+| 作業メモに書くGitの変更情報 | `common/medium/context-pack-builder/script/messenger.py`、`commander.py` |
+| 作業メモ本文の組立て | `common/medium/context-pack-builder/script/processing.py` |
+| 作業メモ本文のPython検査 | `common/medium/context-pack-builder/tests/test_processing.py` |
+| 作業メモ生成のGo版 | `common/native/acr-toolbox/context_pack_command.go` |
+| 検査候補のPython版と検査 | `common/medium/validation-plan/script/validation_plan.py`、`tests/test_validation_plan.py` |
+| 検査候補のGo版と検査 | `common/native/acr-toolbox/validation_plan_command.go`、`change_validation_commands_test.go` |
+
+作業メモはMarkdownが完成物なのでJSONへ変換せず、画面または `--output` で指定したファイルに出力する。Gitの状態が正常に取得できた場合と取得できない場合を区別する。変更状況の表示上限は `--max-state-lines` で指定でき、0は状態の行を出さない指定である。
+
+検査候補のプログラムは、渡されたファイル名と拡張子を判別するだけで、コードを解析したりテストを実行したりしない。結果は `tool`、`status`、`validation_by_file`、`changed_file`、`recommended_validation` を含むJSON形式で返す。誤った部分文字列で分類しないため、名前を区切って照合している。
+
+開発時の確認コマンドは、作業対象のフォルダーにある検査コードから選ぶ。詳細の実装位置は上表を参照する。
