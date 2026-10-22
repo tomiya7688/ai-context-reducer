@@ -1,12 +1,12 @@
-# Find a method by the problem you have
-> Japanese version: [困りごとから手法を探す](../../jp/手法/困りごとから手法を探す.md)
+# Find a method for your problem
 
+> Japanese source: [困りごとから手法を探す](../../jp/手法/困りごとから手法を探す.md)
 
-This page is for people asking an AI to do work. Use it to find an explanation that matches a problem you are facing. You do not need to adopt every method. Start with the closest match.
+When you ask an AI to investigate or change code, **choose the problem closest to yours from the list below.** Each linked guide explains what to ask the AI to do and what evidence you should check. You do not need to adopt every method.
 
-You use these guides by preparing a guide, list, or check yourself, then telling the AI where it is and how to use it when you ask for work. The AI may not read the documents automatically. For continued use, check that your AI tool actually reads the instructions or settings where you registered them.
+To use a guide, tell the AI the task and the location of the page you chose. The AI may not load it automatically. If your AI cannot open project files, provide the relevant passage yourself.
 
-For a concrete question such as "output gets rough only in the later part of a multi-file change" or "which model or editing method should I choose," start with the [AI usage FAQ](../ai-usage/faq.md) to find a short example request.
+For questions such as “the later parts of the AI's output are vague” or “which model should I use,” start with the [AI usage FAQ](../ai-usage/faq.md).
 
 ## You are unsure what to change or read
 
@@ -70,28 +70,30 @@ For a concrete question such as "output gets rough only in the later part of a m
 
 - [Set the goal and finish conditions before work](design-and-completion-criteria.md) — tell the AI what to change and how to know when the work is done.
 
-## If this is your first time here
+## If you are new to this project
 
-If you are unsure how much context a task may use, see [Build estimates by task kind](../ai-usage/estimate-context-use-by-task.md) to distinguish per-call input from cumulative task usage.
+If you are asking an AI to change code for the first time, read [Basic steps for an AI development task](guide.md). To decide what information to give the AI, read [Three ways to limit what the AI reads](context-reduction-basics.md). To choose which method to adopt, see [Choose only the methods you need](../adoption/adoption-priority.md).
 
-Start with [Basic steps for asking AI to work on a project](guide.md). If you are unsure which methods to adopt, see [Choose only the methods you need](../adoption/adoption-priority.md).
+To understand the model first, see [What Is an LLM?](../llm-mechanics/what-is-an-llm.md). To choose a coding agent, see [Coding agents](../ai-usage/coding-agent-overview.md). To record usage by task, see [Estimate context use by task](../ai-usage/estimate-context-use-by-task.md).
 
-To understand LLMs from the ground up, read [What is an LLM?](../llm-mechanics/what-is-an-llm.md) first. For the kinds of coding agents and how to choose one, see the [coding agents guide](../ai-usage/coding-agent-overview.md).
+## Ask the AI to apply a method
 
-## Check that the method helped
+Tell the AI what you want to accomplish and which guide to use. If it can open the page, ask it to read the relevant part. Otherwise, paste that passage into your request.
 
-For a one-time task, write in the request which guide to use, what to return first, and how far to check. For recurring work, put a link and its scope in the instructions the AI actually reads.
-
-At the end, have the AI report the files it referred to, the checks it ran and their results, and what it did not check, and compare them with the visible work log and diff. If your environment does not show what was read, the report alone does not show the actual amount of context. In that case, check that the guide led to the right sources and that no needed test was skipped. Compare before and after on the same kind of task only if your tool can measure tokens.
+**Example message for you to send to the AI:**
 
 ```text
-Task: [what to do]
-Use "[chosen method page]". First show your candidates and why you chose them, then check the original sources before working.
-Run the checks the completion conditions require, and report the sources, results, and anything not checked.
+Task: [What needs to be done]
+Use the method explained in [the guide you selected].
+First list the candidate code, requirements and tests, and why they are relevant.
+Verify the original sources before making changes.
+Report the diff, actual checks and results, and anything not checked.
 ```
 
-Helper tools are optional. If you want one, choose it from the [method and helper tool map](tool-method-map.md).
+When the work finishes, **inspect the actual changes and check results yourself.** The AI saying “verified” does not prove it opened the right sources or ran the tests. If your service provides usage measurements, compare equivalent tasks without omitting necessary evidence.
 
-## Keep the guidance small
+You can start without installing extra tools. For optional tools that you or an agent can run, see the [method-to-tool map](tool-method-map.md).
 
-Start with one short project instruction file, such as `AGENTS.md`. Add folder-specific instructions only when people keep reading rules for unrelated areas. Use reusable skills only for procedures repeated across tasks. Keep shared rules in one place, link to details, and remove outdated examples. Each AI product loads instruction files and skills differently; include their paths or invocation names in your request when needed.
+## Avoid unnecessary permanent instructions
+
+If you repeatedly give the AI the same rules, you can record shared rules and document locations in a file the AI actually reads. Keep folder-specific instructions limited to work in those folders. AI products differ in when and how they load instruction files, so verify your tool's settings and provide an explicit path if needed.
