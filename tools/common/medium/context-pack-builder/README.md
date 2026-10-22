@@ -1,55 +1,70 @@
-# context-pack-builder
+# 作業メモの下書きを作る（context-pack-builder）
 
-Context Pack の生成toolです。成果物そのものがMarkdownなので、このtoolは無理にJSON化しません。
+あなたがAIに複数日にわたる修正を頼むときは、**今回何を直し、何を守り、どうなれば完了か**を短いメモにまとめると、別の会話へ作業を引き継ぎやすくなります。
 
-## Output contract
+補助ツール `context-pack-builder` は、あなたが入力した目的・条件・完了の目安と、Gitで確認できるファイルの変更状況から、**作業メモの下書き**を作ります。仕様を読み取って正しい条件を自動で決めるツールではありません。出力されたメモはあなたが確認してからAIに渡してください。
 
-- 正常時はContext Pack Markdownをstdout、または `--output` 先へ出力します。
-- Gitが利用できない場合とclean状態を区別します。
-- changed/statusが上限で切られた場合は本文中にtruncatedを明示します。
-- Markdown生成toolなので `tools/JSON_CONTRACT.md` の「成果物形式自体が目的のtool」の例外に該当します。
-- input root missing / non-directory / output write failureはstderrへ短いdiagnosticを出してnon-zero exitにします。
+## あなたが直接使う
 
-## Usage
+例えば、設定の保存機能を直す場合です。あなたはリポジトリのルートで次のコマンドを実行できます。`/path/to/project` は実際のプロジェクトの場所に置き換えてください。
 
-Python:
+**Pythonが使える場合**
 
-```text
-python script/context_pack_builder.py <repo-root> --goal "..." --required "..." --acceptance "..."
-python script/context_pack_builder.py <repo-root> --output CONTEXT_PACK.md
+```sh
+python3 tools/common/medium/context-pack-builder/script/context_pack_builder.py \
+  "/path/to/project" \
+  --goal "保存した設定を再起動後も保持する" \
+  --required "設定ファイルの形式は変更しない" \
+  --acceptance "保存と再起動後の読み込みをテストで確認する"
 ```
 
-Native:
+**配布済みの `acr-toolbox` を使う場合**
 
-```text
-acr-toolbox context-pack-builder --goal "..." --required "..." --acceptance "..." <repo-root>
-acr-toolbox context-pack-builder --output CONTEXT_PACK.md <repo-root>
+```sh
+./acr-toolbox context-pack-builder \
+  --goal "保存した設定を再起動後も保持する" \
+  --required "設定ファイルの形式は変更しない" \
+  --acceptance "保存と再起動後の読み込みをテストで確認する" \
+  "/path/to/project"
 ```
 
-`--max-state-lines` はagent-visibleなGit状態だけをboundedにします。0はchanged/status rowsを返さない指定です。負値は0へ正規化します。
+後者は配布物を展開したフォルダーで実行する例です。Windowsでは展開した `acr-toolbox.exe` を呼び出してください。配布済み実行ファイルだけを使うなら、PythonやGoを新しく導入する必要はありません。
 
-## Development routing
+ツールは結果を画面へ表示します。ファイルに保存したい場合は `--output CONTEXT_PACK.md` を追加できます。**同名ファイルがあると上書きされるため、保存先を先に確認してください。**
 
-- Python CLI / output file変更: `script/context_pack_builder.py`
-- Git状態取得変更: `script/messenger.py`
-- Git結果からstateを組み立てるflow変更: `script/commander.py`
-- Context Pack本文・項目変更: `script/processing.py`
-- Python Markdown contract変更: `tests/test_processing.py`
-- Native CLI / Git state / Markdown rendering: `tools/common/native/acr-toolbox/context_pack_command.go`
-- Native contract validation: `tools/common/native/acr-toolbox/context_generation_commands_test.go`
+## AIに作業メモを作らせる
 
-変更内容から読む場所を決め、担当ごとに処理を分け、小さな変更では無関係なコードを読まずに済むようにしています。
+AIがコマンドを実行できる場合は、あなたがAIに目的・守る条件・完了の目安を伝え、この補助ツールで下書きを作らせることもできます。
 
-## Targeted validation
+**次は、あなたがAIに送る依頼文の例です。**
 
 ```text
-python -m unittest discover -s tests
-python -m py_compile script/*.py
+今回の目的は、再起動後も設定値を保持することです。
+設定ファイルの形式は変えないでください。
+保存・読み込みのテストが通ることを完了の条件にします。
+
+context-pack-builderが使える場合は、この条件で作業メモの下書きを作ってください。
+下書きに書かれた変更ファイルの情報を確かめ、関係する仕様とテストの場所を示してください。
+分からない点や確認していない箇所は、推測せず報告してください。
+まだコードを編集しないでください。
 ```
 
-Native:
+AIにコマンド実行機能がない場合は、あなたがツールを使って下書きを作り、その内容をAIへ渡してください。
 
-```text
-cd ../../native/acr-toolbox
-go test ./...
-```
+## ツールが書く内容と、あなたが確かめること
+
+| ツールへ渡す情報 | ツールが下書きに書く内容 |
+| --- | --- |
+| `--goal` | 今回の目的 |
+| `--required` | 必ず守る条件 |
+| `--acceptance` | 完了したか確認する条件 |
+| `--deferred`（任意） | 今回しないこと |
+| 調査対象のフォルダー | Gitが利用できる場合、変更済みファイルと現在の変更状態 |
+
+結果はMarkdown形式の作業メモです。**完成した仕様書でも、検証が終わった報告でもありません。** 検証方法や未確認事項など、空欄になっている項目はあなたが必要に応じて埋めてください。
+
+Gitを使えない場合、ツールはその状況を明示します。「変更なし」と「変更状況を調べられなかった」は別です。また、変更ファイルの一覧を `--max-state-lines` で短くした場合、表示されない行があることもメモに記録されます。表示していない範囲を確認済みとして扱わないでください。
+
+## 使わなくてもよい場合
+
+今回の依頼が短く、目的と完了条件を数行で説明できるなら、あなたは依頼文へそのまま書くだけで十分です。作業メモの作り方は[今回の作業に必要なことを短くまとめる](../../../../docs/jp/手法/今回の作業に必要なことを短くまとめる.md)にもあります。
