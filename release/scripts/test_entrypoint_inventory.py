@@ -40,12 +40,26 @@ class EntrypointInventoryTests(unittest.TestCase):
 
     # {責務: [test_new_python_helpers_and_wrappers_are_rejected: 新しい入口や内部ファイルの登録漏れを検出する], 処理: [1: 三種類のファイルを順に追加する, 2: 未登録として拒否されることを確認する], 引数: [], 戻り値: []}
     def test_new_python_helpers_and_wrappers_are_rejected(self):
-        for name, source in (("new.py", 'if __name__ == "__main__": pass\n'), ("internal.py", "pass\n"), ("new.sh", "")):
+        for name, source in (("new.py", 'if __name__ == "__main__": pass\n'), ("internal.py", "pass\n"),
+                             ("new.sh", ""), ("new.cmd", ""), ("new.ps1", ""), ("bin/new.py", "pass\n")):
             with self.subTest(name=name):
                 path = self.write("tools/app/" + name, source)
-                with self.assertRaisesRegex(ValueError, "unregistered"):
-                    validate(self.manifest, discover(self.root, self.go_entries))
-                path.unlink()
+                try:
+                    with self.assertRaisesRegex(ValueError, "unregistered"):
+                        validate(self.manifest, discover(self.root, self.go_entries))
+                finally:
+                    path.unlink()
+
+    # {責務: [test_python_encoding_and_syntax_diagnostics: 文字コード宣言を尊重し壊れたソースの位置を示す], 処理: [1: UTF以外の宣言付きソースを読む, 2: 構文不正と文字コード不正の位置を照合する], 引数: [], 戻り値: []}
+    def test_python_encoding_and_syntax_diagnostics(self):
+        path = self.root / "tools/app/entry.py"
+        path.write_bytes(b'# coding: latin-1\n# \xe9\nif __name__ == "__main__": pass\n')
+        self.assertTrue(has_main_guard(path))
+        for source in (b"if (", b"# coding: utf-8\n# \xff\n"):
+            path.write_bytes(source)
+            with self.subTest(source=source), self.assertRaises(SyntaxError) as error:
+                has_main_guard(path)
+            self.assertEqual(str(path), error.exception.filename)
 
     # {責務: [test_removal_and_classification_change_are_rejected: 削除と内部モジュールの公開化を検出する], 処理: [1: 起動条件を変えて検査する, 2: ファイルを削除して検査する], 引数: [], 戻り値: []}
     def test_removal_and_classification_change_are_rejected(self):

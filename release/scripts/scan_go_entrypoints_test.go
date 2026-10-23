@@ -56,12 +56,12 @@ func TestNonliteralAndMalformedSourcesFail(t *testing.T) {
 // {責務: [TestTreeFindsEntrypointsOutsideMainFilename: ファイル名に依存せず入口を探し内部試験を除外することを確認する], 処理: [1: 実行入口と除外対象を用意する, 2: 相対位置と空のコマンド一覧を確認する], 引数: [t: 試験], 戻り値: []}
 func TestTreeFindsEntrypointsOutsideMainFilename(t *testing.T) {
 	root := t.TempDir()
-	for _, name := range []string{"tools/new/entry.go", "tools/new/entry_test.go", "tools/new/testdata/main.go"} {
+	for _, name := range []string{"tools/bin/entry.go", "tools/new/entry.go", "tools/new/entry_test.go", "tools/new/testdata/main.go"} {
 		writeGoFixture(t, root, name, `package main; func main() {}`)
 	}
 	writeGoFixture(t, root, "tools/library/helper.go", `package library; func helper() {}`)
 	entries, err := scanGoTree(root)
-	want := []goEntrypoint{{Path: "tools/new/entry.go", Commands: []string{}}}
+	want := []goEntrypoint{{Path: "tools/bin/entry.go", Commands: []string{}}, {Path: "tools/new/entry.go", Commands: []string{}}}
 	if err != nil || !reflect.DeepEqual(entries, want) {
 		t.Fatalf("unexpected tree: %+v, %v", entries, err)
 	}

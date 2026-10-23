@@ -85,7 +85,7 @@ func scanGoTree(root string) ([]goEntrypoint, error) {
 		name := item.Name()
 		if item.IsDir() {
 			switch name {
-			case "tests", "testdata", "fixtures", "dist", "bin", "node_modules", "__pycache__":
+			case "tests", "testdata", "fixtures", "dist", "node_modules", "__pycache__":
 				return filepath.SkipDir
 			}
 			if strings.HasPrefix(name, ".") {

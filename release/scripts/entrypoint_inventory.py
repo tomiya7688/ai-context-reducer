@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path, PurePosixPath
 
 
-SKIP_DIRECTORIES = {"tests", "testdata", "fixtures", "dist", "bin", "node_modules", "__pycache__"}
+SKIP_DIRECTORIES = {"tests", "testdata", "fixtures", "dist", "node_modules", "__pycache__"}
 FIELDS = {"schema_version", "coverage", "python", "internal_python", "shell", "go"}
 
 
@@ -23,7 +23,7 @@ def unique_object(pairs):
 
 # {責務: [has_main_guard: Pythonを直接起動する入口が宣言されているか判定する], 処理: [1: 構文を読み取る, 2: モジュール直下の起動条件を探す], 引数: [path: Pythonソース], 戻り値: [1: 起動条件がある場合は真]}
 def has_main_guard(path):
-    tree = ast.parse(path.read_text(encoding="utf-8-sig"))
+    tree = ast.parse(path.read_bytes(), filename=str(path))
     for statement in tree.body:
         if not isinstance(statement, ast.If):
             continue
@@ -44,7 +44,7 @@ def discover(root, go_entries):
         relative = path.relative_to(root)
         if any(part in SKIP_DIRECTORIES or part.startswith(".") for part in relative.parts[:-1]):
             continue
-        if path.suffix not in {".py", ".sh", ".bat", ".ps1"}:
+        if path.suffix not in {".py", ".sh", ".bat", ".cmd", ".ps1"}:
             continue
         if path.is_symlink():
             raise ValueError(f"source symlink is not supported: {relative}")
