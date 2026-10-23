@@ -82,6 +82,14 @@ jobs:
           test -f release/RELEASE_MANIFEST.json
           bash -n release/scripts/acceptance.sh
           bash -n release/scripts/acr_hub_loopback_smoke.sh
+      - name: Validate public entrypoint inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          go test release/scripts/scan_go_entrypoints.go release/scripts/scan_go_entrypoints_test.go
+          go build -o "$RUNNER_TEMP/scan-go-entrypoints" release/scripts/scan_go_entrypoints.go
+          python release/scripts/test_entrypoint_inventory.py
+          python release/scripts/entrypoint_inventory.py --go-scanner "$RUNNER_TEMP/scan-go-entrypoints"
       - name: Validate release builder and documentation
         shell: bash
         run: |
