@@ -57,9 +57,10 @@ class EntrypointInventoryTests(unittest.TestCase):
         self.assertTrue(has_main_guard(path))
         for source in (b"if (", b"# coding: utf-8\n# \xff\n"):
             path.write_bytes(source)
-            with self.subTest(source=source), self.assertRaises(SyntaxError) as error:
-                has_main_guard(path)
-            self.assertEqual(str(path), error.exception.filename)
+            with self.subTest(source=source):
+                with self.assertRaises(ValueError) as error:
+                    has_main_guard(path)
+                self.assertIn(str(path), str(error.exception))
 
     # {責務: [test_removal_and_classification_change_are_rejected: 削除と内部モジュールの公開化を検出する], 処理: [1: 起動条件を変えて検査する, 2: ファイルを削除して検査する], 引数: [], 戻り値: []}
     def test_removal_and_classification_change_are_rejected(self):

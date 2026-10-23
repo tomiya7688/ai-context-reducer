@@ -4,6 +4,7 @@ import argparse
 import ast
 import json
 import subprocess
+import tokenize
 from pathlib import Path, PurePosixPath
 
 
@@ -23,7 +24,11 @@ def unique_object(pairs):
 
 # {責務: [has_main_guard: Pythonを直接起動する入口が宣言されているか判定する], 処理: [1: 構文を読み取る, 2: モジュール直下の起動条件を探す], 引数: [path: Pythonソース], 戻り値: [1: 起動条件がある場合は真]}
 def has_main_guard(path):
-    tree = ast.parse(path.read_bytes(), filename=str(path))
+    try:
+        with tokenize.open(path) as source:
+            tree = ast.parse(source.read(), filename=str(path))
+    except (SyntaxError, UnicodeError, LookupError) as error:
+        raise ValueError(f"cannot parse Python source {path}: {error}") from error
     for statement in tree.body:
         if not isinstance(statement, ast.If):
             continue
