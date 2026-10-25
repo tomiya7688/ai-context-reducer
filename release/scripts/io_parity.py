@@ -76,7 +76,8 @@ def run_suite(suite, commands):
         previous = None
         for route, command in commands.items():
             with tempfile.TemporaryDirectory() as temporary:
-                work = Path(temporary)
+                # 一時先のリンクやWindowsの短縮名を、実装間の差と誤認しないよう先に解決する。
+                work = Path(temporary).resolve()
                 project = work / "project"
                 project.mkdir()
                 for name, content in suite["fixtures"][case["fixture"]].items():

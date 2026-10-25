@@ -4,6 +4,7 @@ import copy
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -40,6 +41,16 @@ class IOParityTests(unittest.TestCase):
         self.assertEqual(2, run_suite(self.suite, {"first": self.command(), "second": self.command()}))
         with self.assertRaises(ValueError):
             run_suite(self.suite, {})
+
+    # {責務: [test_work_directory_is_canonical_before_launch: 一時先の別表記を入力先の違いと誤認しない], 処理: [1: 同じ一時先を指す別表記を用意する, 2: 子プロセスへ実体の絶対位置が渡ることを確認する], 引数: [], 戻り値: []}
+    def test_work_directory_is_canonical_before_launch(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "actual"
+            target.mkdir()
+            alias = str(target / ".." / "actual")
+            with patch("io_parity.tempfile.TemporaryDirectory") as directory:
+                directory.return_value.__enter__.return_value = alias
+                self.assertEqual(1, run_suite(self.suite, {"canonical": self.command()}))
 
     # {責務: [test_wrong_exit_stderr_json_and_root_fail: 各応答項目の違いを検出する], 処理: [1: 制御した不正応答を順に返す, 2: 正常として通らないことを確認する], 引数: [], 戻り値: []}
     def test_wrong_exit_stderr_json_and_root_fail(self):
