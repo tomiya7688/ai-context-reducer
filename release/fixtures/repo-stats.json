@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "python_entry": "tools/common/small/repo-stats/script/repo_stats.py",
+  "go_entry": "tools/common/native/acr-toolbox/main.go",
+  "command": "stats",
+  "fixtures": {
+    "mixed": {
+      "src/main.py": "print(1)\n\n",
+      "src/util.go": "package sample\n",
+      "README.md": "# Fixture\n",
+      "src/binary.py": "x\u0000\n",
+      "build/generated.py": "ignored\n",
+      "unknown.dat": "ignored\n"
+    },
+    "empty": {}
+  },
+  "cases": [
+    {
+      "id": "mixed-languages-and-ignored-files",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "repo-stats",
+        "status": "ok",
+        "backend": "portable",
+        "recognized_files_seen": 4,
+        "analyzed_file_count": 3,
+        "analyzed_line_count": 4,
+        "oversized_file_count": 0,
+        "read_error_count": 0,
+        "walk_error_count": 0,
+        "binary_like_file_count": 1,
+        "max_file_bytes": 0,
+        "languages": {
+          "Python": {
+            "file_count": 1,
+            "line_count": 2,
+            "byte_count": 10
+          },
+          "Go": {
+            "file_count": 1,
+            "line_count": 1,
+            "byte_count": 15
+          },
+          "Markdown": {
+            "file_count": 1,
+            "line_count": 1,
+            "byte_count": 10
+          }
+        }
+      }
+    },
+    {
+      "id": "explicit-file-size-limit",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "--max-file-bytes",
+        "9"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "repo-stats",
+        "status": "ok",
+        "backend": "portable",
+        "recognized_files_seen": 4,
+        "analyzed_file_count": 0,
+        "analyzed_line_count": 0,
+        "oversized_file_count": 3,
+        "binary_like_file_count": 1,
+        "max_file_bytes": 9,
+        "read_error_count": 0,
+        "walk_error_count": 0,
+        "languages": {}
+      }
+    },
+    {
+      "id": "empty-directory",
+      "fixture": "empty",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "repo-stats",
+        "status": "ok",
+        "backend": "portable",
+        "recognized_files_seen": 0,
+        "analyzed_file_count": 0,
+        "analyzed_line_count": 0,
+        "oversized_file_count": 0,
+        "binary_like_file_count": 0,
+        "max_file_bytes": 0,
+        "read_error_count": 0,
+        "walk_error_count": 0,
+        "languages": {}
+      }
+    },
+    {
+      "id": "missing-root",
+      "fixture": "empty",
+      "root": "missing",
+      "args": [
+        "--backend",
+        "portable"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "repo-stats",
+        "status": "input_missing"
+      }
+    },
+    {
+      "id": "file-instead-of-directory",
+      "fixture": "mixed",
+      "root": "src/main.py",
+      "args": [
+        "--backend",
+        "portable"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "repo-stats",
+        "status": "input_not_directory"
+      }
+    },
+    {
+      "id": "optional-backend-unavailable",
+      "fixture": "empty",
+      "root": ".",
+      "args": [
+        "--backend",
+        "scc"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "repo-stats",
+        "status": "external_backend_unavailable",
+        "backend": "scc"
+      }
+    }
+  ]
+}
