@@ -90,6 +90,8 @@ jobs:
           go build -o "$RUNNER_TEMP/scan-go-entrypoints" release/scripts/scan_go_entrypoints.go
           python release/scripts/test_entrypoint_inventory.py
           python release/scripts/entrypoint_inventory.py --go-scanner "$RUNNER_TEMP/scan-go-entrypoints"
+          python release/scripts/test_io_parity.py
+          python release/scripts/io_parity.py --python
       - name: Validate release builder and documentation
         shell: bash
         run: |
@@ -222,6 +224,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python release/scripts/io_parity.py --python --binary "$BUNDLE/acr-toolbox${{ matrix.ext }}"
+          python release/scripts/io_parity.py --binary "$FULL_BUNDLE/acr-toolbox${{ matrix.ext }}"
           bash release/scripts/acceptance.sh "$BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance"
           bash release/scripts/acceptance.sh "$FULL_BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/full-release-acceptance"
           python release/scripts/runtime_smoke.py "$BUNDLE" --install-guard "$INSTALL_GUARD_BIN"
@@ -283,6 +287,7 @@ jobs:
             test -x "$extracted/affected-tests"
           fi
 
+          python release/scripts/io_parity.py --binary "$extracted/acr-toolbox${{ matrix.ext }}"
           bash release/scripts/acceptance.sh "$extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance-extracted"
           python release/scripts/runtime_smoke.py "$extracted" --install-guard "$INSTALL_GUARD_BIN"
           full_verify="$RUNNER_TEMP/full-archive-verify"
@@ -290,6 +295,7 @@ jobs:
           python release/scripts/archive_tools.py extract "$FULL_ARCHIVE" "$full_verify"
           full_extracted="$full_verify/$(basename "$FULL_BUNDLE")"
           python release/scripts/full_bundle.py verify --repo . --bundle "$full_extracted" --version "$RELEASE_VERSION"
+          python release/scripts/io_parity.py --binary "$full_extracted/acr-toolbox${{ matrix.ext }}"
           bash release/scripts/acceptance.sh "$full_extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/full-acceptance-extracted"
           python release/scripts/runtime_smoke.py "$full_extracted" --full --install-guard "$INSTALL_GUARD_BIN"
       - uses: actions/upload-artifact@v4
