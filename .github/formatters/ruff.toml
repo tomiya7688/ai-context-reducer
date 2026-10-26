@@ -1,0 +1,4 @@
+target-version = "py312"
+line-length = 100
+force-exclude = true
+extend-exclude = ["release/fixtures", "**/node_modules", "**/__pycache__"]

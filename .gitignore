@@ -2,3 +2,6 @@
 /.codex/implementation-notes.md
 /.codex/review-criteria.md
 /.codex/AGENTS.private.md
+
+# 開発用の整形依存は配布しない。
+/.github/formatters/node_modules/
