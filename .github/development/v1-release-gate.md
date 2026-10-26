@@ -57,6 +57,24 @@ Release CIは、ソース側のPython単独、6環境の通常版バイナリと
 
 報告の`coverage: partial`は統計の6事例だけの確認を表す。他の入口へのテスト割り当て、全入口の未割り当て検出、他のコマンドやGUI操作の意味比較はIssue #33の残件である。この検査はOS全体の書き込み・通信を隔離するものではない。
 
+## 入出力テストの割り当てと未割り当ての検出
+
+`release/scripts/io_coverage.py`は`ENTRYPOINTS.json`と`release/fixtures/*.json`を照合する。Python入口・シェル・Go入口・Goサブコマンドを別の公開面として数え、現在は118件のうち統計の2件を割り当て済みとする。Go入口は、登録されたサブコマンド全ての割り当てがある場合だけ集約する。サブコマンドのない単独バイナリやGUIを、この比較器で検査済みにはしない。
+
+`release/IO_PENDING.json`は、Issue #33で残っている116件だけを固定した一覧である。通常のCIは`python release/scripts/io_coverage.py --allow-pending`でこの既知の残件を認める。新しい未割り当て、削除後の古い残件、割り当て済みなのに残った例外、重複は失敗する。新しい入口を追加した際に残件一覧を自動で増やす処理はない。例外を増やす変更もレビュー対象となる。
+
+`python release/scripts/io_coverage.py`は厳密な確認であり、現在は116件の未割り当てを報告して終了コード1を返す。リリース公開ジョブは、この厳密な確認を通らなければ配布しない。通常CIが成功しても公開可能・全入口の入出力検査済みとは扱わない。
+
+`--allow-pending --run --python --binary <acr-toolboxの絶対位置>`で、登録された全ての事例を指定経路へ渡す。CIは特定の統計ファイル名だけを起動せず、今後追加された事例も同じ入口から実行する。新しい事例を追加したら対応する残件を消す。空の事例、登録されていない入口、未対応のバイナリ経路、リポジトリ外やリンク先の定義は拒否する。割り当ての報告と実行件数を区別し、実行していない監査では実行件数を0とする。
+
+## 変更ファイルの整形
+
+PythonはRuff 0.15.22、JavaScript・JSON・YAML・MarkdownはPrettier 3.6.2に固定する。準備は`python -m pip install -r .github/formatters/requirements.txt`と`npm ci --prefix .github/formatters --ignore-scripts`で行う。必要なら先にEドライブ内の作業先へPythonの仮想環境を作る。
+
+整形はリポジトリのルートから`npm --prefix .github/formatters run format -- <変更ファイル>...`、書き換えない確認は`npm --prefix .github/formatters run format:check -- <変更ファイル>...`を実行する。別のPythonを使う場合は環境変数`PYTHON`にその実体を指定する。指定バージョンと違うRuffでは失敗する。対象を省略した全体整形、リポジトリ外、生成物、依存物、原文を保つfixtureは受け付けない。RuffのTOML設定はRuff自身が読み込み、依存の版指定は固定ファイルで管理する。
+
+CIは今回追加・変更したPython・設定・開発文書だけを書き換えず検査する。既存の他のソースへ一括整形を広げない。今後別のファイルを変更する担当者は、そのファイルを明示して同じ整形入口を使う。
+
 ## 未完了の検査と隔離の範囲
 
 ユーザーが公開する全スクリプトの同一fixtureによる網羅的な意味比較はIssue #33、全体の追加インストール防止検査は #34 の残件も含む。基本機能の空PATH検査だけで、これらの全項目が完了したとは扱わない。

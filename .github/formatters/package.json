@@ -1,0 +1,13 @@
+{
+  "name": "acr-development-formatters",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "node format.mjs",
+    "format:check": "node format.mjs --check"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

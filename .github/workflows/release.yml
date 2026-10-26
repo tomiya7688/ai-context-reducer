@@ -13,6 +13,7 @@ on:
       - 'templates/**'
       - 'LICENSE'
       - '.github/workflows/release.yml'
+      - '.github/formatters/**'
     tags:
       - 'v*'
   workflow_dispatch:
@@ -40,6 +41,7 @@ on:
       - 'templates/**'
       - 'README*'
       - '.github/workflows/release.yml'
+      - '.github/formatters/**'
 permissions:
   contents: write
 
@@ -82,6 +84,13 @@ jobs:
           test -f release/RELEASE_MANIFEST.json
           bash -n release/scripts/acceptance.sh
           bash -n release/scripts/acr_hub_loopback_smoke.sh
+      - name: Check changed release files formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r .github/formatters/requirements.txt
+          npm ci --prefix .github/formatters --ignore-scripts --no-audit --no-fund
+          npm --prefix .github/formatters run format:check -- .github/formatters/format.mjs .github/formatters/package.json .github/formatters/package-lock.json release/scripts/io_coverage.py release/scripts/test_io_coverage.py release/IO_PENDING.json .github/workflows/release.yml .github/development/v1-release-gate.md
       - name: Validate public entrypoint inventory
         shell: bash
         run: |
@@ -91,7 +100,9 @@ jobs:
           python release/scripts/test_entrypoint_inventory.py
           python release/scripts/entrypoint_inventory.py --go-scanner "$RUNNER_TEMP/scan-go-entrypoints"
           python release/scripts/test_io_parity.py
-          python release/scripts/io_parity.py --python
+          python release/scripts/test_io_coverage.py
+          python release/scripts/io_coverage.py --allow-pending
+          python release/scripts/io_coverage.py --allow-pending --run --python
       - name: Validate release builder and documentation
         shell: bash
         run: |
@@ -224,8 +235,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python release/scripts/io_parity.py --python --binary "$BUNDLE/acr-toolbox${{ matrix.ext }}"
-          python release/scripts/io_parity.py --binary "$FULL_BUNDLE/acr-toolbox${{ matrix.ext }}"
+          python release/scripts/io_coverage.py --allow-pending --run --python --binary "$BUNDLE/acr-toolbox${{ matrix.ext }}"
+          python release/scripts/io_coverage.py --allow-pending --run --binary "$FULL_BUNDLE/acr-toolbox${{ matrix.ext }}"
           bash release/scripts/acceptance.sh "$BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance"
           bash release/scripts/acceptance.sh "$FULL_BUNDLE" "$RELEASE_VERSION" "$RUNNER_TEMP/full-release-acceptance"
           python release/scripts/runtime_smoke.py "$BUNDLE" --install-guard "$INSTALL_GUARD_BIN"
@@ -287,7 +298,7 @@ jobs:
             test -x "$extracted/affected-tests"
           fi
 
-          python release/scripts/io_parity.py --binary "$extracted/acr-toolbox${{ matrix.ext }}"
+          python release/scripts/io_coverage.py --allow-pending --run --binary "$extracted/acr-toolbox${{ matrix.ext }}"
           bash release/scripts/acceptance.sh "$extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/release-acceptance-extracted"
           python release/scripts/runtime_smoke.py "$extracted" --install-guard "$INSTALL_GUARD_BIN"
           full_verify="$RUNNER_TEMP/full-archive-verify"
@@ -295,7 +306,7 @@ jobs:
           python release/scripts/archive_tools.py extract "$FULL_ARCHIVE" "$full_verify"
           full_extracted="$full_verify/$(basename "$FULL_BUNDLE")"
           python release/scripts/full_bundle.py verify --repo . --bundle "$full_extracted" --version "$RELEASE_VERSION"
-          python release/scripts/io_parity.py --binary "$full_extracted/acr-toolbox${{ matrix.ext }}"
+          python release/scripts/io_coverage.py --allow-pending --run --binary "$full_extracted/acr-toolbox${{ matrix.ext }}"
           bash release/scripts/acceptance.sh "$full_extracted" "$RELEASE_VERSION" "$RUNNER_TEMP/full-acceptance-extracted"
           python release/scripts/runtime_smoke.py "$full_extracted" --full --install-guard "$INSTALL_GUARD_BIN"
       - uses: actions/upload-artifact@v4
@@ -374,6 +385,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require complete I/O assignments before publication
+        shell: bash
+        run: python release/scripts/io_coverage.py
       - uses: actions/download-artifact@v4
         with:
           name: v1-release-candidate
