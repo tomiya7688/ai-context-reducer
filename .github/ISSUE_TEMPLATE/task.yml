@@ -36,11 +36,14 @@ body:
     id: priority
     attributes:
       label: 優先度
+      description: "P0は重大な緊急事態専用、通常はP2とする"
       options:
-        - P0 - 公開文書・利用者が理解するための基盤
-        - P1 - 正しさに関わる実装・バグ
-        - P2 - source内部の可読性・保守性
-        - P3 - CI・Release仕上げ・その他
+        - "P0 - 緊急（重大障害・セキュリティ事故・データ損失）"
+        - "P1 - 高（直近の重要タスク・開発ブロッカー）"
+        - "P2 - 通常（一般的な実装・不具合・文書作業）"
+        - "P3 - 低（後回し可能な改善）"
+        - "P4 - 保留（長期構想・アイデア）"
+      default: 2
     validations:
       required: true
 
