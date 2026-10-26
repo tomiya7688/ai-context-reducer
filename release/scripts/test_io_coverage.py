@@ -139,10 +139,12 @@ class CoverageTests(unittest.TestCase):
 
     # {責務: [test_multiple_suites_for_one_surface_are_all_executed: 同じ入口の追加事例で被覆件数を水増しせず全事例を実行する], 処理: [1: 別名の定義を追加する, 2: 割り当て件数と実行件数を分けて確認する], 引数: [], 戻り値: []}
     def test_multiple_suites_for_one_surface_are_all_executed(self):
-        self.write("release/fixtures/stats-more.json", self.suite)
+        second = copy.deepcopy(self.suite)
+        second["cases"].append(dict(second["cases"][0], id="another-empty"))
+        self.write("release/fixtures/stats-more.json", second)
         report, suites = load_coverage(self.repo)
         self.assertEqual(2, report["assigned_surfaces"])
-        self.assertEqual(2, report["case_count"])
+        self.assertEqual(3, report["case_count"])
         with patch("io_coverage.run_suite", return_value=1) as run:
             self.assertEqual(2, execute_suites(self.repo, suites, python=True))
         self.assertEqual(2, run.call_count)
@@ -153,6 +155,17 @@ class CoverageTests(unittest.TestCase):
             with patch("io_coverage.run_suite") as run:
                 with self.assertRaisesRegex(ValueError, "Python entry"):
                     execute_suites(self.repo, [("stats", self.suite)], python=True)
+                run.assert_not_called()
+
+    # {責務: [test_later_outside_entry_blocks_all_execution: 後続の不正な入口も全事例の実行前に拒否する], 処理: [1: 正常と外部入口の順で渡す, 2: 比較器が一度も呼ばれないことを確認する], 引数: [], 戻り値: []}
+    def test_later_outside_entry_blocks_all_execution(self):
+        for outside in ("../outside.py", str(self.repo.parent / "outside.py")):
+            second = dict(self.suite, python_entry=outside)
+            with self.subTest(outside=outside), patch("io_coverage.run_suite") as run:
+                with self.assertRaisesRegex(ValueError, "Python entry"):
+                    execute_suites(
+                        self.repo, [("stats", self.suite), ("outside", second)], python=True
+                    )
                 run.assert_not_called()
 
     # {責務: [test_cli_execution_modes_and_diagnostics: CLIの実行経路と失敗時の残件を正しく報告する], 処理: [1: 小さい実入口を用意する, 2: 引数不足と厳密な拒否を確認する, 3: 許可付きで実行する], 引数: [], 戻り値: []}

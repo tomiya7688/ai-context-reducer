@@ -99,14 +99,17 @@ def load_coverage(repo):
 def execute_suites(repo, suites, python=False, binary=None):
     if not python and binary is None:
         raise ValueError("at least one execution route is required")
+    # 後続の入口が不正な場合も、先頭の事例を実行する前に拒否する。
+    if python:
+        for _, suite in suites:
+            entry = repo / suite["python_entry"]
+            if entry.is_symlink() or not entry.resolve().is_relative_to(repo.resolve()):
+                raise ValueError(f"Python entry must stay inside repository: {entry}")
     count = 0
     for _, suite in suites:
         commands = {}
         if python:
-            entry = repo / suite["python_entry"]
-            if entry.is_symlink() or not entry.resolve().is_relative_to(repo.resolve()):
-                raise ValueError(f"Python entry must stay inside repository: {entry}")
-            commands["python"] = [sys.executable, str(entry)]
+            commands["python"] = [sys.executable, str(repo / suite["python_entry"])]
         if binary is not None:
             commands["binary"] = [str(binary.resolve()), suite["command"]]
         count += run_suite(suite, commands)
@@ -134,7 +137,7 @@ def main():
         report["executions"] = execute_suites(repo, suites, args.python, args.binary)
         report["executed_routes"] = [
             route
-            for route, enabled in (("python", args.python), ("binary", args.binary))
+            for route, enabled in (("python", args.python), ("binary", args.binary is not None))
             if enabled
         ]
         # 成功した実行では残件一覧を省く。未実行の失敗では診断を残す。
