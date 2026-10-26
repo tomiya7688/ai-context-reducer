@@ -145,9 +145,15 @@ class CoverageTests(unittest.TestCase):
         report, suites = load_coverage(self.repo)
         self.assertEqual(2, report["assigned_surfaces"])
         self.assertEqual(3, report["case_count"])
-        with patch("io_coverage.run_suite", return_value=1) as run:
-            self.assertEqual(2, execute_suites(self.repo, suites, python=True))
+        with patch(
+            "io_coverage.run_suite", side_effect=lambda suite, commands: len(suite["cases"])
+        ) as run:
+            self.assertEqual(3, execute_suites(self.repo, suites, python=True))
         self.assertEqual(2, run.call_count)
+        self.assertEqual(
+            {("empty",), ("empty", "another-empty")},
+            {tuple(case["id"] for case in call.args[0]["cases"]) for call in run.call_args_list},
+        )
 
     # {責務: [test_python_entry_link_is_rejected_before_execution: 登録された入口からリポジトリ外を実行しない], 処理: [1: 入口をリンクと模擬する, 2: 比較器を呼ぶ前に拒否する], 引数: [], 戻り値: []}
     def test_python_entry_link_is_rejected_before_execution(self):
@@ -226,11 +232,16 @@ class CoverageTests(unittest.TestCase):
     # {責務: [test_linked_definitions_fail_without_reading: 定義のリンクから別の保存先を読ませない], 処理: [1: 残件定義をリンクと模擬する, 2: 読み取り前に拒否する], 引数: [], 戻り値: []}
     def test_linked_definitions_fail_without_reading(self):
         original = Path.is_symlink
+        read_text = Path.read_text
         with patch.object(
             Path, "is_symlink", lambda path: path.name == "IO_PENDING.json" or original(path)
         ):
-            with self.assertRaisesRegex(ValueError, "symlink"):
-                load_coverage(self.repo)
+            with patch.object(Path, "read_text", autospec=True, side_effect=read_text) as read:
+                with self.assertRaisesRegex(ValueError, "symlink"):
+                    load_coverage(self.repo)
+        self.assertEqual(
+            [self.repo / "release/ENTRYPOINTS.json"], [call.args[0] for call in read.call_args_list]
+        )
 
     # {責務: [test_strict_cli_blocks_pending_and_complete_cli_passes: 段階的CIと公開前の終了コードを区別する], 処理: [1: 残件ありの厳密・許可付き実行を比較する, 2: 全割り当て後の成功を確認する], 引数: [], 戻り値: []}
     def test_strict_cli_blocks_pending_and_complete_cli_passes(self):

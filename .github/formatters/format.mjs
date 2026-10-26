@@ -34,6 +34,8 @@ const files = [
           .some((part) =>
             [
               'node_modules',
+              '.venv',
+              'venv',
               'vendor',
               'fixtures',
               'testdata',
