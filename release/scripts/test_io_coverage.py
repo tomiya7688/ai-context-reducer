@@ -124,8 +124,74 @@ class CoverageTests(unittest.TestCase):
             self.assertEqual(4, execute_suites(self.repo, suites, True, self.repo / "acr-toolbox"))
         self.assertEqual(2, run.call_count)
         self.assertEqual(
+            {
+                ("next", (sys.executable, str(self.repo / "tools/next.py"))),
+                ("stats", (sys.executable, str(self.repo / "tools/stats.py"))),
+            },
+            {
+                (call.args[0]["command"], tuple(call.args[1]["python"]))
+                for call in run.call_args_list
+            },
+        )
+        self.assertEqual(
             {"next", "stats"}, {call.args[1]["binary"][1] for call in run.call_args_list}
         )
+
+    # {責務: [test_multiple_suites_for_one_surface_are_all_executed: 同じ入口の追加事例で被覆件数を水増しせず全事例を実行する], 処理: [1: 別名の定義を追加する, 2: 割り当て件数と実行件数を分けて確認する], 引数: [], 戻り値: []}
+    def test_multiple_suites_for_one_surface_are_all_executed(self):
+        self.write("release/fixtures/stats-more.json", self.suite)
+        report, suites = load_coverage(self.repo)
+        self.assertEqual(2, report["assigned_surfaces"])
+        self.assertEqual(2, report["case_count"])
+        with patch("io_coverage.run_suite", return_value=1) as run:
+            self.assertEqual(2, execute_suites(self.repo, suites, python=True))
+        self.assertEqual(2, run.call_count)
+
+    # {責務: [test_python_entry_link_is_rejected_before_execution: 登録された入口からリポジトリ外を実行しない], 処理: [1: 入口をリンクと模擬する, 2: 比較器を呼ぶ前に拒否する], 引数: [], 戻り値: []}
+    def test_python_entry_link_is_rejected_before_execution(self):
+        with patch.object(Path, "is_symlink", return_value=True):
+            with patch("io_coverage.run_suite") as run:
+                with self.assertRaisesRegex(ValueError, "Python entry"):
+                    execute_suites(self.repo, [("stats", self.suite)], python=True)
+                run.assert_not_called()
+
+    # {責務: [test_cli_execution_modes_and_diagnostics: CLIの実行経路と失敗時の残件を正しく報告する], 処理: [1: 小さい実入口を用意する, 2: 引数不足と厳密な拒否を確認する, 3: 許可付きで実行する], 引数: [], 戻り値: []}
+    def test_cli_execution_modes_and_diagnostics(self):
+        entry = self.repo / "tools/stats.py"
+        entry.parent.mkdir(parents=True)
+        entry.write_text(
+            "import json, sys\nfrom pathlib import Path\n"
+            'print(json.dumps({"status": "ok", "project_root": str(Path(sys.argv[-1]).resolve())}))\n',
+            encoding="utf-8",
+        )
+        script = Path(__file__).with_name("io_coverage.py")
+        for flags, code in (
+            (["--run"], 2),
+            (["--python"], 2),
+            (["--run", "--python"], 1),
+            (["--allow-pending", "--run", "--python"], 0),
+        ):
+            with self.subTest(flags=flags):
+                result = subprocess.run(
+                    [sys.executable, str(script), "--repo", str(self.repo), *flags],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=30,
+                )
+                self.assertEqual(code, result.returncode, result.stderr)
+                if code == 2:
+                    self.assertIn("must be supplied together", result.stderr)
+                    continue
+                report = json.loads(result.stdout)
+                if code == 1:
+                    self.assertEqual(0, report["executions"])
+                    self.assertEqual([], report["executed_routes"])
+                    self.assertEqual(sorted(self.pending), report["pending"])
+                else:
+                    self.assertEqual(1, report["executions"])
+                    self.assertEqual(["python"], report["executed_routes"])
+                    self.assertNotIn("pending", report)
 
     # {責務: [test_empty_invalid_and_unsupported_suites_fail: 実行できない事例を登録件数に数えない], 処理: [1: 事例を不正にする, 2: 空の定義一覧も拒否する], 引数: [], 戻り値: []}
     def test_empty_invalid_and_unsupported_suites_fail(self):

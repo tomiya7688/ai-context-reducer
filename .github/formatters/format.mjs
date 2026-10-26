@@ -15,37 +15,44 @@ const check = process.argv.includes('--check');
 const names = process.argv.slice(2).filter((arg) => arg !== '--check');
 if (!names.length)
   throw new Error('Specify the changed files; whole-tree formatting is not supported.');
-const files = names.map((name) => {
-  const file = fs.realpathSync(path.resolve(root, name));
-  const relative = path.relative(root, file);
-  if (
-    relative === '..' ||
-    relative.startsWith('..' + path.sep) ||
-    path.isAbsolute(relative) ||
-    !fs.statSync(file).isFile()
-  )
-    throw new Error('Format target must be a file inside this repository: ' + name);
-  if (
-    relative
-      .split(path.sep)
-      .some((part) =>
-        [
-          'node_modules',
-          'vendor',
-          'fixtures',
-          'testdata',
-          '__pycache__',
-          '.git',
-          'dist',
-          'build',
-        ].includes(part),
+const files = [
+  ...new Set(
+    names.map((name) => {
+      const file = fs.realpathSync(path.resolve(root, name));
+      const relative = path.relative(root, file);
+      if (
+        relative === '..' ||
+        relative.startsWith('..' + path.sep) ||
+        path.isAbsolute(relative) ||
+        !fs.statSync(file).isFile()
       )
-  )
-    throw new Error('Generated files, dependencies and preserved fixtures are excluded: ' + name);
-  if (!['.py', '.json', '.yml', '.yaml', '.md', '.mjs', '.js'].includes(path.extname(file)))
-    throw new Error('Unsupported formatter target: ' + file);
-  return file;
-});
+        throw new Error('Format target must be a file inside this repository: ' + name);
+      if (
+        relative
+          .split(path.sep)
+          .some((part) =>
+            [
+              'node_modules',
+              'vendor',
+              'fixtures',
+              'testdata',
+              '__pycache__',
+              '.git',
+              'dist',
+              'build',
+            ].includes(part),
+          )
+      )
+        throw new Error(
+          'Generated files, dependencies and preserved fixtures are excluded: ' + name,
+        );
+      if (!['.py', '.json', '.yml', '.yaml', '.md', '.mjs', '.js'].includes(path.extname(file)))
+        throw new Error('Unsupported formatter target: ' + file);
+      return file;
+    }),
+  ),
+];
+// 相対位置は呼び出し元によらずリポジトリのルートを基準とする。
 const pythonFiles = files.filter((file) => path.extname(file) === '.py');
 if (pythonFiles.length) {
   const python = process.env.PYTHON || 'python';
@@ -61,11 +68,12 @@ if (pythonFiles.length) {
     path.join(root, '.github/formatters/ruff.toml'),
   ];
   if (check) args.push('--check');
-  const result = spawnSync(python, [...args, ...pythonFiles], { stdio: 'inherit' });
+  const result = spawnSync(python, [...args, ...pythonFiles], { stdio: 'inherit', cwd: root });
   if (result.error || result.status !== 0) process.exit(result.status || 1);
 }
 let failed = false;
-for (const file of files.filter((file) => !pythonFiles.includes(file))) {
+const prettierFiles = files.filter((file) => !pythonFiles.includes(file));
+for (const file of prettierFiles) {
   if (!['.json', '.yml', '.yaml', '.md', '.mjs', '.js'].includes(path.extname(file)))
     throw new Error('Unsupported formatter target: ' + file);
   const before = fs.readFileSync(file, 'utf8');
@@ -88,7 +96,9 @@ console.log(
     prettier.version +
     (check ? ' check' : ' format') +
     ': ' +
-    files.length +
+    prettierFiles.length +
+    ' explicit files; Ruff: ' +
+    pythonFiles.length +
     ' explicit files',
 );
 if (failed) process.exit(1);

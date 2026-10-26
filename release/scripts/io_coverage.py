@@ -32,7 +32,7 @@ def public_surfaces(inventory):
     return surfaces
 
 
-# {責務: [load_coverage: 事例と既知の未割り当てを公開入口へ一対一で対応させる], 処理: [1: 定義を読み検証する, 2: 実行できる事例を全件集める, 3: 新規の欠落・古い例外・重複を拒否する], 引数: [repo: リポジトリ], 戻り値: [1: 割り当て報告, 2: 全ての事例定義]}
+# {責務: [load_coverage: 公開入口を事例ありと既知の未割り当てへ分ける], 処理: [1: 定義を読み検証する, 2: 実行できる事例を全件集める, 3: 新規の欠落・古い例外・重複を拒否する], 引数: [repo: リポジトリ], 戻り値: [1: 割り当て報告, 2: 全ての事例定義]}
 def load_coverage(repo):
     repo = repo.resolve()
     inventory = load_json(repo, repo / "release/ENTRYPOINTS.json")
@@ -103,7 +103,10 @@ def execute_suites(repo, suites, python=False, binary=None):
     for _, suite in suites:
         commands = {}
         if python:
-            commands["python"] = [sys.executable, str(repo / suite["python_entry"])]
+            entry = repo / suite["python_entry"]
+            if entry.is_symlink() or not entry.resolve().is_relative_to(repo.resolve()):
+                raise ValueError(f"Python entry must stay inside repository: {entry}")
+            commands["python"] = [sys.executable, str(entry)]
         if binary is not None:
             commands["binary"] = [str(binary.resolve()), suite["command"]]
         count += run_suite(suite, commands)
@@ -126,10 +129,15 @@ def main():
     incomplete = report["pending_surfaces"] > 0 and not args.allow_pending
     report["status"] = "incomplete" if incomplete else "ok"
     report["executions"] = 0
+    report["executed_routes"] = []
     if args.run and not incomplete:
         report["executions"] = execute_suites(repo, suites, args.python, args.binary)
-    # 実行時は同じ116件の位置を繰り返さず、監査結果と原本に残す。
-    if args.run:
+        report["executed_routes"] = [
+            route
+            for route, enabled in (("python", args.python), ("binary", args.binary))
+            if enabled
+        ]
+        # 成功した実行では残件一覧を省く。未実行の失敗では診断を残す。
         del report["pending"]
     print(json.dumps(report))
     return 1 if incomplete else 0
