@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import prettier from 'prettier';
 
-const root = fs.realpathSync(fileURLToPath(new URL('../../', import.meta.url)));
+const root = fs.realpathSync.native(fileURLToPath(new URL('../../', import.meta.url)));
 const expectedPrettier = JSON.parse(
   fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 ).devDependencies.prettier;
@@ -15,10 +15,11 @@ const check = process.argv.includes('--check');
 const names = process.argv.slice(2).filter((arg) => arg !== '--check');
 if (!names.length)
   throw new Error('Specify the changed files; whole-tree formatting is not supported.');
+// 相対位置は呼び出し元によらずリポジトリのルートを基準とする。
 const files = [
   ...new Set(
     names.map((name) => {
-      const file = fs.realpathSync(path.resolve(root, name));
+      const file = fs.realpathSync.native(path.resolve(root, name));
       const relative = path.relative(root, file);
       if (
         relative === '..' ||
@@ -52,7 +53,6 @@ const files = [
     }),
   ),
 ];
-// 相対位置は呼び出し元によらずリポジトリのルートを基準とする。
 const pythonFiles = files.filter((file) => path.extname(file) === '.py');
 if (pythonFiles.length) {
   const python = process.env.PYTHON || 'python';
