@@ -17,18 +17,38 @@ def relative_path(name, allow_root=False):
     if not isinstance(name, str) or not name or "\\" in name or ":" in name:
         raise ValueError(f"invalid fixture path: {name}")
     path = PurePosixPath(name)
-    if path.is_absolute() or ".." in path.parts or path.as_posix() != name or (name == "." and not allow_root):
+    if (
+        path.is_absolute()
+        or ".." in path.parts
+        or path.as_posix() != name
+        or (name == "." and not allow_root)
+    ):
         raise ValueError(f"invalid fixture path: {name}")
     return path
 
 
 # {責務: [validate_suite: 入力と期待値の形式および公開入口への対応を確認する], 処理: [1: 形式と重複を検査する, 2: 公開入口一覧と照合する, 3: 全事例の入力を検証する], 引数: [suite: 検査定義, inventory: 公開入口一覧], 戻り値: []}
 def validate_suite(suite, inventory):
-    if set(suite) != {"schema_version", "python_entry", "go_entry", "command", "fixtures", "cases"} or type(suite["schema_version"]) is not int or suite["schema_version"] != 1:
+    required = {"schema_version", "python_entry", "go_entry", "command", "fixtures", "cases"}
+    if (
+        not isinstance(suite, dict)
+        or set(suite) not in (required, required | {"root_field"})
+        or type(suite["schema_version"]) is not int
+        or suite["schema_version"] != 1
+    ):
         raise ValueError("unsupported I/O suite schema")
-    if suite["python_entry"] not in inventory["python"] or suite["command"] not in inventory["go"].get(suite["go_entry"], []):
+    if suite.get("root_field", "project_root") not in ("project_root", "root_path"):
+        raise ValueError("unsupported I/O root field")
+    if suite["python_entry"] not in inventory["python"] or suite["command"] not in inventory[
+        "go"
+    ].get(suite["go_entry"], []):
         raise ValueError("I/O suite refers to an unregistered entrypoint")
-    if not isinstance(suite["fixtures"], dict) or not suite["fixtures"] or not isinstance(suite["cases"], list) or not suite["cases"]:
+    if (
+        not isinstance(suite["fixtures"], dict)
+        or not suite["fixtures"]
+        or not isinstance(suite["cases"], list)
+        or not suite["cases"]
+    ):
         raise ValueError("fixtures and cases must not be empty")
     for files in suite["fixtures"].values():
         if not isinstance(files, dict):
@@ -39,15 +59,32 @@ def validate_suite(suite, inventory):
                 raise ValueError("fixture content must be text")
     seen = set()
     for case in suite["cases"]:
-        if not isinstance(case, dict) or set(case) != {"id", "fixture", "root", "args", "exit_code", "stderr", "json"}:
+        if not isinstance(case, dict) or set(case) != {
+            "id",
+            "fixture",
+            "root",
+            "args",
+            "exit_code",
+            "stderr",
+            "json",
+        }:
             raise ValueError("invalid I/O case fields")
         if not isinstance(case["id"], str) or not case["id"] or case["id"] in seen:
             raise ValueError("invalid or duplicate I/O case id")
         seen.add(case["id"])
         relative_path(case["root"], allow_root=True)
-        if case["fixture"] not in suite["fixtures"] or not isinstance(case["args"], list) or any(not isinstance(arg, str) for arg in case["args"]):
+        if (
+            case["fixture"] not in suite["fixtures"]
+            or not isinstance(case["args"], list)
+            or any(not isinstance(arg, str) for arg in case["args"])
+        ):
             raise ValueError("invalid fixture reference or arguments")
-        if type(case["exit_code"]) is not int or not isinstance(case["stderr"], str) or not isinstance(case["json"], dict) or not case["json"].get("status"):
+        if (
+            type(case["exit_code"]) is not int
+            or not isinstance(case["stderr"], str)
+            or not isinstance(case["json"], dict)
+            or not case["json"].get("status")
+        ):
             raise ValueError("exit code, stderr and JSON status expectations are required")
 
 
@@ -61,7 +98,10 @@ def project_expected(actual, expected, location="$"):
         # 空の辞書は、言語別集計が存在しないという期待値にも使う。
         if not expected and actual:
             raise ValueError(f"{location}: expected an empty object")
-        return {key: project_expected(actual[key], value, f"{location}.{key}") for key, value in expected.items()}
+        return {
+            key: project_expected(actual[key], value, f"{location}.{key}")
+            for key, value in expected.items()
+        }
     if actual != expected:
         raise ValueError(f"{location}: expected {expected!r}, got {actual!r}")
     return actual
@@ -89,14 +129,25 @@ def run_suite(suite, commands):
                 root = project / relative_path(case["root"], allow_root=True)
                 env = dict(os.environ, PATH=str(empty_path), PYTHONDONTWRITEBYTECODE="1")
                 before = snapshot(work)
-                result = subprocess.run([*command, *case["args"], str(root)], input="", capture_output=True,
-                                        text=True, encoding="utf-8", env=env, cwd=work, timeout=30)
+                result = subprocess.run(
+                    [*command, *case["args"], str(root)],
+                    input="",
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    env=env,
+                    cwd=work,
+                    timeout=30,
+                )
                 label = f"{case['id']}/{route}"
                 if result.returncode != case["exit_code"] or result.stderr != case["stderr"]:
-                    raise ValueError(f"{label}: exit/stderr mismatch: {result.returncode}: {result.stderr}")
+                    raise ValueError(
+                        f"{label}: exit/stderr mismatch: {result.returncode}: {result.stderr}"
+                    )
                 payload = json.loads(result.stdout, object_pairs_hook=unique_object)
-                if not isinstance(payload, dict) or payload.get("project_root") != str(root.resolve()):
-                    raise ValueError(f"{label}: unexpected project_root")
+                root_field = suite.get("root_field", "project_root")
+                if not isinstance(payload, dict) or payload.get(root_field) != str(root.resolve()):
+                    raise ValueError(f"{label}: unexpected {root_field}")
                 projected = project_expected(payload, case["json"], label)
                 assert_unchanged(work, before)
                 if previous is not None and projected != previous:
@@ -112,11 +163,19 @@ def main():
     parser.add_argument("--repo", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--suite", default="release/fixtures/repo-stats.json")
     parser.add_argument("--binary", type=Path)
-    parser.add_argument("--python", action="store_true", help="Also execute the source Python entrypoint")
+    parser.add_argument(
+        "--python", action="store_true", help="Also execute the source Python entrypoint"
+    )
     args = parser.parse_args()
     repo = args.repo.resolve()
-    suite = json.loads((repo / relative_path(args.suite)).read_text(encoding="utf-8"), object_pairs_hook=unique_object)
-    inventory = json.loads((repo / "release/ENTRYPOINTS.json").read_text(encoding="utf-8"), object_pairs_hook=unique_object)
+    suite = json.loads(
+        (repo / relative_path(args.suite)).read_text(encoding="utf-8"),
+        object_pairs_hook=unique_object,
+    )
+    inventory = json.loads(
+        (repo / "release/ENTRYPOINTS.json").read_text(encoding="utf-8"),
+        object_pairs_hook=unique_object,
+    )
     validate_suite(suite, inventory)
     commands = {}
     if args.python:
@@ -124,9 +183,20 @@ def main():
     if args.binary:
         commands["binary"] = [str(args.binary.resolve()), suite["command"]]
     count = run_suite(suite, commands)
-    print(json.dumps({"status": "ok", "coverage": "partial", "cases": len(suite["cases"]),
-                      "executions": count, "routes": list(commands), "python_entry": suite["python_entry"],
-                      "go_entry": suite["go_entry"], "command": suite["command"]}))
+    print(
+        json.dumps(
+            {
+                "status": "ok",
+                "coverage": "partial",
+                "cases": len(suite["cases"]),
+                "executions": count,
+                "routes": list(commands),
+                "python_entry": suite["python_entry"],
+                "go_entry": suite["go_entry"],
+                "command": suite["command"],
+            }
+        )
+    )
 
 
 if __name__ == "__main__":
