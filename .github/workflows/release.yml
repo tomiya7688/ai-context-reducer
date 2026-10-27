@@ -90,7 +90,7 @@ jobs:
           set -euo pipefail
           python -m pip install -r .github/formatters/requirements.txt
           npm ci --prefix .github/formatters --ignore-scripts --no-audit --no-fund
-          npm --prefix .github/formatters run format:check -- .github/formatters/format.mjs .github/formatters/package.json .github/formatters/package-lock.json release/scripts/io_coverage.py release/scripts/test_io_coverage.py release/IO_PENDING.json .github/workflows/release.yml .github/development/v1-release-gate.md
+          npm --prefix .github/formatters run format:check -- .github/formatters/format.mjs .github/formatters/package.json .github/formatters/package-lock.json release/scripts/io_coverage.py release/scripts/test_io_coverage.py release/scripts/io_parity.py release/scripts/test_io_parity.py release/IO_PENDING.json .github/workflows/release.yml .github/development/v1-release-gate.md
       - name: Validate public entrypoint inventory
         shell: bash
         run: |

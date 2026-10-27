@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "python_entry": "tools/common/small/path-find/script/path_find.py",
+  "go_entry": "tools/common/native/acr-toolbox/main.go",
+  "command": "find",
+  "root_field": "root_path",
+  "fixtures": {
+    "mixed": {
+      "a.txt": "alpha\n",
+      "z.md": "ignored\n",
+      "src/main.txt": "main\n",
+      "node_modules/ignored.txt": "ignore\n"
+    },
+    "flat": {
+      "a.txt": "a\n",
+      "b.txt": "b\n",
+      "c.txt": "c\n"
+    },
+    "empty": {}
+  },
+  "cases": [
+    {
+      "id": "matches-and-prunes-dependencies",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "*.txt"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "ok",
+        "backend": "portable",
+        "query": {
+          "pattern": "*.txt",
+          "type": "file",
+          "max_depth": 0
+        },
+        "results": [
+          {
+            "path": "a.txt",
+            "kind": "file"
+          },
+          {
+            "path": "src/main.txt",
+            "kind": "file"
+          }
+        ],
+        "results_truncated": false,
+        "scan_truncated": false,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "empty-directory",
+      "fixture": "empty",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "*.txt"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "ok",
+        "backend": "portable",
+        "query": {
+          "pattern": "*.txt",
+          "type": "file",
+          "max_depth": 0
+        },
+        "results": [],
+        "results_truncated": false,
+        "scan_truncated": false,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "no-matches",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "*.go"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "ok",
+        "backend": "portable",
+        "query": {
+          "pattern": "*.go",
+          "type": "file",
+          "max_depth": 0
+        },
+        "results": [],
+        "results_truncated": false,
+        "scan_truncated": false,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "result-limit",
+      "fixture": "flat",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "--max-results",
+        "1",
+        "*.txt"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "ok",
+        "backend": "portable",
+        "query": {
+          "pattern": "*.txt",
+          "type": "file",
+          "max_depth": 0
+        },
+        "results": [
+          {
+            "path": "a.txt",
+            "kind": "file"
+          }
+        ],
+        "results_truncated": true,
+        "scan_truncated": false,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "scan-limit",
+      "fixture": "flat",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "--max-results",
+        "0",
+        "--max-visited",
+        "1",
+        "*"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "partial",
+        "backend": "portable",
+        "query": {
+          "pattern": "*",
+          "type": "file",
+          "max_depth": 0
+        },
+        "results": [
+          {
+            "path": "a.txt",
+            "kind": "file"
+          }
+        ],
+        "results_truncated": false,
+        "scan_truncated": true,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "missing-root",
+      "fixture": "empty",
+      "root": "missing",
+      "args": [
+        "--backend",
+        "portable",
+        "*"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "input_missing",
+        "query": {
+          "pattern": "*",
+          "type": "file",
+          "max_depth": 0
+        }
+      }
+    },
+    {
+      "id": "file-instead-of-directory",
+      "fixture": "mixed",
+      "root": "a.txt",
+      "args": [
+        "--backend",
+        "portable",
+        "*"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "input_not_directory",
+        "query": {
+          "pattern": "*",
+          "type": "file",
+          "max_depth": 0
+        }
+      }
+    },
+    {
+      "id": "optional-backend-unavailable",
+      "fixture": "empty",
+      "root": ".",
+      "args": [
+        "--backend",
+        "fd",
+        "*"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "external_backend_unavailable",
+        "backend": "fd",
+        "query": {
+          "pattern": "*",
+          "type": "file",
+          "max_depth": 0
+        }
+      }
+    }
+  ]
+}
