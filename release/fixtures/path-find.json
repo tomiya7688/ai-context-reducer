@@ -9,14 +9,19 @@
       "a.txt": "alpha\n",
       "z.md": "ignored\n",
       "src/main.txt": "main\n",
-      "node_modules/ignored.txt": "ignore\n"
+      "node_modules/ignored.txt": "ignore\n",
+      "generated/ignored.txt": "ignore\n"
     },
     "flat": {
       "a.txt": "a\n",
       "b.txt": "b\n",
       "c.txt": "c\n"
     },
-    "empty": {}
+    "empty": {},
+    "nested": {
+      "a-dir/inner.txt": "inner\n",
+      "z.txt": "top\n"
+    }
   },
   "cases": [
     {
@@ -236,6 +241,183 @@
           "type": "file",
           "max_depth": 0
         }
+      }
+    },
+    {
+      "id": "nested-files-before-descendants",
+      "fixture": "nested",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "*"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "ok",
+        "backend": "portable",
+        "query": {
+          "pattern": "*",
+          "type": "file",
+          "max_depth": 0
+        },
+        "results": [
+          {
+            "path": "z.txt",
+            "kind": "file"
+          },
+          {
+            "path": "a-dir/inner.txt",
+            "kind": "file"
+          }
+        ],
+        "results_truncated": false,
+        "scan_truncated": false,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "nested-file-scan-limit",
+      "fixture": "nested",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "--max-results",
+        "0",
+        "--max-visited",
+        "1",
+        "*"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "partial",
+        "backend": "portable",
+        "query": {
+          "pattern": "*",
+          "type": "file",
+          "max_depth": 0
+        },
+        "results": [
+          {
+            "path": "z.txt",
+            "kind": "file"
+          }
+        ],
+        "results_truncated": false,
+        "scan_truncated": true,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "nested-directory-scan-limit",
+      "fixture": "nested",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "--type",
+        "dir",
+        "--max-results",
+        "0",
+        "--max-visited",
+        "1",
+        "*"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "ok",
+        "backend": "portable",
+        "query": {
+          "pattern": "*",
+          "type": "dir",
+          "max_depth": 0
+        },
+        "results": [
+          {
+            "path": "a-dir",
+            "kind": "dir"
+          }
+        ],
+        "results_truncated": false,
+        "scan_truncated": false,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "nested-any-scan-limit",
+      "fixture": "nested",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "--type",
+        "any",
+        "--max-results",
+        "0",
+        "--max-visited",
+        "1",
+        "*"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "partial",
+        "backend": "portable",
+        "query": {
+          "pattern": "*",
+          "type": "any",
+          "max_depth": 0
+        },
+        "results": [
+          {
+            "path": "a-dir",
+            "kind": "dir"
+          }
+        ],
+        "results_truncated": false,
+        "scan_truncated": true,
+        "walk_error_count": 0
+      }
+    },
+    {
+      "id": "nested-depth-limit",
+      "fixture": "nested",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "--max-depth",
+        "1",
+        "*"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "path-find",
+        "status": "ok",
+        "backend": "portable",
+        "query": {
+          "pattern": "*",
+          "type": "file",
+          "max_depth": 1
+        },
+        "results": [
+          {
+            "path": "z.txt",
+            "kind": "file"
+          }
+        ],
+        "results_truncated": false,
+        "scan_truncated": false,
+        "walk_error_count": 0
       }
     }
   ]
