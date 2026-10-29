@@ -49,7 +49,7 @@ func TestSearchRipgrepPrunesIncludedDirectories(t *testing.T) {
 		t.Skip("ripgrep unavailable")
 	}
 	root := t.TempDir()
-	for _, folder := range []string{"generated", "node_modules"} {
+	for _, folder := range []string{"Generated", "Node_Modules", "nested/generated", "nested/node_modules"} {
 		if err := os.MkdirAll(filepath.Join(root, folder), 0o755); err != nil {
 			t.Fatal(err)
 		}

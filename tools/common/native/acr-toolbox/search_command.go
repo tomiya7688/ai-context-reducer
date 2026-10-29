@@ -287,7 +287,7 @@ func ripgrepSearch(
 		args = append(args, "--glob", pattern)
 	}
 	for _, name := range ignoreNames {
-		args = append(args, "--glob", "!**/"+name+"/**")
+		args = append(args, "--iglob", "!**/"+name+"/**")
 	}
 	for _, pattern := range excludes {
 		args = append(args, "--glob", "!"+pattern)

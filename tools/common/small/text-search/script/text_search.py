@@ -176,7 +176,7 @@ def rg_glob_args(globs: list[str], excludes: list[str]) -> list[str]:
     for pattern in globs:
         args.extend(["--glob", pattern])
     for name in sorted(DEFAULT_IGNORE):
-        args.extend(["--glob", f"!**/{name}/**"])
+        args.extend(["--iglob", f"!**/{name}/**"])
     for pattern in excludes:
         args.extend(["--glob", f"!{pattern}"])
     return args

@@ -47,8 +47,8 @@ class TextSearchTests(unittest.TestCase):
     def test_ripgrep_include_cannot_restore_ignored_directories(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            for folder in ("generated", "node_modules"):
-                (root / folder).mkdir()
+            for folder in ("Generated", "Node_Modules", "nested/generated", "nested/node_modules"):
+                (root / folder).mkdir(parents=True)
                 (root / folder / "hidden.txt").write_text("needle\n", encoding="utf-8")
             (root / "visible.txt").write_text("needle\n", encoding="utf-8")
             code, payload = self.run_tool(
