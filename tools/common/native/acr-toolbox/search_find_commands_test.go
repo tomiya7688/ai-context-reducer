@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -39,6 +40,35 @@ func TestSearchPortableJSONContract(t *testing.T) {
 	match := matches[0].(map[string]any)
 	if match["path"] != "src/a.txt" || match["line"] != float64(2) || match["text"] != "needle here" {
 		t.Fatalf("unexpected match: %#v", match)
+	}
+}
+
+// TestSearchRipgrepPrunesIncludedDirectories は包含条件より生成物と依存先の除外を優先することを確認する。
+func TestSearchRipgrepPrunesIncludedDirectories(t *testing.T) {
+	if _, err := exec.LookPath("rg"); err != nil {
+		t.Skip("ripgrep unavailable")
+	}
+	root := t.TempDir()
+	for _, folder := range []string{"generated", "node_modules"} {
+		if err := os.MkdirAll(filepath.Join(root, folder), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(root, folder, "hidden.txt"), []byte("needle\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(root, "visible.txt"), []byte("needle\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	code, payload := captureJSONCommand(t, func() int {
+		return cmdSearch([]string{"--backend", "ripgrep", "--glob", "*.txt", "-F", "needle", root})
+	})
+	matches, ok := payload["matches"].([]any)
+	if code != 0 || payload["backend"] != "ripgrep" || !ok || len(matches) != 1 {
+		t.Fatalf("unexpected search result: code=%d payload=%#v", code, payload)
+	}
+	if matches[0].(map[string]any)["path"] != "visible.txt" {
+		t.Fatalf("ignored path returned: %#v", matches)
 	}
 }
 

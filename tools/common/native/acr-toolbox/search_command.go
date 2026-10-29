@@ -283,11 +283,11 @@ func ripgrepSearch(
 	}
 	ignoreNames = append(ignoreNames, "generated")
 	sort.Strings(ignoreNames)
-	for _, name := range ignoreNames {
-		args = append(args, "--glob", "!**/"+name+"/**")
-	}
 	for _, pattern := range globs {
 		args = append(args, "--glob", pattern)
+	}
+	for _, name := range ignoreNames {
+		args = append(args, "--glob", "!**/"+name+"/**")
 	}
 	for _, pattern := range excludes {
 		args = append(args, "--glob", "!"+pattern)
