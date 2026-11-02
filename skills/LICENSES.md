@@ -26,6 +26,7 @@
 | **実際の配布元・公開者** | **GitHub, Inc.** が公開するコミュニティ提供のスキル集 **[github/awesome-copilot](https://github.com/github/awesome-copilot)** |
 | **実際に取得したファイル** | [github/awesome-copilot の SKILL.md（取得した版へ固定）](https://github.com/github/awesome-copilot/blob/60764df8b04cec728fd106744f98f90e18479105/skills/bug-reproduction-brief/SKILL.md) |
 | **取得元のコミット** | `60764df8b04cec728fd106744f98f90e18479105` |
+| 未改変の原本のGit blob SHA | `add9ca292293ef860cb4cab05063b922c49d3c1f` |
 | 取得日 | 2026年11月3日 |
 | **元スキルに記載された別の公開者** | **[skyestrela/ai-agent-skill-preview](https://github.com/skyestrela/ai-agent-skill-preview)**。配布元の`SKILL.md`自身がこのMITライセンスの公開スキルを出典として挙げています。元公開者の著作をGitHubだけの成果と扱いません |
 | 適用ライセンス | **MIT**（配布元リポジトリと、元スキルの公開元の双方で確認） |
