@@ -57,6 +57,10 @@ For questions such as “the later parts of the AI's output are vague” or “w
 - [Avoid repeating the same explanation](documentation-duplication-control.md) — keep detailed explanations in one place and link to them.
 - [Create repeated documents and settings from a template](boilerplate-generation.md) — create standard text or files automatically.
 
+## The AI thinks too long or repeats the same failed attempts
+
+- [Avoid unnecessary reasoning and repeated attempts](avoid-unnecessary-reasoning-and-retries.md) — Choose reasoning effort that fits the task, stop when enough evidence is available, and ask the AI to investigate what changed before retrying the same failure. Keep the required tests.
+
 ## You keep asking follow-up questions about AI explanations
 
 - [Give the AI document headings and their order](write-from-document-outline.md) — save a short outline, then provide section requirements and factual sources to the AI.

@@ -243,6 +243,28 @@ It reduces over-generalization from one example and separates mechanical candida
 
 For code, [Source Structure Index](../methods/source-structure-index.md) can help find candidates. For documents and configuration, inspect each candidate in its original context instead of deciding from a text match alone.
 
+## The AI overthinks or repeats the same failed attempt
+
+### Short answer
+
+When your AI lets you choose reasoning effort, start with a lower setting for straightforward tasks. Tell the AI what evidence it must find and which tests demonstrate completion. If it repeats an error, ask **what changed in the input, code, environment or result**; pause when there is no new evidence.
+
+Do not skip necessary tests or assume a prompt can strictly limit hidden reasoning tokens.
+
+### Example message for you to send to the AI
+
+```text
+Confirm the goal and completion criteria first.
+Inspect the necessary code and requirements; run the relevant tests after editing.
+Before retrying a failure, report what changed since the previous attempt.
+If there is no progress or new evidence, pause and report what remains unknown.
+Do not skip required tests.
+```
+
+### Read more
+
+[Avoid unnecessary reasoning and repeated attempts](../methods/avoid-unnecessary-reasoning-and-retries.md) explains reasoning settings, when to stop, repeated failure detection, and the TALE, REFRAIN, Sonata and ASAG research with their limitations.
+
 ## Which model or editing mode should I use for a task?
 
 ### Short answer

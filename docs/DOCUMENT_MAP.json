@@ -440,6 +440,12 @@
       "japanese": "docs/jp/手法/Webページから必要な情報だけをAIに渡す.md",
       "english": "docs/en/methods/retrieve-relevant-webpage-information.md",
       "english_status": "translated"
+    },
+    {
+      "id": "unnecessary-reasoning-and-retries",
+      "japanese": "docs/jp/手法/AIに無駄な推論と再試行をさせない.md",
+      "english": "docs/en/methods/avoid-unnecessary-reasoning-and-retries.md",
+      "english_status": "translated"
     }
   ]
 }
