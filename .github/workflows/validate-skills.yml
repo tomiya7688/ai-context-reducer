@@ -2,16 +2,8 @@ name: Validate Agent Skills
 
 on:
   pull_request:
-    paths:
-      - "skills/**"
-      - ".github/scripts/validate_skill_pack.py"
-      - ".github/workflows/validate-skills.yml"
   push:
     branches: [main]
-    paths:
-      - "skills/**"
-      - ".github/scripts/validate_skill_pack.py"
-      - ".github/workflows/validate-skills.yml"
 
 permissions:
   contents: read
