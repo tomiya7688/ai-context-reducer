@@ -55,4 +55,4 @@ Inspect existing files before overwriting a skill with the same name.
 
 You do not need to install every skill. A skill is an instruction, **not an added tool permission**. Your agent still needs access to the files, commands and tests required for a task. Review its actual diff and results.
 
-ObaPick-authored skills are covered by the repository's [MIT License](../LICENSE). For any redistributed third-party skill, see [LICENSES.md](LICENSES.md) for the publisher, original source, pinned revision, modification status, and copyright/license notices.
+ObaPick-authored skills are covered by the repository's [MIT License](../LICENSE). For any redistributed third-party skill, see [LICENSES.en.md](LICENSES.en.md) for the publisher, original source, pinned revision, modification status, and copyright/license notices.
