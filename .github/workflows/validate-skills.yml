@@ -1,0 +1,17 @@
+name: Validate Agent Skills
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check skill files and license notices
+        run: python3 .github/scripts/validate_skill_pack.py
