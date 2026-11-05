@@ -118,7 +118,7 @@ Memory organization, retrieval, and multi-agent access control are separate engi
 
 ## How to measure whether shared memory helped
 
-Compare three strategies using the **same task kind, starting source revision, and completion criteria**. Prefer testing each strategy on the same tasks. When using different tasks, assign them randomly and balance task difficulty, recording any remaining differences. Tasks of the same kind may still vary in difficulty. This is an evaluation plan, not a result from this guide.
+Compare three strategies using the **same task kind, starting source revision, and completion criteria**. Prefer testing each strategy on the same tasks. When using different tasks, assign them randomly and balance task difficulty, recording any remaining differences. Tasks of the same kind may still vary in difficulty. Prefer the same model, model version, and inference settings. Search and memory tools can differ by strategy, so record the actual tool configuration and permissions for every run rather than forcing identical tools. This is an evaluation plan, not a result from this guide.
 
 - **Full history:** Pass earlier conversation content to the next agent.
 - **Short task handoff:** Pass only goals, decisions, and unfinished work.
