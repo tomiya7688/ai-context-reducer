@@ -60,6 +60,7 @@ For questions such as “the later parts of the AI's output are vague” or “w
 ## The AI thinks too long or repeats the same failed attempts
 
 - [Avoid unnecessary reasoning and repeated attempts](avoid-unnecessary-reasoning-and-retries.md) — Choose reasoning effort that fits the task, stop when enough evidence is available, and ask the AI to investigate what changed before retrying the same failure. Keep the required tests.
+- [Consult another AI only for hard decisions](consult-stronger-ai-for-hard-decisions.md) — ask for targeted criticism at consequential decisions, verify advice with original sources, and measure the additional cost of consulting.
 
 ## You keep asking follow-up questions about AI explanations
 

@@ -6,7 +6,7 @@ When you ask an AI to change code, it can spend too long considering alternative
 
 You can decide what evidence is needed, how hard the task is, and when the AI should report a lack of progress. Whether you can directly control a model's reasoning effort depends on the product and model.
 
-This guide covers **choosing reasoning effort, stopping when there is enough evidence, and preventing unproductive retries**. For stopping file investigation specifically, see [Decide when the AI should stop investigating](exploration-control.md). For inspecting previous runs, see [Diagnose repeated context from work logs](diagnose-repeated-context-from-work-logs.md).
+This guide covers **choosing reasoning effort, stopping when there is enough evidence, and preventing unproductive retries**. For **difficult design forks or stalled work where a second AI could challenge a decision**, see [Consult another AI only for hard decisions](consult-stronger-ai-for-hard-decisions.md). Another model adds usage, so consultation is not an automatic savings method. For stopping file investigation specifically, see [Decide when the AI should stop investigating](exploration-control.md). For inspecting previous runs, see [Diagnose repeated context from work logs](diagnose-repeated-context-from-work-logs.md).
 
 ## Understand what is being repeated
 
