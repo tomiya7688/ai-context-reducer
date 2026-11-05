@@ -62,6 +62,7 @@ To use a method, attach its guide to the request or tell the AI its path. It may
 - What is supplied, and why is it needed? [What Is Context?](docs/en/llm-mechanics/what-is-context.md)
 - Why can equal call counts produce different usage and costs? [Context Amount, Computation, and Cost](docs/en/llm-mechanics/context-compute-and-cost.md)
 - What are the benefits beyond savings, and the risks of removing too much? [Context Amount and Use](docs/en/llm-mechanics/context-amount-and-use.md)
+- Ask for a second opinion only at difficult decision points: [Consult another AI only for hard decisions](docs/en/methods/consult-stronger-ai-for-hard-decisions.md)
 
 ## Start with these habits
 

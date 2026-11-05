@@ -446,6 +446,12 @@
       "japanese": "docs/jp/手法/AIに無駄な推論と再試行をさせない.md",
       "english": "docs/en/methods/avoid-unnecessary-reasoning-and-retries.md",
       "english_status": "translated"
+    },
+    {
+      "id": "selective-advisor-consultation",
+      "japanese": "docs/jp/手法/難しい判断だけ別のAIに相談する.md",
+      "english": "docs/en/methods/consult-stronger-ai-for-hard-decisions.md",
+      "english_status": "translated"
     }
   ]
 }
