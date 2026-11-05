@@ -93,6 +93,7 @@ Writing “only this agent may read” in a prompt does not enforce access contr
 | Method | What it passes forward | Best for | Relation to shared memory |
 | --- | --- | --- | --- |
 | **Full chat history** | Dialogue and tool outputs together | A very short continuation | Easily carries irrelevant attempts |
+| **Conversation summary** | Condensed account of earlier turns | Continuing a conversation or briefing another worker | May omit needed conditions; unlike shared memory it needs separate cross-task retrieval and versioning. Verify against originals |
 | **Context Pack / task handoff** | Goal, constraints, diff, next step | Continuing one bounded task | Retain reusable long-term facts separately when warranted |
 | **Source retrieval** | Current original code/specification passages | Establishing what is true now | Confirms whether a shared memory is still correct |
 | **Shared memory** | Source-linked, versioned knowledge reusable across tasks | Repeated tasks and multiple AIs | Adds retention, retrieval, updating, invalidation, and access control |
@@ -117,7 +118,7 @@ Memory organization, retrieval, and multi-agent access control are separate engi
 
 ## How to measure whether shared memory helped
 
-Compare three strategies using the **same task kind, starting source revision, and completion criteria**. This is an evaluation plan, not a result from this guide.
+Compare three strategies using the **same task kind, starting source revision, and completion criteria**. Prefer testing each strategy on the same tasks. When using different tasks, assign them randomly and balance task difficulty, recording any remaining differences. Tasks of the same kind may still vary in difficulty. This is an evaluation plan, not a result from this guide.
 
 - **Full history:** Pass earlier conversation content to the next agent.
 - **Short task handoff:** Pass only goals, decisions, and unfinished work.
@@ -151,7 +152,7 @@ Check what the AI actually retrieved against its original sources and tests. Wit
 
 ## Sources and publishers
 
-Sources checked November 5, 2026. This is original explanatory content prepared for ObaPick. No external code, configuration, or text is copied or bundled. If third-party programs or skills are bundled in a future change, record authors, origins, and applicable licenses separately.
+Sources checked November 5, 2026. This is original explanatory content prepared for ObaPick. No external code, configuration, or text is copied or bundled.
 
 1. **ChatAndBuild**. [Living Brain official site](https://livingbrain.com/) — product concepts and the conditions of internally reported benchmarks.
 2. **Prateek Chhikara et al.** (2025). [Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory](https://arxiv.org/abs/2504.19413) — memory extraction, consolidation, and retrieval.
