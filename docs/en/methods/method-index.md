@@ -24,9 +24,8 @@ For questions such as “the later parts of the AI's output are vague” or “w
 
 ## The AI is reading unrelated material
 
-- [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md)
+- [Assign AI roles and separate chats by task](../ai-usage/split-chats-by-task.md) — when unrelated research, implementation, and writing accumulate in one chat, explain why cache reuse does not remove history, when to split, and what evidence to hand over.
 - [Share memory across AI agents and retrieve only what is relevant](share-relevant-memory-across-ai-agents.md) — retain source-linked decisions in a shared store and have each AI retrieve only task-relevant memories, checking staleness and access boundaries.
- — when unrelated research, implementation, and writing accumulate in one chat, explain why cache reuse does not remove history, when to split, and what evidence to hand over.
 
 - [Summarize project capabilities and limitations](context-state.md) — give the AI a short note about which features work and what their limits are.
 - [Write a short note for the current task](context-pack.md) — give the AI the goal, relevant documents, and conditions for this task.
