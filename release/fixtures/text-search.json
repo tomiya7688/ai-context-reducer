@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "python_entry": "tools/common/small/text-search/script/text_search.py",
+  "go_entry": "tools/common/native/acr-toolbox/main.go",
+  "command": "search",
+  "root_field": "root_path",
+  "fixtures": {
+    "mixed": {
+      "a.txt": "Alpha one\nother\n",
+      "src/b.txt": "alpha two\n",
+      "node_modules/hidden.txt": "alpha hidden\n",
+      "generated/hidden.txt": "alpha hidden\n"
+    },
+    "empty": {}
+  },
+  "cases": [
+    {
+      "id": "fixed-ignore-case-and-prune",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "-F",
+        "-i",
+        "alpha"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "ok",
+        "backend": "portable",
+        "walk_error_count": 0,
+        "stat_error_count": 0,
+        "read_error_count": 0,
+        "matches": [
+          {
+            "path": "a.txt",
+            "line": 1,
+            "text": "Alpha one"
+          },
+          {
+            "path": "src/b.txt",
+            "line": 1,
+            "text": "alpha two"
+          }
+        ],
+        "matches_truncated": false
+      }
+    },
+    {
+      "id": "case-sensitive",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "-F",
+        "alpha"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "ok",
+        "backend": "portable",
+        "walk_error_count": 0,
+        "stat_error_count": 0,
+        "read_error_count": 0,
+        "matches": [
+          {
+            "path": "src/b.txt",
+            "line": 1,
+            "text": "alpha two"
+          }
+        ],
+        "matches_truncated": false
+      }
+    },
+    {
+      "id": "no-matches",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "-F",
+        "absent"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "ok",
+        "backend": "portable",
+        "walk_error_count": 0,
+        "stat_error_count": 0,
+        "read_error_count": 0,
+        "matches": [],
+        "matches_truncated": false
+      }
+    },
+    {
+      "id": "empty-directory",
+      "fixture": "empty",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "-F",
+        "alpha"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "ok",
+        "backend": "portable",
+        "walk_error_count": 0,
+        "stat_error_count": 0,
+        "read_error_count": 0,
+        "matches": [],
+        "matches_truncated": false
+      }
+    },
+    {
+      "id": "result-limit",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "-F",
+        "-i",
+        "--max-results",
+        "1",
+        "alpha"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "ok",
+        "backend": "portable",
+        "walk_error_count": 0,
+        "stat_error_count": 0,
+        "read_error_count": 0,
+        "matches": [
+          {
+            "path": "a.txt",
+            "line": 1,
+            "text": "Alpha one"
+          }
+        ],
+        "matches_truncated": true
+      }
+    },
+    {
+      "id": "missing-root",
+      "fixture": "mixed",
+      "root": "missing",
+      "args": [
+        "--backend",
+        "portable",
+        "-F",
+        "alpha"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "input_missing"
+      }
+    },
+    {
+      "id": "file-root",
+      "fixture": "mixed",
+      "root": "a.txt",
+      "args": [
+        "--backend",
+        "portable",
+        "-F",
+        "alpha"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "input_not_directory"
+      }
+    },
+    {
+      "id": "ripgrep-unavailable",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "ripgrep",
+        "-F",
+        "alpha"
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "external_backend_unavailable",
+        "backend": "ripgrep"
+      }
+    },
+    {
+      "id": "invalid-regex",
+      "fixture": "mixed",
+      "root": ".",
+      "args": [
+        "--backend",
+        "portable",
+        "["
+      ],
+      "exit_code": 2,
+      "stderr": "",
+      "json": {
+        "tool": "text-search",
+        "status": "invalid_pattern"
+      }
+    }
+  ]
+}
