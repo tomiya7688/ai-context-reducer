@@ -6,7 +6,7 @@ After asking Codex to fix a bug, do you have to explain the same requirements to
 
 **Shared memory** stores reusable information outside the model so that different AIs and conversations can retrieve only the parts needed later. This does not retrain the model's parameters. Only when an application retrieves a memory and includes it in the current input can that memory condition the model's response. [1][2]
 
-**You** decide what may be shared and who can read it. The AI can propose memory entries and search for relevant records. The memory store retains permitted information and returns selected records. You and the working AI must still verify the current source code, specification, and test evidence. This guide explains a method, not a mandatory external service.
+**You** decide what may be shared and who can read it. The AI can propose memory entries and search for relevant records. The memory store retains permitted information and returns selected records. You and the working AI must still verify the current source code, specification, and test evidence. This guide explains a method, not a mandatory external service. For Living Brain's connectivity, pricing, commercial-use terms, and data handling, see [External services](../ai-usage/external-services.md).
 
 ## Why sharing entire conversations is not enough
 

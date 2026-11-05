@@ -452,6 +452,12 @@
       "japanese": "docs/jp/手法/複数のAIで記憶を共有し必要な情報だけ読み出す.md",
       "english": "docs/en/methods/share-relevant-memory-across-ai-agents.md",
       "english_status": "translated"
+    },
+    {
+      "id": "external-services-overview",
+      "japanese": "docs/jp/AI利用/外部サービス紹介.md",
+      "english": "docs/en/ai-usage/external-services.md",
+      "english_status": "translated"
     }
   ]
 }

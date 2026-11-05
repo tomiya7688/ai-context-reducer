@@ -15,6 +15,17 @@ Suppose a guide wants to name Product X as an example for finding tests related 
 
 If all four are clear and the tool directly illustrates the method, link to the product and its official information. If the free option is personal-use only, commercial terms are unclear, or a persistent service contract is required, describe the general method instead. Do not list unclear tools as recommendations.
 
+## Neutral technical examples are not recommendations
+
+The free-use, commercial-use, attribution, and adoption checks above are the threshold for **recommending a product to readers**. Distinguish this from **documenting an external service as a neutral technical case study** directly relevant to a method.
+
+A neutral example may describe a paid service or one with unverified conditions only where the implementation example materially helps readers understand the method. It must also:
+
+- Identify the provider, date checked, **price and free-plan status, commercial-use terms, attribution verification status, setup, and data handling** in the same place, without implying endorsement or free availability.
+- Clearly mark unknown conditions; never infer permission for commercial use, lack of attribution obligations, or free availability. Do not list such a product as a recommendation.
+- Link to official sources and explain costs, access, and privacy constraints. Clearly identify performance and savings figures as vendor-reported when applicable.
+- Keep the underlying method usable without the service; scope the case study to the method it illustrates rather than creating an unrelated product catalog.
+
 ## Check cost and license separately
 
 “Free to use” and “usable commercially” are separate conditions. A free plan may restrict company use, and open-source software may still have conditions for particular uses or redistribution. Check official terms and the license against the use being described.
