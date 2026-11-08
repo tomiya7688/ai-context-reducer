@@ -62,6 +62,7 @@ To use a method, attach its guide to the request or tell the AI its path. It may
 - What is supplied, and why is it needed? [What Is Context?](docs/en/llm-mechanics/what-is-context.md)
 - Why can equal call counts produce different usage and costs? [Context Amount, Computation, and Cost](docs/en/llm-mechanics/context-compute-and-cost.md)
 - What are the benefits beyond savings, and the risks of removing too much? [Context Amount and Use](docs/en/llm-mechanics/context-amount-and-use.md)
+- Sharing decisions across AI tools without copying whole chats: [Share memory across AI agents](docs/en/methods/share-relevant-memory-across-ai-agents.md) (see [External services](docs/en/ai-usage/external-services.md) for a provider example and its terms)
 
 ## Start with these habits
 
